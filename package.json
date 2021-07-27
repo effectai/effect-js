@@ -10,7 +10,10 @@
     "dist/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
+    "build": "tsc -p ./",
+    "watch": "tsc --watch"
   },
   "repository": {
     "type": "git",
@@ -43,5 +46,24 @@
   "bugs": {
     "url": "https://github.com/effectai/effect-js/issues"
   },
-  "homepage": "https://github.com/effectai/effect-js#readme"
+  "homepage": "https://github.com/effectai/effect-js#readme",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^16.4.3",
+    "@types/text-encoding": "0.0.36",
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
+    "@typescript-eslint/parser": "^4.28.5",
+    "dotenv": "^10.0.0",
+    "eosjs": "^22.1.0",
+    "eslint": "^7.31.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "prettier": "^2.3.2",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  }
 }
