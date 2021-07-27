@@ -1,0 +1,47 @@
+{
+  "name": "@effectai/effect-js",
+  "version": "0.0.1",
+  "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+  "main": "dist/lib/index.js",
+  "module": "dist/effect-js.js",
+  "browser": "dist/effect-js.umd.js",
+  "typings": "dist/types/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/effectai/effect-js.git"
+  },
+  "keywords": [
+    "effect",
+    "efx",
+    "future",
+    "work",
+    "ai",
+    "crypto",
+    "blockchain",
+    "microtask",
+    "task",
+    "micro-task"
+  ],
+  "author": {
+    "name": "Effect-AI",
+    "url": "https://effect.network",
+    "email": "dev@effect.ai"
+  },
+  "contributors": [
+    {
+      "name": "David Britt",
+      "email": "david@effect.ai"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/effectai/effect-js/issues"
+  },
+  "homepage": "https://github.com/effectai/effect-js#readme"
+}
