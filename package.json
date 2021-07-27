@@ -6,13 +6,15 @@
   "module": "dist/effect-js.js",
   "browser": "dist/effect-js.umd.js",
   "typings": "dist/types/index.d.ts",
+  "type": "module",
   "files": [
     "dist/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "build": "tsc -p ./",
+    "build:main": "tsc -p ./",
+    "build:common": "tsc --module commonjs",
     "watch": "tsc --watch"
   },
   "repository": {
