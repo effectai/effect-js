@@ -3,7 +3,8 @@ import process from "process";
 
 dotenv.config();
 
-if (process.env.ANSWER){
-    const answer: string = process.env.ANSWER
-    console.log(answer)
+const getAnswer = (): string => {
+    return process.env.ANSWER || "42"
 }
+
+export { getAnswer }
