@@ -57,7 +57,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^16.4.3",
-    "@types/text-encoding": "0.0.36",
+    "@types/text-encoding": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
     "dotenv": "^10.0.0",
@@ -70,6 +70,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^7.0.1",
+    "node-fetch": "^2.6.1",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.8",
