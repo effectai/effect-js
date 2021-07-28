@@ -20,6 +20,7 @@
     "watch": "tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
+    "lint": "eslint \"src/**\"",
     "prepare": "husky install"
   },
   "repository": {
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^16.4.3",
+    "@types/node-fetch": "^2.5.12",
     "@types/text-encoding": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
