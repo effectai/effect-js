@@ -1,10 +1,20 @@
-import * as dotenv from "dotenv";
-import process from "process";
+/**
+ * 🐰:  Do a Barrel Roll 🛢️🚀
+ */
 
-dotenv.config();
+/**
+ * Main module
+ */
+export * from './client/client'
 
-const getAnswer = (): string => {
-    return process.env.ANSWER || "42"
-}
+ /**
+  * Utility methods
+  */
+export * from './utils/time'
 
-export { getAnswer }
+/**
+ * Types
+ */
+export * from './types/error'
+export * from './types/auth-token'
+export * from '@dfuse/client/dist/types/types/transaction'
