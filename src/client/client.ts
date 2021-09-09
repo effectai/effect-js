@@ -52,30 +52,18 @@ export interface EffectClientOptions {
     authUrl?: string
 }
 
-export const getAnswer = (): string => {
-    return process.env.ANSWER || "42"
+export class EffectClient {
+    api: Api;
+
+    constructor(options: EffectClientOptions) {
+        const { apiKey, network, privateKey, host, secure, authentication, authUrl } = options
+        const signatureProvider = new JsSignatureProvider([privateKey])
+        const rpc = new JsonRpc(host, {fetch})
+        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+    }
+
+    getBalance = async (account: string): Promise<any> => {
+        const resp = await this.api.rpc.get_currency_balance('eosio.token', account, 'EOS')
+        return resp[0]
+    }
 }
-
-export function getOtherAnswer (): string {
-    return process.env.OTHER_ANSWER || "43"
-}
-
-export function printAnswer (): void {
-    console.log(getAnswer())
-}
-
-export function createEffectClient(options: EffectClientOptions): Api {
-    const { apiKey, network, privateKey, host, secure, authentication, authUrl } = options
-    const signatureProvider = new JsSignatureProvider([privateKey])
-    const rpc = new JsonRpc(host, {fetch})
-    const api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
-    return api
-}
-
-
-// export class EffectClient {
-
-//     constructor(options: EffectClientOptions) {
-//         this.api = createClient(options)
-//     }
-// }
