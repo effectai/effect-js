@@ -2,6 +2,8 @@ import { Api, JsonRpc, RpcError } from 'eosjs'
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
 import * as dotenv from "dotenv";
+import { Transaction } from "@dfuse/client"
+
 import process from "process";
 
 dotenv.config();
@@ -63,7 +65,42 @@ export class EffectClient {
     }
 
     getBalance = async (account: string): Promise<any> => {
-        const resp = await this.api.rpc.get_currency_balance('eosio.token', account, 'EOS')
-        return resp[0]
+        // TODO: env config
+        try {
+          const resp = await this.api.rpc.get_currency_balance('eosio.token', account, 'EOS')
+          return resp[0]
+        } catch (err) {
+          throw new Error(err)
+        }
+    }
+
+    openAccount = async (account: string): Promise<any> => {
+      console.log('openAccount', account)
+      // TODO: env config
+      try {
+        const result = await this.api.transact({
+          actions: [{
+            account: 'acckylin1111',
+            name: 'open',
+            authorization: [{
+              actor: 'testjairtest',
+              permission: 'active',
+            }],
+            data: {
+              // TODO: check if checksum or name
+              acc: ["name", account],
+              symbol: {contract: "tokenonkylin", sym: "4,UTL"},
+              payer: 'testjairtest',
+            },
+          }]
+        },
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
+      return result;
+      } catch (err) {
+        throw new Error(err)
+      }
     }
 }
