@@ -1,4 +1,4 @@
-import { Api, JsonRpc, RpcError } from 'eosjs'
+import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
 import { Transaction } from "@dfuse/client"
@@ -58,15 +58,34 @@ export class EffectClient {
         this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
     }
 
-    // TODO: make get balance
-    getBalance = async (account: string): Promise<any> => {
-      // TODO: env config
+    getBalance = async (accountName: string): Promise<any> => {
       try {
-        const resp = await this.api.rpc.get_currency_balance('eosio.token', account, 'EOS')
-        return resp[0]
+        const accString = (this.nameToHex(process.env.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
+
+        const resp = this.api.rpc.get_table_rows({
+            code: process.env.ACCOUNT_CONTRACT,
+            scope: process.env.ACCOUNT_CONTRACT,
+            index_position: 2,
+            key_type: "sha256",
+            lower_bound: accString,
+            upper_bound: accString,
+            table: 'account',
+            json: true,
+        }).then(function(res) {
+            console.log(res);
+        });
+        
+        return resp
       } catch (err) {
         throw new Error(err)
       }
+    }
+
+    nameToHex = (account: string): string => {
+      const serialbuff = new Serialize.SerialBuffer();
+      serialbuff.pushName(account);
+      const bytes = serialbuff.asUint8Array();
+      return Serialize.arrayToHex(bytes);
     }
 
     openAccount = async (account: string): Promise<any> => {
@@ -91,7 +110,7 @@ export class EffectClient {
           blocksBehind: 3,
           expireSeconds: 60
         });
-      return result;
+        return result;
       } catch (err) {
         throw new Error(err)
       }
