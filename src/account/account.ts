@@ -7,11 +7,11 @@ export class Account {
     this.api = api;
   }
 
-  getBalance = async (accountName: string): Promise<any> => {
+  getBalance = async (accountName: string): Promise<Array<object>> => {
     try {
       const accString = (this.nameToHex(process.env.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
 
-      const resp = this.api.rpc.get_table_rows({
+      const resp = await this.api.rpc.get_table_rows({
           code: process.env.ACCOUNT_CONTRACT,
           scope: process.env.ACCOUNT_CONTRACT,
           index_position: 2,
@@ -20,11 +20,11 @@ export class Account {
           upper_bound: accString,
           table: 'account',
           json: true,
-      }).then(function(res) {
-          console.log(res);
+      }).then((data) => {
+        return data.rows;
       });
-      
-      return resp
+
+      return resp;
     } catch (err) {
       throw new Error(err)
     }
@@ -65,23 +65,23 @@ export class Account {
     }
   }
 
-  // TODO: finish this when get balance is done
-  deposit = async (fromAccount: string, amount: string, memo: string): Promise<any> => {
-    try {
+  deposit = async (fromAccount: string, toAccount: string, amount: string): Promise<any> => {
+    try {      
+      // TODO: add filter for EFX only
+      const balance: object = await this.getBalance(toAccount)
       const result = await this.api.transact({
         actions: [{
           account: process.env.EFX_TOKEN_ACCOUNT,
           name: 'transfer',
           authorization: [{
-            actor: process.env.EOS_FEE_PAYER,
+            actor: fromAccount,
             permission: 'active',
           }],
           data: {
-            from: process.env.EOS_FEE_PAYER,
+            from: fromAccount,
             to: process.env.ACCOUNT_CONTRACT,
             quantity: amount,
-            // TODO: memo = account balance index
-            memo: "0",
+            memo: balance[0].id,
           },
         }]
       }, {
