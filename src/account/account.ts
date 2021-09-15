@@ -39,11 +39,12 @@ export class Account {
 
   /**
    * Open a vaccount
-   * @param account - name of the account to open
+   * @param account - name or address of the account to open, for BSC addresses without 0x
    * @returns 
    */
   openAccount = async (account: string): Promise<object> => {
     try {
+      const type:string = account.length == 40 ? 'address' : 'name';
       const result = await this.api.transact({
         actions: [{
           account: process.env.ACCOUNT_CONTRACT,
@@ -53,8 +54,7 @@ export class Account {
             permission: 'active',
           }],
           data: {
-            // TODO: check if checksum or name, assume name for now
-            acc: ["name", account],
+            acc: [type, account],
             symbol: {contract: process.env.EFX_TOKEN_ACCOUNT, sym: process.env.EFX_EXTENDED_SYMBOL},
             payer: process.env.EOS_FEE_PAYER,
           },
@@ -78,7 +78,6 @@ export class Account {
    * @returns 
    */
   deposit = async (fromAccount: string, toAccount: string, amount: string): Promise<object> => {
-    // TODO: BSC withdraw
     try {
       const balance: object = await this.getBalance(toAccount)
       const balanceIndexTo: number = balance[0].id
@@ -159,6 +158,7 @@ export class Account {
    * @returns 
    */
   vtransfer = async (fromAccount: string, toAccount: string, amount: string): Promise<object> => {
+    // TODO: BSC vtransfer
     const balanceFrom: object = await this.getBalance(fromAccount)
     const balanceIndexFrom: number = balanceFrom[0].id
     const balanceTo: object = await this.getBalance(toAccount)
