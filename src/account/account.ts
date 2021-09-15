@@ -78,6 +78,7 @@ export class Account {
    * @returns 
    */
   deposit = async (fromAccount: string, toAccount: string, amount: string): Promise<object> => {
+    // TODO: BSC withdraw
     try {
       const balance: object = await this.getBalance(toAccount)
       const balanceIndexTo: number = balance[0].id
@@ -115,11 +116,9 @@ export class Account {
    * @returns 
    */
   withdraw = async (fromAccount: string, toAccount: string, amount: string, memo?: string): Promise<object> => {
+    // TODO: BSC withdraw
     const balance: object = await this.getBalance(fromAccount)
     const balanceIndexFrom: number = balance[0].id
-    console.log('fromaccount', fromAccount);
-    console.log('toaccount', toAccount);
-    console.log('balance', balance[0]);
     try {
       const result = await this.api.transact({
         actions: [{
