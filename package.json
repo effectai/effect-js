@@ -1,6 +1,6 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.0.2",
+  "version": "0.0.7",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "module": "dist/effect-js.js",
@@ -71,7 +71,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^7.0.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.1", 
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.8",
@@ -79,6 +79,9 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@dfuse/client": "^0.3.20"
+    "@dfuse/client": "^0.3.20",
+    "dotenv": "^10.0.0",
+    "eosjs": "^22.1.0",
+    "node-fetch": "^2.6.1"
   }
 }
