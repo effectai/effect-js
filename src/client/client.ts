@@ -1,10 +1,7 @@
-import { Api, JsonRpc, RpcError } from 'eosjs'
+import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
-import * as dotenv from "dotenv";
-import process from "process";
-
-dotenv.config();
+import { Account } from '../account/account'
 
 /**
  * Options that can be passed to the client factory.
@@ -17,9 +14,9 @@ export interface EffectClientOptions {
     network: "mainnet" | "kylin" | string
 
     /**
-     * Private key of the account to use for the client.
+     * EOS Signature Provider
      */
-    privateKey: string
+    signatureProvider: JsSignatureProvider
 
     /**
      * The host where the json-rpc will connect to.
@@ -52,30 +49,14 @@ export interface EffectClientOptions {
     authUrl?: string
 }
 
-export const getAnswer = (): string => {
-    return process.env.ANSWER || "42"
+export class EffectClient {
+    api: Api;
+    account: Account;
+
+    constructor(options: EffectClientOptions) {
+        const { apiKey, network, signatureProvider, host, secure, authentication, authUrl } = options
+        const rpc = new JsonRpc(host, {fetch})
+        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+        this.account = new Account(this.api)
+    }
 }
-
-export function getOtherAnswer (): string {
-    return process.env.OTHER_ANSWER || "43"
-}
-
-export function printAnswer (): void {
-    console.log(getAnswer())
-}
-
-export function createEffectClient(options: EffectClientOptions): Api {
-    const { apiKey, network, privateKey, host, secure, authentication, authUrl } = options
-    const signatureProvider = new JsSignatureProvider([privateKey])
-    const rpc = new JsonRpc(host, {fetch})
-    const api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
-    return api
-}
-
-
-// export class EffectClient {
-
-//     constructor(options: EffectClientOptions) {
-//         this.api = createClient(options)
-//     }
-// }
