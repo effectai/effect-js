@@ -26,7 +26,6 @@ export class Account {
       // TODO: add filter for EFX balances only
       // TODO: check if address or name, assume name for now
       const accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
-
       const resp = await this.api.rpc.get_table_rows({
           code: this.config.ACCOUNT_CONTRACT,
           scope: this.config.ACCOUNT_CONTRACT,
@@ -59,13 +58,13 @@ export class Account {
           account: this.config.ACCOUNT_CONTRACT,
           name: 'open',
           authorization: [{
-            actor: this.config.EOS_FEE_PAYER,
+            actor: account,
             permission: 'active',
           }],
           data: {
             acc: [type, account],
             symbol: {contract: this.config.EFX_TOKEN_ACCOUNT, sym: this.config.EFX_EXTENDED_SYMBOL},
-            payer: this.config.EOS_FEE_PAYER,
+            payer: account,
           },
         }]
       },
@@ -73,6 +72,7 @@ export class Account {
         blocksBehind: 3,
         expireSeconds: 60
       });
+      // TODO: send/sign seperate
       return result;
     } catch (err) {
       throw new Error(err)
