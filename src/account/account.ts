@@ -2,9 +2,18 @@ import { Api, Serialize } from 'eosjs'
 
 export class Account {
   api: Api;
+  config: any;
 
   constructor(api: Api) {
     this.api = api;
+    // TODO: replace this with proper config
+    this.config = {
+      EFX_TOKEN_ACCOUNT:"tokenonkylin",
+      EFX_SYMBOL:"UTL",
+      EFX_EXTENDED_SYMBOL:"4,UTL",
+      EOS_FEE_PAYER:"testjairtest",
+      ACCOUNT_CONTRACT:"acckylin1111"
+    }
   }
 
   /**
@@ -16,11 +25,10 @@ export class Account {
     try {
       // TODO: add filter for EFX balances only
       // TODO: check if address or name, assume name for now
-      const accString = (this.nameToHex(process.env.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
-
+      const accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
       const resp = await this.api.rpc.get_table_rows({
-          code: process.env.ACCOUNT_CONTRACT,
-          scope: process.env.ACCOUNT_CONTRACT,
+          code: this.config.ACCOUNT_CONTRACT,
+          scope: this.config.ACCOUNT_CONTRACT,
           index_position: 2,
           key_type: "sha256",
           lower_bound: accString,
@@ -47,16 +55,16 @@ export class Account {
       const type:string = account.length == 40 ? 'address' : 'name';
       const result = await this.api.transact({
         actions: [{
-          account: process.env.ACCOUNT_CONTRACT,
+          account: this.config.ACCOUNT_CONTRACT,
           name: 'open',
           authorization: [{
-            actor: process.env.EOS_FEE_PAYER,
+            actor: account,
             permission: 'active',
           }],
           data: {
             acc: [type, account],
-            symbol: {contract: process.env.EFX_TOKEN_ACCOUNT, sym: process.env.EFX_EXTENDED_SYMBOL},
-            payer: process.env.EOS_FEE_PAYER,
+            symbol: {contract: this.config.EFX_TOKEN_ACCOUNT, sym: this.config.EFX_EXTENDED_SYMBOL},
+            payer: account,
           },
         }]
       },
@@ -64,6 +72,7 @@ export class Account {
         blocksBehind: 3,
         expireSeconds: 60
       });
+      // TODO: send/sign seperate
       return result;
     } catch (err) {
       throw new Error(err)
@@ -83,7 +92,7 @@ export class Account {
       const balanceIndexTo: number = balance[0].id
       const result = await this.api.transact({
         actions: [{
-          account: process.env.EFX_TOKEN_ACCOUNT,
+          account: this.config.EFX_TOKEN_ACCOUNT,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
@@ -91,8 +100,8 @@ export class Account {
           }],
           data: {
             from: fromAccount,
-            to: process.env.ACCOUNT_CONTRACT,
-            quantity: amount + ' ' + process.env.EFX_SYMBOL,
+            to: this.config.ACCOUNT_CONTRACT,
+            quantity: amount + ' ' + this.config.EFX_SYMBOL,
             memo: balanceIndexTo,
           },
         }]
@@ -121,7 +130,7 @@ export class Account {
     try {
       const result = await this.api.transact({
         actions: [{
-          account: process.env.ACCOUNT_CONTRACT,
+          account: this.config.ACCOUNT_CONTRACT,
           name: 'withdraw',
           authorization: [{
             actor: fromAccount,
@@ -131,8 +140,8 @@ export class Account {
             from_id: balanceIndexFrom,
             to_account: toAccount,
             quantity: {
-              quantity: amount + ' ' + process.env.EFX_SYMBOL,
-              contract: process.env.EFX_TOKEN_ACCOUNT
+              quantity: amount + ' ' + this.config.EFX_SYMBOL,
+              contract: this.config.EFX_TOKEN_ACCOUNT
             },
             memo: memo,
             sig: null,
@@ -166,7 +175,7 @@ export class Account {
     try {
       const result = await this.api.transact({
         actions: [{
-          account: process.env.ACCOUNT_CONTRACT,
+          account: this.config.ACCOUNT_CONTRACT,
           name: 'vtransfer',
           authorization: [{
             actor: fromAccount,
@@ -176,8 +185,8 @@ export class Account {
             from_id: balanceIndexFrom,
             to_id: balanceIndexTo,
             quantity: {
-              quantity: amount + ' ' + process.env.EFX_SYMBOL,
-              contract: process.env.EFX_TOKEN_ACCOUNT
+              quantity: amount + ' ' + this.config.EFX_SYMBOL,
+              contract: this.config.EFX_TOKEN_ACCOUNT
             },
             sig: null,
             fee: null
