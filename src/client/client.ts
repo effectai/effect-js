@@ -1,4 +1,5 @@
 import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
+import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
 import { Account } from '../account/account'
@@ -16,7 +17,7 @@ export interface EffectClientOptions {
     /**
      * EOS Signature Provider
      */
-    signatureProvider: JsSignatureProvider
+    signatureProvider: JsSignatureProvider | SignatureProvider
 
     /**
      * The host where the json-rpc will connect to.
