@@ -12,7 +12,7 @@
   "scripts": {
     "test": "echo \"🔥\"",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "build": "npm run build:cjs && npm run build:es && npm run build:umd",
+    "build": "npm run build:cjs",
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
