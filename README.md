@@ -10,6 +10,12 @@ The official distribution for the package can be found at npm.
 npm i --save-dev @effectai/effect-js
 ```
 
+# Install & build
+```
+npm i
+npm run build
+```
+
 # Example usage
 ```
 const signatureProvider = new JsSignatureProvider([PRIVATE_KEY])
