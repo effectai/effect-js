@@ -48,9 +48,9 @@ export class Account {
   /**
    * Open a vaccount
    * @param account - name or address of the account to open, for BSC addresses without 0x
-   * @returns 
+   * @returns
    */
-  openAccount = async (account: string): Promise<object> => {
+  openAccount = async (account: string, permission: string): Promise<object> => {
     try {
       const type:string = account.length == 40 ? 'address' : 'name';
       const result = await this.api.transact({
@@ -59,7 +59,7 @@ export class Account {
           name: 'open',
           authorization: [{
             actor: account,
-            permission: 'active',
+            permission: permission,
           }],
           data: {
             acc: [type, account],
@@ -84,9 +84,9 @@ export class Account {
    * @param fromAccount - account to deposit from
    * @param toAccount - account to deposit to
    * @param amount - amount, example: '10.0000'
-   * @returns 
+   * @returns
    */
-  deposit = async (fromAccount: string, toAccount: string, amount: string): Promise<object> => {
+  deposit = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
     try {
       const balance: object = await this.getBalance(toAccount)
       const balanceIndexTo: number = balance[0].id
@@ -96,7 +96,7 @@ export class Account {
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: 'active',
+            permission: permission,
           }],
           data: {
             from: fromAccount,
@@ -121,9 +121,9 @@ export class Account {
    * @param toAccount - account to withdraw to
    * @param amount - amount, example: '10.0000'
    * @param memo - optional memo
-   * @returns 
+   * @returns
    */
-  withdraw = async (fromAccount: string, toAccount: string, amount: string, memo?: string): Promise<object> => {
+  withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<object> => {
     // TODO: BSC withdraw
     const balance: object = await this.getBalance(fromAccount)
     const balanceIndexFrom: number = balance[0].id
@@ -134,7 +134,7 @@ export class Account {
           name: 'withdraw',
           authorization: [{
             actor: fromAccount,
-            permission: 'active',
+            permission: permission,
           }],
           data: {
             from_id: balanceIndexFrom,
@@ -164,9 +164,9 @@ export class Account {
    * @param fromAccount - vaccount to transfer from
    * @param toAccount - vaccount to transfer to
    * @param amount - amount, example: '10.0000'
-   * @returns 
+   * @returns
    */
-  vtransfer = async (fromAccount: string, toAccount: string, amount: string): Promise<object> => {
+  vtransfer = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
     // TODO: BSC vtransfer
     const balanceFrom: object = await this.getBalance(fromAccount)
     const balanceIndexFrom: number = balanceFrom[0].id
@@ -179,7 +179,7 @@ export class Account {
           name: 'vtransfer',
           authorization: [{
             actor: fromAccount,
-            permission: 'active',
+            permission: permission,
           }],
           data: {
             from_id: balanceIndexFrom,
