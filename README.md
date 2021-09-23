@@ -18,6 +18,8 @@ npm run build
 
 # Example usage
 ```
+const effectSdk = require('@effectai/effect-js')
+
 const signatureProvider = new JsSignatureProvider([PRIVATE_KEY])
 const options = {
   network: "kylin",
