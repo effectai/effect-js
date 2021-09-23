@@ -82,6 +82,7 @@
     "@dfuse/client": "^0.3.20",
     "dotenv": "^10.0.0",
     "eosjs": "^22.1.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "web3": "^1.5.3"
   }
 }
