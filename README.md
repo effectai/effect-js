@@ -7,7 +7,7 @@ Javascript API for integration with [Effect.Network](https://effect.network)
 The official distribution for the package can be found at npm.
 
 ```
-npm i --save-dev @effectai/effect-js
+npm i --save @effectai/effect-js
 ```
 
 # Install & build
