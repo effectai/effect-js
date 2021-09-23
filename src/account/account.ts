@@ -18,14 +18,21 @@ export class Account {
 
   /**
    * Get the balance from a vaccount
-   * @param accountName - name of the account
+   * @param account - name of the account or bsc
    * @returns - balance object of
    */
-  getBalance = async (accountName: string): Promise<Array<object>> => {
+  getBalance = async (account: string): Promise<Array<object>> => {
     try {
-      // TODO: add filter for EFX balances only
-      // TODO: check if address or name, assume name for now
-      const accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(accountName)).padEnd(64, "0");
+      let accString;
+
+      // if account = bsc address
+      if(account.length == 42 || account.length == 40) {
+        const address:string = account.length == 42 ? account.substring(2) : account;
+        accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "00" + address).padEnd(64, "0");
+      } else {
+        accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(account)).padEnd(64, "0");
+      }
+
       const resp = await this.api.rpc.get_table_rows({
           code: this.config.ACCOUNT_CONTRACT,
           scope: this.config.ACCOUNT_CONTRACT,
