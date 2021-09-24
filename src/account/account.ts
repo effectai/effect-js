@@ -46,6 +46,7 @@ export class Account {
           table: 'account',
           json: true,
       }).then((data) => {
+        console.log('data', data);
         return data.rows;
       });
 
@@ -140,9 +141,45 @@ export class Account {
    * @returns
    */
   withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<object> => {
-    // TODO: BSC withdraw
-    const balance: object = await this.getBalance(fromAccount)
-    const balanceIndexFrom: number = balance[0].id
+    // TODO: BSC withdraw    
+    const balance: Array<any> = await this.getBalance(toAccount)
+    let balanceIndexFrom: number;
+    let nonce: number;
+    if (balance) {
+      balance.forEach((row) => {
+        if (row.balance.contract === this.config.EFX_SYMBOL) {
+          balanceIndexFrom = row.id;
+          nonce = row.nonce;
+        }
+      });
+    }
+
+    // (defn pack-withdraw-params
+    //   [nonce from to {:keys [quantity contract]}]
+    //   (let [buff (doto (new (.-SerialBuffer Serialize))
+    //                (.push 2)
+    //                (.pushUint32 nonce)
+    //                (.pushArray (uint64->bytes from))
+    //                (.pushName to)
+    //                (.pushAsset quantity)
+    //                (.pushName contract))]
+    //     (.asUint8Array buff)))
+    // withdraw_params params = {2, from.nonce, from.id, to_account, quantity};
+    // std::vector<char> msg_bytes = pack(params);
+    // require_sig(msg_bytes, from, sig.value());
+    if(this.isBscAddress(fromAccount)) {
+      const serialbuff = new Serialize.SerialBuffer();
+
+      serialbuff.push(2)
+      serialbuff.pushUint32(nonce)
+      // todo: first to bytes
+      //serialbuff.pushArray(balanceIndexFrom)
+      serialbuff.pushName(toAccount)
+      serialbuff.pushAsset(amount)
+      serialbuff.pushName(this.config.ACCOUNT_CONTRACT)
+      
+    }
+
     try {
       const result = await this.api.transact({
         actions: [{
@@ -160,7 +197,8 @@ export class Account {
               contract: this.config.EFX_TOKEN_ACCOUNT
             },
             memo: memo,
-            sig: null,
+            // TODO: add sig for bsc
+            sig: this.isBscAddress(fromAccount) ? null : null,
             fee: null
           },
         }]
