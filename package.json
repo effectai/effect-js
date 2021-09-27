@@ -20,7 +20,10 @@
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
     "lint": "eslint \"src/**\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "publish:latest": "npm version patch && npm run build:cjs && npm publish",
+    "publish:next": "npm version patch && npm run build:cjs && npm publish --tag next "
+
   },
   "repository": {
     "type": "git",
@@ -47,8 +50,15 @@
     {
       "name": "David Britt",
       "email": "david@effect.ai"
+    },
+    {
+      "name": "Jaïr Zijp",
+      "email": "jair@effect.ai"
     }
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/effectai/effect-js/issues"
