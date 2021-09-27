@@ -66,7 +66,7 @@ npm link /path/to/effect-js/
 From your project folder you should be able to import the compiled code from `effect-js`. Depending on your environment use `import` or `require` as needed.
 
 # Publishing
-Run the following command to, build the source, increment the vrsion, and publish the `dist` transpiled code and types to the npm repository, assuming you have the correct credentials.
+Run the following command to, build the source, increment the version, and publish the `dist` transpiled code and types to the npm repository, assuming you have the correct credentials.
 
 Make sure the git is clean and everything has been committed, and run the following.
 ```
