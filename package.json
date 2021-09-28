@@ -47,6 +47,10 @@
   },
   "contributors": [
     {
+      "name": "Laurens Verspeek",
+      "email": "laurens@effect.ai"
+    },
+    {
       "name": "David Britt",
       "email": "david@effect.ai"
     },
@@ -90,7 +94,10 @@
   "dependencies": {
     "@dfuse/client": "^0.3.20",
     "dotenv": "^10.0.0",
+    "elliptic": "^6.5.4",
     "eosjs": "^22.1.0",
-    "node-fetch": "^2.6.1"
+    "ethers": "^5.4.7",
+    "node-fetch": "^2.6.1",
+    "web3": "^1.5.3"
   }
 }

@@ -3,6 +3,7 @@ import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
 import { Account } from '../account/account'
+import Web3 from 'web3'
 
 /**
  * Options that can be passed to the client factory.
@@ -24,6 +25,11 @@ export interface EffectClientOptions {
      * @default "localhost"
      */
     host: string
+
+    /**
+     * Web3 instance for BSC
+     */
+     web3?: Web3
 
     /**
      * The Effect API Key to interact with Effect-Network api service.
@@ -55,9 +61,18 @@ export class EffectClient {
     account: Account;
 
     constructor(options: EffectClientOptions) {
-        const { apiKey, network, signatureProvider, host, secure, authentication, authUrl } = options
+        const { apiKey, network, web3, signatureProvider, host, secure, authentication, authUrl } = options
         const rpc = new JsonRpc(host, {fetch})
-        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
-        this.account = new Account(this.api)
+
+        // if it's web3 instance (bsc account) use the relayer as signatureProvider
+        if (web3) {
+            // TODO: add config with relayer key
+            const relayer = new JsSignatureProvider(['PRIVATE KEY'])
+            this.api = new Api({rpc, signatureProvider: relayer, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+        } else {
+            this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+        }
+
+        this.account = new Account(this.api, web3)
     }
 }

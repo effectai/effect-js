@@ -1,18 +1,32 @@
-import { Api, Serialize } from 'eosjs'
+import { Api, Serialize, Numeric } from 'eosjs'
+import RIPEMD160 from "eosjs/dist/ripemd"
+import Web3 from 'web3';
+import { Signature } from 'eosjs/dist/eosjs-key-conversions';
+import { utils } from 'ethers';
+import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
+
+// (def ec (new ec "secp256k1"))
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
 export class Account {
   api: Api;
   config: any;
+  web3: Web3;
+  pub: string;
 
-  constructor(api: Api) {
+  constructor(api: Api, web3?: Web3) {
     this.api = api;
+    this.web3 = web3;
+
     // TODO: replace this with proper config
     this.config = {
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
       EFX_SYMBOL:"UTL",
       EFX_EXTENDED_SYMBOL:"4,UTL",
-      EOS_FEE_PAYER:"testjairtest",
-      ACCOUNT_CONTRACT:"acckylin1111"
+      EOS_RELAYER:"testjairtest",
+      ACCOUNT_CONTRACT:"acckylin1111",
+      FORCE_CONTRACT:"propsonkylin"
     }
   }
 
@@ -25,8 +39,7 @@ export class Account {
     try {
       let accString;
 
-      // if account = bsc address
-      if(account.length == 42 || account.length == 40) {
+      if(this.isBscAddress(account)) {
         const address:string = account.length == 42 ? account.substring(2) : account;
         accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "00" + address).padEnd(64, "0");
       } else {
@@ -59,19 +72,25 @@ export class Account {
    */
   openAccount = async (account: string, permission: string): Promise<object> => {
     try {
-      const type:string = account.length == 40 ? 'address' : 'name';
+      let type = 'name'
+      let address: string
+      if(this.isBscAddress(account)) {
+        type = 'address'
+        address = account.length == 42 ? account.substring(2) : account;
+      }
+
       const result = await this.api.transact({
         actions: [{
           account: this.config.ACCOUNT_CONTRACT,
           name: 'open',
           authorization: [{
-            actor: account,
-            permission: permission,
+            actor: type == 'address' ? this.config.EOS_RELAYER : account,
+            permission: permission ? permission : 'active',
           }],
           data: {
-            acc: [type, account],
+            acc: [type, type == 'address' ? address : account],
             symbol: {contract: this.config.EFX_TOKEN_ACCOUNT, sym: this.config.EFX_EXTENDED_SYMBOL},
-            payer: account,
+            payer: type == 'address' ? this.config.EOS_RELAYER : account,
           },
         }]
       },
@@ -103,7 +122,7 @@ export class Account {
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: permission,
+            permission: 'active',
           }],
           data: {
             from: fromAccount,
@@ -130,18 +149,53 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<object> => {
-    // TODO: BSC withdraw
-    const balance: object = await this.getBalance(fromAccount)
-    const balanceIndexFrom: number = balance[0].id
-    try {
+  withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
+    const balance: Array<any> = await this.getBalance(fromAccount)
+    let balanceIndexFrom: number;
+    let nonce: number;
+    if (balance) {
+      balance.forEach((row) => {
+        if (row.balance.contract === this.config.EFX_TOKEN_ACCOUNT) {
+          balanceIndexFrom = row.id;
+          nonce = row.nonce;
+        }
+      });
+    }
+
+    let sig;
+    if(this.isBscAddress(fromAccount)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(2)
+      serialbuff.pushUint32(nonce)
+      serialbuff.pushArray(Numeric.decimalToBinary(8, balanceIndexFrom.toString()))
+      serialbuff.pushName(toAccount)
+      serialbuff.pushAsset(amount + ' ' + this.config.EFX_SYMBOL)
+      serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
+
+      const bytes = serialbuff.asUint8Array()
+      console.log('serialbuff string: ', Serialize.arrayToHex(bytes))
+
+      let paramsHash = ec.hash().update(bytes).digest();
+      console.log('paramsHash: ', Serialize.arrayToHex(paramsHash))
+  
+      // TODO
+      const keypair = ec.keyFromPrivate('PRIVATE_KEY')
+      const sigg = keypair.sign(paramsHash)
+  
+      sig = Signature.fromElliptic(sigg, 0)
+    }
+
+    // BSC -> EOS toAccount handmatig meegeven
+    // BSC -> BSC transactie met memo via pnetwork
+  
+    try {      
       const result = await this.api.transact({
         actions: [{
           account: this.config.ACCOUNT_CONTRACT,
           name: 'withdraw',
           authorization: [{
-            actor: fromAccount,
-            permission: permission,
+            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
+            permission: permission ? permission : 'active',
           }],
           data: {
             from_id: balanceIndexFrom,
@@ -151,7 +205,7 @@ export class Account {
               contract: this.config.EFX_TOKEN_ACCOUNT
             },
             memo: memo,
-            sig: null,
+            sig: sig ? sig.toString() : null,
             fee: null
           },
         }]
@@ -220,4 +274,37 @@ export class Account {
     return Serialize.arrayToHex(bytes);
   }
 
+  /**
+   * Check if account is bsc address
+   * @param account 
+   */
+  isBscAddress = (account: string): boolean => {
+    return (account.length == 42 || account.length == 40)
+  }
+
+  /********************************************************
+   * FORCE METHODS (TODO: place in different file/class?) *
+   ********************************************************/
+
+  /**
+   * Get force campaigns
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @returns - Campaign Table Rows Result
+   */
+  getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'proposal', // 'campaign',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data;
+  }
 }
