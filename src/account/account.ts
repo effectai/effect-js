@@ -75,47 +75,6 @@ export class Account {
       if(this.isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
-
-        // BSC-Extensions only support 'eth_sign'
-        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-          this.web3.extend({
-            property: 'bsc',
-            methods: [{
-              name: 'sign',
-              call: 'eth_sign',
-              params: 2
-            }]
-          })
-
-          try {
-            let signature
-            const message = 'Effect Account Registration'
-            // @ts-ignore
-            if (this.web3.currentProvider === window.BinanceChain) {
-              // @ts-ignore
-              signature = await this.web3.bsc.sign(account, message)
-            } else {
-              // @ts-ignore
-              signature = await this.web3.eth.personal.sign(message, account)
-            }
-
-            // recover public key
-            const hashedMsg = utils.hashMessage(message)
-            const sigAddress = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim());
-
-            // compress public key
-            const keypair = ec.keyFromPublic(sigAddress.substring(2), 'hex')
-            const compressed = keypair.getPublic().encodeCompressed("hex")
-
-            // RIPEMD160 hash public key
-            let ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-            address = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-            
-          } catch (error) {
-            console.error(error)
-            return Promise.reject(error)
-          }
-
       }
 
       const result = await this.api.transact({
@@ -320,18 +279,5 @@ export class Account {
   isBscAddress = (account: string): boolean => {
     return (account.length == 42 || account.length == 40)
   }
-
-  longToByteArray = function(int) {
-    // we want to represent the input as a 8-bytes array
-    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-
-    for ( var index = 0; index < byteArray.length; index ++ ) {
-        var byte = int & 0xff;
-        byteArray [ index ] = byte;
-        int = (int - byte) / 256 ;
-    }
-
-    return byteArray;
-};
 
 }
