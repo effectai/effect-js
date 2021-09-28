@@ -171,17 +171,33 @@ export class Account {
       serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
 
       const bytes = serialbuff.asUint8Array()
-      console.log('serialbuff string: ', Serialize.arrayToHex(bytes))
 
-      let paramsHash = ec.hash().update(bytes).digest();
-      console.log('paramsHash: ', Serialize.arrayToHex(paramsHash))
+      let paramsHash = ec.hash().update(bytes).digest()
   
       // TODO
-      const keypair = ec.keyFromPrivate('PRIVATE_KEY')
-      const sigg = keypair.sign(paramsHash)
+      // const keypair = ec.keyFromPrivate('PRIVATE_KEY')
+      // const sigg = keypair.sign(paramsHash)
+
+      // WIP doesnt work yet
+      try {
+        const message = paramsHash.toString()
+        console.log(paramsHash)
+        // @ts-ignore
+        if (this.web3.currentProvider === window.BinanceChain) {
+          // @ts-ignore
+          sig = await this.web3.bsc.sign(fromAccount, message)
+        } else {
+          // @ts-ignore
+          sig = await this.web3.eth.personal.sign(message, fromAccount)
+        }
+      } catch (error) {
+        console.error(error)
+        return Promise.reject(error)
+      }
   
-      sig = Signature.fromElliptic(sigg, 0)
+      // console.log('with priv', Signature.fromElliptic(sigg, 0).toString())
     }
+    console.log('with wallet', Signature.fromString(sig))
 
     // BSC -> EOS toAccount handmatig meegeven
     // BSC -> BSC transactie met memo via pnetwork
