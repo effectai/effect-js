@@ -1,7 +1,7 @@
 import { Api, Serialize, Numeric } from 'eosjs'
+import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
-import { ecrecover, fromRpcSig, toBuffer, hashPersonalMessage } from 'ethereumjs-util'
 import { utils } from 'ethers';
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 
@@ -13,6 +13,7 @@ export class Account {
   api: Api;
   config: any;
   web3: Web3;
+  pub: string;
 
   constructor(api: Api, web3?: Web3) {
     this.api = api;
@@ -76,40 +77,6 @@ export class Account {
       if(this.isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
-
-        // BSC-Extensions only support 'eth_sign'
-        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-          this.web3.extend({
-            property: 'bsc',
-            methods: [{
-              name: 'sign',
-              call: 'eth_sign',
-              params: 2
-            }]
-          })
-
-          try {
-            let signature
-            const message = 'Effect Account Registration'
-            console.log('start signing')
-            // @ts-ignore
-            if (this.web3.currentProvider === window.BinanceChain) {
-              // @ts-ignore
-              signature = await this.web3.bsc.sign(account, message)
-            } else {
-              // @ts-ignore
-              signature = await this.web3.eth.personal.sign(message, account)
-            }
-            console.log('finished signing')
-            const sha3msg = this.web3.utils.sha3(message)
-            const sigAddress = utils.recoverPublicKey(sha3msg.trim(), signature.trim());
-            console.log('sigAddress: ', sigAddress)
-            
-          } catch (error) {
-            console.error(error)
-            return Promise.reject(error)
-          }
-
       }
 
       const result = await this.api.transact({
@@ -183,7 +150,6 @@ export class Account {
    * @returns
    */
   withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
-    // TODO: BSC withdraw
     const balance: Array<any> = await this.getBalance(fromAccount)
     let balanceIndexFrom: number;
     let nonce: number;
@@ -196,28 +162,9 @@ export class Account {
       });
     }
 
-    console.log('index', balanceIndexFrom);
-
-    // (defn pack-withdraw-params
-    //   [nonce from to {:keys [quantity contract]}]
-    //   (let [buff (doto (new (.-SerialBuffer Serialize))
-    //                (.push 2)
-    //                (.pushUint32 nonce)
-    //                (.pushArray (uint64->bytes from))
-    //                (.pushName to)
-    //                (.pushAsset quantity)
-    //                (.pushName contract))]
-    //     (.asUint8Array buff)))
-
-    // transfer-params (pack-withdraw-params 1 0 acc-2 asset)
-    //       params-hash (.digest (.update (.hash ec) transfer-params))
-    //       sig (.sign keypair params-hash)
-    //       eos-sig (.fromElliptic Signature sig 0)]
-    
     let sig;
     if(this.isBscAddress(fromAccount)) {
-      const serialbuff = new Serialize.SerialBuffer();      
-
+      const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, balanceIndexFrom.toString()))
@@ -228,26 +175,20 @@ export class Account {
       const bytes = serialbuff.asUint8Array()
       console.log('serialbuff string: ', Serialize.arrayToHex(bytes))
 
-      // params-hash (.digest (.update (.hash ec) transfer-params))
       let paramsHash = ec.hash().update(bytes).digest();
       console.log('paramsHash: ', Serialize.arrayToHex(paramsHash))
   
-      // sig (.sign keypair params-hash)
-      const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
+      // TODO
+      const keypair = ec.keyFromPrivate('PRIVATE_KEY')
       const sigg = keypair.sign(paramsHash)
-    
-      // eos-sig (.fromElliptic Signature sig 0)]
+  
       sig = Signature.fromElliptic(sigg, 0)
     }
 
     // BSC -> EOS toAccount handmatig meegeven
     // BSC -> BSC transactie met memo via pnetwork
   
-    try {
-      if (sig) {
-        console.log('SIG', sig.toString())
-      }
-      
+    try {      
       const result = await this.api.transact({
         actions: [{
           account: this.config.ACCOUNT_CONTRACT,
@@ -340,19 +281,6 @@ export class Account {
   isBscAddress = (account: string): boolean => {
     return (account.length == 42 || account.length == 40)
   }
-
-  longToByteArray = function(int) {
-    // we want to represent the input as a 8-bytes array
-    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-
-    for ( var index = 0; index < byteArray.length; index ++ ) {
-        var byte = int & 0xff;
-        byteArray [ index ] = byte;
-        int = (int - byte) / 256 ;
-    }
-
-    return byteArray;
-  };
 
   /********************************************************
    * FORCE METHODS (TODO: place in different file/class?) *
