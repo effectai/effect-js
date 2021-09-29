@@ -151,25 +151,13 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, fromAccountAddress: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
-    const balance: Array<any> = await this.getBalance(fromAccount)
-    let balanceIndexFrom: number;
-    let nonce: number;
-    if (balance) {
-      balance.forEach((row) => {
-        if (row.balance.contract === this.config.EFX_TOKEN_ACCOUNT) {
-          balanceIndexFrom = row.id;
-          nonce = row.nonce;
-        }
-      });
-    }
-
+  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
     let sig;
-    if(this.isBscAddress(fromAccountAddress)) {
+    if(this.isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
-      serialbuff.pushArray(Numeric.decimalToBinary(8, balanceIndexFrom.toString()))
+      serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
       serialbuff.pushName(toAccount)
       serialbuff.pushAsset(amount + ' ' + this.config.EFX_SYMBOL)
       serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
@@ -186,18 +174,18 @@ export class Account {
       // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
 
       try {
-        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccountAddress)
+        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccount)
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
       }
-    }
-    sig = utils.splitSignature(sig)
-    // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
-    sig.s = new BN(sig.s.substring(2), 16)
-    sig = Signature.fromElliptic(sig, 0)
 
+      sig = utils.splitSignature(sig)
+      // TODO: figure out how to get Signature in right format without this hack
+      sig.r = new BN(sig.r.substring(2),16)
+      sig.s = new BN(sig.s.substring(2), 16)
+      sig = Signature.fromElliptic(sig, 0)
+    }
     // BSC -> EOS toAccount handmatig meegeven
     // BSC -> BSC transactie met memo via pnetwork
     try {
@@ -206,11 +194,11 @@ export class Account {
           account: this.config.ACCOUNT_CONTRACT,
           name: 'withdraw',
           authorization: [{
-            actor: this.isBscAddress(fromAccountAddress) ? this.config.EOS_RELAYER : fromAccount,
+            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
             permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
-            from_id: balanceIndexFrom,
+            from_id: accountId,
             to_account: toAccount,
             quantity: {
               quantity: amount + ' ' + this.config.EFX_SYMBOL,
