@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
+const BN = require('bn.js');
 
 // (def ec (new ec "secp256k1"))
 const EC = require('elliptic').ec;
@@ -25,6 +26,7 @@ export class Account {
       EFX_SYMBOL:"UTL",
       EFX_EXTENDED_SYMBOL:"4,UTL",
       EOS_RELAYER:"testjairtest",
+      EOS_RELAYER_PERMISSION:"active",
       ACCOUNT_CONTRACT:"acckylin1111",
       FORCE_CONTRACT:"propsonkylin"
     }
@@ -85,7 +87,7 @@ export class Account {
           name: 'open',
           authorization: [{
             actor: type == 'address' ? this.config.EOS_RELAYER : account,
-            permission: permission ? permission : 'active',
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
@@ -149,7 +151,7 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (fromAccount: string, fromAccountAddress: string, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
     const balance: Array<any> = await this.getBalance(fromAccount)
     let balanceIndexFrom: number;
     let nonce: number;
@@ -163,7 +165,7 @@ export class Account {
     }
 
     let sig;
-    if(this.isBscAddress(fromAccount)) {
+    if(this.isBscAddress(fromAccountAddress)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
@@ -175,43 +177,37 @@ export class Account {
       const bytes = serialbuff.asUint8Array()
 
       let paramsHash = ec.hash().update(bytes).digest()
+      paramsHash = Serialize.arrayToHex(paramsHash)
   
-      // TODO
-      // const keypair = ec.keyFromPrivate('PRIVATE_KEY')
+      // For test purposes (sometimes different than MetaMask signature?)
+      // const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
       // const sigg = keypair.sign(paramsHash)
+      // console.log('sig priv', sigg)
+      // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
 
-      // WIP doesnt work yet
       try {
-        const message = paramsHash.toString()
-        console.log(paramsHash)
-        // @ts-ignore
-        if (this.web3.currentProvider === window.BinanceChain) {
-          // @ts-ignore
-          sig = await this.web3.bsc.sign(fromAccount, message)
-        } else {
-          // @ts-ignore
-          sig = await this.web3.eth.personal.sign(message, fromAccount)
-        }
+        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccountAddress)
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
       }
-  
-      // console.log('with priv', Signature.fromElliptic(sigg, 0).toString())
     }
-    console.log('with wallet', Signature.fromString(sig))
+    sig = utils.splitSignature(sig)
+    // TODO: figure out how to get Signature in right format without this hack
+    sig.r = new BN(sig.r.substring(2),16)
+    sig.s = new BN(sig.s.substring(2), 16)
+    sig = Signature.fromElliptic(sig, 0)
 
     // BSC -> EOS toAccount handmatig meegeven
     // BSC -> BSC transactie met memo via pnetwork
-  
-    try {      
+    try {
       const result = await this.api.transact({
         actions: [{
           account: this.config.ACCOUNT_CONTRACT,
           name: 'withdraw',
           authorization: [{
-            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
-            permission: permission ? permission : 'active',
+            actor: this.isBscAddress(fromAccountAddress) ? this.config.EOS_RELAYER : fromAccount,
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
             from_id: balanceIndexFrom,
