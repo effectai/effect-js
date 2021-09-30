@@ -3,7 +3,6 @@ import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
-import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 const BN = require('bn.js');
 
 // (def ec (new ec "secp256k1"))
@@ -24,11 +23,11 @@ export class Account {
     this.config = {
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
       EFX_SYMBOL:"UTL",
+      EFX_PRECISION: 4,
       EFX_EXTENDED_SYMBOL:"4,UTL",
       EOS_RELAYER:"testjairtest",
       EOS_RELAYER_PERMISSION:"active",
-      ACCOUNT_CONTRACT:"acckylin1111",
-      FORCE_CONTRACT:"propsonkylin"
+      ACCOUNT_CONTRACT:"acckylin1111"
     }
   }
 
@@ -114,23 +113,22 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
+  deposit = async (fromAccount: string, accountId: number, amountEfx: string, permission: string): Promise<object> => {
     try {
-      const balance: object = await this.getBalance(toAccount)
-      const balanceIndexTo: number = balance[0].id
+      const amount = this.convertToAsset(amountEfx)
       const result = await this.api.transact({
         actions: [{
           account: this.config.EFX_TOKEN_ACCOUNT,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: 'active',
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
             from: fromAccount,
             to: this.config.ACCOUNT_CONTRACT,
             quantity: amount + ' ' + this.config.EFX_SYMBOL,
-            memo: balanceIndexTo,
+            memo: accountId,
           },
         }]
       }, {
@@ -151,8 +149,9 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
     let sig;
+    const amount = this.convertToAsset(amountEfx)
     if(this.isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
@@ -186,8 +185,7 @@ export class Account {
       sig.s = new BN(sig.s.substring(2), 16)
       sig = Signature.fromElliptic(sig, 0)
     }
-    // BSC -> EOS toAccount handmatig meegeven
-    // BSC -> BSC transactie met memo via pnetwork
+    // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
       const result = await this.api.transact({
         actions: [{
@@ -227,23 +225,21 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
-    // TODO: BSC vtransfer
-    const balanceFrom: object = await this.getBalance(fromAccount)
-    const balanceIndexFrom: number = balanceFrom[0].id
+  vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amountEfx: string, permission: string): Promise<object> => {
     const balanceTo: object = await this.getBalance(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
+    const amount = this.convertToAsset(amountEfx)
     try {
       const result = await this.api.transact({
         actions: [{
           account: this.config.ACCOUNT_CONTRACT,
           name: 'vtransfer',
           authorization: [{
-            actor: fromAccount,
-            permission: permission,
+            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
-            from_id: balanceIndexFrom,
+            from_id: fromAccountId,
             to_id: balanceIndexTo,
             quantity: {
               quantity: amount + ' ' + this.config.EFX_SYMBOL,
@@ -282,29 +278,50 @@ export class Account {
     return (account.length == 42 || account.length == 40)
   }
 
-  /********************************************************
-   * FORCE METHODS (TODO: place in different file/class?) *
-   ********************************************************/
+  /**
+   * Recover BSC public key from signed message
+   * @param message
+   * @param signature
+   * @returns
+   */
+  recoverPublicKey = async (message: string, signature: string): Promise<object> => {
+    // recover public key
+    const hashedMsg = utils.hashMessage(message)
+    const pk = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
+    const address = utils.computeAddress(utils.arrayify(pk))
+
+    // compress public key
+    const keypair = ec.keyFromPublic(pk.substring(2), 'hex')
+    const compressed = keypair.getPublic().encodeCompressed('hex')
+
+    // RIPEMD160 hash public key
+    const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
+    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return { address, accountAddress }
+  }
 
   /**
-   * Get force campaigns
-   * @param nextKey - key to start searching from
-   * @param limit - max number of rows to return
-   * @returns - Campaign Table Rows Result
+   * Convert amount to asset
+   * @param amount
+   * @returns 
+   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
    */
-  getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
-    const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
-      table: 'proposal', // 'campaign',
-      limit: limit,
-      lower_bound: undefined
-    }
-    if (nextKey) {
-      config.lower_bound = nextKey
-    }
-    const data = await this.api.rpc.get_table_rows(config)
+  convertToAsset = (amount: string): string => {
+    // TODO: add filter for wrong values, e.g -1, or 10.00000
+    try {
+      const precision = this.config.EFX_PRECISION
+      const part = amount.split('.')
 
-    return data;
+      if (part.length === 1) {
+        return `${part[0]}.${'0'.repeat(precision)}`
+      } else {
+        const pad = precision - part[1].length
+        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+      }
+    } catch (error) {
+      throw Error(error)
+    }
+    
   }
+
 }
