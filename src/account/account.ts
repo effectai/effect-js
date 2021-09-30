@@ -186,8 +186,7 @@ export class Account {
       sig.s = new BN(sig.s.substring(2), 16)
       sig = Signature.fromElliptic(sig, 0)
     }
-    // BSC -> EOS toAccount handmatig meegeven
-    // BSC -> BSC transactie met memo via pnetwork
+    // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
       const result = await this.api.transact({
         actions: [{
@@ -280,6 +279,22 @@ export class Account {
    */
   isBscAddress = (account: string): boolean => {
     return (account.length == 42 || account.length == 40)
+  }
+
+  recoverPublicKey = async (message: string, signature: string): Promise<object> => {
+    // recover public key
+    const hashedMsg = utils.hashMessage(message)
+    const pk = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
+    const address = utils.computeAddress(utils.arrayify(pk))
+
+    // compress public key
+    const keypair = ec.keyFromPublic(pk.substring(2), 'hex')
+    const compressed = keypair.getPublic().encodeCompressed('hex')
+
+    // RIPEMD160 hash public key
+    const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
+    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return { address, accountAddress }
   }
 
   /********************************************************
