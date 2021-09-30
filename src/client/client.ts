@@ -3,6 +3,7 @@ import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import fetch from 'node-fetch' // fetch for node.js environment 
 import { Account } from '../account/account'
+import { Force } from '../force/force'
 import Web3 from 'web3'
 
 /**
@@ -59,6 +60,7 @@ export interface EffectClientOptions {
 export class EffectClient {
     api: Api;
     account: Account;
+    force: Force;
 
     constructor(options: EffectClientOptions) {
         const { apiKey, network, web3, signatureProvider, host, secure, authentication, authUrl } = options
@@ -74,5 +76,6 @@ export class EffectClient {
         }
 
         this.account = new Account(this.api, web3)
+        this.force = new Force(this.api)
     }
 }

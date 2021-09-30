@@ -3,7 +3,6 @@ import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
-import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 const BN = require('bn.js');
 
 // (def ec (new ec "secp256k1"))
@@ -27,8 +26,7 @@ export class Account {
       EFX_EXTENDED_SYMBOL:"4,UTL",
       EOS_RELAYER:"testjairtest",
       EOS_RELAYER_PERMISSION:"active",
-      ACCOUNT_CONTRACT:"acckylin1111",
-      FORCE_CONTRACT:"propsonkylin"
+      ACCOUNT_CONTRACT:"acckylin1111"
     }
   }
 
@@ -297,29 +295,4 @@ export class Account {
     return { address, accountAddress }
   }
 
-  /********************************************************
-   * FORCE METHODS (TODO: place in different file/class?) *
-   ********************************************************/
-
-  /**
-   * Get force campaigns
-   * @param nextKey - key to start searching from
-   * @param limit - max number of rows to return
-   * @returns - Campaign Table Rows Result
-   */
-  getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
-    const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
-      table: 'proposal', // 'campaign',
-      limit: limit,
-      lower_bound: undefined
-    }
-    if (nextKey) {
-      config.lower_bound = nextKey
-    }
-    const data = await this.api.rpc.get_table_rows(config)
-
-    return data;
-  }
 }
