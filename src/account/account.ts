@@ -23,6 +23,7 @@ export class Account {
     this.config = {
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
       EFX_SYMBOL:"UTL",
+      EFX_PRECISION: 4,
       EFX_EXTENDED_SYMBOL:"4,UTL",
       EOS_RELAYER:"testjairtest",
       EOS_RELAYER_PERMISSION:"active",
@@ -112,8 +113,9 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (fromAccount: string, accountId: number, amount: string, permission: string): Promise<object> => {
+  deposit = async (fromAccount: string, accountId: number, amountEfx: string, permission: string): Promise<object> => {
     try {
+      const amount = this.convertToAsset(amountEfx)
       const result = await this.api.transact({
         actions: [{
           account: this.config.EFX_TOKEN_ACCOUNT,
@@ -147,8 +149,9 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amount: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
     let sig;
+    const amount = this.convertToAsset(amountEfx)
     if(this.isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
@@ -222,9 +225,10 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amount: string, permission: string): Promise<object> => {
+  vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amountEfx: string, permission: string): Promise<object> => {
     const balanceTo: object = await this.getBalance(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
+    const amount = this.convertToAsset(amountEfx)
     try {
       const result = await this.api.transact({
         actions: [{
@@ -294,6 +298,30 @@ export class Account {
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
     const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
     return { address, accountAddress }
+  }
+
+  /**
+   * Convert amount to asset
+   * @param amount
+   * @returns 
+   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
+   */
+  convertToAsset = (amount: string): string => {
+    // TODO: add filter for wrong values, e.g -1, or 10.00000
+    try {
+      const precision = this.config.EFX_PRECISION
+      const part = amount.split('.')
+
+      if (part.length === 1) {
+        return `${part[0]}.${'0'.repeat(precision)}`
+      } else {
+        const pad = precision - part[1].length
+        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+      }
+    } catch (error) {
+      throw Error(error)
+    }
+    
   }
 
 }
