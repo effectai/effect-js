@@ -1,7 +1,7 @@
 import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
 import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
-import fetch from 'node-fetch' // fetch for node.js environment 
+// import fetch from 'node-fetch' // fetch for node.js environment
 import { Account } from '../account/account'
 import Web3 from 'web3'
 
@@ -59,10 +59,16 @@ export interface EffectClientOptions {
 export class EffectClient {
     api: Api;
     account: Account;
+    config: {[k: string]: any};
 
     constructor(options: EffectClientOptions) {
         const { apiKey, network, web3, signatureProvider, host, secure, authentication, authUrl } = options
         const rpc = new JsonRpc(host, {fetch})
+
+        // TODO: replace this with proper config
+        this.config = {
+            IPFS_NODE: 'https://ipfs.effect.ai'
+        }
 
         // if it's web3 instance (bsc account) use the relayer as signatureProvider
         if (web3) {
@@ -74,5 +80,31 @@ export class EffectClient {
         }
 
         this.account = new Account(this.api, web3)
+    }
+    // TODO: move to generic helper file/class
+    /**
+     * Get IPFS Content in JSON
+     * @param hash - hash of the IPFS content you want to fetch
+     * @param format - format of the content you are fetching.
+     * @returns content of the ipfs hash in your preferred format
+     */
+    getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
+        const data = await fetch(this.config.IPFS_NODE + '/ipfs/' + hash)
+        switch (format.toLowerCase()) {
+            case 'formdata':
+            case 'form':
+                return data.text()
+            case 'buffer':
+            case 'arraybuffer':
+            case 'array':
+                return data.arrayBuffer()
+            case 'blob':
+                return data.blob()
+            case 'text':
+                return data.text()
+            case 'json':
+                return data.json()
+        }
+        return data
     }
 }
