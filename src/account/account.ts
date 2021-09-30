@@ -112,23 +112,21 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
+  deposit = async (fromAccount: string, accountId: number, amount: string, permission: string): Promise<object> => {
     try {
-      const balance: object = await this.getBalance(toAccount)
-      const balanceIndexTo: number = balance[0].id
       const result = await this.api.transact({
         actions: [{
           account: this.config.EFX_TOKEN_ACCOUNT,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: 'active',
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
             from: fromAccount,
             to: this.config.ACCOUNT_CONTRACT,
             quantity: amount + ' ' + this.config.EFX_SYMBOL,
-            memo: balanceIndexTo,
+            memo: accountId,
           },
         }]
       }, {
@@ -224,10 +222,7 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, toAccount: string, amount: string, permission: string): Promise<object> => {
-    // TODO: BSC vtransfer
-    const balanceFrom: object = await this.getBalance(fromAccount)
-    const balanceIndexFrom: number = balanceFrom[0].id
+  vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amount: string, permission: string): Promise<object> => {
     const balanceTo: object = await this.getBalance(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     try {
@@ -236,11 +231,11 @@ export class Account {
           account: this.config.ACCOUNT_CONTRACT,
           name: 'vtransfer',
           authorization: [{
-            actor: fromAccount,
-            permission: permission,
+            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
           data: {
-            from_id: balanceIndexFrom,
+            from_id: fromAccountId,
             to_id: balanceIndexTo,
             quantity: {
               quantity: amount + ' ' + this.config.EFX_SYMBOL,
@@ -279,6 +274,12 @@ export class Account {
     return (account.length == 42 || account.length == 40)
   }
 
+  /**
+   * Recover BSC public key from signed message
+   * @param message
+   * @param signature
+   * @returns
+   */
   recoverPublicKey = async (message: string, signature: string): Promise<object> => {
     // recover public key
     const hashedMsg = utils.hashMessage(message)
