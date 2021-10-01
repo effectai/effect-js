@@ -30,7 +30,7 @@ const options = {
 const sdk = new effectSdk.EffectClient(options);
 
 sdk.account.openAccount('account_name')
-sdk.account.getBalance('account_name')
+sdk.account.getVAccountByName('account_name')
 
 // from account, to vaccount, amount in EFX
 sdk.account.deposit('from_account_name', 'to_vaccount_name', '1.0000')
