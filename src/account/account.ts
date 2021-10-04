@@ -76,7 +76,7 @@ export class Account {
       const resp = await this.api.rpc.get_table_rows({
         code: this.config.ACCOUNT_CONTRACT,
         scope: this.config.ACCOUNT_CONTRACT,
-        index_position: 2,
+        index_position: 1,
         key_type: "sha256",
         lower_bound: id,
         upper_bound: id,
