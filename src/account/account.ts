@@ -81,12 +81,12 @@ export class Account {
         upper_bound: id,
         table: 'account',
         json: true,
-    }).then((data) => {
-      return data.rows;
-    });
+      }).then((data) => {
+        return data.rows;
+      });
 
-    return resp;  
-  } catch (err) {
+      return resp;
+    } catch (err) {
       throw new Error(err)
     }
   }
