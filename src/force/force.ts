@@ -51,6 +51,28 @@ export class Force {
     return data;
   }
 
+  /**
+   * Get force campaigns
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @returns - Campaign Table Rows Result
+   */
+  getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'batch',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data;
+  }
+
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
