@@ -1,13 +1,22 @@
-import { Api } from 'eosjs'
+import { Api, Serialize, Numeric } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
+import { Signature } from 'eosjs/dist/eosjs-key-conversions';
+import Web3 from 'web3';
+import { utils } from 'ethers';
 const BN = require('bn.js');
+
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
 export class Force {
   config: any;
   api: Api;
+  web3: Web3;
 
-  constructor(api: Api) {
+  constructor(api: Api, web3?: Web3) {
     this.api = api;
+    this.web3 = web3;
+    
     // TODO: replace this with proper config
     this.config = {
       PROPS_CONTRACT:"propsonkylin",
@@ -65,8 +74,40 @@ export class Force {
     }
   }
 
-  createCampaign = async (owner: string, hash: string, quantity: string, permission: string): Promise<object> => {
+  createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, permission: string): Promise<object> => {
     try {
+      let sig;
+
+      if(this.isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(2)
+        serialbuff.pushUint32(nonce)
+        serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
+        serialbuff.pushName(this.config.FORCE_CONTRACT)
+        serialbuff.pushAsset(quantity + ' ' + this.config.EFX_SYMBOL)
+        serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
+  
+        const bytes = serialbuff.asUint8Array()
+  
+        let paramsHash = ec.hash().update(bytes).digest()
+        paramsHash = Serialize.arrayToHex(paramsHash)
+        
+        try {
+          sig = await this.web3.eth.sign('0x'+paramsHash, owner)
+          console.log('sig sig', sig)
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
+        }
+  
+        sig = utils.splitSignature(sig)
+        console.log('sig sig2', sig)
+        // TODO: figure out how to get Signature in right format without this hack
+        sig.r = new BN(sig.r.substring(2),16)
+        sig.s = new BN(sig.s.substring(2), 16)
+        sig = Signature.fromElliptic(sig, 0)
+      }
+
       return await this.api.transact({
         actions: [{
           account: this.config.FORCE_CONTRACT,
@@ -83,7 +124,7 @@ export class Force {
               contract: this.config.EFX_TOKEN_ACCOUNT
             },
             payer: this.config.EOS_RELAYER,
-            sig: null
+            sig: sig ? sig.toString() : null,
           },
         }]
       }, {
