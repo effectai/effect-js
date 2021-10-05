@@ -32,11 +32,11 @@ export class Account {
   }
 
   /**
-   * Get the balance from a vaccount
+   * Get a vaccount
    * @param account - name of the account or bsc
-   * @returns - balance object of
+   * @returns - object of the given account name
    */
-  getBalance = async (account: string): Promise<Array<object>> => {
+  getVAccountByName = async (account: string): Promise<Array<object>> => {
     try {
       let accString;
 
@@ -62,6 +62,32 @@ export class Account {
 
       return resp;
     } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * Get a vaccount
+   * @param id - id of the account
+   * @returns - object of the given account id
+   */
+  getVAccountById = async (id: number): Promise<Array<object>> => {
+    try {
+      const resp = await this.api.rpc.get_table_rows({
+        code: this.config.ACCOUNT_CONTRACT,
+        scope: this.config.ACCOUNT_CONTRACT,
+        index_position: 1,
+        key_type: "sha256",
+        lower_bound: id,
+        upper_bound: id,
+        table: 'account',
+        json: true,
+    }).then((data) => {
+      return data.rows;
+    });
+
+    return resp;  
+  } catch (err) {
       throw new Error(err)
     }
   }
@@ -226,7 +252,7 @@ export class Account {
    * @returns
    */
   vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amountEfx: string, permission: string): Promise<object> => {
-    const balanceTo: object = await this.getBalance(toAccount)
+    const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = this.convertToAsset(amountEfx)
     try {
