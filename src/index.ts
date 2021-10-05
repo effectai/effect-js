@@ -20,6 +20,8 @@
  */
 export * from './client/client'
 
+export * from './force/template'
+
  /**
   * Utility methods
   */

@@ -25,8 +25,8 @@ export class Account {
       EFX_SYMBOL:"UTL",
       EFX_PRECISION: 4,
       EFX_EXTENDED_SYMBOL:"4,UTL",
-      EOS_RELAYER:"testjairtest",
-      EOS_RELAYER_PERMISSION:"active",
+      EOS_RELAYER:"efxkylin1111",
+      EOS_RELAYER_PERMISSION:"owner",
       ACCOUNT_CONTRACT:"acckylin1111"
     }
   }
