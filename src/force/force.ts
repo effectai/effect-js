@@ -19,7 +19,6 @@ export class Force {
     
     // TODO: replace this with proper config
     this.config = {
-      PROPS_CONTRACT:"propsonkylin",
       FORCE_CONTRACT:"forceonkylin",
       IPFS_NODE: 'https://ipfs.effect.ai',
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
@@ -38,9 +37,9 @@ export class Force {
    */
   getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.PROPS_CONTRACT,
-      scope: this.config.PROPS_CONTRACT,
-      table: 'proposal', // 'campaign',
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'campaign',
       limit: limit,
       lower_bound: undefined
     }
