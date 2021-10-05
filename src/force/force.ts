@@ -24,7 +24,7 @@ export class Force {
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
       EFX_SYMBOL:"UTL",
       EFX_PRECISION: 4,
-      EOS_RELAYER:"testjairtest",
+      EOS_RELAYER:"pixeos1gswap",
       EOS_RELAYER_PERMISSION:"active",
     }
   }
@@ -122,7 +122,7 @@ export class Force {
               quantity: this.convertToAsset(quantity) + ' ' + this.config.EFX_SYMBOL,
               contract: this.config.EFX_TOKEN_ACCOUNT
             },
-            payer: this.config.EOS_RELAYER,
+            payer: this.isBscAddress(owner) ? this.config.EOS_RELAYER : owner,
             sig: sig ? sig.toString() : null,
           },
         }]
