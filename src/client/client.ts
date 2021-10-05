@@ -82,7 +82,7 @@ export class EffectClient {
         }
 
         this.account = new Account(this.api, web3)
-        this.force = new Force(this.api)
+        this.force = new Force(this.api, web3)
     }
     // TODO: move to generic helper file/class
     /**

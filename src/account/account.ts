@@ -5,7 +5,6 @@ import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 const BN = require('bn.js');
 
-// (def ec (new ec "secp256k1"))
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
