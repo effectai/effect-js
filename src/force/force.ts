@@ -10,8 +10,14 @@ export class Force {
     this.api = api;
     // TODO: replace this with proper config
     this.config = {
-      FORCE_CONTRACT:"propsonkylin",
-      IPFS_NODE: 'https://ipfs.effect.ai'
+      PROPS_CONTRACT:"propsonkylin",
+      FORCE_CONTRACT:"forceonkylin",
+      IPFS_NODE: 'https://ipfs.effect.ai',
+      EFX_TOKEN_ACCOUNT:"tokenonkylin",
+      EFX_SYMBOL:"UTL",
+      EFX_PRECISION: 4,
+      EOS_RELAYER:"testjairtest",
+      EOS_RELAYER_PERMISSION:"active",
     }
   }
 
@@ -23,8 +29,8 @@ export class Force {
    */
   getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.PROPS_CONTRACT,
+      scope: this.config.PROPS_CONTRACT,
       table: 'proposal', // 'campaign',
       limit: limit,
       lower_bound: undefined
@@ -51,7 +57,6 @@ export class Force {
             body: formData
           })
         const campaign = await response.json()
-        console.log(campaign)
         return campaign.Hash
       } catch (e) {
         console.log(e)
@@ -60,53 +65,66 @@ export class Force {
     }
   }
 
-  createCampaign = async (): Promise<object> => {
-    const actions = []
-    
-    // TODO transaction to smart contract
-    // actions.push(
-    //   {
-    //     account: process.env.proposalContract,
-    //     name: 'createprop',
-    //     authorization: [{
-    //       actor: this.wallet.auth.accountName,
-    //       permission: this.wallet.auth.permission
-    //     }],
-    //     data: {
-    //       author: this.wallet.auth.accountName,
-    //       pay: [
-    //         {
-    //           field_0: {
-    //             quantity: Number.parseFloat(this.proposal.reward).toFixed(4) + ' ' + process.env.efxToken,
-    //             contract: process.env.tokenContract
-    //           },
-    //           field_1: payoutTime.toISOString().slice(0, -1)
-    //         }],
-    //       content_hash: this.proposal.content_hash,
-    //       category: parseInt(this.proposal.category),
-    //       cycle: parseInt(this.proposal.cycle),
-    //       transaction_hash: null
-    //     }
-    //   }
-    // )
-
+  createCampaign = async (owner: string, hash: string, quantity: string, permission: string): Promise<object> => {
     try {
-      // do transaction
-      return await this.handleTransaction(actions)
-    } catch (e) {
-      throw new Error(e)
-    }
-  }
-
-  handleTransaction = async (actions): Promise<object> => {
-    try {
-      return await this.api.transact({ actions },
-        {
-          blocksBehind: 3,
-          expireSeconds: 60
-        });
+      return await this.api.transact({
+        actions: [{
+          account: this.config.FORCE_CONTRACT,
+          name: 'mkcampaign',
+          authorization: [{
+            actor: this.isBscAddress(owner) ? this.config.EOS_RELAYER : owner,
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+          }],
+          data: {      
+            owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
+            content: {field_0: 0, field_1: hash},
+            reward: {
+              quantity: this.convertToAsset(quantity) + ' ' + this.config.EFX_SYMBOL,
+              contract: this.config.EFX_TOKEN_ACCOUNT
+            },
+            payer: this.config.EOS_RELAYER,
+            sig: null
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
     } catch (err) {
       throw new Error(err)
     }
   }
+
+  // TODO make these functions global? they are also used in accounts
+  /**
+   * Check if account is bsc address
+   * @param account 
+   */
+  isBscAddress = (account: string): boolean => {
+    return (account.length == 42 || account.length == 40)
+  }
+
+  /**
+   * Convert amount to asset
+   * @param amount
+   * @returns 
+   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
+   */
+  convertToAsset = (amount: string): string => {
+    // TODO: add filter for wrong values, e.g -1, or 10.00000
+    try {
+      const precision = this.config.EFX_PRECISION
+      const part = amount.split('.')
+
+      if (part.length === 1) {
+        return `${part[0]}.${'0'.repeat(precision)}`
+      } else {
+        const pad = precision - part[1].length
+        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+      }
+    } catch (error) {
+      throw Error(error)
+    }       
+  }
+
 }
