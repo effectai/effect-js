@@ -75,7 +75,7 @@ export class EffectClient {
         // if it's web3 instance (bsc account) use the relayer as signatureProvider
         if (web3) {
             // TODO: add config with relayer key
-            const relayer = new JsSignatureProvider(['5KDRYyZe6SRFX47Uf5wWXecHA8Qg8frXdehAATmqHEcYcwZS21K'])
+            const relayer = new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr'])
             this.api = new Api({rpc, signatureProvider: relayer, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
         } else {
             this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
