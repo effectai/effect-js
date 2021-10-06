@@ -73,6 +73,47 @@ export class Force {
     return data;
   }
 
+  campaignJoin = async (index: number): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'campaignjoin',
+      key_type: 'i64',
+      lower_bound: index,
+      upper_bound: index,
+    }
+
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data;
+  }
+
+  joinCampaign = async (owner:string, permission: string, accountId: number, campaignId:number): Promise<object> => {
+    try {
+      return await this.api.transact({
+        actions: [{
+          account: this.config.FORCE_CONTRACT,
+          name: 'joincampaign',
+          authorization: [{
+            actor: owner,
+            permission: permission,
+          }],
+          data: {
+            account_id: accountId,
+            campaign_id: campaignId,      
+            payer: owner,
+            sig: null,
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
