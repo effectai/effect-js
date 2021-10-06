@@ -51,6 +51,21 @@ export class Force {
     return data;
   }
 
+  countBatches = async (cid): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'batch',
+      index_position: 2,
+      key_type: 'uint32_t',
+      lower_bound: cid,
+      upper_bound: cid,
+    }
+
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data;
+  }
   /**
    * Get force campaigns
    * @param nextKey - key to start searching from
