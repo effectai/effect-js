@@ -3,7 +3,9 @@ import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
+import { MerkleTree } from 'merkletreejs'
 const BN = require('bn.js');
+const ecc = require('eosjs-ecc')
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -198,6 +200,44 @@ export class Force {
     }
   }
 
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {  
+    const buf2hex = x => x.toString('hex')
+    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+
+    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+    const tree = new MerkleTree(leaves, sha256)
+    const proof = tree.getProof(leaves[taskIndex])
+    const hexproof = proof.map(x => buf2hex(x.data))
+    const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+
+    // TODO: actor & payer
+    return await this.api.transact({
+      actions: [{
+        account: this.config.FORCE_CONTRACT,
+        name: 'reservetask',
+        authorization: [{
+          actor: 'testjairtest',
+          permission: this.config.EOS_RELAYER_PERMISSION,
+        }],
+        data: {      
+          proof: hexproof,
+          position: pos,
+          data: "7b226e616d65223a22576f726c64227d",
+          campaign_id: campaignId,
+          batch_id: batchId,
+          account_id: accountId,
+          payer: 'testjairtest',
+          sig: null,
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    });
+    
+  }
+
+
   // TODO make these functions global? they are also used in accounts
   /**
    * Check if account is bsc address
@@ -227,7 +267,7 @@ export class Force {
       }
     } catch (error) {
       throw Error(error)
-    }       
+    }
   }
   /**
    * Create composite key with `account id` and `campaign id`
