@@ -73,19 +73,19 @@ export class Force {
     return data;
   }
 
-  campaignJoin = async (index: number): Promise<GetTableRowsResult> => {
+  campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
+    const key = this.getCompositeKey(accountId, campaignId)
+
     const config = {
       code: this.config.FORCE_CONTRACT,
       scope: this.config.FORCE_CONTRACT,
       table: 'campaignjoin',
       key_type: 'i64',
-      lower_bound: index,
-      upper_bound: index,
+      lower_bound: key,
+      upper_bound: key,
     }
 
-    const data = await this.api.rpc.get_table_rows(config)
-
-    return data;
+    return await this.api.rpc.get_table_rows(config)
   }
 
   joinCampaign = async (owner:string, permission: string, accountId: number, campaignId:number): Promise<object> => {
