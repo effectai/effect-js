@@ -10,6 +10,14 @@ const ec = new EC('secp256k1');
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
 
+function toHex(str) {
+  var result = '';
+  for (var i=0; i<str.length; i++) {
+    result += str.charCodeAt(i).toString(16);
+  }
+  return result;
+}
+
 export class Force {
   config: any;
   api: Api;
@@ -237,7 +245,7 @@ export class Force {
     }
   }
 
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {  
+  reserveTask = async (user: string, permission: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {
     const buf2hex = x => x.toString('hex')
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
@@ -247,23 +255,22 @@ export class Force {
     const hexproof = proof.map(x => buf2hex(x.data))
     const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
-    // TODO: actor & payer
     return await this.api.transact({
       actions: [{
         account: this.config.FORCE_CONTRACT,
         name: 'reservetask',
         authorization: [{
-          actor: 'testjairtest',
-          permission: this.config.EOS_RELAYER_PERMISSION,
+          actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
         }],
         data: {      
           proof: hexproof,
           position: pos,
-          data: "7b226e616d65223a22576f726c64227d",
+          data: toHex(JSON.stringify(tasks[taskIndex])),
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
-          payer: 'testjairtest',
+          payer: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
           sig: null,
         },
       }]
