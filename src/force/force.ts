@@ -3,12 +3,12 @@ import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
-import { MerkleTree } from 'merkletreejs'
-const BN = require('bn.js');
 const ecc = require('eosjs-ecc')
-
+import BN from 'bn.js';
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+import { MerkleTree } from 'merkletreejs';
+import SHA256 from 'crypto-js/sha256';
 
 export class Force {
   config: any;
@@ -52,7 +52,6 @@ export class Force {
 
     return data;
   }
-
   /**
    * Get force campaigns
    * @param nextKey - key to start searching from
@@ -137,7 +136,45 @@ export class Force {
       }
     }
   }
-
+  getMerkleRoot = (dataArray) => {
+    const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
+    const tree = new MerkleTree(leaves, SHA256)
+    const root = tree.getRoot().toString('hex')
+    
+    console.log(tree.toString())
+    return root
+  }
+  createBatch = async (campaignOwner, permission, campaignId, batchId, content, repetitions): Promise<object> => {
+    const hash = await this.uploadCampaign(content)
+    const merkleRoot = this.getMerkleRoot(content.tasks)
+    console.log(typeof campaignId, typeof batchId)
+    try {
+      return await this.api.transact({
+        actions: [{
+          account: this.config.FORCE_CONTRACT,
+          name: 'mkbatch',
+          authorization: [{
+            actor: this.isBscAddress(campaignOwner) ? this.config.EOS_RELAYER : campaignOwner,
+            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+          }],
+          data: {      
+            id: batchId,
+            campaign_id: campaignId,
+            content: {field_0: 0, field_1: hash},
+            task_merkle_root: merkleRoot,
+            num_tasks: content.tasks.length,
+            payer: this.isBscAddress(campaignOwner) ? this.config.EOS_RELAYER : campaignOwner,
+            sig: null,
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
   createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, permission: string): Promise<object> => {
     try {
       let sig;
