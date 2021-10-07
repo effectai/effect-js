@@ -88,19 +88,19 @@ export class Force {
     return data;
   }
 
-  campaignJoin = async (index: number): Promise<GetTableRowsResult> => {
+  campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
+    const key = this.getCompositeKey(accountId, campaignId)
+
     const config = {
       code: this.config.FORCE_CONTRACT,
       scope: this.config.FORCE_CONTRACT,
       table: 'campaignjoin',
       key_type: 'i64',
-      lower_bound: index,
-      upper_bound: index,
+      lower_bound: key,
+      upper_bound: key,
     }
 
-    const data = await this.api.rpc.get_table_rows(config)
-
-    return data;
+    return await this.api.rpc.get_table_rows(config)
   }
 
   joinCampaign = async (owner:string, permission: string, accountId: number, campaignId:number): Promise<object> => {
@@ -244,5 +244,17 @@ export class Force {
       throw Error(error)
     }       
   }
-
+  /**
+   * Create composite key with `account id` and `campaign id`
+   * @param accountId ID of account logged in
+   * @param campaignId ID of the campaign
+   * @returns uint 64 bit number
+   */
+  getCompositeKey = (accountId: number, campaignId: number) => {
+    const buf = new Serialize.SerialBuffer()
+    buf.reserve(64)
+    buf.pushUint32(accountId)
+    buf.pushUint32(campaignId)
+    return Numeric.binaryToDecimal(buf.getUint8Array(8))
+  }
 }
