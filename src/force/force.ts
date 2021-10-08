@@ -299,17 +299,15 @@ export class Force {
     
   }
 
-  getTaskFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<Number>{
+  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<Number>{
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
     const leaves = tasks.map(x => sha256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
     let taskIndex;
-    
-    console.log('leafhash', leafHash)
+
     for (let i = 0; i < treeLeaves.length; i++) {
-      console.log('leaf i', treeLeaves[i].substring(2))
       if(treeLeaves[i].substring(2) === leafHash) {
         taskIndex = i
       }
