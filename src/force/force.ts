@@ -26,7 +26,7 @@ export class Force {
   constructor(api: Api, web3?: Web3) {
     this.api = api;
     this.web3 = web3;
-    
+
     // TODO: replace this with proper config
     this.config = {
       FORCE_CONTRACT:"forceonkylin",
@@ -109,7 +109,7 @@ export class Force {
           }],
           data: {
             account_id: accountId,
-            campaign_id: campaignId,      
+            campaign_id: campaignId,
             payer: owner,
             sig: null,
           },
@@ -148,7 +148,7 @@ export class Force {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, SHA256)
     const root = tree.getRoot().toString('hex')
-    
+
     console.log(tree.toString())
     return root
   }
@@ -165,7 +165,7 @@ export class Force {
             actor: this.isBscAddress(campaignOwner) ? this.config.EOS_RELAYER : campaignOwner,
             permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
-          data: {      
+          data: {
             id: batchId,
             campaign_id: campaignId,
             content: {field_0: 0, field_1: hash},
@@ -195,12 +195,12 @@ export class Force {
         serialbuff.pushName(this.config.FORCE_CONTRACT)
         serialbuff.pushAsset(quantity + ' ' + this.config.EFX_SYMBOL)
         serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
-  
+
         const bytes = serialbuff.asUint8Array()
-  
+
         let paramsHash = ec.hash().update(bytes).digest()
         paramsHash = Serialize.arrayToHex(paramsHash)
-        
+
         try {
           sig = await this.web3.eth.sign('0x'+paramsHash, owner)
           console.log('sig sig', sig)
@@ -208,7 +208,7 @@ export class Force {
           console.error(error)
           return Promise.reject(error)
         }
-  
+
         sig = utils.splitSignature(sig)
         console.log('sig sig2', sig)
         // TODO: figure out how to get Signature in right format without this hack
@@ -225,7 +225,7 @@ export class Force {
             actor: this.isBscAddress(owner) ? this.config.EOS_RELAYER : owner,
             permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
           }],
-          data: {      
+          data: {
             owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
             content: {field_0: 0, field_1: hash},
             reward: {
@@ -263,7 +263,7 @@ export class Force {
           actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
           permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
         }],
-        data: {      
+        data: {
           proof: hexproof,
           position: pos,
           data: toHex(JSON.stringify(tasks[taskIndex])),
@@ -278,14 +278,39 @@ export class Force {
       blocksBehind: 3,
       expireSeconds: 30,
     });
-    
+
+  }
+
+  submitTask = async (user: string, permission: string, batchId: number, submissionId: number, data: string, accountId: number) => {
+    return await this.api.transact({
+      actions: [{
+        account: this.config.FORCE_CONTRACT,
+        name: 'submittask',
+        authorization: [{
+          actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+        }],
+        data: {
+          task_id: submissionId,
+          data: data,
+          account_id: accountId,
+          batch_id: batchId,
+          payer: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          sig: null,
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    });
+
   }
 
 
   // TODO make these functions global? they are also used in accounts
   /**
    * Check if account is bsc address
-   * @param account 
+   * @param account
    */
   isBscAddress = (account: string): boolean => {
     return (account.length == 42 || account.length == 40)
@@ -294,7 +319,7 @@ export class Force {
   /**
    * Convert amount to asset
    * @param amount
-   * @returns 
+   * @returns
    * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
    */
   convertToAsset = (amount: string): string => {
