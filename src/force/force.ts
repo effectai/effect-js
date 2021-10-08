@@ -60,6 +60,24 @@ export class Force {
 
     return data;
   }
+
+  /**
+   * Get reservations
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @returns - Campaign Table Rows Result
+   */
+  getReservations = async (): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'submission',
+    }
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data;
+  }
+
   /**
    * Get force campaigns
    * @param nextKey - key to start searching from
@@ -279,6 +297,24 @@ export class Force {
       expireSeconds: 30,
     });
     
+  }
+
+  getTaskFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<Number>{
+    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+
+    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+    const tree = new MerkleTree(leaves, sha256)
+    const treeLeaves = tree.getHexLeaves()
+    let taskIndex;
+    
+    console.log('leafhash', leafHash)
+    for (let i = 0; i < treeLeaves.length; i++) {
+      console.log('leaf i', treeLeaves[i].substring(2))
+      if(treeLeaves[i].substring(2) === leafHash) {
+        taskIndex = i
+      }
+    }
+    return taskIndex
   }
 
 
