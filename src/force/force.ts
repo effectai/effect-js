@@ -63,9 +63,7 @@ export class Force {
 
   /**
    * Get reservations
-   * @param nextKey - key to start searching from
-   * @param limit - max number of rows to return
-   * @returns - Campaign Table Rows Result
+   * @returns - Submission Table Rows Result
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
     const config = {
