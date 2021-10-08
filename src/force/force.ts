@@ -29,7 +29,7 @@ export class Force {
 
     // TODO: replace this with proper config
     this.config = {
-      FORCE_CONTRACT:"forceonkylin",
+      FORCE_CONTRACT:"forceonkyli2",
       IPFS_NODE: 'https://ipfs.effect.ai',
       EFX_TOKEN_ACCOUNT:"tokenonkylin",
       EFX_SYMBOL:"UTL",
