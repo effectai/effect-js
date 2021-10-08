@@ -40,6 +40,26 @@ export class Force {
   }
 
   /**
+   * get pending balance
+   * @param accountId ID of  the given acccount
+   * @returns the payment rows of the given `accountId`
+   */
+  getPendingBalance = async (accountId: number): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.FORCE_CONTRACT,
+      scope: this.config.FORCE_CONTRACT,
+      table: 'payment',
+      index_position: 3,
+      key_type: 'i64',
+      lower_bound: accountId,
+      upper_bound: accountId
+    }
+
+    return await this.api.rpc.get_table_rows(config)
+  }
+
+
+  /**
    * Get force campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
