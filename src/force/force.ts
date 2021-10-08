@@ -3,13 +3,20 @@ import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
+const ecc = require('eosjs-ecc')
 import BN from 'bn.js';
-
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
+
+function toHex(str) {
+  var result = '';
+  for (var i=0; i<str.length; i++) {
+    result += str.charCodeAt(i).toString(16);
+  }
+  return result;
+}
 
 export class Force {
   config: any;
@@ -238,6 +245,43 @@ export class Force {
     }
   }
 
+  reserveTask = async (user: string, permission: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {
+    const buf2hex = x => x.toString('hex')
+    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+
+    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+    const tree = new MerkleTree(leaves, sha256)
+    const proof = tree.getProof(leaves[taskIndex])
+    const hexproof = proof.map(x => buf2hex(x.data))
+    const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+
+    return await this.api.transact({
+      actions: [{
+        account: this.config.FORCE_CONTRACT,
+        name: 'reservetask',
+        authorization: [{
+          actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+        }],
+        data: {      
+          proof: hexproof,
+          position: pos,
+          data: toHex(JSON.stringify(tasks[taskIndex])),
+          campaign_id: campaignId,
+          batch_id: batchId,
+          account_id: accountId,
+          payer: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          sig: null,
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    });
+    
+  }
+
+
   // TODO make these functions global? they are also used in accounts
   /**
    * Check if account is bsc address
@@ -267,7 +311,7 @@ export class Force {
       }
     } catch (error) {
       throw Error(error)
-    }       
+    }
   }
   /**
    * Create composite key with `account id` and `campaign id`

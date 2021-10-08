@@ -97,6 +97,7 @@
     "dotenv": "^10.0.0",
     "elliptic": "^6.5.4",
     "eosjs": "^22.1.0",
+    "eosjs-ecc": "^4.0.7",
     "ethers": "^5.4.7",
     "merkletreejs": "^0.2.24",
     "node-fetch": "^2.6.1",
