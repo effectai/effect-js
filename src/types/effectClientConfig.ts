@@ -9,8 +9,9 @@ import Web3 from "web3";
 
     /**
      * The network to connect to.
+     * @default mainnet or kylin
      */
-    network: "mainnet" | "kylin" | string
+    network: string
 
     /**
      * EOS Signature Provider
@@ -20,11 +21,11 @@ import Web3 from "web3";
     /**
      * Relayer Key
      */
-    relayerKey: '5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr' | string
+    relayerKey: string
 
     /**
      * The host where the json-rpc will connect to.
-     * @default "localhost"
+     * @default "localhost", "eos.greymass.com", "api.kylin.alohaeos.com"
      */
     host: string
 
@@ -61,48 +62,55 @@ import Web3 from "web3";
      * IPFS
      * @default https://ipfs.effect.ai
      */
-     ipfs_node: 'https://ipfs.effect.ai' | string
+     ipfs_node: string
 
 
     /**
      * Force Contract
+     * @default '', forceonkyli2
      */
-     force_contract: "forceonkyli2" | string
+     force_contract: string
 
      /**
       * Account Contract
+      * @default "acckylin1111"
       */
-     account_contract: 'acckylin1111' | string
+     account_contract: string
 
     /**
      * EFX Token account
+     * @default "tokenonkylin"
      */
-     efx_token_account: "tokenonkylin" | string
+     efx_token_account: string
 
      /**
       * EFX Token Symbol
+      * 'EFX', 'UTL'
       */
-     efx_symbol: "UTL" | string
+     efx_symbol: string
 
      /**
       * EFX Token Precision
+      * 4
       */
-     efx_precision: 4 | number
+     efx_precision: number
 
      /**
       * Extended Symbol
+      * @default '4, EFX', '4,UTL' 
       */
-     efx_extended_symbol: '4,UTL' | string
+     efx_extended_symbol: string
 
      /**
       * Eos Relayer
       */
-     eos_relayer: "pixeos1gswap" | string
+     eos_relayer: string
 
      /**
       * Relayer Permission
+      * @default "active"
       */
-     eos_relayer_permission: "active" | string
+     eos_relayer_permission: string
 
 }
 
