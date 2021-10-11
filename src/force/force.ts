@@ -89,6 +89,7 @@ export class Force {
     const config = {
       code: this.config.FORCE_CONTRACT,
       scope: this.config.FORCE_CONTRACT,
+      limit: -1,
       table: 'submission',
     }
     const data = await this.api.rpc.get_table_rows(config)
