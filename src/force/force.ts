@@ -116,6 +116,10 @@ export class Force {
     }
     const data = await this.api.rpc.get_table_rows(config)
 
+    data.rows.forEach(batch => {
+      batch.batch_id = this.getCompositeKey(batch.id, batch.campaign_id)
+    });
+
     return data;
   }
 
@@ -402,6 +406,6 @@ export class Force {
     buf.reserve(64)
     buf.pushUint32(accountId)
     buf.pushUint32(campaignId)
-    return Numeric.binaryToDecimal(buf.getUint8Array(8))
+    return parseInt(Numeric.binaryToDecimal(buf.getUint8Array(8)))
   }
 }
