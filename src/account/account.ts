@@ -1,11 +1,10 @@
-import { EffectClientConfig } from './../types/effectClientConfig';
+import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 const BN = require('bn.js');
-
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
@@ -15,10 +14,10 @@ export class Account {
   pub: string;
   config: EffectClientConfig;
 
-  constructor(api: Api, config: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, environment: string = 'testnet', config?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = config.web3 || web3;
-    this.config = config;
+    this.config =  defaultConfiguration(environment, config);
   }
 
   /**

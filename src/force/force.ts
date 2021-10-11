@@ -1,5 +1,5 @@
 import { EffectApiError } from './../types/error';
-import { EffectClientConfig } from './../types/effectClientConfig';
+import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
@@ -12,6 +12,7 @@ const ec = new EC('secp256k1');
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
 
+// TODO move to utilities
 function toHex(str) {
   var result = '';
   for (var i=0; i<str.length; i++) {
@@ -25,10 +26,10 @@ export class Force {
   web3: Web3;
   config: EffectClientConfig;
 
-  constructor(api: Api, configuration: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = configuration.web3 || web3;
-    this.config = configuration;
+    this.config = defaultConfiguration(environment, configuration);
   }
 
   /**
