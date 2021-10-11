@@ -32,4 +32,5 @@ export * from './utils/time'
  */
 export * from './types/error'
 export * from './types/auth-token'
+export * from './types/effectClientConfig'
 // export * from '@dfuse/client/dist/types/types/transaction'
