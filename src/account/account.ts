@@ -1,3 +1,4 @@
+import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
@@ -10,24 +11,14 @@ const ec = new EC('secp256k1');
 
 export class Account {
   api: Api;
-  config: any;
   web3: Web3;
   pub: string;
+  config: EffectClientConfig;
 
-  constructor(api: Api, web3?: Web3) {
+  constructor(api: Api, config: EffectClientConfig, web3?: Web3) {
     this.api = api;
-    this.web3 = web3;
-
-    // TODO: replace this with proper config
-    this.config = {
-      EFX_TOKEN_ACCOUNT:"tokenonkylin",
-      EFX_SYMBOL:"UTL",
-      EFX_PRECISION: 4,
-      EFX_EXTENDED_SYMBOL:"4,UTL",
-      EOS_RELAYER:"pixeos1gswap",
-      EOS_RELAYER_PERMISSION:"active",
-      ACCOUNT_CONTRACT:"acckylin1111"
-    }
+    this.web3 = config.web3 || web3;
+    this.config = config;
   }
 
   /**
@@ -41,14 +32,14 @@ export class Account {
 
       if(this.isBscAddress(account)) {
         const address:string = account.length == 42 ? account.substring(2) : account;
-        accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "00" + address).padEnd(64, "0");
+        accString = (this.nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
       } else {
-        accString = (this.nameToHex(this.config.EFX_TOKEN_ACCOUNT) + "01" + this.nameToHex(account)).padEnd(64, "0");
+        accString = (this.nameToHex(this.config.efx_token_account) + "01" + this.nameToHex(account)).padEnd(64, "0");
       }
 
       const resp = await this.api.rpc.get_table_rows({
-          code: this.config.ACCOUNT_CONTRACT,
-          scope: this.config.ACCOUNT_CONTRACT,
+          code: this.config.account_contract,
+          scope: this.config.account_contract,
           index_position: 2,
           key_type: "sha256",
           lower_bound: accString,
@@ -73,8 +64,8 @@ export class Account {
   getVAccountById = async (id: number): Promise<Array<object>> => {
     try {
       const resp = await this.api.rpc.get_table_rows({
-        code: this.config.ACCOUNT_CONTRACT,
-        scope: this.config.ACCOUNT_CONTRACT,
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
         index_position: 1,
         key_type: "sha256",
         lower_bound: id,
@@ -107,16 +98,16 @@ export class Account {
 
       const result = await this.api.transact({
         actions: [{
-          account: this.config.ACCOUNT_CONTRACT,
+          account: this.config.account_contract,
           name: 'open',
           authorization: [{
-            actor: type == 'address' ? this.config.EOS_RELAYER : account,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            actor: type == 'address' ? this.config.eos_relayer : account,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
-            symbol: {contract: this.config.EFX_TOKEN_ACCOUNT, sym: this.config.EFX_EXTENDED_SYMBOL},
-            payer: type == 'address' ? this.config.EOS_RELAYER : account,
+            symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
+            payer: type == 'address' ? this.config.eos_relayer : account,
           },
         }]
       },
@@ -143,16 +134,16 @@ export class Account {
       const amount = this.convertToAsset(amountEfx)
       const result = await this.api.transact({
         actions: [{
-          account: this.config.EFX_TOKEN_ACCOUNT,
+          account: this.config.efx_token_account,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             from: fromAccount,
-            to: this.config.ACCOUNT_CONTRACT,
-            quantity: amount + ' ' + this.config.EFX_SYMBOL,
+            to: this.config.account_contract,
+            quantity: amount + ' ' + this.config.efx_symbol,
             memo: accountId,
           },
         }]
@@ -183,8 +174,8 @@ export class Account {
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
       serialbuff.pushName(toAccount)
-      serialbuff.pushAsset(amount + ' ' + this.config.EFX_SYMBOL)
-      serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
+      serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
+      serialbuff.pushName(this.config.efx_token_account)
 
       const bytes = serialbuff.asUint8Array()
 
@@ -214,18 +205,18 @@ export class Account {
     try {
       const result = await this.api.transact({
         actions: [{
-          account: this.config.ACCOUNT_CONTRACT,
+          account: this.config.account_contract,
           name: 'withdraw',
           authorization: [{
-            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            actor: this.isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             from_id: accountId,
             to_account: toAccount,
             quantity: {
-              quantity: amount + ' ' + this.config.EFX_SYMBOL,
-              contract: this.config.EFX_TOKEN_ACCOUNT
+              quantity: amount + ' ' + this.config.efx_symbol,
+              contract: this.config.efx_token_account
             },
             memo: memo,
             sig: sig ? sig.toString() : null,
@@ -257,18 +248,18 @@ export class Account {
     try {
       const result = await this.api.transact({
         actions: [{
-          account: this.config.ACCOUNT_CONTRACT,
+          account: this.config.account_contract,
           name: 'vtransfer',
           authorization: [{
-            actor: this.isBscAddress(fromAccount) ? this.config.EOS_RELAYER : fromAccount,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            actor: this.isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             from_id: fromAccountId,
             to_id: balanceIndexTo,
             quantity: {
-              quantity: amount + ' ' + this.config.EFX_SYMBOL,
-              contract: this.config.EFX_TOKEN_ACCOUNT
+              quantity: amount + ' ' + this.config.efx_symbol,
+              contract: this.config.efx_token_account
             },
             sig: null,
             fee: null
@@ -334,7 +325,7 @@ export class Account {
   convertToAsset = (amount: string): string => {
     // TODO: add filter for wrong values, e.g -1, or 10.00000
     try {
-      const precision = this.config.EFX_PRECISION
+      const precision = this.config.efx_precision
       const part = amount.split('.')
 
       if (part.length === 1) {
