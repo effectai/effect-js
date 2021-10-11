@@ -1,3 +1,5 @@
+import { EffectApiError } from './../types/error';
+import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
@@ -10,6 +12,7 @@ const ec = new EC('secp256k1');
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
 
+// TODO move to utilities
 function toHex(str) {
   var result = '';
   for (var i=0; i<str.length; i++) {
@@ -19,24 +22,14 @@ function toHex(str) {
 }
 
 export class Force {
-  config: any;
   api: Api;
   web3: Web3;
+  config: EffectClientConfig;
 
-  constructor(api: Api, web3?: Web3) {
+  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
-    this.web3 = web3;
-
-    // TODO: replace this with proper config
-    this.config = {
-      FORCE_CONTRACT:"forceonkyli2",
-      IPFS_NODE: 'https://ipfs.effect.ai',
-      EFX_TOKEN_ACCOUNT:"tokenonkylin",
-      EFX_SYMBOL:"UTL",
-      EFX_PRECISION: 4,
-      EOS_RELAYER:"pixeos1gswap",
-      EOS_RELAYER_PERMISSION:"active",
-    }
+    this.web3 = configuration.web3 || web3;
+    this.config = defaultConfiguration(environment, configuration);
   }
 
   /**
@@ -46,8 +39,8 @@ export class Force {
    */
   getPendingBalance = async (accountId: number): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
       table: 'payment',
       index_position: 3,
       key_type: 'i64',
@@ -67,8 +60,8 @@ export class Force {
    */
   getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
       table: 'campaign',
       limit: limit,
       lower_bound: undefined
@@ -87,8 +80,8 @@ export class Force {
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
       limit: -1,
       table: 'submission',
     }
@@ -105,8 +98,8 @@ export class Force {
    */
   getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
       table: 'batch',
       limit: limit,
       lower_bound: undefined
@@ -127,8 +120,8 @@ export class Force {
     const key = this.getCompositeKey(accountId, campaignId)
 
     const config = {
-      code: this.config.FORCE_CONTRACT,
-      scope: this.config.FORCE_CONTRACT,
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
       table: 'campaignjoin',
       key_type: 'i64',
       lower_bound: key,
@@ -142,7 +135,7 @@ export class Force {
     try {
       return await this.api.transact({
         actions: [{
-          account: this.config.FORCE_CONTRACT,
+          account: this.config.force_contract,
           name: 'joincampaign',
           authorization: [{
             actor: owner,
@@ -172,7 +165,7 @@ export class Force {
       alert('Max file size allowed is 10 MB')
     } else {
       try {
-        const response = await fetch(`${this.config.IPFS_NODE}/api/v0/add?pin=true`,
+        const response = await fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`,
           {
             method: 'POST',
             body: formData
@@ -200,11 +193,11 @@ export class Force {
     try {
       return await this.api.transact({
         actions: [{
-          account: this.config.FORCE_CONTRACT,
+          account: this.config.force_contract,
           name: 'mkbatch',
           authorization: [{
-            actor: this.isBscAddress(campaignOwner) ? this.config.EOS_RELAYER : campaignOwner,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            actor: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             id: batchId,
@@ -212,7 +205,7 @@ export class Force {
             content: {field_0: 0, field_1: hash},
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
-            payer: this.isBscAddress(campaignOwner) ? this.config.EOS_RELAYER : campaignOwner,
+            payer: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
             sig: null,
           },
         }]
@@ -233,9 +226,9 @@ export class Force {
         serialbuff.push(2)
         serialbuff.pushUint32(nonce)
         serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
-        serialbuff.pushName(this.config.FORCE_CONTRACT)
-        serialbuff.pushAsset(quantity + ' ' + this.config.EFX_SYMBOL)
-        serialbuff.pushName(this.config.EFX_TOKEN_ACCOUNT)
+        serialbuff.pushName(this.config.force_contract)
+        serialbuff.pushAsset(quantity + ' ' + this.config.efx_symbol)
+        serialbuff.pushName(this.config.efx_token_account)
 
         const bytes = serialbuff.asUint8Array()
 
@@ -260,20 +253,20 @@ export class Force {
 
       return await this.api.transact({
         actions: [{
-          account: this.config.FORCE_CONTRACT,
+          account: this.config.force_contract,
           name: 'mkcampaign',
           authorization: [{
-            actor: this.isBscAddress(owner) ? this.config.EOS_RELAYER : owner,
-            permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+            actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
             owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
             content: {field_0: 0, field_1: hash},
             reward: {
-              quantity: this.convertToAsset(quantity) + ' ' + this.config.EFX_SYMBOL,
-              contract: this.config.EFX_TOKEN_ACCOUNT
+              quantity: this.convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+              contract: this.config.efx_token_account
             },
-            payer: this.isBscAddress(owner) ? this.config.EOS_RELAYER : owner,
+            payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
             sig: sig ? sig.toString() : null,
           },
         }]
@@ -298,11 +291,11 @@ export class Force {
 
     return await this.api.transact({
       actions: [{
-        account: this.config.FORCE_CONTRACT,
+        account: this.config.force_contract,
         name: 'reservetask',
         authorization: [{
-          actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
-          permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: permission ? permission : this.config.eos_relayer_permission,
         }],
         data: {
           proof: hexproof,
@@ -311,7 +304,7 @@ export class Force {
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
-          payer: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
           sig: null,
         },
       }]
@@ -325,18 +318,18 @@ export class Force {
   submitTask = async (user: string, permission: string, batchId: number, submissionId: number, data: string, accountId: number) => {
     return await this.api.transact({
       actions: [{
-        account: this.config.FORCE_CONTRACT,
+        account: this.config.force_contract,
         name: 'submittask',
         authorization: [{
-          actor: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
-          permission: permission ? permission : this.config.EOS_RELAYER_PERMISSION,
+          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: permission ? permission : this.config.eos_relayer_permission,
         }],
         data: {
           task_id: submissionId,
           data: data,
           account_id: accountId,
           batch_id: batchId,
-          payer: this.isBscAddress(user) ? this.config.EOS_RELAYER : user,
+          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
           sig: null,
         },
       }]
@@ -347,7 +340,7 @@ export class Force {
 
   }
 
-  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<Number>{
+  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number>{
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
     const leaves = tasks.map(x => sha256(JSON.stringify(x)))
@@ -365,6 +358,7 @@ export class Force {
 
 
   // TODO make these functions global? they are also used in accounts
+  // Add them to util class
   /**
    * Check if account is bsc address
    * @param account
@@ -382,7 +376,7 @@ export class Force {
   convertToAsset = (amount: string): string => {
     // TODO: add filter for wrong values, e.g -1, or 10.00000
     try {
-      const precision = this.config.EFX_PRECISION
+      const precision = this.config.efx_precision
       const part = amount.split('.')
 
       if (part.length === 1) {
