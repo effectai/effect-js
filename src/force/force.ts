@@ -116,6 +116,7 @@ export class Force {
     return data;
   }
 
+  // TODO remame this
   campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
     const key = this.getCompositeKey(accountId, campaignId)
 
@@ -131,21 +132,31 @@ export class Force {
     return await this.api.rpc.get_table_rows(config)
   }
 
-  joinCampaign = async (owner:string, permission: string, accountId: number, campaignId:number): Promise<object> => {
+  joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
     try {
+      let sig;
+
+      if(this.isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(7)
+        serialbuff.pushUint32(campaignId)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
           name: 'joincampaign',
           authorization: [{
-            actor: owner,
-            permission: permission,
+            actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             account_id: accountId,
             campaign_id: campaignId,
-            payer: owner,
-            sig: null,
+            payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: this.isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -178,6 +189,7 @@ export class Force {
       }
     }
   }
+
   getMerkleRoot = (dataArray) => {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, SHA256)
@@ -186,6 +198,7 @@ export class Force {
     console.log(tree.toString())
     return root
   }
+
   createBatch = async (campaignOwner, permission, campaignId, batchId, content, repetitions): Promise<object> => {
     const hash = await this.uploadCampaign(content)
     const merkleRoot = this.getMerkleRoot(content.tasks)
@@ -227,23 +240,7 @@ export class Force {
         serialbuff.push(0)
         serialbuff.pushString(hash)
 
-        const bytes = serialbuff.asUint8Array()
-
-        let paramsHash = ec.hash().update(bytes).digest()
-        paramsHash = Serialize.arrayToHex(paramsHash)
-
-        try {
-          sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
-        } catch (error) {
-          console.error(error)
-          return Promise.reject(error)
-        }
-
-        sig = utils.splitSignature(sig)
-        // TODO: figure out how to get Signature in right format without this hack
-        sig.r = new BN(sig.r.substring(2),16)
-        sig.s = new BN(sig.s.substring(2), 16)
-        sig = Signature.fromElliptic(sig, 0)
+        sig = await this.generateSignature(serialbuff, options['address'])
       }
 
       return await this.api.transact({
@@ -262,7 +259,7 @@ export class Force {
               contract: this.config.efx_token_account
             },
             payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: sig ? sig.toString() : null,
+            sig: this.isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -351,6 +348,35 @@ export class Force {
     return taskIndex
   }
 
+  /**
+   * Generate Signature
+   * @param serialbuff
+   * @param address 
+   * @returns 
+   */
+  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
+    let sig
+    
+    const bytes = serialbuff.asUint8Array()
+
+    let paramsHash = ec.hash().update(bytes).digest()
+    paramsHash = Serialize.arrayToHex(paramsHash)
+
+    try {
+      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+    } catch (error) {
+      console.error(error)
+      return Promise.reject(error)
+    }
+
+    sig = utils.splitSignature(sig)
+    // TODO: figure out how to get Signature in right format without this hack
+    sig.r = new BN(sig.r.substring(2),16)
+    sig.s = new BN(sig.s.substring(2), 16)
+    sig = Signature.fromElliptic(sig, 0)
+    
+    return sig
+  }
 
   // TODO make these functions global? they are also used in accounts
   // Add them to util class
