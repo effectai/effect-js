@@ -217,18 +217,15 @@ export class Force {
       throw new Error(err)
     }
   }
-  createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, permission: string): Promise<object> => {
+  createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
     try {
       let sig;
 
       if(this.isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(2)
-        serialbuff.pushUint32(nonce)
-        serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
-        serialbuff.pushName(this.config.force_contract)
-        serialbuff.pushAsset(quantity + ' ' + this.config.efx_symbol)
-        serialbuff.pushName(this.config.efx_token_account)
+        serialbuff.push(9)
+        serialbuff.push(0)
+        serialbuff.pushString(hash)
 
         const bytes = serialbuff.asUint8Array()
 
@@ -236,15 +233,13 @@ export class Force {
         paramsHash = Serialize.arrayToHex(paramsHash)
 
         try {
-          sig = await this.web3.eth.sign('0x'+paramsHash, owner)
-          console.log('sig sig', sig)
+          sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
         } catch (error) {
           console.error(error)
           return Promise.reject(error)
         }
 
         sig = utils.splitSignature(sig)
-        console.log('sig sig2', sig)
         // TODO: figure out how to get Signature in right format without this hack
         sig.r = new BN(sig.r.substring(2),16)
         sig.s = new BN(sig.s.substring(2), 16)
@@ -257,7 +252,7 @@ export class Force {
           name: 'mkcampaign',
           authorization: [{
             actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
