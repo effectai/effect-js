@@ -1,11 +1,11 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.0.14",
+  "version": "0.0.16",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
-  "module": "dist/effect-js.js",
-  "browser": "dist/effect-js.umd.js",
-  "typings": "dist/types/index.d.ts",
+  "module": "dist/libs/index.js",
+  "browser": "dist/libs/index.js",
+  "types": "dist/libs/index.d.ts",
   "files": [
     "dist/*"
   ],
@@ -21,8 +21,8 @@
     "docs": "typedoc",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
-    "publish:latest": "npm version patch && npm run build:cjs && npm publish",
-    "publish:next": "npm version patch && npm run build:cjs && npm publish --tag next "
+    "publish:latest": "npm version patch && npm run build && npm publish",
+    "publish:next": "npm version patch && npm run build && npm publish --tag next "
   },
   "repository": {
     "type": "git",
