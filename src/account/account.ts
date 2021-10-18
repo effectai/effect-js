@@ -180,7 +180,7 @@ export class Account {
 
       let paramsHash = ec.hash().update(bytes).digest()
       paramsHash = Serialize.arrayToHex(paramsHash)
-  
+
       // For test purposes (sometimes different than MetaMask signature?)
       // const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
       // const sigg = keypair.sign(paramsHash)
@@ -287,7 +287,7 @@ export class Account {
 
   /**
    * Check if account is bsc address
-   * @param account 
+   * @param account
    */
   isBscAddress = (account: string): boolean => {
     return (account.length == 42 || account.length == 40)
@@ -318,7 +318,7 @@ export class Account {
   /**
    * Convert amount to asset
    * @param amount
-   * @returns 
+   * @returns
    * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
    */
   convertToAsset = (amount: string): string => {
@@ -336,7 +336,7 @@ export class Account {
     } catch (error) {
       throw Error(error)
     }
-    
+
   }
 
 }

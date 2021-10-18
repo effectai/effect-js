@@ -19,11 +19,6 @@ import Web3 from "web3";
     signatureProvider: JsSignatureProvider | SignatureProvider
 
     /**
-     * Relayer Key
-     */
-    relayerKey: string
-
-    /**
      * The host where the json-rpc will connect to.
      * @default "localhost", "eos.greymass.com", "api.kylin.alohaeos.com"
      */
@@ -47,7 +42,7 @@ import Web3 from "web3";
     secure?: boolean
 
     /**
-     * Specifies the need for authentication of the call. 
+     * Specifies the need for authentication of the call.
      * If the call is made to a public endpoint this can be set to false.
      */
     authentication?: boolean
@@ -97,7 +92,7 @@ import Web3 from "web3";
 
      /**
       * Extended Symbol
-      * @default '4, EFX', '4,UTL' 
+      * @default '4, EFX', '4,UTL'
       */
      efx_extended_symbol: string
 
@@ -116,14 +111,13 @@ import Web3 from "web3";
 
 /**
  * Build default configuration object to be passed to client instantiation.
- * 
+ *
  */
 export const defaultConfiguration = (environment: string = 'testnet', config?: EffectClientConfig): EffectClientConfig => {
     if (environment == 'testnet') {
         return {
             network: config.network ?? "kylin",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
-            relayerKey: config.relayerKey ?? '5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr',
             host: config.host ?? 'api.kylin.alohaeos.com',
             web3: config.web3 ?? new Web3,
             apiKey: config.apiKey ?? '',
@@ -145,7 +139,6 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
         return {
             network: config.network ?? "mainnet",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
-            relayerKey: config.relayerKey ?? '5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr',
             host: config.host ?? 'eos.greymass.com',
             web3: config.web3 ?? new Web3,
             apiKey: config.apiKey ?? '',

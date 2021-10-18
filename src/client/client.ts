@@ -11,20 +11,15 @@ export class EffectClient {
     account: Account;
     force: Force;
     config: EffectClientConfig;
-    
+
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
         this.config = defaultConfiguration(environment, configuration)
         // TODO clean up these variables?
-        const { web3, signatureProvider, relayerKey, host } = this.config
+        const { web3, signatureProvider, host } = this.config
         const rpc = new JsonRpc(host, {fetch})
 
         // if it's web3 instance (bsc account) use the relayer as signatureProvider
-        if (web3) {
-            const relayer = new JsSignatureProvider([relayerKey])
-            this.api = new Api({rpc, signatureProvider: relayer, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
-        } else {
-            this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
-        }
+        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
 
         this.account = new Account(this.api, environment, configuration, web3)
         this.force = new Force(this.api, environment, configuration, web3)
