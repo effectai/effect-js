@@ -1,4 +1,4 @@
-import { defaultConfiguration } from './../types/effectClientConfig';
+import { defaultConfiguration } from './../config/config';
 import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { Account } from '../account/account'
