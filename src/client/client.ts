@@ -13,12 +13,9 @@ export class EffectClient {
     config: EffectClientConfig;
     
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
-
-        console.log(`EffectClient::Configuration: ${JSON.stringify(configuration)}`)
-
         this.config = defaultConfiguration(environment, configuration)
         // TODO clean up these variables?
-        const { web3, signatureProvider, relayerKey, host } = configuration
+        const { web3, signatureProvider, relayerKey, host } = this.config
         const rpc = new JsonRpc(host, {fetch})
 
         // if it's web3 instance (bsc account) use the relayer as signatureProvider
