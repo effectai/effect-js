@@ -224,27 +224,23 @@ export class Force {
    * @returns
    */
   createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
-    const hash = await this.uploadCampaign(content)
-    const merkleRoot = this.getMerkleRoot(content.tasks)
-
-    let sig;
-    if(isBscAddress(campaignOwner)) {
-      console.log(merkleRoot)
-
-      // (.push 8) (.pushUint32 id) (.pushUint32 camp-id) (.push 0) (.pushString content)
-      // (.pushUint8ArrayChecked (vacc/hex->bytes root) 32))))
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(8)
-      serialbuff.pushUint32(batchId)
-      serialbuff.pushUint32(campaignId)
-      serialbuff.push(0)
-      serialbuff.pushString(hash)
-      serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
-
-      sig = await this.generateSignature(serialbuff, options['address'])
-    }
-
     try {
+      const hash = await this.uploadCampaign(content)
+      const merkleRoot = this.getMerkleRoot(content.tasks)
+
+      let sig;
+      if(isBscAddress(campaignOwner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(8)
+        serialbuff.pushUint32(batchId)
+        serialbuff.pushUint32(campaignId)
+        serialbuff.push(0)
+        serialbuff.pushString(hash)
+        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
