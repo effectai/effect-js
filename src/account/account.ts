@@ -4,6 +4,9 @@ import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
+import { isBscAddress } from '../utils/bscAddress'
+import { convertToAsset } from '../utils/asset'
+import { nameToHex } from '../utils/hex'
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -29,11 +32,11 @@ export class Account {
     try {
       let accString;
 
-      if(this.isBscAddress(account)) {
+      if(isBscAddress(account)) {
         const address:string = account.length == 42 ? account.substring(2) : account;
-        accString = (this.nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
+        accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
       } else {
-        accString = (this.nameToHex(this.config.efx_token_account) + "01" + this.nameToHex(account)).padEnd(64, "0");
+        accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
 
       const resp = await this.api.rpc.get_table_rows({
@@ -90,7 +93,7 @@ export class Account {
     try {
       let type = 'name'
       let address: string
-      if(this.isBscAddress(account)) {
+      if(isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }
@@ -130,7 +133,7 @@ export class Account {
    */
   deposit = async (fromAccount: string, accountId: number, amountEfx: string, permission: string): Promise<object> => {
     try {
-      const amount = this.convertToAsset(amountEfx)
+      const amount = convertToAsset(amountEfx)
       const result = await this.api.transact({
         actions: [{
           account: this.config.efx_token_account,
@@ -166,8 +169,8 @@ export class Account {
    */
   withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
     let sig;
-    const amount = this.convertToAsset(amountEfx)
-    if(this.isBscAddress(fromAccount)) {
+    const amount = convertToAsset(amountEfx)
+    if(isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
@@ -207,7 +210,7 @@ export class Account {
           account: this.config.account_contract,
           name: 'withdraw',
           authorization: [{
-            actor: this.isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
             permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
@@ -243,14 +246,14 @@ export class Account {
   vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amountEfx: string, permission: string): Promise<object> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
-    const amount = this.convertToAsset(amountEfx)
+    const amount = convertToAsset(amountEfx)
     try {
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
           name: 'vtransfer',
           authorization: [{
-            actor: this.isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
             permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
@@ -276,24 +279,6 @@ export class Account {
   }
 
   /**
-   * Convert account name to hex
-   */
-  nameToHex = (account: string): string => {
-    const serialbuff = new Serialize.SerialBuffer();
-    serialbuff.pushName(account);
-    const bytes = serialbuff.asUint8Array();
-    return Serialize.arrayToHex(bytes);
-  }
-
-  /**
-   * Check if account is bsc address
-   * @param account
-   */
-  isBscAddress = (account: string): boolean => {
-    return (account.length == 42 || account.length == 40)
-  }
-
-  /**
    * Recover BSC public key from signed message
    * @param message
    * @param signature
@@ -313,30 +298,6 @@ export class Account {
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
     const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
     return { address, accountAddress }
-  }
-
-  /**
-   * Convert amount to asset
-   * @param amount
-   * @returns
-   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
-   */
-  convertToAsset = (amount: string): string => {
-    // TODO: add filter for wrong values, e.g -1, or 10.00000
-    try {
-      const precision = this.config.efx_precision
-      const part = amount.split('.')
-
-      if (part.length === 1) {
-        return `${part[0]}.${'0'.repeat(precision)}`
-      } else {
-        const pad = precision - part[1].length
-        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
-      }
-    } catch (error) {
-      throw Error(error)
-    }
-
   }
 
 }

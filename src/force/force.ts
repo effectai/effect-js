@@ -1,25 +1,19 @@
-import { EffectApiError } from './../types/error';
 import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
-import { Api, Serialize, Numeric } from 'eosjs'
+import { Api, Serialize } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
-const ecc = require('eosjs-ecc')
-import BN from 'bn.js';
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
-
-// TODO move to utilities
-function toHex(str) {
-  var result = '';
-  for (var i=0; i<str.length; i++) {
-    result += str.charCodeAt(i).toString(16);
-  }
-  return result;
-}
+import { isBscAddress } from '../utils/bscAddress'
+import { convertToAsset } from '../utils/asset'
+import { getCompositeKey } from '../utils/compositeKey'
+import { stringToHex } from '../utils/hex'
+import BN from 'bn.js';
+const ecc = require('eosjs-ecc')
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
 export class Force {
   api: Api;
@@ -110,7 +104,7 @@ export class Force {
     const data = await this.api.rpc.get_table_rows(config)
 
     data.rows.forEach(batch => {
-      batch.batch_id = this.getCompositeKey(batch.id, batch.campaign_id)
+      batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
     });
 
     return data;
@@ -118,7 +112,7 @@ export class Force {
 
   // TODO remame this
   campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
-    const key = this.getCompositeKey(accountId, campaignId)
+    const key = getCompositeKey(accountId, campaignId)
 
     const config = {
       code: this.config.force_contract,
@@ -136,7 +130,7 @@ export class Force {
     try {
       let sig;
 
-      if(this.isBscAddress(owner)) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
@@ -149,14 +143,14 @@ export class Force {
           account: this.config.force_contract,
           name: 'joincampaign',
           authorization: [{
-            actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             account_id: accountId,
             campaign_id: campaignId,
-            payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: this.isBscAddress(owner) ? sig.toString() : null,
+            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -209,7 +203,7 @@ export class Force {
           account: this.config.force_contract,
           name: 'mkbatch',
           authorization: [{
-            actor: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
             permission: permission ? permission : this.config.eos_relayer_permission,
           }],
           data: {
@@ -218,7 +212,7 @@ export class Force {
             content: {field_0: 0, field_1: hash},
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
-            payer: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
             sig: null,
           },
         }]
@@ -234,7 +228,7 @@ export class Force {
     try {
       let sig;
 
-      if(this.isBscAddress(owner)) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
@@ -248,18 +242,18 @@ export class Force {
           account: this.config.force_contract,
           name: 'mkcampaign',
           authorization: [{
-            actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
-            owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
+            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
             content: {field_0: 0, field_1: hash},
             reward: {
-              quantity: this.convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+              quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
             },
-            payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: this.isBscAddress(owner) ? sig.toString() : null,
+            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -286,17 +280,17 @@ export class Force {
         account: this.config.force_contract,
         name: 'reservetask',
         authorization: [{
-          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
           permission: permission ? permission : this.config.eos_relayer_permission,
         }],
         data: {
           proof: hexproof,
           position: pos,
-          data: toHex(JSON.stringify(tasks[taskIndex])),
+          data: stringToHex(JSON.stringify(tasks[taskIndex])),
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
-          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: null,
         },
       }]
@@ -313,7 +307,7 @@ export class Force {
         account: this.config.force_contract,
         name: 'submittask',
         authorization: [{
-          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
           permission: permission ? permission : this.config.eos_relayer_permission,
         }],
         data: {
@@ -321,7 +315,7 @@ export class Force {
           data: data,
           account_id: accountId,
           batch_id: batchId,
-          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: null,
         },
       }]
@@ -378,49 +372,4 @@ export class Force {
     return sig
   }
 
-  // TODO make these functions global? they are also used in accounts
-  // Add them to util class
-  /**
-   * Check if account is bsc address
-   * @param account
-   */
-  isBscAddress = (account: string): boolean => {
-    return (account.length == 42 || account.length == 40)
-  }
-
-  /**
-   * Convert amount to asset
-   * @param amount
-   * @returns
-   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
-   */
-  convertToAsset = (amount: string): string => {
-    // TODO: add filter for wrong values, e.g -1, or 10.00000
-    try {
-      const precision = this.config.efx_precision
-      const part = amount.split('.')
-
-      if (part.length === 1) {
-        return `${part[0]}.${'0'.repeat(precision)}`
-      } else {
-        const pad = precision - part[1].length
-        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
-      }
-    } catch (error) {
-      throw Error(error)
-    }
-  }
-  /**
-   * Create composite key with `account id` and `campaign id`
-   * @param accountId ID of account logged in
-   * @param campaignId ID of the campaign
-   * @returns uint 64 bit number
-   */
-  getCompositeKey = (accountId: number, campaignId: number) => {
-    const buf = new Serialize.SerialBuffer()
-    buf.reserve(64)
-    buf.pushUint32(accountId)
-    buf.pushUint32(campaignId)
-    return parseInt(Numeric.binaryToDecimal(buf.getUint8Array(8)))
-  }
 }

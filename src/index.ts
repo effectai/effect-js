@@ -26,6 +26,10 @@ export * from './force/template'
   * Utility methods
   */
 export * from './utils/time'
+export * from './utils/bscAddress'
+export * from './utils/asset'
+export * from './utils/compositeKey'
+export * from './utils/hex'
 
 /**
  * Types
