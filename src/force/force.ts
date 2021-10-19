@@ -447,8 +447,8 @@ export class Force {
   /**
    * Generate Signature
    * @param serialbuff
-   * @param address 
-   * @returns 
+   * @param address
+   * @returns
    */
   generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
     let sig
@@ -469,7 +469,7 @@ export class Force {
     sig.r = new BN(sig.r.substring(2),16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
-    
+
     return sig
   }
 

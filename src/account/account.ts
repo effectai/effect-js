@@ -243,10 +243,24 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, toAccount: string, amountEfx: string, permission: string): Promise<object> => {
+  vtransfer = async (fromAccount: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
+
+    let sig;
+    if(isBscAddress(fromAccount)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(1)
+      serialbuff.pushUint32(nonce)
+      serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
+      serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
+      serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
+      serialbuff.pushName(this.config.efx_token_account)
+
+      sig = await this.generateSignature(serialbuff, options['address'])
+    }
+
     try {
       const result = await this.api.transact({
         actions: [{
@@ -254,7 +268,7 @@ export class Account {
           name: 'vtransfer',
           authorization: [{
             actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             from_id: fromAccountId,
@@ -263,7 +277,7 @@ export class Account {
               quantity: amount + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
             },
-            sig: null,
+            sig: isBscAddress(fromAccount) ? sig.toString() : null,
             fee: null
           },
         }]
@@ -298,6 +312,35 @@ export class Account {
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
     const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
     return { address, accountAddress }
+  }
+
+  /**
+   * Generate Signature
+   * @param serialbuff
+   * @param address
+   * @returns 
+   */
+  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
+    let sig
+    const bytes = serialbuff.asUint8Array()
+
+    let paramsHash = ec.hash().update(bytes).digest()
+    paramsHash = Serialize.arrayToHex(paramsHash)
+
+    try {
+      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+    } catch (error) {
+      console.error(error)
+      return Promise.reject(error)
+    }
+
+    sig = utils.splitSignature(sig)
+    // TODO: figure out how to get Signature in right format without this hack
+    sig.r = new BN(sig.r.substring(2),16)
+    sig.s = new BN(sig.s.substring(2), 16)
+    sig = Signature.fromElliptic(sig, 0)
+
+    return sig
   }
 
 }
