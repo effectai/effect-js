@@ -1,5 +1,7 @@
-import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
-import { Api, Serialize } from 'eosjs'
+import { defaultConfiguration } from './../config/config';
+import { EffectApiError } from './../types/error';
+import { EffectClientConfig } from './../types/effectClientConfig';
+import { Api, Serialize, Numeric } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';

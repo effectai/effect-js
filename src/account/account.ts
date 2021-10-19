@@ -1,4 +1,5 @@
-import { EffectClientConfig, defaultConfiguration } from './../types/effectClientConfig';
+import { defaultConfiguration } from './../config/config';
+import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
