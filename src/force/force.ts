@@ -221,9 +221,27 @@ export class Force {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignOwner, permission, campaignId, batchId, content, repetitions): Promise<object> => {
+  createBatch = async (campaignOwner, campaignId, batchId, content, repetitions, options): Promise<object> => {
     const hash = await this.uploadCampaign(content)
     const merkleRoot = this.getMerkleRoot(content.tasks)
+
+    let sig;
+    if(isBscAddress(campaignOwner)) {
+      console.log(hash)
+
+      // (.push 8) (.pushUint32 id) (.pushUint32 camp-id) (.push 0) (.pushString content)
+      // (.pushUint8ArrayChecked (vacc/hex->bytes root) 32))))
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(8)
+      serialbuff.pushUint32(batchId)
+      serialbuff.pushUint32(campaignId)
+      serialbuff.push(0)
+      serialbuff.pushString(content)
+      serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(hash), 32)
+
+      sig = await this.generateSignature(serialbuff, options['address'])
+    }
+
     try {
       return await this.api.transact({
         actions: [{
@@ -231,7 +249,7 @@ export class Force {
           name: 'mkbatch',
           authorization: [{
             actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             id: batchId,
@@ -240,7 +258,7 @@ export class Force {
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
             payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: null,
+            sig: isBscAddress(campaignOwner) ? sig.toString() : null
           },
         }]
       }, {
