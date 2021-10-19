@@ -269,6 +269,17 @@ export class Force {
       throw new Error(err)
     }
   }
+
+  /**
+   * 
+   * @param owner 
+   * @param accountId 
+   * @param nonce 
+   * @param hash 
+   * @param quantity 
+   * @param options 
+   * @returns 
+   */
   createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
     try {
       let sig;
@@ -310,39 +321,65 @@ export class Force {
     }
   }
 
-  reserveTask = async (user: string, permission: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {
-    const buf2hex = x => x.toString('hex')
-    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+  /**
+   * 
+   * @param user 
+   * @param batchId 
+   * @param taskIndex 
+   * @param campaignId 
+   * @param accountId 
+   * @param tasks 
+   * @param options 
+   * @returns 
+   */
+  reserveTask = async (user: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
+    try {
+      const buf2hex = x => x.toString('hex')
+      const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
-    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
-    const tree = new MerkleTree(leaves, sha256)
-    const proof = tree.getProof(leaves[taskIndex])
-    const hexproof = proof.map(x => buf2hex(x.data))
-    const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+      const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+      const tree = new MerkleTree(leaves, sha256)
+      const proof = tree.getProof(leaves[taskIndex])
+      const hexproof = proof.map(x => buf2hex(x.data))
+      const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
-    return await this.api.transact({
-      actions: [{
-        account: this.config.force_contract,
-        name: 'reservetask',
-        authorization: [{
-          actor: isBscAddress(user) ? this.config.eos_relayer : user,
-          permission: permission ? permission : this.config.eos_relayer_permission,
-        }],
-        data: {
-          proof: hexproof,
-          position: pos,
-          data: stringToHex(JSON.stringify(tasks[taskIndex])),
-          campaign_id: campaignId,
-          batch_id: batchId,
-          account_id: accountId,
-          payer: isBscAddress(user) ? this.config.eos_relayer : user,
-          sig: null,
-        },
-      }]
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
+      let sig
+      if(isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(6)
+        serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
+        serialbuff.pushUint32(campaignId)
+        serialbuff.pushUint32(batchId)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
+      return await this.api.transact({
+        actions: [{
+          account: this.config.force_contract,
+          name: 'reservetask',
+          authorization: [{
+            actor: isBscAddress(user) ? this.config.eos_relayer : user,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+          }],
+          data: {
+            proof: hexproof,
+            position: pos,
+            data: stringToHex(JSON.stringify(tasks[taskIndex])),
+            campaign_id: campaignId,
+            batch_id: batchId,
+            account_id: accountId,
+            payer: isBscAddress(user) ? this.config.eos_relayer : user,
+            sig: isBscAddress(user) ? sig.toString() : null,
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
 
   }
 
