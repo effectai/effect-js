@@ -110,8 +110,13 @@ export class Force {
     return data;
   }
 
-  // TODO remame this
-  campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
+  /**
+   * get campaign join table
+   * @param accountId 
+   * @param campaignId 
+   * @returns 
+   */
+  getCampaignJoins = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
     const key = getCompositeKey(accountId, campaignId)
 
     const config = {
@@ -126,6 +131,14 @@ export class Force {
     return await this.api.rpc.get_table_rows(config)
   }
 
+  /**
+   * Join campaign
+   * @param owner 
+   * @param accountId 
+   * @param campaignId 
+   * @param options 
+   * @returns 
+   */
   joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
     try {
       let sig;
@@ -162,6 +175,11 @@ export class Force {
     }
   }
 
+  /**
+   * Upload campaign data to ipfs
+   * @param campaignIpfs 
+   * @returns 
+   */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
@@ -193,10 +211,19 @@ export class Force {
     return root
   }
 
+  /**
+   * 
+   * @param campaignOwner
+   * @param permission
+   * @param campaignId
+   * @param batchId
+   * @param content
+   * @param repetitions
+   * @returns
+   */
   createBatch = async (campaignOwner, permission, campaignId, batchId, content, repetitions): Promise<object> => {
     const hash = await this.uploadCampaign(content)
     const merkleRoot = this.getMerkleRoot(content.tasks)
-    console.log(typeof campaignId, typeof batchId)
     try {
       return await this.api.transact({
         actions: [{
