@@ -221,13 +221,13 @@ export class Force {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignOwner, campaignId, batchId, content, repetitions, options): Promise<object> => {
+  createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
     const hash = await this.uploadCampaign(content)
     const merkleRoot = this.getMerkleRoot(content.tasks)
 
     let sig;
     if(isBscAddress(campaignOwner)) {
-      console.log(hash)
+      console.log(merkleRoot)
 
       // (.push 8) (.pushUint32 id) (.pushUint32 camp-id) (.push 0) (.pushString content)
       // (.pushUint8ArrayChecked (vacc/hex->bytes root) 32))))
@@ -236,8 +236,8 @@ export class Force {
       serialbuff.pushUint32(batchId)
       serialbuff.pushUint32(campaignId)
       serialbuff.push(0)
-      serialbuff.pushString(content)
-      serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(hash), 32)
+      serialbuff.pushString(hash)
+      serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
 
       sig = await this.generateSignature(serialbuff, options['address'])
     }
@@ -383,14 +383,34 @@ export class Force {
 
   }
 
-  submitTask = async (user: string, permission: string, batchId: number, submissionId: number, data: string, accountId: number) => {
+  /**
+   * 
+   * @param user
+   * @param batchId
+   * @param submissionId
+   * @param data
+   * @param accountId
+   * @param options
+   * @returns
+   */
+  submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
+    let sig
+    if(isBscAddress(user)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(5)
+      serialbuff.pushNumberAsUint64(submissionId)
+      serialbuff.pushString(data)
+
+      sig = await this.generateSignature(serialbuff, options['address'])
+    }
+
     return await this.api.transact({
       actions: [{
         account: this.config.force_contract,
         name: 'submittask',
         authorization: [{
           actor: isBscAddress(user) ? this.config.eos_relayer : user,
-          permission: permission ? permission : this.config.eos_relayer_permission,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
         }],
         data: {
           task_id: submissionId,
@@ -398,7 +418,7 @@ export class Force {
           account_id: accountId,
           batch_id: batchId,
           payer: isBscAddress(user) ? this.config.eos_relayer : user,
-          sig: null,
+          sig: isBscAddress(user) ? sig.toString() : null
         },
       }]
     }, {
@@ -432,7 +452,6 @@ export class Force {
    */
   generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
     let sig
-    
     const bytes = serialbuff.asUint8Array()
 
     let paramsHash = ec.hash().update(bytes).digest()
