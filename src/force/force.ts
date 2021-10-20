@@ -6,21 +6,16 @@ import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
-const ecc = require('eosjs-ecc')
-import BN from 'bn.js';
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
-
-// TODO move to utilities
-function toHex(str) {
-  var result = '';
-  for (var i=0; i<str.length; i++) {
-    result += str.charCodeAt(i).toString(16);
-  }
-  return result;
-}
+import { isBscAddress } from '../utils/bscAddress'
+import { convertToAsset } from '../utils/asset'
+import { getCompositeKey } from '../utils/compositeKey'
+import { stringToHex } from '../utils/hex'
+import BN from 'bn.js';
+const ecc = require('eosjs-ecc')
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
 export class Force {
   api: Api;
@@ -111,14 +106,20 @@ export class Force {
     const data = await this.api.rpc.get_table_rows(config)
 
     data.rows.forEach(batch => {
-      batch.batch_id = this.getCompositeKey(batch.id, batch.campaign_id)
+      batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
     });
 
     return data;
   }
 
-  campaignJoin = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
-    const key = this.getCompositeKey(accountId, campaignId)
+  /**
+   * get campaign join table
+   * @param accountId 
+   * @param campaignId 
+   * @returns 
+   */
+  getCampaignJoins = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
+    const key = getCompositeKey(accountId, campaignId)
 
     const config = {
       code: this.config.force_contract,
@@ -132,21 +133,39 @@ export class Force {
     return await this.api.rpc.get_table_rows(config)
   }
 
-  joinCampaign = async (owner:string, permission: string, accountId: number, campaignId:number): Promise<object> => {
+  /**
+   * Join campaign
+   * @param owner 
+   * @param accountId 
+   * @param campaignId 
+   * @param options 
+   * @returns 
+   */
+  joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
     try {
+      let sig;
+
+      if(isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(7)
+        serialbuff.pushUint32(campaignId)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
           name: 'joincampaign',
           authorization: [{
-            actor: owner,
-            permission: permission,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             account_id: accountId,
             campaign_id: campaignId,
-            payer: owner,
-            sig: null,
+            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -158,6 +177,11 @@ export class Force {
     }
   }
 
+  /**
+   * Upload campaign data to ipfs
+   * @param campaignIpfs 
+   * @returns 
+   */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
@@ -179,6 +203,7 @@ export class Force {
       }
     }
   }
+
   getMerkleRoot = (dataArray) => {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, SHA256)
@@ -187,18 +212,42 @@ export class Force {
     console.log(tree.toString())
     return root
   }
-  createBatch = async (campaignOwner, permission, campaignId, batchId, content, repetitions): Promise<object> => {
-    const hash = await this.uploadCampaign(content)
-    const merkleRoot = this.getMerkleRoot(content.tasks)
-    console.log(typeof campaignId, typeof batchId)
+
+  /**
+   * 
+   * @param campaignOwner
+   * @param permission
+   * @param campaignId
+   * @param batchId
+   * @param content
+   * @param repetitions
+   * @returns
+   */
+  createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
     try {
+      const hash = await this.uploadCampaign(content)
+      const merkleRoot = this.getMerkleRoot(content.tasks)
+
+      let sig;
+      if(isBscAddress(campaignOwner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(8)
+        serialbuff.pushUint32(batchId)
+        serialbuff.pushUint32(campaignId)
+        serialbuff.push(0)
+        serialbuff.pushString(hash)
+        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
           name: 'mkbatch',
           authorization: [{
-            actor: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             id: batchId,
@@ -206,8 +255,8 @@ export class Force {
             content: {field_0: 0, field_1: hash},
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
-            payer: this.isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: null,
+            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            sig: isBscAddress(campaignOwner) ? sig.toString() : null
           },
         }]
       }, {
@@ -218,33 +267,28 @@ export class Force {
       throw new Error(err)
     }
   }
+
+  /**
+   * 
+   * @param owner 
+   * @param accountId 
+   * @param nonce 
+   * @param hash 
+   * @param quantity 
+   * @param options 
+   * @returns 
+   */
   createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
     try {
       let sig;
 
-      if(this.isBscAddress(owner)) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
         serialbuff.pushString(hash)
 
-        const bytes = serialbuff.asUint8Array()
-
-        let paramsHash = ec.hash().update(bytes).digest()
-        paramsHash = Serialize.arrayToHex(paramsHash)
-
-        try {
-          sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
-        } catch (error) {
-          console.error(error)
-          return Promise.reject(error)
-        }
-
-        sig = utils.splitSignature(sig)
-        // TODO: figure out how to get Signature in right format without this hack
-        sig.r = new BN(sig.r.substring(2),16)
-        sig.s = new BN(sig.s.substring(2), 16)
-        sig = Signature.fromElliptic(sig, 0)
+        sig = await this.generateSignature(serialbuff, options['address'])
       }
 
       return await this.api.transact({
@@ -252,18 +296,18 @@ export class Force {
           account: this.config.force_contract,
           name: 'mkcampaign',
           authorization: [{
-            actor: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
-            owner: [this.isBscAddress(owner) ? 'address' : 'name', owner],
+            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
             content: {field_0: 0, field_1: hash},
             reward: {
-              quantity: this.convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+              quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
             },
-            payer: this.isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: sig ? sig.toString() : null,
+            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: isBscAddress(owner) ? sig.toString() : null,
           },
         }]
       }, {
@@ -275,58 +319,104 @@ export class Force {
     }
   }
 
-  reserveTask = async (user: string, permission: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>) => {
-    const buf2hex = x => x.toString('hex')
-    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+  /**
+   * 
+   * @param user 
+   * @param batchId 
+   * @param taskIndex 
+   * @param campaignId 
+   * @param accountId 
+   * @param tasks 
+   * @param options 
+   * @returns 
+   */
+  reserveTask = async (user: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
+    try {
+      const buf2hex = x => x.toString('hex')
+      const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
-    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
-    const tree = new MerkleTree(leaves, sha256)
-    const proof = tree.getProof(leaves[taskIndex])
-    const hexproof = proof.map(x => buf2hex(x.data))
-    const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+      const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+      const tree = new MerkleTree(leaves, sha256)
+      const proof = tree.getProof(leaves[taskIndex])
+      const hexproof = proof.map(x => buf2hex(x.data))
+      const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
-    return await this.api.transact({
-      actions: [{
-        account: this.config.force_contract,
-        name: 'reservetask',
-        authorization: [{
-          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
-          permission: permission ? permission : this.config.eos_relayer_permission,
-        }],
-        data: {
-          proof: hexproof,
-          position: pos,
-          data: toHex(JSON.stringify(tasks[taskIndex])),
-          campaign_id: campaignId,
-          batch_id: batchId,
-          account_id: accountId,
-          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
-          sig: null,
-        },
-      }]
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
+      let sig
+      if(isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(6)
+        serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
+        serialbuff.pushUint32(campaignId)
+        serialbuff.pushUint32(batchId)
+
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+
+      return await this.api.transact({
+        actions: [{
+          account: this.config.force_contract,
+          name: 'reservetask',
+          authorization: [{
+            actor: isBscAddress(user) ? this.config.eos_relayer : user,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+          }],
+          data: {
+            proof: hexproof,
+            position: pos,
+            data: stringToHex(JSON.stringify(tasks[taskIndex])),
+            campaign_id: campaignId,
+            batch_id: batchId,
+            account_id: accountId,
+            payer: isBscAddress(user) ? this.config.eos_relayer : user,
+            sig: isBscAddress(user) ? sig.toString() : null,
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
 
   }
 
-  submitTask = async (user: string, permission: string, batchId: number, submissionId: number, data: string, accountId: number) => {
+  /**
+   * 
+   * @param user
+   * @param batchId
+   * @param submissionId
+   * @param data
+   * @param accountId
+   * @param options
+   * @returns
+   */
+  submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
+    let sig
+    if(isBscAddress(user)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(5)
+      serialbuff.pushNumberAsUint64(submissionId)
+      serialbuff.pushString(data)
+
+      sig = await this.generateSignature(serialbuff, options['address'])
+    }
+
     return await this.api.transact({
       actions: [{
         account: this.config.force_contract,
         name: 'submittask',
         authorization: [{
-          actor: this.isBscAddress(user) ? this.config.eos_relayer : user,
-          permission: permission ? permission : this.config.eos_relayer_permission,
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
         }],
         data: {
           task_id: submissionId,
           data: data,
           account_id: accountId,
           batch_id: batchId,
-          payer: this.isBscAddress(user) ? this.config.eos_relayer : user,
-          sig: null,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
         },
       }]
     }, {
@@ -352,50 +442,33 @@ export class Force {
     return taskIndex
   }
 
-
-  // TODO make these functions global? they are also used in accounts
-  // Add them to util class
   /**
-   * Check if account is bsc address
-   * @param account
-   */
-  isBscAddress = (account: string): boolean => {
-    return (account.length == 42 || account.length == 40)
-  }
-
-  /**
-   * Convert amount to asset
-   * @param amount
+   * Generate Signature
+   * @param serialbuff
+   * @param address
    * @returns
-   * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
    */
-  convertToAsset = (amount: string): string => {
-    // TODO: add filter for wrong values, e.g -1, or 10.00000
-    try {
-      const precision = this.config.efx_precision
-      const part = amount.split('.')
+  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
+    let sig
+    const bytes = serialbuff.asUint8Array()
 
-      if (part.length === 1) {
-        return `${part[0]}.${'0'.repeat(precision)}`
-      } else {
-        const pad = precision - part[1].length
-        return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
-      }
+    let paramsHash = ec.hash().update(bytes).digest()
+    paramsHash = Serialize.arrayToHex(paramsHash)
+
+    try {
+      sig = await this.web3.eth.sign('0x'+paramsHash, address)
     } catch (error) {
-      throw Error(error)
+      console.error(error)
+      return Promise.reject(error)
     }
+
+    sig = utils.splitSignature(sig)
+    // TODO: figure out how to get Signature in right format without this hack
+    sig.r = new BN(sig.r.substring(2),16)
+    sig.s = new BN(sig.s.substring(2), 16)
+    sig = Signature.fromElliptic(sig, 0)
+
+    return sig
   }
-  /**
-   * Create composite key with `account id` and `campaign id`
-   * @param accountId ID of account logged in
-   * @param campaignId ID of the campaign
-   * @returns uint 64 bit number
-   */
-  getCompositeKey = (accountId: number, campaignId: number) => {
-    const buf = new Serialize.SerialBuffer()
-    buf.reserve(64)
-    buf.pushUint32(accountId)
-    buf.pushUint32(campaignId)
-    return parseInt(Numeric.binaryToDecimal(buf.getUint8Array(8)))
-  }
+
 }
