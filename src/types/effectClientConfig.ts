@@ -108,5 +108,10 @@ import Web3 from "web3";
       */
      eos_relayer_permission: string
 
+     /**
+      * Relayer url
+      */
+     eos_relayer_url
+
 }
 

@@ -13,6 +13,7 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import BN from 'bn.js';
+const axios = require('axios').default;
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -153,25 +154,38 @@ export class Force {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'joincampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-          }],
-          data: {
-            account_id: accountId,
-            campaign_id: campaignId,
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null,
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'joincampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          account_id: accountId,
+          campaign_id: campaignId,
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null,
+        }
+      }
+
+      if(isBscAddress(owner)) {
+        // post to relayer
+        await axios.post(this.config.eos_relayer_url + '/transaction', action)
+        .then(function (response) {
+          return response.data;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      } else {
+        return await this.api.transact({
+            actions: [action]
+          }, {
+            blocksBehind: 3,
+            expireSeconds: 30,
+          });
+        }
     } catch (err) {
       throw new Error(err)
     }
@@ -241,28 +255,42 @@ export class Force {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkbatch',
-          authorization: [{
-            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-          }],
-          data: {
-            id: batchId,
-            campaign_id: campaignId,
-            content: {field_0: 0, field_1: hash},
-            task_merkle_root: merkleRoot,
-            num_tasks: content.tasks.length,
-            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: isBscAddress(campaignOwner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'mkbatch',
+        authorization: [{
+          actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          id: batchId,
+          campaign_id: campaignId,
+          content: {field_0: 0, field_1: hash},
+          task_merkle_root: merkleRoot,
+          num_tasks: content.tasks.length,
+          payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+          sig: isBscAddress(campaignOwner) ? sig.toString() : null
+        }
+      }
+
+      if(isBscAddress(campaignOwner)) {
+        // post to relayer
+        await axios.post(this.config.eos_relayer_url + '/transaction', action)
+        .then(function (response) {
+          console.log('response.data', response.data);
+          return response.data;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      } else {
+        return await this.api.transact({
+          actions: [action]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      }
     } catch (err) {
       throw new Error(err)
     }
