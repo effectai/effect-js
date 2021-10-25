@@ -8,6 +8,7 @@ import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
+const axios = require('axios').default;
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -99,7 +100,7 @@ export class Account {
         address = account.length == 42 ? account.substring(2) : account;
       }
 
-      const result = await this.api.transact({
+      const action = {
         actions: [{
           account: this.config.account_contract,
           name: 'open',
@@ -113,13 +114,8 @@ export class Account {
             payer: type == 'address' ? this.config.eos_relayer : account,
           },
         }]
-      },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
-      // TODO: send/sign seperate
-      return result;
+      }
+      return this.sendTransaction(account, action);
     } catch (err) {
       throw new Error(err)
     }
@@ -206,7 +202,7 @@ export class Account {
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
-      const result = await this.api.transact({
+      const action = {
         actions: [{
           account: this.config.account_contract,
           name: 'withdraw',
@@ -226,12 +222,8 @@ export class Account {
             fee: null
           },
         }]
-      },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
-      return result;
+      }
+      return this.sendTransaction(fromAccount, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -263,31 +255,26 @@ export class Account {
     }
 
     try {
-      const result = await this.api.transact({
-        actions: [{
-          account: this.config.account_contract,
-          name: 'vtransfer',
-          authorization: [{
-            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-          }],
-          data: {
-            from_id: fromAccountId,
-            to_id: balanceIndexTo,
-            quantity: {
-              quantity: amount + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            sig: isBscAddress(fromAccount) ? sig.toString() : null,
-            fee: null
+      const action = {
+        account: this.config.account_contract,
+        name: 'vtransfer',
+        authorization: [{
+          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          from_id: fromAccountId,
+          to_id: balanceIndexTo,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
-      },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
-      return result;
+          sig: isBscAddress(fromAccount) ? sig.toString() : null,
+          fee: null
+        },
+      }
+
+      return this.sendTransaction(fromAccount, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -343,5 +330,26 @@ export class Account {
 
     return sig
   }
+
+  sendTransaction = async function (owner: string, action: object): Promise<any> {
+    if(isBscAddress(owner)) {
+     // post to relayer
+     return await axios.post(this.config.eos_relayer_url + '/transaction', action)
+     .then(function (response) {
+       console.log('return this', response.data)
+       return response.data;
+     })
+     .catch(function (error) {
+       console.log(error);
+     });
+   } else {
+     return await this.api.transact({
+       actions: [action]
+     }, {
+       blocksBehind: 3,
+       expireSeconds: 30,
+     });
+   }
+ }
 
 }
