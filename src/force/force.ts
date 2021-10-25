@@ -169,23 +169,7 @@ export class Force {
         }
       }
 
-      if(isBscAddress(owner)) {
-        // post to relayer
-        await axios.post(this.config.eos_relayer_url + '/transaction', action)
-        .then(function (response) {
-          return response.data;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-      } else {
-        return await this.api.transact({
-            actions: [action]
-          }, {
-            blocksBehind: 3,
-            expireSeconds: 30,
-          });
-        }
+      return await this.sendTransaction(owner, action);
     } catch (err) {
       throw new Error(err)
     }
@@ -273,24 +257,7 @@ export class Force {
         }
       }
 
-      if(isBscAddress(campaignOwner)) {
-        // post to relayer
-        await axios.post(this.config.eos_relayer_url + '/transaction', action)
-        .then(function (response) {
-          console.log('response.data', response.data);
-          return response.data;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-      } else {
-        return await this.api.transact({
-          actions: [action]
-        }, {
-          blocksBehind: 3,
-          expireSeconds: 30,
-        });
-      }
+      return await this.sendTransaction(campaignOwner, action);
     } catch (err) {
       throw new Error(err)
     }
@@ -319,29 +286,25 @@ export class Force {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkcampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-          }],
-          data: {
-            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
-            content: {field_0: 0, field_1: hash},
-            reward: {
-              quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null,
+      const action = {
+        account: this.config.force_contract,
+        name: 'mkcampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+          content: {field_0: 0, field_1: hash},
+          reward: {
+            quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null,
+        },
+      }
+      return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -380,29 +343,26 @@ export class Force {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'reservetask',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-          }],
-          data: {
-            proof: hexproof,
-            position: pos,
-            data: stringToHex(JSON.stringify(tasks[taskIndex])),
-            campaign_id: campaignId,
-            batch_id: batchId,
-            account_id: accountId,
-            payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null,
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'reservetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          proof: hexproof,
+          position: pos,
+          data: stringToHex(JSON.stringify(tasks[taskIndex])),
+          campaign_id: campaignId,
+          batch_id: batchId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null,
+        }
+      }
+
+      return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
     }
@@ -420,18 +380,18 @@ export class Force {
    * @returns
    */
   submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
-    let sig
-    if(isBscAddress(user)) {
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(5)
-      serialbuff.pushNumberAsUint64(submissionId)
-      serialbuff.pushString(data)
-
-      sig = await this.generateSignature(serialbuff, options['address'])
-    }
-
-    return await this.api.transact({
-      actions: [{
+    try {
+      let sig
+      if(isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(5)
+        serialbuff.pushNumberAsUint64(submissionId)
+        serialbuff.pushString(data)
+  
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+  
+      const action = {
         account: this.config.force_contract,
         name: 'submittask',
         authorization: [{
@@ -445,13 +405,13 @@ export class Force {
           batch_id: batchId,
           payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: isBscAddress(user) ? sig.toString() : null
-        },
-      }]
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
-
+        }
+      }
+  
+      return await this.sendTransaction(user, action);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number>{
@@ -468,6 +428,27 @@ export class Force {
       }
     }
     return taskIndex
+  }
+
+  sendTransaction = async function (owner: string, action: object): Promise<any> {
+     if(isBscAddress(owner)) {
+      // post to relayer
+      return await axios.post(this.config.eos_relayer_url + '/transaction', action)
+      .then(function (response) {
+        console.log('return this', response.data)
+        return response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    } else {
+      return await this.api.transact({
+        actions: [action]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    }
   }
 
   /**
