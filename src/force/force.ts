@@ -435,7 +435,6 @@ export class Force {
       // post to relayer
       return await axios.post(this.config.eos_relayer_url + '/transaction', action)
       .then(function (response) {
-        console.log('return this', response.data)
         return response.data;
       })
       .catch(function (error) {
