@@ -106,4 +106,5 @@ dist
 .idea/
 *.iml
 
-# docs/
+# Typedoc
+docs/
