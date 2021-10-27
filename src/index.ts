@@ -20,7 +20,23 @@
  */
 export * from './client/client'
 
+/**
+ * Account
+ */
+export * from './account/account'
+
+/**
+ * Template
+ */
+export * from './force/force'
 export * from './force/template'
+export * from './force/templateScript'
+
+/**
+ * Configuration
+ */
+export * from './config/config'
+
 
  /**
   * Utility methods
@@ -36,5 +52,6 @@ export * from './utils/hex'
  */
 export * from './types/error'
 export * from './types/auth-token'
+export * from './types/client'
 export * from './types/effectClientConfig'
-// export * from '@dfuse/client/dist/types/types/transaction'
+export * from './types/transaction'

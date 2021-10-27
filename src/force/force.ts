@@ -17,6 +17,12 @@ const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+/**
+ * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
+ * It is used for campaign creation, publishing and related campaign functions. 
+ * These are the main methods that are needed in order to interact with Effect Network.
+ * 
+ */
 export class Force {
   api: Api;
   web3: Web3;
