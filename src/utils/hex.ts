@@ -1,9 +1,9 @@
 import { Serialize } from 'eosjs'
 
 /**
- * Convert string to hex
- * @param str 
- * @returns 
+ * Utility function: Convert string to hex
+ * @param str - string to convert
+ * @returns string
  */
 export function stringToHex(str: string): string {
   let result = '';
@@ -13,9 +13,9 @@ export function stringToHex(str: string): string {
   return result;
 }
 /**
- * Convert account name to hex
- * @param str 
- * @returns 
+ * Utility function: Convert account name to hex
+ * @param account: string - account name
+ * @returns string
  */
 export function nameToHex(account: string): string {
   const serialbuff = new Serialize.SerialBuffer();

@@ -1,5 +1,5 @@
 /**
- * Check if address is a BSC address
+ * Utility function: Check if address is a BSC address
  * @param address
  * @returns 
  */
