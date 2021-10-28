@@ -93,6 +93,23 @@ export class Force {
   }
 
   /**
+   * Get Task submissions
+   * @returns - Array<object> of submissions for batch
+   */
+  getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<object>> => {
+    const submissions = await this.getReservations()
+
+    const batchSubmissions = []
+    submissions.rows.forEach(sub => {
+      if (batchId === parseInt(sub.batch_id) && sub.data) {
+        batchSubmissions.push(sub)
+      }
+    });
+
+    return batchSubmissions;
+  }
+
+  /**
    * Get force campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
