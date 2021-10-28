@@ -8,6 +8,7 @@ import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
+import fetch from 'cross-fetch';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
