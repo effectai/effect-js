@@ -2,7 +2,7 @@ import { defaultConfiguration } from './../config/config';
 import { EffectApiError } from './../types/error';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
-import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
+import { GetTableRowsResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
 import { utils } from 'ethers';
@@ -28,10 +28,10 @@ export class Force {
   web3: Web3;
   config: EffectClientConfig;
 
-  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, configuration: EffectClientConfig) {
     this.api = api;
-    this.web3 = configuration.web3 || web3;
-    this.config = defaultConfiguration(environment, configuration);
+    this.config = configuration;
+    this.web3 = configuration.web3;
   }
 
   /**
@@ -147,11 +147,11 @@ export class Force {
    * @param options 
    * @returns 
    */
-  joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
+  joinCampaign = async (owner: string, accountId: number, campaignId: number, options: object): Promise<object> => {
     try {
       let sig;
 
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
@@ -229,13 +229,13 @@ export class Force {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
+  createBatch = async (campaignOwner: string, campaignId: number, batchId: number, content, repetitions, options): Promise<object> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
 
       let sig;
-      if(isBscAddress(campaignOwner)) {
+      if (isBscAddress(campaignOwner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(8)
         serialbuff.pushUint32(batchId)
@@ -258,7 +258,7 @@ export class Force {
           data: {
             id: batchId,
             campaign_id: campaignId,
-            content: {field_0: 0, field_1: hash},
+            content: { field_0: 0, field_1: hash },
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
             payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
@@ -288,7 +288,7 @@ export class Force {
     try {
       let sig;
 
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
@@ -307,7 +307,7 @@ export class Force {
           }],
           data: {
             owner: [isBscAddress(owner) ? 'address' : 'name', owner],
-            content: {field_0: 0, field_1: hash},
+            content: { field_0: 0, field_1: hash },
             reward: {
               quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
@@ -348,7 +348,7 @@ export class Force {
       const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
       let sig
-      if(isBscAddress(user)) {
+      if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(6)
         serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
@@ -397,9 +397,9 @@ export class Force {
    * @param options
    * @returns
    */
-  submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
+  submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options: object) => {
     let sig
-    if(isBscAddress(user)) {
+    if (isBscAddress(user)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(5)
       serialbuff.pushNumberAsUint64(submissionId)
@@ -432,7 +432,7 @@ export class Force {
 
   }
 
-  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number>{
+  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number> {
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
     const leaves = tasks.map(x => sha256(JSON.stringify(x)))
@@ -441,7 +441,7 @@ export class Force {
     let taskIndex;
 
     for (let i = 0; i < treeLeaves.length; i++) {
-      if(treeLeaves[i].substring(2) === leafHash) {
+      if (treeLeaves[i].substring(2) === leafHash) {
         taskIndex = i
       }
     }
@@ -462,7 +462,7 @@ export class Force {
     paramsHash = Serialize.arrayToHex(paramsHash)
 
     try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+      sig = await this.web3.eth.sign('0x' + paramsHash, address)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -470,7 +470,7 @@ export class Force {
 
     sig = utils.splitSignature(sig)
     // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
+    sig.r = new BN(sig.r.substring(2), 16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
 

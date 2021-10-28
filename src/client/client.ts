@@ -1,6 +1,5 @@
 import { defaultConfiguration } from './../config/config';
-import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
+import { Api, JsonRpc } from 'eosjs'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
@@ -14,15 +13,14 @@ export class EffectClient {
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
         this.config = defaultConfiguration(environment, configuration)
-        // TODO clean up these variables?
         const { web3, signatureProvider, host } = this.config
-        const rpc = new JsonRpc(host, {fetch})
+        const rpc = new JsonRpc(host, { fetch })
 
         // if it's web3 instance (bsc account) use the relayer as signatureProvider
-        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+        this.api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
-        this.account = new Account(this.api, environment, configuration, web3)
-        this.force = new Force(this.api, environment, configuration, web3)
+        this.account = new Account(this.api, this.config)
+        this.force = new Force(this.api, this.config)
     }
     // TODO: move to generic helper file/class
     /**

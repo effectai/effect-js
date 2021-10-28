@@ -18,10 +18,10 @@ export class Account {
   pub: string;
   config: EffectClientConfig;
 
-  constructor(api: Api, environment: string = 'testnet', config?: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, configuration: EffectClientConfig) {
     this.api = api;
-    this.web3 = config.web3 || web3;
-    this.config =  defaultConfiguration(environment, config);
+    this.config = configuration;
+    this.web3 = configuration.web3;
   }
 
   /**
@@ -33,22 +33,22 @@ export class Account {
     try {
       let accString;
 
-      if(isBscAddress(account)) {
-        const address:string = account.length == 42 ? account.substring(2) : account;
+      if (isBscAddress(account)) {
+        const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
       } else {
         accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
 
       const resp = await this.api.rpc.get_table_rows({
-          code: this.config.account_contract,
-          scope: this.config.account_contract,
-          index_position: 2,
-          key_type: "sha256",
-          lower_bound: accString,
-          upper_bound: accString,
-          table: 'account',
-          json: true,
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
+        index_position: 2,
+        key_type: "sha256",
+        lower_bound: accString,
+        upper_bound: accString,
+        table: 'account',
+        json: true,
       }).then((data) => {
         return data.rows;
       });
@@ -94,7 +94,7 @@ export class Account {
     try {
       let type = 'name'
       let address: string
-      if(isBscAddress(account)) {
+      if (isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }
@@ -109,15 +109,15 @@ export class Account {
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
-            symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
+            symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
             payer: type == 'address' ? this.config.eos_relayer : account,
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
       // TODO: send/sign seperate
       return result;
     } catch (err) {
@@ -171,7 +171,7 @@ export class Account {
   withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
     let sig;
     const amount = convertToAsset(amountEfx)
-    if(isBscAddress(fromAccount)) {
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
@@ -192,7 +192,7 @@ export class Account {
       // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
 
       try {
-        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccount)
+        sig = await this.web3.eth.sign('0x' + paramsHash, fromAccount)
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
@@ -200,7 +200,7 @@ export class Account {
 
       sig = utils.splitSignature(sig)
       // TODO: figure out how to get Signature in right format without this hack
-      sig.r = new BN(sig.r.substring(2),16)
+      sig.r = new BN(sig.r.substring(2), 16)
       sig.s = new BN(sig.s.substring(2), 16)
       sig = Signature.fromElliptic(sig, 0)
     }
@@ -227,10 +227,10 @@ export class Account {
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
       return result;
     } catch (err) {
       throw new Error(err)
@@ -244,13 +244,13 @@ export class Account {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
+  vtransfer = async (fromAccount: string, fromAccountId: number, nonce: number, toAccount: string, toAccountId: number, amountEfx: string, options: object): Promise<object> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
 
     let sig;
-    if(isBscAddress(fromAccount)) {
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(1)
       serialbuff.pushUint32(nonce)
@@ -283,10 +283,10 @@ export class Account {
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
       return result;
     } catch (err) {
       throw new Error(err)
@@ -329,7 +329,7 @@ export class Account {
     paramsHash = Serialize.arrayToHex(paramsHash)
 
     try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+      sig = await this.web3.eth.sign('0x' + paramsHash, address)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -337,7 +337,7 @@ export class Account {
 
     sig = utils.splitSignature(sig)
     // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
+    sig.r = new BN(sig.r.substring(2), 16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
 
