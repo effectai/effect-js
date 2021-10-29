@@ -9,6 +9,7 @@ import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
 import fetch from 'cross-fetch';
+import { EffectAccount } from '../types/effectAccount';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -25,7 +26,7 @@ export class Account extends BaseContract {
    * @param account - name of the account or bsc
    * @returns - object of the given account name
    */
-  getVAccountByName = async (account: string): Promise<Array<object>> => {
+  getVAccountByName = async (account: string): Promise<Array<EffectAccount>> => {
     try {
       let accString;
 
@@ -60,7 +61,7 @@ export class Account extends BaseContract {
    * @param id - id of the account
    * @returns - object of the given account id
    */
-  getVAccountById = async (id: number): Promise<Array<object>> => {
+  getVAccountById = async (id: number): Promise<Array<EffectAccount>> => {
     try {
       const resp = await this.api.rpc.get_table_rows({
         code: this.config.account_contract,

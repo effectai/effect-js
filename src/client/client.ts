@@ -6,12 +6,12 @@ import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
 import Web3 from 'web3';
 import fetch from 'cross-fetch';
+import { EffectAccount } from '../types/effectAccount';
 
 export class EffectClient {
     api: Api;
     account: Account;
-    // TODO: make interface for this?
-    effectAccount: object;
+    effectAccount: EffectAccount;
     force: Force;
     config: EffectClientConfig;
     environment: string;
@@ -31,17 +31,21 @@ export class EffectClient {
     }
 
     connectAccount = async (signatureProvider: SignatureProvider, web3: Web3, accountName?: string, sig?: string): Promise<any> => {
-        let account;
-        if (sig) {
-            // TODO: add sign function here
-            const message = 'Effect Account'
-            account = this.account.recoverPublicKey(message, sig)
-        }
+        try {
+            let account;
+            if (sig) {
+                // TODO: add sign function here
+                const message = 'Effect Account'
+                account = this.account.recoverPublicKey(message, sig)
+            }
 
-        // TODO: use the account_id in Account & Force
-        this.effectAccount = await this.account.getVAccountByName(sig ? account.accountAddress : accountName)
-        this.account.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
-        this.force.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
+            // TODO: use the account_id in Account & Force
+            this.effectAccount = await this.account.getVAccountByName(sig ? account.accountAddress : accountName)[0]
+            this.account.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
+            this.force.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
+        } catch (error) {
+            throw new Error(error)
+        }
     }
 
     // TODO: move to generic helper file/class

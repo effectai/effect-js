@@ -6,6 +6,7 @@ import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
+import { EffectAccount } from '../types/effectAccount';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -14,8 +15,7 @@ export class BaseContract {
   api: Api;
   web3: Web3;
   config: EffectClientConfig;
-  // TODO: create interface/type for effectAccount
-  effectAccount: object;
+  effectAccount: EffectAccount;
 
   constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
@@ -32,7 +32,7 @@ export class BaseContract {
    * @param web3 
    * @returns 
    */
-  setSignatureProvider = async (effectAccount: object, rpc: JsonRpc, signatureProvider: SignatureProvider, web3?: Web3): Promise<Boolean> => {
+  setSignatureProvider = async (effectAccount: EffectAccount, rpc: JsonRpc, signatureProvider: SignatureProvider, web3?: Web3): Promise<Boolean> => {
     if(web3) {
       this.web3 = web3;
     }

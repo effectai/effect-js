@@ -108,6 +108,7 @@ export class Force extends BaseContract {
    * @returns - Campaign Table Rows Result
    */
   getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+    console.log('EFFECT ACCOUNT', this.effectAccount.id)
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
