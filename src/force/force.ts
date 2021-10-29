@@ -28,7 +28,7 @@ export class Force {
   web3: Web3;
   config: EffectClientConfig;
 
-  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
+  constructor(account: object, api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = configuration.web3 || web3;
     this.config = defaultConfiguration(environment, configuration);

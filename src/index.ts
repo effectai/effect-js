@@ -23,7 +23,7 @@ export * from './client/client'
 /**
  * Account
  */
-export * from './account/account'
+export * from './effect-account/effectAccount'
 
 /**
  * Template
