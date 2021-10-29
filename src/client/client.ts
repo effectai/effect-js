@@ -6,6 +6,7 @@ import { EffectClientConfig } from '../types/effectClientConfig'
 import { isBscAddress } from '../utils/bscAddress'
 import { nameToHex } from '../utils/hex'
 // import fetch from 'node-fetch' // fetch for node.js environment
+import fetch from 'cross-fetch';
 
 export class EffectClient {
     api: Api;
