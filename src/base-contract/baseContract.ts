@@ -23,6 +23,8 @@ export class BaseContract {
     this.config = defaultConfiguration(environment, configuration);
   }
 
+  // TODO: make check/require connected account function
+
   /**
    * 
    * @param rpc 

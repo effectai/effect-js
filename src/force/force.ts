@@ -30,7 +30,6 @@ export class Force extends BaseContract {
    * @returns the payment rows of the given `accountId`
    */
   // TODO: if connectAccount is done use that accountId. make optional parameter accountId
-  // make check/require connected function
   getPendingBalance = async (accountId: number): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,

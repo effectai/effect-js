@@ -24,7 +24,6 @@ export class EffectClient {
         const { web3, signatureProvider, host } = this.config
 
         this.rpc = new JsonRpc(host, {fetch})
-
         this.api = new Api({rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
 
         this.account = new Account(this.api, this.environment, configuration, web3)
@@ -34,11 +33,12 @@ export class EffectClient {
     connectAccount = async (signatureProvider: SignatureProvider, web3: Web3, accountName?: string, sig?: string): Promise<any> => {
         let account;
         if (sig) {
-            // also do the .sign() method itself here? or keep that in the force?
+            // TODO: add sign function here
             const message = 'Effect Account'
             account = this.account.recoverPublicKey(message, sig)
         }
 
+        // TODO: use the account_id in Account & Force
         this.effectAccount = await this.account.getVAccountByName(sig ? account.accountAddress : accountName)
         this.account.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
         this.force.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
