@@ -93,6 +93,24 @@ export class Force {
   }
 
   /**
+   * Get task submissions of batch
+   * @param batchId
+   * @returns
+   */
+  getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<object>> => {
+    const submissions = await this.getReservations()
+
+    const batchSubmissions = []
+    submissions.rows.forEach(sub => {
+      if (batchId === parseInt(sub.batch_id) && sub.data) {
+        batchSubmissions.push(sub)
+      }
+    });
+
+    return batchSubmissions;
+  }
+
+  /**
    * Get force campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
@@ -320,6 +338,27 @@ export class Force {
         blocksBehind: 3,
         expireSeconds: 30,
       });
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * Make campaign, uploadCampaign & createCampaign combined
+   * @param content
+   * @param owner
+   * @param accountId
+   * @param nonce
+   * @param quantity
+   * @param options
+   * @returns
+   */
+  makeCampaign = async (content: object, owner: string, accountId: number, nonce: number, quantity: string, options: object): Promise<object> => {
+    try {
+      // upload to ipfs
+      const hash = await this.uploadCampaign(content)
+      // create campaign
+      return await this.createCampaign(owner, accountId, nonce, hash, quantity, options)
     } catch (err) {
       throw new Error(err)
     }
