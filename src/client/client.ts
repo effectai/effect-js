@@ -25,10 +25,10 @@ export class EffectClient {
 
         this.rpc = new JsonRpc(host, {fetch})
 
+        this.api = new Api({rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+
         this.account = new Account(this.api, this.environment, configuration, web3)
         this.force = new Force(this.api, this.environment, configuration, web3)
-
-        this.api = new Api({rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
     }
 
     connectAccount = async (signatureProvider: SignatureProvider, web3: Web3, accountName?: string, sig?: string): Promise<any> => {
