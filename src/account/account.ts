@@ -1,6 +1,7 @@
 import { defaultConfiguration } from './../config/config';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize, Numeric } from 'eosjs'
+import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
+import { Api, Serialize, Numeric, JsonRpc } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
@@ -18,12 +19,30 @@ export class Account {
   web3: Web3;
   pub: string;
   config: EffectClientConfig;
+  // TODO: create interface/type for effectAccount
+  effectAccount: object;
 
   constructor(api: Api, environment: string = 'testnet', config?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = config.web3 || web3;
     this.config =  defaultConfiguration(environment, config);
   }
+
+  /**
+   * 
+   * @param rpc 
+   * @param signatureProvider 
+   * @param web3 
+   * @returns 
+   */
+     setSignatureProvider = async (effectAccount: object, rpc: JsonRpc, signatureProvider: SignatureProvider, web3?: Web3): Promise<Boolean> => {
+      if(web3) {
+        this.web3 = web3;
+      }
+      this.effectAccount = effectAccount
+      this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})    
+      return true
+    }
 
   /**
    * Get a vaccount

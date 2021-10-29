@@ -1,7 +1,7 @@
 import { defaultConfiguration } from './../config/config';
-import { EffectApiError } from './../types/error';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize, Numeric } from 'eosjs'
+import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
+import { Api, Serialize, JsonRpc } from 'eosjs'
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
@@ -27,11 +27,29 @@ export class Force {
   api: Api;
   web3: Web3;
   config: EffectClientConfig;
+  // TODO: create interface/type for effectAccount
+  effectAccount: object;
 
-  constructor(account: object, api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = configuration.web3 || web3;
     this.config = defaultConfiguration(environment, configuration);
+  }
+
+  /**
+   * 
+   * @param rpc 
+   * @param signatureProvider 
+   * @param web3 
+   * @returns 
+   */
+  setSignatureProvider = async (effectAccount: object, rpc: JsonRpc, signatureProvider: SignatureProvider, web3?: Web3): Promise<Boolean> => {
+    if(web3) {
+      this.web3 = web3;
+    }
+    this.effectAccount = effectAccount
+    this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})    
+    return true
   }
 
   /**
@@ -39,6 +57,8 @@ export class Force {
    * @param accountId ID of  the given acccount
    * @returns the payment rows of the given `accountId`
    */
+  // TODO: if connectAccount is done use that accountId. make optional parameter accountId
+  // make check/require connected function
   getPendingBalance = async (accountId: number): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
