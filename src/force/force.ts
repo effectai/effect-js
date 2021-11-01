@@ -14,6 +14,8 @@ import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import BN from 'bn.js';
 import fetch from 'cross-fetch';
+import Blob from 'cross-blob';
+import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -193,6 +195,7 @@ export class Force {
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
+    // const formData = formidable({})
     formData.append('file', blob)
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
