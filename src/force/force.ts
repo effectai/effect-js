@@ -13,9 +13,11 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import BN from 'bn.js';
+import fetch from 'cross-fetch';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
