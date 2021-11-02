@@ -10,6 +10,7 @@ import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
 import fetch from 'cross-fetch';
 import { EffectAccount } from '../types/effectAccount';
+import { vAccountRow } from '../types/vAccountRow';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -26,7 +27,7 @@ export class Account extends BaseContract {
    * @param account - name of the account or bsc
    * @returns - object of the given account name
    */
-  getVAccountByName = async (account: string): Promise<Array<EffectAccount>> => {
+  getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
     try {
       let accString;
 
@@ -61,7 +62,7 @@ export class Account extends BaseContract {
    * @param id - id of the account
    * @returns - object of the given account id
    */
-  getVAccountById = async (id: number): Promise<Array<EffectAccount>> => {
+  getVAccountById = async (id: number): Promise<Array<vAccountRow>> => {
     try {
       const resp = await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
@@ -87,6 +88,7 @@ export class Account extends BaseContract {
    * @param account - name or address of the account to open, for BSC addresses without 0x
    * @returns
    */
+  // TODO: optional parameter signatureProvider, use relayer
   openAccount = async (account: string, permission: string): Promise<object> => {
     try {
       let type = 'name'
@@ -129,8 +131,11 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (fromAccount: string, accountId: number, amountEfx: string, permission: string): Promise<object> => {
+  deposit = async (amountEfx: string, permission: string): Promise<object> => {
     try {
+      const fromAccount = this.effectAccount.accountName;
+      const accountId = this.effectAccount.vAccountRows[0].id
+
       const amount = convertToAsset(amountEfx)
       const result = await this.api.transact({
         actions: [{
@@ -165,9 +170,13 @@ export class Account extends BaseContract {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
     let sig;
     const amount = convertToAsset(amountEfx)
+    const fromAccount = this.effectAccount.accountName;
+    const accountId = this.effectAccount.vAccountRows[0].id
+    const nonce = this.effectAccount.vAccountRows[0].nonce
+    
     if(isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
@@ -241,10 +250,13 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
+  vtransfer = async (toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
+    const fromAccount = this.effectAccount.accountName;
+    const fromAccountId = this.effectAccount.vAccountRows[0].id
+    const nonce = this.effectAccount.vAccountRows[0].nonce
 
     let sig;
     if(isBscAddress(fromAccount)) {

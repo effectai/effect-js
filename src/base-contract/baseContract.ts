@@ -23,7 +23,9 @@ export class BaseContract {
     this.config = defaultConfiguration(environment, configuration);
   }
 
-  // TODO: make check/require connected account function
+  isAccountIsConnected(): boolean {
+    return this.effectAccount ? true : false
+  }
 
   /**
    * 
@@ -32,13 +34,11 @@ export class BaseContract {
    * @param web3 
    * @returns 
    */
-  setSignatureProvider = async (effectAccount: EffectAccount, rpc: JsonRpc, signatureProvider: SignatureProvider, web3?: Web3): Promise<Boolean> => {
+  setSignatureProvider = async (effectAccount: EffectAccount, web3?: Web3): Promise<void> => {
     if(web3) {
       this.web3 = web3;
     }
     this.effectAccount = effectAccount
-    this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})    
-    return true
   }
 
   /**

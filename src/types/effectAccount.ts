@@ -1,6 +1,9 @@
+import { vAccountRow } from "./vAccountRow";
+
 export interface EffectAccount {
-  address: Array<string>;
-  balance: object;
-  id: number;
-  nonce: number;
+  accountName: string;
+  publicKey: string;
+  privateKey?: string;
+  permission?: string;
+  vAccountRows: Array<vAccountRow>;
 }

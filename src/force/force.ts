@@ -72,6 +72,9 @@ export class Force extends BaseContract {
    * @returns - Submission Table Rows Result
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
+    if(this.effectAccount) {
+      console.log('Hey account', this.effectAccount)
+    }
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -108,7 +111,6 @@ export class Force extends BaseContract {
    * @returns - Campaign Table Rows Result
    */
   getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
-    console.log('EFFECT ACCOUNT', this.effectAccount.id)
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -157,11 +159,12 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
+  joinCampaign = async (campaignId:number, options: object): Promise<object> => {
     try {
       let sig;
+      const owner = this.effectAccount.accountName
 
-      if(isBscAddress(owner)) {
+      if(owner) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
@@ -178,7 +181,7 @@ export class Force extends BaseContract {
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
-            account_id: accountId,
+            account_id: this.effectAccount.vAccountRows[0].id,
             campaign_id: campaignId,
             payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
             sig: isBscAddress(owner) ? sig.toString() : null,
@@ -239,10 +242,11 @@ export class Force extends BaseContract {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
+  createBatch = async (campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
+      const campaignOwner = this.effectAccount.accountName
 
       let sig;
       if(isBscAddress(campaignOwner)) {
@@ -294,9 +298,10 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
+  createCampaign = async (hash: string, quantity: string, options: object): Promise<object> => {
     try {
       let sig;
+      const owner = this.effectAccount.accountName
 
       if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
@@ -345,12 +350,12 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  makeCampaign = async (content: object, owner: string, accountId: number, nonce: number, quantity: string, options: object): Promise<object> => {
+  makeCampaign = async (content: object, quantity: string, options: object): Promise<object> => {
     try {
       // upload to ipfs
       const hash = await this.uploadCampaign(content)
       // create campaign
-      return await this.createCampaign(owner, accountId, nonce, hash, quantity, options)
+      return await this.createCampaign(hash, quantity, options)
     } catch (err) {
       throw new Error(err)
     }
@@ -367,8 +372,10 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  reserveTask = async (user: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
     try {
+      const user = this.effectAccount.accountName
+
       const buf2hex = x => x.toString('hex')
       const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
@@ -428,38 +435,43 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  submitTask = async (user: string, batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
-    let sig
-    if(isBscAddress(user)) {
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(5)
-      serialbuff.pushNumberAsUint64(submissionId)
-      serialbuff.pushString(data)
-
-      sig = await this.generateSignature(serialbuff, options['address'])
+  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
+    try {
+      let sig
+      const user = this.effectAccount.accountName
+      if(isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(5)
+        serialbuff.pushNumberAsUint64(submissionId)
+        serialbuff.pushString(data)
+  
+        sig = await this.generateSignature(serialbuff, options['address'])
+      }
+  
+      return await this.api.transact({
+        actions: [{
+          account: this.config.force_contract,
+          name: 'submittask',
+          authorization: [{
+            actor: isBscAddress(user) ? this.config.eos_relayer : user,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+          }],
+          data: {
+            task_id: submissionId,
+            data: data,
+            account_id: accountId,
+            batch_id: batchId,
+            payer: isBscAddress(user) ? this.config.eos_relayer : user,
+            sig: isBscAddress(user) ? sig.toString() : null
+          },
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    } catch (error) {
+      throw new Error(error);
     }
-
-    return await this.api.transact({
-      actions: [{
-        account: this.config.force_contract,
-        name: 'submittask',
-        authorization: [{
-          actor: isBscAddress(user) ? this.config.eos_relayer : user,
-          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-        }],
-        data: {
-          task_id: submissionId,
-          data: data,
-          account_id: accountId,
-          batch_id: batchId,
-          payer: isBscAddress(user) ? this.config.eos_relayer : user,
-          sig: isBscAddress(user) ? sig.toString() : null
-        },
-      }]
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
 
   }
 

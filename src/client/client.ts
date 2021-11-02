@@ -30,22 +30,52 @@ export class EffectClient {
         this.force = new Force(this.api, this.environment, configuration, web3)
     }
 
-    connectAccount = async (signatureProvider: SignatureProvider, web3: Web3, accountName?: string, sig?: string): Promise<any> => {
+    // TODO: fix any parameter
+    connectAccount = async (eos: any, bsc: any): Promise<EffectAccount> => {
         try {
             let account;
-            if (sig) {
+            if (bsc) {
                 // TODO: add sign function here
+                const sig = '';
                 const message = 'Effect Account'
                 account = this.account.recoverPublicKey(message, sig)
             }
 
-            // TODO: use the account_id in Account & Force
-            this.effectAccount = await this.account.getVAccountByName(sig ? account.accountAddress : accountName)[0]
-            this.account.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
-            this.force.setSignatureProvider(this.effectAccount, this.rpc, signatureProvider, web3)
+            console.log('Connect account GO!')
+
+            // TODO: create effectACcount completetly from signature provider or web3 object (extra call)
+            // + permission
+            // make function to set vAccountRows again, updateBlockchainAccount. 
+            // For example in withdraw for the nonce and balance
+
+            if(bsc) {
+                console.log('bsc', bsc)
+                this.effectAccount = { accountName: null, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
+            } else {
+                console.log('signatureProvider', eos)
+                console.log('signatureProvider.getAvailableKeys', eos.signatureProvider.getAvailableKeys())
+                this.effectAccount = { accountName: eos.auth.accountName, permission: eos.auth.permission, publicKey: eos.auth.publicKey, vAccountRows: null }
+                this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+            }
+
+            // TODO: if account doesnt exists do openAccount
+            // save
+            this.effectAccount.vAccountRows = (await this.account.getVAccountByName(this.effectAccount.accountName))
+
+            console.log('effect account:', this.effectAccount)
+
+            this.account.setSignatureProvider(this.effectAccount)
+            this.force.setSignatureProvider(this.effectAccount)
+
+            return this.effectAccount
         } catch (error) {
             throw new Error(error)
         }
+    }
+
+    // TODO: updateblockchaininfo here
+    updateBlockchainInfo = async (): Promise<any> => {
+
     }
 
     // TODO: move to generic helper file/class
