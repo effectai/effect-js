@@ -11,6 +11,8 @@ import { nameToHex } from '../utils/hex'
 import fetch from 'cross-fetch';
 import { EffectAccount } from '../types/effectAccount';
 import { vAccountRow } from '../types/vAccountRow';
+import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
+import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rpc-interfaces';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -89,7 +91,7 @@ export class Account extends BaseContract {
    * @returns
    */
   // TODO: optional parameter signatureProvider, use relayer
-  openAccount = async (account: string, permission: string): Promise<object> => {
+  openAccount = async (account: string, permission: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let type = 'name'
       let address: string
@@ -131,7 +133,7 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (amountEfx: string, permission: string): Promise<object> => {
+  deposit = async (amountEfx: string, permission: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const fromAccount = this.effectAccount.accountName;
       const accountId = this.effectAccount.vAccountRows[0].id
@@ -170,7 +172,7 @@ export class Account extends BaseContract {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig;
     const amount = convertToAsset(amountEfx)
     const fromAccount = this.effectAccount.accountName;
@@ -250,7 +252,7 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
+  vtransfer = async (toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)

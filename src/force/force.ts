@@ -1,7 +1,7 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, JsonRpc } from 'eosjs'
-import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
+import {GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult} from "eosjs/dist/eosjs-rpc-interfaces";
 import Web3 from 'web3';
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
@@ -9,6 +9,7 @@ import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
+import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -159,7 +160,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  joinCampaign = async (campaignId:number, options: object): Promise<object> => {
+  joinCampaign = async (campaignId:number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig;
       const owner = this.effectAccount.accountName
@@ -242,7 +243,7 @@ export class Force extends BaseContract {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
+  createBatch = async (campaignId: number, batchId:number, content, repetitions, options): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
@@ -298,7 +299,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  createCampaign = async (hash: string, quantity: string, options: object): Promise<object> => {
+  createCampaign = async (hash: string, quantity: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig;
       const owner = this.effectAccount.accountName
@@ -350,7 +351,7 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  makeCampaign = async (content: object, quantity: string, options: object): Promise<object> => {
+  makeCampaign = async (content: object, quantity: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       // upload to ipfs
       const hash = await this.uploadCampaign(content)
@@ -372,7 +373,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const user = this.effectAccount.accountName
 
@@ -435,7 +436,7 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options:object) => {
+  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options:object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig
       const user = this.effectAccount.accountName
