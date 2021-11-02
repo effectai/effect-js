@@ -52,15 +52,13 @@ export class EffectClient {
                 console.log('bsc', bsc)
                 this.effectAccount = { accountName: null, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
             } else {
-                console.log('signatureProvider', eos)
-                console.log('signatureProvider.getAvailableKeys', eos.signatureProvider.getAvailableKeys())
                 this.effectAccount = { accountName: eos.auth.accountName, permission: eos.auth.permission, publicKey: eos.auth.publicKey, vAccountRows: null }
                 this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
             // TODO: if account doesnt exists do openAccount
             // save
-            this.effectAccount.vAccountRows = (await this.account.getVAccountByName(this.effectAccount.accountName))
+            this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
 
             console.log('effect account:', this.effectAccount)
 
