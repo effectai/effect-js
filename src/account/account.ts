@@ -1,4 +1,4 @@
-~import { BaseContract } from '../base-contract/baseContract';
+import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric, JsonRpc } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
@@ -17,10 +17,26 @@ const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
-
+//  * > To state the facts frankly is not to despair the future nor indict the past. The prudent heir takes careful inventory of his legacies and gives a faithful accounting to those whom he owes an obligation of trust. -John F. Kennedy
+/**
+ * > “And he read Principles of Accounting all morning, but just to make it interesting, he put lots of dragons in it.” ― Terry Pratchett, Wintersmith 
+ *
+ * This class is used to interact with the virtual account system of Effect Network.
+ * The virtual account system is a system that allows you to create virtual accounts on the blockchain.
+ * This allows users to login with both their EOS and BSC addresses. 
+ * Then have one unififying interface from which transactions can be signed from the wallet of the user.
+ * 
+ */
 export class Account extends BaseContract {
   pub: string;
   
+  /**
+  * @constructor Creates a new instance of Account
+  * @param api The EOS api instance that is used to send transactions to EOS blockchain
+  * @param environment The environment that is used to connect to mainnet or testnet blockchain, default is `testnet` which connects to `kylin`
+  * @param configuration The configuration that is used to connect to Effect Network
+  * @param web3 The web3 instance that is used to interact with BSC blockchain
+  */
   constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     super(api, environment, configuration, web3)
   }

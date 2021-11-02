@@ -13,12 +13,25 @@ const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+/**
+ * > “Elinor agreed to it all, for she did not think he deserved the compliment of rational opposition.” ― Jane Austen
+ * 
+ * The BaseContract class is the base class for Accounts and Force classes. 
+ * It's main functionality is to handle the signatures and the connection to the network.
+ */
 export class BaseContract {
   api: Api;
   web3: Web3;
   config: EffectClientConfig;
   effectAccount: EffectAccount;
 
+  /**
+   * Constructor for the BaseContract class. 
+   * @param api The EOSIO API
+   * @param environment The environment to connect to. Default to testnet, which connects to kylin.
+   * @param configuration The configuration object for the client.
+   * @param web3 The web3 instance to use for BSC.
+   */
   constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
     this.api = api;
     this.web3 = configuration.web3 || web3;
