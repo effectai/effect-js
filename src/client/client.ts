@@ -48,6 +48,9 @@ export class EffectClient {
             // make function to set vAccountRows again, updateBlockchainAccount. 
             // For example in withdraw for the nonce and balance
 
+            // this.account.updateRetrieveNonce()
+
+
             if(bsc) {
                 console.log('bsc', bsc)
                 this.effectAccount = { accountName: null, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
@@ -69,11 +72,6 @@ export class EffectClient {
         } catch (error) {
             throw new Error(error)
         }
-    }
-
-    // TODO: updateblockchaininfo here
-    updateBlockchainInfo = async (): Promise<any> => {
-
     }
 
     // TODO: move to generic helper file/class

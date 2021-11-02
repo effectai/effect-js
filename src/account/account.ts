@@ -1,4 +1,4 @@
-import { BaseContract } from '../base-contract/baseContract';
+~import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric, JsonRpc } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
@@ -17,6 +17,7 @@ const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+
 export class Account extends BaseContract {
   pub: string;
   
@@ -31,7 +32,7 @@ export class Account extends BaseContract {
    */
   getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
     try {
-      let accString;
+      let accString: string;
 
       if(isBscAddress(account)) {
         const address:string = account.length == 42 ? account.substring(2) : account;
@@ -40,7 +41,7 @@ export class Account extends BaseContract {
         accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
 
-      const resp = await this.api.rpc.get_table_rows({
+      return (await this.api.rpc.get_table_rows({
           code: this.config.account_contract,
           scope: this.config.account_contract,
           index_position: 2,
@@ -49,11 +50,8 @@ export class Account extends BaseContract {
           upper_bound: accString,
           table: 'account',
           json: true,
-      }).then((data) => {
-        return data.rows;
-      });
-
-      return resp;
+      })).rows;
+      
     } catch (err) {
       throw new Error(err)
     }
@@ -99,7 +97,10 @@ export class Account extends BaseContract {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }
-
+      
+      // Call update account function here.
+      const nonce = await this.updateRetrieveNonce()
+    
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
@@ -112,6 +113,7 @@ export class Account extends BaseContract {
             acc: [type, type == 'address' ? address : account],
             symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
             payer: type == 'address' ? this.config.eos_relayer : account,
+            nonce: nonce            
           },
         }]
       },
@@ -137,8 +139,8 @@ export class Account extends BaseContract {
     try {
       const fromAccount = this.effectAccount.accountName;
       const accountId = this.effectAccount.vAccountRows[0].id
-
       const amount = convertToAsset(amountEfx)
+      const nonce = await this.updateRetrieveNonce()
       const result = await this.api.transact({
         actions: [{
           account: this.config.efx_token_account,
@@ -152,6 +154,7 @@ export class Account extends BaseContract {
             to: this.config.account_contract,
             quantity: amount + ' ' + this.config.efx_symbol,
             memo: accountId,
+            nonce: nonce
           },
         }]
       }, {
@@ -214,6 +217,7 @@ export class Account extends BaseContract {
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
+      const nonce = await this.updateRetrieveNonce()
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
@@ -231,7 +235,8 @@ export class Account extends BaseContract {
             },
             memo: memo,
             sig: sig ? sig.toString() : null,
-            fee: null
+            fee: null,
+            nonce: nonce
           },
         }]
       },
@@ -274,6 +279,7 @@ export class Account extends BaseContract {
     }
 
     try {
+      const nonce = await this.updateRetrieveNonce()
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
@@ -290,7 +296,8 @@ export class Account extends BaseContract {
               contract: this.config.efx_token_account
             },
             sig: isBscAddress(fromAccount) ? sig.toString() : null,
-            fee: null
+            fee: null,
+            nonce: nonce
           },
         }]
       },

@@ -1,3 +1,4 @@
+import { Account } from './../account/account';
 import { defaultConfiguration } from './../config/config';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
@@ -7,6 +8,7 @@ import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
+import { isBscAddress, nameToHex } from '..';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -25,6 +27,46 @@ export class BaseContract {
 
   isAccountIsConnected(): boolean {
     return this.effectAccount ? true : false
+  }
+
+    /**
+  * Update vAccountRows, then use length of rows as nonce.
+  * @returns {Promise<number>} Nonce to be used with each transaction
+  */
+  updateRetrieveNonce = async (): Promise<number> => {
+      if(!this.isAccountIsConnected()) {
+          throw new Error('No account connected.')
+      } else {
+        try {
+          const account = this.effectAccount.accountName;
+          let accString: string;
+    
+          if(isBscAddress(account)) {
+            const address:string = account.length == 42 ? account.substring(2) : account;
+            accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
+          } else {
+            accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
+          }
+    
+          const rows = (await this.api.rpc.get_table_rows({
+              code: this.config.account_contract,
+              scope: this.config.account_contract,
+              index_position: 2,
+              key_type: "sha256",
+              lower_bound: accString,
+              upper_bound: accString,
+              table: 'account',
+              json: true,
+          })).rows;
+  
+          this.effectAccount.vAccountRows = rows;
+  
+          return rows.length
+          
+        } catch (err) {
+          throw new Error(err)
+        } 
+      }
   }
 
   /**
