@@ -34,40 +34,57 @@ export class EffectClient {
     connectAccount = async (eos: any, bsc: any): Promise<EffectAccount> => {
         try {
             let account;
-            if (bsc) {
+            if (bsc && bsc.wallet) {
+                console.log(bsc)
                 // TODO: add sign function here
-                const sig = '';
                 const message = 'Effect Account'
-                account = this.account.recoverPublicKey(message, sig)
+                const signature = await this.sign(bsc, message)
+                account = await this.account.recoverPublicKey(message, signature)
             }
 
-            console.log('Connect account GO!')
-
-            // TODO: create effectACcount completetly from signature provider or web3 object (extra call)
-            // + permission
-            // make function to set vAccountRows again, updateBlockchainAccount. 
-            // For example in withdraw for the nonce and balance
-
-            if(bsc) {
-                console.log('bsc', bsc)
-                this.effectAccount = { accountName: null, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
-            } else {
+            if(bsc && bsc.wallet) {
+                this.effectAccount = { accountName: account.accountAddress, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
+            } else if (eos && eos.auth) {
                 this.effectAccount = { accountName: eos.auth.accountName, permission: eos.auth.permission, publicKey: eos.auth.publicKey, vAccountRows: null }
                 this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
             // TODO: if account doesnt exists do openAccount
-            // save
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-
-            console.log('effect account:', this.effectAccount)
 
             this.account.setSignatureProvider(this.effectAccount)
             this.force.setSignatureProvider(this.effectAccount)
 
             return this.effectAccount
         } catch (error) {
+            console.error(error)
             throw new Error(error)
+        }
+    }
+
+    sign = async (bsc, message: string): Promise<string> => {
+        // BSC-Extensions only support 'eth_sign'
+        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
+        bsc.web3.extend({
+            property: 'bsc',
+            methods: [{
+                name: 'sign',
+                call: 'eth_sign',
+                params: 2
+            }]
+        })
+    
+        try {
+            if (bsc.currentProvider === bsc.binance) {
+                return await bsc.web3.bsc.sign(bsc.wallet.address, message)
+            } else if (bsc.currentProvider === 'burner-wallet') {
+                return (await bsc.web3.eth.accounts.sign(message, bsc.wallet.privateKey)).signature
+            } else {
+                return await bsc.web3.eth.personal.sign(message, bsc.wallet.address)
+            }
+        } catch (error) {
+            console.error(error)
+            return Promise.reject(error)
         }
     }
 
