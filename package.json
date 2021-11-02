@@ -19,6 +19,7 @@
     "watch": "tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
+    "docs:watch": "typedoc --watch",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
     "publish:latest": "npm version patch && npm run build && npm publish",

@@ -1,16 +1,3 @@
-// const path = require('path')
-// const fs = require('fs')
-
-// const env = process.env.APP_ENV || process.env.NODE_ENV
-
-// const envPath = path.resolve(__dirname + '../../../', `.env.${env}`)
-// const defaultEnvPath = path.resolve(__dirname + '../../../', '.env.development')
-
-// const envFile = fs.existsSync(envPath) ? envPath : defaultEnvPath
-// require('dotenv').config({
-//   path: envFile
-// })
-
 /**
  * 🐰:  Do a Barrel Roll 🛢️🚀
  */
@@ -19,6 +6,11 @@
  * Main module
  */
 export * from './client/client'
+
+/**
+ * BaseContract
+ */
+export * from './base-contract/baseContract'
 
 /**
  * Account

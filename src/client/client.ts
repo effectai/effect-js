@@ -88,11 +88,6 @@ export class EffectClient {
         }
     }
 
-    // TODO: updateblockchaininfo here
-    updateBlockchainInfo = async (): Promise<any> => {
-
-    }
-
     // TODO: move to generic helper file/class
     /**
      * Get IPFS Content in JSON
