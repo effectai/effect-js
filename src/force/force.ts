@@ -173,7 +173,6 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      const nonce = await this.updateRetrieveNonce()
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -186,8 +185,7 @@ export class Force extends BaseContract {
             account_id: this.effectAccount.vAccountRows[0].id,
             campaign_id: campaignId,
             payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null,
-            nonce: nonce
+            sig: isBscAddress(owner) ? sig.toString() : null
           },
         }]
       }, {
@@ -264,7 +262,6 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      const nonce = await this.updateRetrieveNonce()
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -280,8 +277,7 @@ export class Force extends BaseContract {
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
             payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: isBscAddress(campaignOwner) ? sig.toString() : null,
-            nonce: nonce
+            sig: isBscAddress(campaignOwner) ? sig.toString() : null
           },
         }]
       }, {
@@ -317,7 +313,6 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      const nonce = await this.updateRetrieveNonce()
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -334,8 +329,7 @@ export class Force extends BaseContract {
               contract: this.config.efx_token_account
             },
             payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null,
-            nonce: nonce
+            sig: isBscAddress(owner) ? sig.toString() : null
           },
         }]
       }, {
@@ -403,7 +397,6 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
 
-      const nonce = await this.updateRetrieveNonce()
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -420,8 +413,7 @@ export class Force extends BaseContract {
             batch_id: batchId,
             account_id: accountId,
             payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null,
-            nonce: nonce
+            sig: isBscAddress(user) ? sig.toString() : null
           },
         }]
       }, {
@@ -457,7 +449,6 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff, options['address'])
       }
   
-      const nonce = await this.updateRetrieveNonce()
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -472,8 +463,7 @@ export class Force extends BaseContract {
             account_id: accountId,
             batch_id: batchId,
             payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null,
-            nonce: nonce
+            sig: isBscAddress(user) ? sig.toString() : null
           },
         }]
       }, {

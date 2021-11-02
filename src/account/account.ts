@@ -46,6 +46,16 @@ export class Account extends BaseContract {
    * @param account - name of the account or bsc
    * @returns - object of the given account name
    */
+  // TODO: maybe do this in a better way?
+  static getVAccountByName(account: string) {
+    return this.getVAccountByName(account)
+  }
+
+  /**
+   * Get a vaccount
+   * @param account - name of the account or bsc
+   * @returns - object of the given account name
+   */
   getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
     try {
       let accString: string;
@@ -114,8 +124,7 @@ export class Account extends BaseContract {
         address = account.length == 42 ? account.substring(2) : account;
       }
       
-      // Call update account function here.
-      const nonce = await this.updateRetrieveNonce()
+      await this.updatevAccountRows()
     
       const result = await this.api.transact({
         actions: [{
@@ -129,7 +138,6 @@ export class Account extends BaseContract {
             acc: [type, type == 'address' ? address : account],
             symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
             payer: type == 'address' ? this.config.eos_relayer : account,
-            nonce: nonce            
           },
         }]
       },
@@ -156,7 +164,7 @@ export class Account extends BaseContract {
       const fromAccount = this.effectAccount.accountName;
       const accountId = this.effectAccount.vAccountRows[0].id
       const amount = convertToAsset(amountEfx)
-      const nonce = await this.updateRetrieveNonce()
+      await this.updatevAccountRows()
       const result = await this.api.transact({
         actions: [{
           account: this.config.efx_token_account,
@@ -170,7 +178,6 @@ export class Account extends BaseContract {
             to: this.config.account_contract,
             quantity: amount + ' ' + this.config.efx_symbol,
             memo: accountId,
-            nonce: nonce
           },
         }]
       }, {
@@ -193,6 +200,8 @@ export class Account extends BaseContract {
    */
   withdraw = async (toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig;
+
+    await this.updatevAccountRows()
     const amount = convertToAsset(amountEfx)
     const fromAccount = this.effectAccount.accountName;
     const accountId = this.effectAccount.vAccountRows[0].id
@@ -233,7 +242,6 @@ export class Account extends BaseContract {
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
-      const nonce = await this.updateRetrieveNonce()
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
@@ -251,8 +259,7 @@ export class Account extends BaseContract {
             },
             memo: memo,
             sig: sig ? sig.toString() : null,
-            fee: null,
-            nonce: nonce
+            fee: null
           },
         }]
       },
@@ -274,6 +281,7 @@ export class Account extends BaseContract {
    * @returns
    */
   vtransfer = async (toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    await this.updatevAccountRows()
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
@@ -295,7 +303,6 @@ export class Account extends BaseContract {
     }
 
     try {
-      const nonce = await this.updateRetrieveNonce()
       const result = await this.api.transact({
         actions: [{
           account: this.config.account_contract,
@@ -312,8 +319,7 @@ export class Account extends BaseContract {
               contract: this.config.efx_token_account
             },
             sig: isBscAddress(fromAccount) ? sig.toString() : null,
-            fee: null,
-            nonce: nonce
+            fee: null
           },
         }]
       },
