@@ -1,12 +1,11 @@
 import { defaultConfiguration } from './../config/config';
-import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
 import { Api, JsonRpc } from 'eosjs'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
-import Web3 from 'web3';
 import fetch from 'cross-fetch';
 import { EffectAccount } from '../types/effectAccount';
+const retry = require('async-retry')
 
 export class EffectClient {
     api: Api;
@@ -18,7 +17,7 @@ export class EffectClient {
     rpc: JsonRpc;
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
-        // TODO: set relayer
+        // TODO: set relayer, after merge with relayer branch
         this.environment = environment;
         this.config = defaultConfiguration(environment, configuration)
         const { web3, signatureProvider, host } = this.config
@@ -30,7 +29,7 @@ export class EffectClient {
         this.force = new Force(this.api, this.environment, configuration, web3)
     }
 
-    // TODO: fix any parameter
+    // TODO: make interfaces for eos & bsc
     connectAccount = async (eos: any, bsc: any): Promise<EffectAccount> => {
         try {
             let account;
@@ -47,8 +46,21 @@ export class EffectClient {
                 this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.provider.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
-            // TODO: if account doesnt exists do openAccount
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+            // if account doesnt exists: openAccount
+            if(this.effectAccount.vAccountRows.length === 0) {
+                await this.account.openAccount(this.effectAccount.accountName)
+
+                await retry (async () => {
+                    console.log('retry: getVAccountByName after openAccount')
+                    this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+                  }, {
+                    retries: 5,
+                    onRetry: (error, number) => {
+                        console.log('attempt', number, error)
+                    }
+                })
+            }
 
             this.account.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)
             this.force.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)

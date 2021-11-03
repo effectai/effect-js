@@ -145,7 +145,7 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
-      // TODO: send/sign seperate
+
       return result;
     } catch (err) {
       throw new Error(err)
