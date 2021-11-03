@@ -1,14 +1,12 @@
 import { Account } from './../account/account';
 import { defaultConfiguration } from './../config/config';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
-import { Api, Serialize, JsonRpc } from 'eosjs'
+import { Api, Serialize } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
-import { isBscAddress, nameToHex } from '..';
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -67,10 +65,11 @@ export class BaseContract {
    * @param web3 
    * @returns 
    */
-  setSignatureProvider = async (effectAccount: EffectAccount, web3?: Web3): Promise<void> => {
+  setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3?: Web3): Promise<void> => {
     if(web3) {
       this.web3 = web3;
     }
+    this.api = api
     this.effectAccount = effectAccount
   }
 

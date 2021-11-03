@@ -179,7 +179,7 @@ export class Force extends BaseContract {
           name: 'joincampaign',
           authorization: [{
             actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(owner)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             account_id: this.effectAccount.vAccountRows[0].id,
@@ -236,7 +236,6 @@ export class Force extends BaseContract {
   /**
    * 
    * @param campaignOwner
-   * @param permission
    * @param campaignId
    * @param batchId
    * @param content
@@ -268,7 +267,7 @@ export class Force extends BaseContract {
           name: 'mkbatch',
           authorization: [{
             actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(campaignOwner)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             id: batchId,
@@ -319,7 +318,7 @@ export class Force extends BaseContract {
           name: 'mkcampaign',
           authorization: [{
             actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(owner)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             owner: [isBscAddress(owner) ? 'address' : 'name', owner],
@@ -373,9 +372,10 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
 
       const buf2hex = x => x.toString('hex')
       const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
@@ -403,7 +403,7 @@ export class Force extends BaseContract {
           name: 'reservetask',
           authorization: [{
             actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             proof: hexproof,
@@ -455,7 +455,7 @@ export class Force extends BaseContract {
           name: 'submittask',
           authorization: [{
             actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             task_id: submissionId,

@@ -35,8 +35,6 @@ export class EffectClient {
         try {
             let account;
             if (bsc && bsc.wallet) {
-                console.log(bsc)
-                // TODO: add sign function here
                 const message = 'Effect Account'
                 const signature = await this.sign(bsc, message)
                 account = await this.account.recoverPublicKey(message, signature)
@@ -46,14 +44,14 @@ export class EffectClient {
                 this.effectAccount = { accountName: account.accountAddress, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
             } else if (eos && eos.auth) {
                 this.effectAccount = { accountName: eos.auth.accountName, permission: eos.auth.permission, publicKey: eos.auth.publicKey, vAccountRows: null }
-                this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+                this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.provider.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
             // TODO: if account doesnt exists do openAccount
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
 
-            this.account.setSignatureProvider(this.effectAccount)
-            this.force.setSignatureProvider(this.effectAccount)
+            this.account.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)
+            this.force.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)
 
             return this.effectAccount
         } catch (error) {
@@ -62,6 +60,12 @@ export class EffectClient {
         }
     }
 
+    /**
+     * BSC Sign
+     * @param bsc 
+     * @param message 
+     * @returns 
+     */
     sign = async (bsc, message: string): Promise<string> => {
         // BSC-Extensions only support 'eth_sign'
         // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message

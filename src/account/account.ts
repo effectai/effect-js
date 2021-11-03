@@ -115,7 +115,7 @@ export class Account extends BaseContract {
    * @returns
    */
   // TODO: optional parameter signatureProvider, use relayer
-  openAccount = async (account: string, permission: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  openAccount = async (account: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let type = 'name'
       let address: string
@@ -132,7 +132,7 @@ export class Account extends BaseContract {
           name: 'open',
           authorization: [{
             actor: type == 'address' ? this.config.eos_relayer : account,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: isBscAddress(account)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
@@ -159,7 +159,7 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  deposit = async (amountEfx: string, permission: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  deposit = async (amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const fromAccount = this.effectAccount.accountName;
       const accountId = this.effectAccount.vAccountRows[0].id
@@ -171,7 +171,7 @@ export class Account extends BaseContract {
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: isBscAddress(fromAccount)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             from: fromAccount,
@@ -198,7 +198,7 @@ export class Account extends BaseContract {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  withdraw = async (toAccount: string, amountEfx: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig;
 
     await this.updatevAccountRows()
@@ -248,7 +248,7 @@ export class Account extends BaseContract {
           name: 'withdraw',
           authorization: [{
             actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: isBscAddress(fromAccount)? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             from_id: accountId,
@@ -309,7 +309,7 @@ export class Account extends BaseContract {
           name: 'vtransfer',
           authorization: [{
             actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission,
           }],
           data: {
             from_id: fromAccountId,
