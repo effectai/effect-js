@@ -148,17 +148,37 @@ export class Force {
    * @returns 
    */
   joinCampaign = async (owner:string, accountId: number, campaignId:number, options: object): Promise<object> => {
+    let sig;
+
+    if(isBscAddress(owner)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(7)
+      serialbuff.pushUint32(campaignId)
+
+      sig = await this.generateSignature(serialbuff, options)
+    }
+    const config_obj = [{
+      actions: [{
+        account: this.config.force_contract,
+        name: 'joincampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+        }],
+        data: {
+          account_id: accountId,
+          campaign_id: campaignId,
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null,
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    }]
+    console.log('CONFIG', config_obj)
+
     try {
-      let sig;
-
-      if(isBscAddress(owner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(7)
-        serialbuff.pushUint32(campaignId)
-
-        sig = await this.generateSignature(serialbuff, options['address'])
-      }
-
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -179,6 +199,7 @@ export class Force {
         expireSeconds: 30,
       });
     } catch (err) {
+      console.log("ERR2", err)
       throw new Error(err)
     }
   }
@@ -285,19 +306,19 @@ export class Force {
    * @returns 
    */
   createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
+    let sig;
+    console.log("OPTIONS", options)
+
+    if(isBscAddress(owner)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(9)
+      serialbuff.push(0)
+      serialbuff.pushString(hash)
+      sig = await this.generateSignature(serialbuff, options)
+    }
+    console.log("SIG", sig)
     try {
-      let sig;
-
-      if(isBscAddress(owner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(9)
-        serialbuff.push(0)
-        serialbuff.pushString(hash)
-
-        sig = await this.generateSignature(serialbuff, options['address'])
-      }
-
-      return await this.api.transact({
+      const result = await this.api.transact({
         actions: [{
           account: this.config.force_contract,
           name: 'mkcampaign',
@@ -306,7 +327,7 @@ export class Force {
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
-            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+            owner: [isBscAddress(owner) ? 'address' : 'name', options['address']],
             content: {field_0: 0, field_1: hash},
             reward: {
               quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
@@ -320,7 +341,10 @@ export class Force {
         blocksBehind: 3,
         expireSeconds: 30,
       });
+      console.log("SUCC", result)
+      return result
     } catch (err) {
+      console.log("ERR", err)
       throw new Error(err)
     }
   }
@@ -454,7 +478,7 @@ export class Force {
    * @param address
    * @returns
    */
-  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
+  generateSignature = async (serialbuff: Serialize.SerialBuffer, options: object): Promise<Signature> => {
     let sig
     const bytes = serialbuff.asUint8Array()
 
@@ -462,9 +486,19 @@ export class Force {
     paramsHash = Serialize.arrayToHex(paramsHash)
 
     try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+      if(options['provider'] === 'burner-wallet') {
+        console.log('BURNER WALLET USED FOR MAKING SIG')
+        sig = await this.web3.eth.accounts.sign('0x'+paramsHash, options['privateKey'])
+        let address = this.web3.eth.accounts.recover(sig)
+        console.log('ADDRESS', address)
+      } else {
+        console.log('DID I GET HIT?')
+        sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
+        let address = this.web3.eth.personal.ecRecover('0x'+paramsHash, sig)
+        console.log('ADDRESS', address)
+      }
     } catch (error) {
-      console.error(error)
+      console.error('ERR3', error)
       return Promise.reject(error)
     }
 
