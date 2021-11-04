@@ -165,7 +165,7 @@ export class Force extends BaseContract {
       let sig;
       const owner = this.effectAccount.accountName
 
-      if(owner) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)

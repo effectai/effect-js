@@ -163,6 +163,7 @@ export class Account extends BaseContract {
     try {
       const fromAccount = this.effectAccount.accountName;
       const accountId = this.effectAccount.vAccountRows[0].id
+
       const amount = convertToAsset(amountEfx)
       await this.updatevAccountRows()
       const result = await this.api.transact({

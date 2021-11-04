@@ -5,6 +5,9 @@ import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
 import fetch from 'cross-fetch';
 import { EffectAccount } from '../types/effectAccount';
+import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
+import Web3 from 'web3';
+import { eosWalletAuth } from '../types/eosWalletAuth';
 const retry = require('async-retry')
 
 export class EffectClient {
@@ -29,21 +32,31 @@ export class EffectClient {
         this.force = new Force(this.api, this.environment, configuration, web3)
     }
 
-    // TODO: make interfaces for eos & bsc
-    connectAccount = async (eos: any, bsc: any): Promise<EffectAccount> => {
+    /**
+     * Connect Account to SDK
+     * @param chain 
+     * @param signatureProvider 
+     * @param web3
+     * @param eosAccount 
+     * @returns 
+     */
+    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
         try {
             let account;
-            if (bsc && bsc.wallet) {
+            let bscAddress;
+            if (chain === 'bsc') {
                 const message = 'Effect Account'
-                const signature = await this.sign(bsc, message)
+                const signature = await this.sign(web3, message)
+                bscAddress = await web3.eth.getAccounts()[0]
                 account = await this.account.recoverPublicKey(message, signature)
             }
 
-            if(bsc && bsc.wallet) {
-                this.effectAccount = { accountName: account.accountAddress, publicKey: bsc.wallet.address, privateKey: bsc.wallet.privateKey ? bsc.wallet.privateKey : null, vAccountRows: null }
-            } else if (eos && eos.auth) {
-                this.effectAccount = { accountName: eos.auth.accountName, permission: eos.auth.permission, publicKey: eos.auth.publicKey, vAccountRows: null }
-                this.api = new Api({rpc: this.rpc, signatureProvider: eos ? eos.provider.signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+            if (chain === 'bsc') {
+                // TODO: privateKey for burnerwallet?
+                this.effectAccount = { accountName: account.accountAddress, publicKey: bscAddress, privateKey: null, vAccountRows: null }
+            } else if (signatureProvider) {
+                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
+                this.api = new Api({rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
@@ -62,8 +75,8 @@ export class EffectClient {
                 })
             }
 
-            this.account.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)
-            this.force.setSignatureProvider(this.effectAccount, this.api, bsc ? bsc.web3 : null)
+            this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
+            this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
 
             return this.effectAccount
         } catch (error) {
@@ -78,10 +91,10 @@ export class EffectClient {
      * @param message 
      * @returns 
      */
-    sign = async (bsc, message: string): Promise<string> => {
+    sign = async (web3: Web3, message: string): Promise<string> => {
         // BSC-Extensions only support 'eth_sign'
         // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-        bsc.web3.extend({
+        web3.extend({
             property: 'bsc',
             methods: [{
                 name: 'sign',
@@ -89,14 +102,15 @@ export class EffectClient {
                 params: 2
             }]
         })
-    
+
         try {
-            if (bsc.currentProvider === bsc.binance) {
-                return await bsc.web3.bsc.sign(bsc.wallet.address, message)
-            } else if (bsc.currentProvider === 'burner-wallet') {
-                return (await bsc.web3.eth.accounts.sign(message, bsc.wallet.privateKey)).signature
+            const address = await web3.eth.getAccounts()[0]
+            // TODO: how to detect if its a burner-wallet?
+            if (web3.currentProvider === 'burner-wallet') {
+                // TODO: need to find another solution to sign without giving the private key again
+                return (await web3.eth.accounts.sign(message, '')).signature
             } else {
-                return await bsc.web3.eth.personal.sign(message, bsc.wallet.address)
+                return await web3.eth.personal.sign(message, address, '')
             }
         } catch (error) {
             console.error(error)
