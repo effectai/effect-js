@@ -47,7 +47,7 @@ export class EffectClient {
             if (chain === 'bsc') {
                 const message = 'Effect Account'
                 const signature = await this.sign(web3, message)
-                bscAddress = await web3.eth.getAccounts()[0]
+                bscAddress = web3.eth.accounts.wallet[0].address
                 account = await this.account.recoverPublicKey(message, signature)
             }
 
@@ -55,6 +55,7 @@ export class EffectClient {
                 // TODO: privateKey for burnerwallet?
                 this.effectAccount = { accountName: account.accountAddress, publicKey: bscAddress, privateKey: null, vAccountRows: null }
             } else if (signatureProvider) {
+                console.log('whywhywhyws')
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
                 this.api = new Api({rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
@@ -104,7 +105,7 @@ export class EffectClient {
         })
 
         try {
-            const address = await web3.eth.getAccounts()[0]
+            const address = web3.eth.accounts.wallet[0].address
             // TODO: how to detect if its a burner-wallet?
             if (web3.currentProvider === 'burner-wallet') {
                 // TODO: need to find another solution to sign without giving the private key again
