@@ -124,7 +124,7 @@ export class Account extends BaseContract {
         address = account.length == 42 ? account.substring(2) : account;
       }
       
-      await this.updatevAccountRows()
+      // await this.updatevAccountRows() This method works when this is not here.
     
       const result = await this.api.transact({
         actions: [{

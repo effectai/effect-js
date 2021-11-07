@@ -60,10 +60,22 @@ export class EffectClient {
                 this.api = new Api({rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
             }
 
+            console.log(`Setting signature provider.`);
+            this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
+            this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
+            console.log(`Signature provider set.`);
+            
+            console.log(`Getting vAccountByName, ${JSON.stringify(this.effectAccount)}`)
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+            console.log(`Finished, vAccountByName, ${JSON.stringify(this.effectAccount)}`)
+
             // if account doesnt exists: openAccount
             if(this.effectAccount.vAccountRows.length === 0) {
-                await this.account.openAccount(this.effectAccount.accountName)
+                
+                console.log(`opening account`);
+                const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
+                console.log(`Opened account: ${openedAccount}`);
+                
 
                 await retry (async () => {
                     console.log('retry: getVAccountByName after openAccount')
@@ -76,8 +88,6 @@ export class EffectClient {
                 })
             }
 
-            this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
-            this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
 
             return this.effectAccount
         } catch (error) {
