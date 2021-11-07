@@ -48,7 +48,9 @@ export class Account extends BaseContract {
    */
   // TODO: maybe do this in a better way?
   static getVAccountByName(account: string) {
-    return this.getVAccountByName(account)
+    const vAccount = this.getVAccountByName(account)
+    console.log(`🧑🏽‍🚒🧑🏽‍🚒\nAccount::this.getVaccountByName\n${vAccount}`);
+    return vAccount    
   }
 
   /**
@@ -90,7 +92,7 @@ export class Account extends BaseContract {
    */
   getVAccountById = async (id: number): Promise<Array<vAccountRow>> => {
     try {
-      const resp = await this.api.rpc.get_table_rows({
+      const resp = (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,
         index_position: 1,
@@ -99,9 +101,7 @@ export class Account extends BaseContract {
         upper_bound: id,
         table: 'account',
         json: true,
-      }).then((data) => {
-        return data.rows;
-      });
+      })).rows
 
       return resp;
     } catch (err) {
