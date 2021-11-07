@@ -111,7 +111,7 @@ export class EffectClient {
                 // TODO: need to find another solution to sign without giving the private key again
                 return (await web3.eth.accounts.sign(message, '')).signature
             } else {
-                return await web3.eth.personal.sign(message, address, '')
+                return await web3.eth.sign(message, address, '')
             }
         } catch (error) {
             console.error(error)
