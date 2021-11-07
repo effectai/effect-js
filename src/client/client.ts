@@ -93,17 +93,6 @@ export class EffectClient {
      * @returns 
      */
     sign = async (web3: Web3, message: string): Promise<string> => {
-        // BSC-Extensions only support 'eth_sign'
-        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-        web3.extend({
-            property: 'bsc',
-            methods: [{
-                name: 'sign',
-                call: 'eth_sign',
-                params: 2
-            }]
-        })
-
         try {
             const address = web3.eth.accounts.wallet[0].address
             // TODO: how to detect if its a burner-wallet?
