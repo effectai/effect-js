@@ -10,6 +10,10 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
+import fetch from 'cross-fetch';
+import Blob from 'cross-blob';
+// const Blob = require('cross-blob')
+import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
