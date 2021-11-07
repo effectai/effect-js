@@ -46,6 +46,7 @@ export class BaseContract {
   */
   updatevAccountRows = async (): Promise<EffectAccount> => {
       if(!this.isAccountIsConnected()) {
+          console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
           throw new Error('No account connected.')
       } else {
         try {
