@@ -7,6 +7,7 @@ import { EffectAccount } from '../types/effectAccount';
 import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import Web3 from 'web3';
 import { eosWalletAuth } from '../types/eosWalletAuth';
+import fetch from 'cross-fetch';
 const retry = require('async-retry')
 
 export class EffectClient {
@@ -23,22 +24,11 @@ export class EffectClient {
 
     constructor(environment: string = 'browser', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
-
-        if (environment === 'node'){
-            import('@web-std/fetch').then(module => this.fetch = module)
-            import('@web-std/blob').then(module => this.blob = module)
-            import('@web-std/form-data').then(module => this.formData =  module)
-        } else {
-            this.fetch = fetch
-            this.blob = Blob
-            this.formData = FormData
-        }
-
         this.environment = environment;
         this.config = defaultConfiguration(environment, configuration)
         const { web3, signatureProvider, host } = this.config
 
-        this.rpc = new JsonRpc(host, {  })
+        this.rpc = new JsonRpc(host, { fetch: fetch })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
         this.account = new Account(this.api, this.config)
@@ -54,6 +44,8 @@ export class EffectClient {
      * @returns 
      */
     connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
+        console.log('Connecting account');
+        
         try {
             let account;
             let bscAddress;
@@ -71,6 +63,9 @@ export class EffectClient {
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
+
+            console.log('Effect Account.');
+            
 
             console.log(`Setting signature provider.`);
             this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
