@@ -60,8 +60,6 @@ export class Account extends BaseContract {
     try {
       let accString: string;
 
-      console.log('this.config11', this.config)
-
       console.log('getaccountbyname reuqest', {
         code: this.config.account_contract,
         scope: this.config.account_contract,
