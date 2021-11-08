@@ -3,7 +3,7 @@ import { Api, JsonRpc } from 'eosjs'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
-import fetch from 'cross-fetch';
+import fetch from '@web-std/fetch'
 import { EffectAccount } from '../types/effectAccount';
 import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import Web3 from 'web3';
