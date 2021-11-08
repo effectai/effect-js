@@ -13,6 +13,7 @@ import fetch from '@web-std/fetch'
 import { Blob } from '@web-std/blob'
 // import FormData from '@web-std/form-data'
 import { FormData } from 'formdata-node';
+import { Task } from '../types/task';
 const ecc = require('eosjs-ecc')
 
 
@@ -94,7 +95,7 @@ export class Force extends BaseContract {
    * @param batchId
    * @returns
    */
-  getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<object>> => {
+  getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
 
     const batchSubmissions = []
@@ -105,6 +106,24 @@ export class Force extends BaseContract {
     });
 
     return batchSubmissions;
+  }
+
+  /**
+   * Get individual task result
+   * @param leafHash - leafHash of task
+   * @returns Task
+   */
+  getTaskResult = async (leafHash: string): Promise<Task> => {
+    const submissions = await this.getReservations()
+
+    let task;
+    submissions.rows.forEach(sub => {
+      if (leafHash === sub.leaf_hash && sub.data) {
+        task = sub
+      }
+    });
+
+    return task;
   }
 
   /**
