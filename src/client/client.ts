@@ -22,7 +22,7 @@ export class EffectClient {
     blob: any;
     formData: any;
 
-    constructor(environment: string = 'browser', configuration?: EffectClientConfig) {
+    constructor(environment: string = 'node', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
         this.environment = environment;
         this.config = defaultConfiguration(environment, configuration)
@@ -31,7 +31,7 @@ export class EffectClient {
         this.rpc = new JsonRpc(host, { fetch: fetch })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
-        this.account = new Account(this.api, this.config)
+        this.account = new Account(this.api, this.config, environment)
         this.force = new Force(this.api, this.config)
     }
 

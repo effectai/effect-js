@@ -30,6 +30,7 @@ export class BaseContract {
    * Constructor for the BaseContract class. 
    * @param api The EOSIO API
    * @param configuration The configuration object for the client.
+   * @param environment The environment to connect to, either 'node' or 'browser'
    */
   constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
     this.api = api;

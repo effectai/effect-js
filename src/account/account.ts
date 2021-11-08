@@ -34,8 +34,8 @@ export class Account extends BaseContract {
   * @param configuration The configuration that is used to connect to Effect Network
   * @param web3 The web3 instance that is used to interact with BSC blockchain
   */
-  constructor(api: Api, configuration: EffectClientConfig) {
-    super(api, configuration)
+  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
+    super(api, configuration, environment)
   }
 
   /**
