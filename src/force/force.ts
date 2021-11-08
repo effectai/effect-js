@@ -9,8 +9,8 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
+import { Task } from '../types/task';
 const ecc = require('eosjs-ecc')
-
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -220,10 +220,19 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
+    console.log('Uploading campaign to ipfs')
+    console.log(this.blob, '\n', this.fetch, '\n', this.formData)
+    
     const stringify = JSON.stringify(campaignIpfs)
-    const blob = new Blob([stringify], { type: 'text/json' })
-    const formData = new FormData()
-    formData.append('file', blob)
+    const blob = new this.blob([stringify], { type: 'text/json' })
+    console.log('bloblob', JSON.stringify(blob))
+    
+    console.log('----');
+  
+    const formData = new this.formData()
+    formData.append('buffer', blob as Blob)
+    console.log('formData', JSON.stringify(formData))
+  
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
     } else {
@@ -232,11 +241,18 @@ export class Force extends BaseContract {
         const requestOptions: RequestInit = {
           method: 'POST',
           // @ts-ignore:next-line
-          body: formData
+          body: formData as BodyInit
         }
 
-        const response = await fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
-        const campaign = await response.json()
+        console.log('Uploading campaign to ipfs', this.fetch);
+        
+
+        const response = await this.fetch
+                                    .default(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
+                                    .catch(error => console.error('🔥🔥🔥', error))
+                                    .finally(console.log('upload success'))
+
+        const campaign = await response.json().catch(error => console.error('🔥🔥🔥', error)).finally(console.log('json response success'))
         return campaign as string
       } catch (e) {
         console.log(e)
