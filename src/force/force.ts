@@ -1,7 +1,7 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, JsonRpc } from 'eosjs'
-import {GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult} from "eosjs/dist/eosjs-rpc-interfaces";
+import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import Web3 from 'web3';
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
@@ -25,8 +25,8 @@ const ec = new EC('secp256k1');
  * 
  */
 export class Force extends BaseContract {
-  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
-    super(api, environment, configuration, web3)
+  constructor(api: Api, configuration: EffectClientConfig) {
+    super(api, configuration)
   }
 
   /**
@@ -77,7 +77,7 @@ export class Force extends BaseContract {
    * @returns - Submission Table Rows Result
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
-    if(this.effectAccount) {
+    if (this.effectAccount) {
       console.log('Hey account', this.effectAccount)
     }
     const config = {
@@ -164,12 +164,12 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  joinCampaign = async (campaignId:number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  joinCampaign = async (campaignId: number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig;
       const owner = this.effectAccount.accountName
 
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
@@ -183,7 +183,7 @@ export class Force extends BaseContract {
           name: 'joincampaign',
           authorization: [{
             actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             account_id: this.effectAccount.vAccountRows[0].id,
@@ -246,14 +246,14 @@ export class Force extends BaseContract {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignId: number, batchId:number, content, repetitions, options): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, batchId: number, content, repetitions, options): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
       const campaignOwner = this.effectAccount.accountName
 
       let sig;
-      if(isBscAddress(campaignOwner)) {
+      if (isBscAddress(campaignOwner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(8)
         serialbuff.pushUint32(batchId)
@@ -271,12 +271,12 @@ export class Force extends BaseContract {
           name: 'mkbatch',
           authorization: [{
             actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: isBscAddress(campaignOwner)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             id: batchId,
             campaign_id: campaignId,
-            content: {field_0: 0, field_1: hash},
+            content: { field_0: 0, field_1: hash },
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
             payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
@@ -307,7 +307,7 @@ export class Force extends BaseContract {
       let sig;
       const owner = this.effectAccount.accountName
 
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
@@ -322,11 +322,11 @@ export class Force extends BaseContract {
           name: 'mkcampaign',
           authorization: [{
             actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             owner: [isBscAddress(owner) ? 'address' : 'name', owner],
-            content: {field_0: 0, field_1: hash},
+            content: { field_0: 0, field_1: hash },
             reward: {
               quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
@@ -391,7 +391,7 @@ export class Force extends BaseContract {
       const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
       let sig
-      if(isBscAddress(user)) {
+      if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(6)
         serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
@@ -440,19 +440,19 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options:object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig
       const user = this.effectAccount.accountName
-      if(isBscAddress(user)) {
+      if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(5)
         serialbuff.pushNumberAsUint64(submissionId)
         serialbuff.pushString(data)
-  
+
         sig = await this.generateSignature(serialbuff, options['address'])
       }
-  
+
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -480,7 +480,7 @@ export class Force extends BaseContract {
 
   }
 
-  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number>{
+  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number> {
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
     const leaves = tasks.map(x => sha256(JSON.stringify(x)))
@@ -489,7 +489,7 @@ export class Force extends BaseContract {
     let taskIndex;
 
     for (let i = 0; i < treeLeaves.length; i++) {
-      if(treeLeaves[i].substring(2) === leafHash) {
+      if (treeLeaves[i].substring(2) === leafHash) {
         taskIndex = i
       }
     }
