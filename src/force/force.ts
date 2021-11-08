@@ -10,8 +10,10 @@ import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import fetch from 'cross-fetch';
-
-import Blob from 'cross-blob';
+// import Blob from 'cross-blob';
+// import { Blob } from "@web-std/blob"
+import Blob from 'fetch-blob'
+// const Blob = require('cross-blob')
 import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
 
