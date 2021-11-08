@@ -22,16 +22,30 @@ export class BaseContract {
   web3: Web3;
   config: EffectClientConfig;
   effectAccount: EffectAccount;
+  fetch: any;
+  blob: any;
+  formData: any;
 
   /**
    * Constructor for the BaseContract class. 
    * @param api The EOSIO API
    * @param configuration The configuration object for the client.
    */
-  constructor(api: Api, configuration: EffectClientConfig) {
+  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
     this.api = api;
     this.config = configuration;
     this.web3 = this.config.web3;
+    if (environment === 'node'){
+      console.log('USING NODE ENV 🔥🔥🔥')
+      import('@web-std/fetch').then(module => this.fetch = module.default)
+      import('@web-std/blob').then(module => this.blob = module.Blob)
+      import('@web-std/form-data').then(module => this.formData =  module.FormData)
+    } else {
+      console.log('USING WEB ENV 🔥🔥🔥')
+        this.fetch = fetch
+        this.blob = Blob
+        this.formData = FormData
+    }
   }
 
   isAccountIsConnected(): boolean {
