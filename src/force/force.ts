@@ -10,9 +10,9 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
-import fetch from 'cross-fetch';
-import Blob from 'cross-blob';
-// const Blob = require('cross-blob')
+import fetch from '@web-std/fetch'
+import { Blob } from '@web-std/blob'
+// import FormData from '@web-std/form-data'
 import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
@@ -207,9 +207,11 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
+    const stringify = JSON.stringify(campaignIpfs)
+    const blob = new Blob([stringify], { type: 'text/json' })
     const formData = new FormData()
-    formData.append('file', blob)
+    formData.append('file', stringify)
+
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
     } else {
@@ -217,16 +219,16 @@ export class Force extends BaseContract {
         const response = await fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`,
           {
             method: 'POST',
+            // @ts-ignore
             body: formData
           })
-        const campaign = await response.json()
-        return campaign.Hash
+        return await response.json() as string
       } catch (e) {
         console.log(e)
         return null
       }
     }
-  }
+  } 
 
   getMerkleRoot = (dataArray) => {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
