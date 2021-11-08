@@ -10,6 +10,7 @@ import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import fetch from 'cross-fetch';
+
 import Blob from 'cross-blob';
 import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
@@ -212,11 +213,13 @@ export class Force extends BaseContract {
       alert('Max file size allowed is 10 MB')
     } else {
       try {
-        const response = await fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`,
-          {
-            method: 'POST',
-            body: formData
-          })
+        const requestOptions: RequestInit = {
+          method: 'POST',
+          // @ts-ignore:next-line
+          body: formData
+        }
+
+        const response = await fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
         return campaign.Hash
       } catch (e) {
