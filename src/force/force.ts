@@ -16,6 +16,7 @@ import BN from 'bn.js';
 const ecc = require('eosjs-ecc')
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+import Account from 'eth-lib/lib/account';
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -157,26 +158,6 @@ export class Force {
 
       sig = await this.generateSignature(serialbuff, options)
     }
-    const config_obj = [{
-      actions: [{
-        account: this.config.force_contract,
-        name: 'joincampaign',
-        authorization: [{
-          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
-        }],
-        data: {
-          account_id: accountId,
-          campaign_id: campaignId,
-          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-          sig: isBscAddress(owner) ? sig.toString() : null,
-        },
-      }]
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    }]
-    console.log('CONFIG', config_obj)
 
     try {
       return await this.api.transact({
@@ -199,7 +180,6 @@ export class Force {
         expireSeconds: 30,
       });
     } catch (err) {
-      console.log("ERR2", err)
       throw new Error(err)
     }
   }
@@ -307,7 +287,6 @@ export class Force {
    */
   createCampaign = async (owner: string, accountId: number, nonce: number, hash: string, quantity: string, options: object): Promise<object> => {
     let sig;
-    console.log("OPTIONS", options)
 
     if(isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
@@ -316,9 +295,8 @@ export class Force {
       serialbuff.pushString(hash)
       sig = await this.generateSignature(serialbuff, options)
     }
-    console.log("SIG", sig)
     try {
-      const result = await this.api.transact({
+      return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
           name: 'mkcampaign',
@@ -327,7 +305,7 @@ export class Force {
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
-            owner: [isBscAddress(owner) ? 'address' : 'name', options['address']],
+            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
             content: {field_0: 0, field_1: hash},
             reward: {
               quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
@@ -341,10 +319,8 @@ export class Force {
         blocksBehind: 3,
         expireSeconds: 30,
       });
-      console.log("SUCC", result)
-      return result
     } catch (err) {
-      console.log("ERR", err)
+      console.log('ERR1', err)
       throw new Error(err)
     }
   }
@@ -475,7 +451,7 @@ export class Force {
   /**
    * Generate Signature
    * @param serialbuff
-   * @param address
+   * @param options
    * @returns
    */
   generateSignature = async (serialbuff: Serialize.SerialBuffer, options: object): Promise<Signature> => {
@@ -487,18 +463,12 @@ export class Force {
 
     try {
       if(options['provider'] === 'burner-wallet') {
-        console.log('BURNER WALLET USED FOR MAKING SIG')
-        sig = await this.web3.eth.accounts.sign('0x'+paramsHash, options['privateKey'])
-        let address = this.web3.eth.accounts.recover(sig)
-        console.log('ADDRESS', address)
+        // TODO: figure out how to do this more clean later on.
+        sig = Account.sign('0x' + paramsHash, this.web3.eth.accounts.wallet[0].privateKey);
       } else {
-        console.log('DID I GET HIT?')
         sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
-        let address = this.web3.eth.personal.ecRecover('0x'+paramsHash, sig)
-        console.log('ADDRESS', address)
       }
     } catch (error) {
-      console.error('ERR3', error)
       return Promise.reject(error)
     }
 
