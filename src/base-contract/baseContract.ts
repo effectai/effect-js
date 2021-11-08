@@ -26,14 +26,12 @@ export class BaseContract {
   /**
    * Constructor for the BaseContract class. 
    * @param api The EOSIO API
-   * @param environment The environment to connect to. Default to testnet, which connects to kylin.
    * @param configuration The configuration object for the client.
-   * @param web3 The web3 instance to use for BSC.
    */
-  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
+  constructor(api: Api, configuration: EffectClientConfig) {
     this.api = api;
-    this.web3 = configuration.web3 || web3;
-    this.config = defaultConfiguration(environment, configuration);
+    this.config = configuration;
+    this.web3 = this.config.web3;
   }
 
   isAccountIsConnected(): boolean {
@@ -45,18 +43,18 @@ export class BaseContract {
   * @returns {Promise<number>} Nonce to be used with each transaction
   */
   updatevAccountRows = async (): Promise<EffectAccount> => {
-      if(!this.isAccountIsConnected()) {
-          console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
-          throw new Error('No account connected.')
-      } else {
-        try {
-          const account = this.effectAccount.accountName;
-          this.effectAccount.vAccountRows = Account.getVAccountByName(account)
-          return this.effectAccount
-        } catch (err) {
-          throw new Error(err)
-        } 
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        const account = this.effectAccount.accountName;
+        this.effectAccount.vAccountRows = Account.getVAccountByName(account)
+        return this.effectAccount
+      } catch (err) {
+        throw new Error(err)
       }
+    }
   }
 
   /**
@@ -67,7 +65,7 @@ export class BaseContract {
    * @returns 
    */
   setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3?: Web3): Promise<void> => {
-    if(web3) {
+    if (web3) {
       this.web3 = web3;
     }
     this.api = api
@@ -110,7 +108,7 @@ export class BaseContract {
     paramsHash = Serialize.arrayToHex(paramsHash)
 
     try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
+      sig = await this.web3.eth.sign('0x' + paramsHash, address)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -118,7 +116,7 @@ export class BaseContract {
 
     sig = utils.splitSignature(sig)
     // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
+    sig.r = new BN(sig.r.substring(2), 16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
 

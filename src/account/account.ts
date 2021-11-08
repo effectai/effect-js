@@ -2,7 +2,6 @@ import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric, JsonRpc } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
-import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
@@ -28,7 +27,7 @@ const ec = new EC('secp256k1');
  */
 export class Account extends BaseContract {
   pub: string;
-  
+
   /**
   * @constructor Creates a new instance of Account
   * @param api The EOS api instance that is used to send transactions to EOS blockchain
@@ -36,8 +35,8 @@ export class Account extends BaseContract {
   * @param configuration The configuration that is used to connect to Effect Network
   * @param web3 The web3 instance that is used to interact with BSC blockchain
   */
-  constructor(api: Api, environment:string, configuration?: EffectClientConfig, web3?: Web3) {
-    super(api, environment, configuration, web3)
+  constructor(api: Api, configuration: EffectClientConfig) {
+    super(api, configuration)
   }
 
   /**
@@ -49,7 +48,7 @@ export class Account extends BaseContract {
   static getVAccountByName(account: string) {
     const vAccount = this.getVAccountByName(account)
     console.log(`🧑🏽‍🚒🧑🏽‍🚒\nAccount::this.getVaccountByName\n${vAccount}`);
-    return vAccount    
+    return vAccount
   }
 
   /**
@@ -61,24 +60,24 @@ export class Account extends BaseContract {
     try {
       let accString: string;
 
-      if(isBscAddress(account)) {
-        const address:string = account.length == 42 ? account.substring(2) : account;
+      if (isBscAddress(account)) {
+        const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
       } else {
         accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
 
       return (await this.api.rpc.get_table_rows({
-          code: this.config.account_contract,
-          scope: this.config.account_contract,
-          index_position: 2,
-          key_type: "sha256",
-          lower_bound: accString,
-          upper_bound: accString,
-          table: 'account',
-          json: true,
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
+        index_position: 2,
+        key_type: "sha256",
+        lower_bound: accString,
+        upper_bound: accString,
+        table: 'account',
+        json: true,
       })).rows;
-      
+
     } catch (err) {
       throw new Error(err)
     }
@@ -117,7 +116,7 @@ export class Account extends BaseContract {
     try {
       let type = 'name'
       let address: string
-      if(isBscAddress(account)) {
+      if (isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }    
@@ -127,11 +126,11 @@ export class Account extends BaseContract {
           name: 'open',
           authorization: [{
             actor: type == 'address' ? this.config.eos_relayer : account,
-            permission: isBscAddress(account)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(account) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
-            symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
+            symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
             payer: type == 'address' ? this.config.eos_relayer : account,
           },
         }]
@@ -140,6 +139,7 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
+
     } catch (err) {
       throw new Error(err)
     }
@@ -165,7 +165,7 @@ export class Account extends BaseContract {
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: isBscAddress(fromAccount)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             from: fromAccount,
@@ -199,8 +199,8 @@ export class Account extends BaseContract {
     const fromAccount = this.effectAccount.accountName;
     const accountId = this.effectAccount.vAccountRows[0].id
     const nonce = this.effectAccount.vAccountRows[0].nonce
-    
-    if(isBscAddress(fromAccount)) {
+
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
@@ -221,7 +221,7 @@ export class Account extends BaseContract {
       // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
 
       try {
-        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccount)
+        sig = await this.web3.eth.sign('0x' + paramsHash, fromAccount)
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
@@ -229,7 +229,7 @@ export class Account extends BaseContract {
 
       sig = utils.splitSignature(sig)
       // TODO: figure out how to get Signature in right format without this hack
-      sig.r = new BN(sig.r.substring(2),16)
+      sig.r = new BN(sig.r.substring(2), 16)
       sig.s = new BN(sig.s.substring(2), 16)
       sig = Signature.fromElliptic(sig, 0)
     }
@@ -241,7 +241,7 @@ export class Account extends BaseContract {
           name: 'withdraw',
           authorization: [{
             actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: isBscAddress(fromAccount)? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             from_id: accountId,
@@ -260,6 +260,7 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
+
     } catch (err) {
       throw new Error(err)
     }
@@ -272,7 +273,7 @@ export class Account extends BaseContract {
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  vtransfer = async (toAccount: string, toAccountId: number, amountEfx: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     await this.updatevAccountRows()
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
@@ -282,7 +283,7 @@ export class Account extends BaseContract {
     const nonce = this.effectAccount.vAccountRows[0].nonce
 
     let sig;
-    if(isBscAddress(fromAccount)) {
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(1)
       serialbuff.pushUint32(nonce)
@@ -319,6 +320,7 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
+
     } catch (err) {
       throw new Error(err)
     }
