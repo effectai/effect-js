@@ -41,9 +41,8 @@ export class EffectClient {
         this.rpc = new JsonRpc(host, {  })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
-        this.account = new Account(this.api, configuration)
-        this.force = new Force(this.api, configuration)
-
+        this.account = new Account(this.api, this.config)
+        this.force = new Force(this.api, this.config)
     }
 
     /**
@@ -69,7 +68,6 @@ export class EffectClient {
                 // TODO: privateKey for burnerwallet?
                 this.effectAccount = { accountName: account.accountAddress, publicKey: bscAddress, privateKey: null, vAccountRows: null }
             } else if (signatureProvider) {
-                console.log('whywhywhyws')
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
@@ -79,29 +77,27 @@ export class EffectClient {
             this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
             console.log(`Signature provider set.`);
 
-            console.log(`Getting vAccountByName, ${JSON.stringify(this.effectAccount)}`)
-            this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-            console.log(`Finished, vAccountByName, ${JSON.stringify(this.effectAccount)}`)
+            try {
+                console.log(`Getting vAccountByName, ${JSON.stringify(this.effectAccount)}`)
+                this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+                console.log(`Finished, vAccountByName, ${JSON.stringify(this.effectAccount)}`)
+            } catch (e) {
+                // if account doesnt exists: openAccount
+                if (!this.effectAccount.vAccountRows) {
+                    const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
+                    console.log(`Opened account: ${openedAccount}`);
 
-            // if account doesnt exists: openAccount
-            if (this.effectAccount.vAccountRows.length === 0) {
-
-                console.log(`opening account`);
-                const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
-                console.log(`Opened account: ${openedAccount}`);
-
-
-                await retry(async () => {
-                    console.log('retry: getVAccountByName after openAccount')
-                    this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-                }, {
-                    retries: 5,
-                    onRetry: (error, number) => {
-                        console.log('attempt', number, error)
-                    }
-                })
+                    await retry(async () => {
+                        console.log('retry: getVAccountByName after openAccount')
+                        this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+                    }, {
+                        retries: 5,
+                        onRetry: (error, number) => {
+                            console.log('attempt', number, error)
+                        }
+                    })
+                }
             }
-
 
             return this.effectAccount
         } catch (error) {

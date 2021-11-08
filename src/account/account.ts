@@ -59,6 +59,13 @@ export class Account extends BaseContract {
     try {
       let accString: string;
 
+      console.log('getaccountbyname reuqest', {
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
+      })
+
+      console.log('accountt', account)
+
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
@@ -111,21 +118,21 @@ export class Account extends BaseContract {
    * @returns
    */
   // TODO: optional parameter signatureProvider, use relayer
-  openAccount = async (account: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  openAccount = async (account: string, permission?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let type = 'name'
       let address: string
       if (isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
-      }    
+      }
       return await this.api.transact({
         actions: [{
           account: this.config.account_contract,
           name: 'open',
           authorization: [{
             actor: type == 'address' ? this.config.eos_relayer : account,
-            permission: isBscAddress(account) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(account) ? this.config.eos_relayer_permission : permission
           }],
           data: {
             acc: [type, type == 'address' ? address : account],
