@@ -4,7 +4,7 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
-// import fetch from 'node-fetch' // fetch for node.js environment
+import fetch from 'cross-fetch';
 
 export class EffectClient {
     api: Api;
