@@ -15,7 +15,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
     if (environment == 'testnet' || 'kylin') {
         return {
             network:                config.network                ?? "kylin",
-            signatureProvider:      config.signatureProvider      ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
+            signatureProvider:      config.signatureProvider      ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
             host:                   config.host                   ?? 'api.kylin.alohaeos.com',
             web3:                   config.web3                   ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey:                 config.apiKey                 ?? '',
@@ -29,7 +29,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             efx_symbol:             config.efx_symbol             ?? "UTL",
             efx_precision:          config.efx_precision          ?? 4,
             efx_extended_symbol:    config.efx_extended_symbol    ?? '4,UTL',
-            eos_relayer:            config.eos_relayer            ?? "pixeos1gswap",
+            eos_relayer:            config.eos_relayer            ?? "jabbarndcn22",
             eos_relayer_permission: config.eos_relayer_permission ?? "active"
         }
     } else {

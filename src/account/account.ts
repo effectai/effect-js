@@ -5,7 +5,7 @@ import RIPEMD160 from "eosjs/dist/ripemd"
 import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
-import { isBscAddress } from '../utils/bscAddress'
+import { generateSignature, isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
 const BN = require('bn.js');
@@ -168,7 +168,7 @@ export class Account {
    * @param memo - optional memo
    * @returns
    */
-  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
+  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, options: object, memo?: string): Promise<any> => {
     let sig;
     const amount = convertToAsset(amountEfx)
     if(isBscAddress(fromAccount)) {
@@ -180,29 +180,7 @@ export class Account {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      const bytes = serialbuff.asUint8Array()
-
-      let paramsHash = ec.hash().update(bytes).digest()
-      paramsHash = Serialize.arrayToHex(paramsHash)
-
-      // For test purposes (sometimes different than MetaMask signature?)
-      // const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
-      // const sigg = keypair.sign(paramsHash)
-      // console.log('sig priv', sigg)
-      // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
-
-      try {
-        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccount)
-      } catch (error) {
-        console.error(error)
-        return Promise.reject(error)
-      }
-
-      sig = utils.splitSignature(sig)
-      // TODO: figure out how to get Signature in right format without this hack
-      sig.r = new BN(sig.r.substring(2),16)
-      sig.s = new BN(sig.s.substring(2), 16)
-      sig = Signature.fromElliptic(sig, 0)
+      sig = await generateSignature(this.web3, serialbuff, options)
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
@@ -212,7 +190,7 @@ export class Account {
           name: 'withdraw',
           authorization: [{
             actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
             from_id: accountId,
@@ -222,7 +200,7 @@ export class Account {
               contract: this.config.efx_token_account
             },
             memo: memo,
-            sig: sig ? sig.toString() : null,
+            sig: isBscAddress(fromAccount) ? sig.toString() : null,
             fee: null
           },
         }]
@@ -239,18 +217,18 @@ export class Account {
 
   /**
    * Transfer between vaccounts
-   * @param fromAccount - vaccount to transfer from
+   * @param owner - vaccount to transfer from
    * @param toAccount - vaccount to transfer to
    * @param amount - amount, example: '10.0000'
    * @returns
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
+  vtransfer = async (owner: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
 
     let sig;
-    if(isBscAddress(fromAccount)) {
+    if(isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(1)
       serialbuff.pushUint32(nonce)
@@ -259,7 +237,7 @@ export class Account {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      sig = await this.generateSignature(serialbuff, options['address'])
+      sig = await generateSignature(this.web3, serialbuff, options)
     }
 
     try {
@@ -268,7 +246,7 @@ export class Account {
           account: this.config.account_contract,
           name: 'vtransfer',
           authorization: [{
-            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
@@ -278,7 +256,7 @@ export class Account {
               quantity: amount + ' ' + this.config.efx_symbol,
               contract: this.config.efx_token_account
             },
-            sig: isBscAddress(fromAccount) ? sig.toString() : null,
+            sig: isBscAddress(owner) ? sig.toString() : null,
             fee: null
           },
         }]
@@ -314,34 +292,4 @@ export class Account {
     const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
     return { address, accountAddress }
   }
-
-  /**
-   * Generate Signature
-   * @param serialbuff
-   * @param address
-   * @returns 
-   */
-  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
-    let sig
-    const bytes = serialbuff.asUint8Array()
-
-    let paramsHash = ec.hash().update(bytes).digest()
-    paramsHash = Serialize.arrayToHex(paramsHash)
-
-    try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
-    } catch (error) {
-      console.error(error)
-      return Promise.reject(error)
-    }
-
-    sig = utils.splitSignature(sig)
-    // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
-    sig.s = new BN(sig.s.substring(2), 16)
-    sig = Signature.fromElliptic(sig, 0)
-
-    return sig
-  }
-
 }

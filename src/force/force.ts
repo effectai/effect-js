@@ -1,22 +1,16 @@
 import { defaultConfiguration } from './../config/config';
 import { EffectApiError } from './../types/error';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize, Numeric } from 'eosjs'
+import { Api, Serialize } from 'eosjs';
 import {GetTableRowsResult} from "eosjs/dist/eosjs-rpc-interfaces";
-import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import Web3 from 'web3';
-import { utils } from 'ethers';
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
-import { isBscAddress } from '../utils/bscAddress'
-import { convertToAsset } from '../utils/asset'
-import { getCompositeKey } from '../utils/compositeKey'
-import { stringToHex } from '../utils/hex'
-import BN from 'bn.js';
-const ecc = require('eosjs-ecc')
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
-import Account from 'eth-lib/lib/account';
+import { isBscAddress, generateSignature } from '../utils/bscAddress';
+import { convertToAsset } from '../utils/asset';
+import { getCompositeKey } from '../utils/compositeKey';
+import { stringToHex } from '../utils/hex';
+const ecc = require('eosjs-ecc');
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -156,7 +150,7 @@ export class Force {
       serialbuff.push(7)
       serialbuff.pushUint32(campaignId)
 
-      sig = await this.generateSignature(serialbuff, options)
+      sig = await generateSignature(this.web3, serialbuff, options)
     }
 
     try {
@@ -230,13 +224,13 @@ export class Force {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignOwner: string, campaignId: number, batchId:number, content, repetitions, options): Promise<object> => {
+  createBatch = async (owner: string, campaignId: number, batchId:number, content, repetitions, options: object): Promise<object> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
 
       let sig;
-      if(isBscAddress(campaignOwner)) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(8)
         serialbuff.pushUint32(batchId)
@@ -245,7 +239,7 @@ export class Force {
         serialbuff.pushString(hash)
         serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await generateSignature(this.web3, serialbuff, options)
       }
 
       return await this.api.transact({
@@ -253,7 +247,7 @@ export class Force {
           account: this.config.force_contract,
           name: 'mkbatch',
           authorization: [{
-            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
           }],
           data: {
@@ -262,8 +256,8 @@ export class Force {
             content: {field_0: 0, field_1: hash},
             task_merkle_root: merkleRoot,
             num_tasks: content.tasks.length,
-            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: isBscAddress(campaignOwner) ? sig.toString() : null
+            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            sig: isBscAddress(owner) ? sig.toString() : null
           },
         }]
       }, {
@@ -293,7 +287,7 @@ export class Force {
       serialbuff.push(9)
       serialbuff.push(0)
       serialbuff.pushString(hash)
-      sig = await this.generateSignature(serialbuff, options)
+      sig = await generateSignature(this.web3, serialbuff, options)
     }
     try {
       return await this.api.transact({
@@ -337,27 +331,41 @@ export class Force {
    * @returns 
    */
   reserveTask = async (user: string, batchId: number, taskIndex: number, campaignId: number, accountId: number, tasks: Array<any>, options: object) => {
+    let leaves = undefined;
+    let proof = undefined;
+    let hexproof = undefined;
+    let pos = undefined;
+    let tree = undefined;
+    let sig
+
     try {
       const buf2hex = x => x.toString('hex')
       const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+  
+      leaves = tasks.map(x => sha256(JSON.stringify(x)))
+      tree = new MerkleTree(leaves, sha256)
+      proof = tree.getProof(leaves[taskIndex])
+      hexproof = proof.map(x => buf2hex(x.data))
+      pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+    } catch(err) {
+      console.log('err1: ', err)
+    }
+   
+try {
+  if(isBscAddress(user)) {
+    const serialbuff = new Serialize.SerialBuffer()
+    serialbuff.push(6)
+    serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
+    serialbuff.pushUint32(campaignId)
+    serialbuff.pushUint32(batchId)
 
-      const leaves = tasks.map(x => sha256(JSON.stringify(x)))
-      const tree = new MerkleTree(leaves, sha256)
-      const proof = tree.getProof(leaves[taskIndex])
-      const hexproof = proof.map(x => buf2hex(x.data))
-      const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+    sig = await generateSignature(this.web3, serialbuff, options)
+  }
+} catch (error) {
+  console.log('err2: ', error)
+}
 
-      let sig
-      if(isBscAddress(user)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(6)
-        serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
-        serialbuff.pushUint32(campaignId)
-        serialbuff.pushUint32(batchId)
-
-        sig = await this.generateSignature(serialbuff, options['address'])
-      }
-
+    try {
       return await this.api.transact({
         actions: [{
           account: this.config.force_contract,
@@ -405,7 +413,7 @@ export class Force {
       serialbuff.pushNumberAsUint64(submissionId)
       serialbuff.pushString(data)
 
-      sig = await this.generateSignature(serialbuff, options['address'])
+      sig = await generateSignature(this.web3, serialbuff, options)
     }
 
     return await this.api.transact({
@@ -447,38 +455,4 @@ export class Force {
     }
     return taskIndex
   }
-
-  /**
-   * Generate Signature
-   * @param serialbuff
-   * @param options
-   * @returns
-   */
-  generateSignature = async (serialbuff: Serialize.SerialBuffer, options: object): Promise<Signature> => {
-    let sig
-    const bytes = serialbuff.asUint8Array()
-
-    let paramsHash = ec.hash().update(bytes).digest()
-    paramsHash = Serialize.arrayToHex(paramsHash)
-
-    try {
-      if(options['provider'] === 'burner-wallet') {
-        // TODO: figure out how to do this more clean later on.
-        sig = Account.sign('0x' + paramsHash, this.web3.eth.accounts.wallet[0].privateKey);
-      } else {
-        sig = await this.web3.eth.sign('0x'+paramsHash, options['address'])
-      }
-    } catch (error) {
-      return Promise.reject(error)
-    }
-
-    sig = utils.splitSignature(sig)
-    // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
-    sig.s = new BN(sig.s.substring(2), 16)
-    sig = Signature.fromElliptic(sig, 0)
-
-    return sig
-  }
-
 }
