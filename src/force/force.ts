@@ -1,8 +1,7 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize, JsonRpc } from 'eosjs'
+import { Api, Serialize } from 'eosjs'
 import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
-import Web3 from 'web3';
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
 import { isBscAddress } from '../utils/bscAddress'
@@ -12,11 +11,9 @@ import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import fetch from 'cross-fetch';
 import Blob from 'cross-blob';
-// const Blob = require('cross-blob')
 import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
+
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -209,6 +206,7 @@ export class Force extends BaseContract {
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     const blob = new Blob([JSON.stringify(campaignIpfs)], { type: 'text/json' })
     const formData = new FormData()
+    // const formData = formidable({})
     formData.append('file', blob)
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
