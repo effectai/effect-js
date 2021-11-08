@@ -8,8 +8,7 @@ import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
-import fetch from 'cross-fetch';
-import { EffectAccount } from '../types/effectAccount';
+import fetch from '@web-std/fetch'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rpc-interfaces';
@@ -92,7 +91,7 @@ export class Account extends BaseContract {
    */
   getVAccountById = async (id: number): Promise<Array<vAccountRow>> => {
     try {
-      const resp = (await this.api.rpc.get_table_rows({
+      return (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,
         index_position: 1,
@@ -103,7 +102,6 @@ export class Account extends BaseContract {
         json: true,
       })).rows
 
-      return resp;
     } catch (err) {
       throw new Error(err)
     }
@@ -122,11 +120,8 @@ export class Account extends BaseContract {
       if(isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
-      }
-      
-      // await this.updatevAccountRows() This method works when this is not here.
-    
-      const result = await this.api.transact({
+      }    
+      return await this.api.transact({
         actions: [{
           account: this.config.account_contract,
           name: 'open',
@@ -145,8 +140,6 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
-
-      return result;
     } catch (err) {
       throw new Error(err)
     }
@@ -166,7 +159,7 @@ export class Account extends BaseContract {
 
       const amount = convertToAsset(amountEfx)
       await this.updatevAccountRows()
-      const result = await this.api.transact({
+      return await this.api.transact({
         actions: [{
           account: this.config.efx_token_account,
           name: 'transfer',
@@ -185,7 +178,6 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 30,
       });
-      return result;
     } catch (err) {
       throw new Error(err)
     }
@@ -243,7 +235,7 @@ export class Account extends BaseContract {
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
-      const result = await this.api.transact({
+      return await this.api.transact({
         actions: [{
           account: this.config.account_contract,
           name: 'withdraw',
@@ -268,7 +260,6 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
-      return result;
     } catch (err) {
       throw new Error(err)
     }
@@ -304,7 +295,7 @@ export class Account extends BaseContract {
     }
 
     try {
-      const result = await this.api.transact({
+      return await this.api.transact({
         actions: [{
           account: this.config.account_contract,
           name: 'vtransfer',
@@ -328,7 +319,6 @@ export class Account extends BaseContract {
         blocksBehind: 3,
         expireSeconds: 60
       });
-      return result;
     } catch (err) {
       throw new Error(err)
     }
