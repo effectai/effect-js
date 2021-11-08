@@ -220,42 +220,25 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    console.log('Uploading campaign to ipfs')
-    console.log(this.blob, '\n', this.fetch, '\n', this.formData)
-    
     const stringify = JSON.stringify(campaignIpfs)
     const blob = new this.blob([stringify], { type: 'text/json' })
-    console.log('bloblob', JSON.stringify(blob))
-    
-    console.log('----');
-  
     const formData = new this.formData()
-    formData.append('buffer', blob as Blob)
-    console.log('formData', JSON.stringify(formData))
+    formData.append('file', blob.arrayBuffer())
   
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
     } else {
       try {
-
         const requestOptions: RequestInit = {
           method: 'POST',
           // @ts-ignore:next-line
-          body: formData as BodyInit
-        }
-
-        console.log('Uploading campaign to ipfs', this.fetch);
-        
-
-        const response = await this.fetch
-                                    .default(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
-                                    .catch(error => console.error('🔥🔥🔥', error))
-                                    .finally(console.log('upload success'))
-
-        const campaign = await response.json().catch(error => console.error('🔥🔥🔥', error)).finally(console.log('json response success'))
+          body: formData
+        }        
+        const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
+        const campaign = await response.json()
         return campaign as string
       } catch (e) {
-        console.log(e)
+        console.error(`🔥🔥🔥: ${e}`)
         return null
       }
     }
