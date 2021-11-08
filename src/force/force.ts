@@ -9,10 +9,10 @@ import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
-import fetch from '@web-std/fetch'
-import { Blob } from '@web-std/blob'
-// import FormData from '@web-std/form-data'
-import { FormData } from 'formdata-node';
+// import fetch from '@web-std/fetch'
+// import { Blob } from '@web-std/blob'
+// // import FormData from '@web-std/form-data'
+// import { FormData } from 'formdata-node';
 const ecc = require('eosjs-ecc')
 
 
@@ -25,6 +25,7 @@ const ecc = require('eosjs-ecc')
 export class Force extends BaseContract {
   constructor(api: Api, configuration: EffectClientConfig) {
     super(api, configuration)
+    // const std_fetch = import('@web-std/fetch').then((module) => global.fetch = module)
   }
 
   /**
@@ -214,7 +215,7 @@ export class Force extends BaseContract {
     } else {
       try {
 
-        const requestOptions: fetch.RequestInit = {
+        const requestOptions: RequestInit = {
           method: 'POST',
           // @ts-ignore:next-line
           body: formData

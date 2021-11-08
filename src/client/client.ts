@@ -3,7 +3,6 @@ import { Api, JsonRpc } from 'eosjs'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
-import fetch from '@web-std/fetch'
 import { EffectAccount } from '../types/effectAccount';
 import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import Web3 from 'web3';
@@ -18,18 +17,33 @@ export class EffectClient {
     config: EffectClientConfig;
     environment: string;
     rpc: JsonRpc;
+    fetch: any;
+    blob: any;
+    formData: any;
 
-    constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
+    constructor(environment: string = 'browser', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
+
+        if (environment === 'node'){
+            import('@web-std/fetch').then(module => this.fetch = module)
+            import('@web-std/blob').then(module => this.blob = module)
+            import('@web-std/form-data').then(module => this.formData =  module)
+        } else {
+            this.fetch = fetch
+            this.blob = Blob
+            this.formData = FormData
+        }
+
         this.environment = environment;
         this.config = defaultConfiguration(environment, configuration)
         const { web3, signatureProvider, host } = this.config
 
-        this.rpc = new JsonRpc(host, { fetch })
+        this.rpc = new JsonRpc(host, {  })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
         this.account = new Account(this.api, configuration)
         this.force = new Force(this.api, configuration)
+
     }
 
     /**
@@ -126,7 +140,7 @@ export class EffectClient {
      * @returns content of the ipfs hash in your preferred format
      */
     getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-        const data = await fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+        const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
         switch (format.toLowerCase()) {
             case 'formdata':
             case 'form':
