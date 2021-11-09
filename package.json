@@ -1,6 +1,6 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "module": "dist/libs/index.js",
@@ -23,7 +23,10 @@
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
     "publish:latest": "npm version patch && npm run build && npm publish",
-    "publish:next": "npm version patch && npm run build && npm publish --tag next "
+    "publish:next": "npm run prebuild &&  npm run build && npm publish --tag next ",
+    "publish:cjs": "npm run prebuild &&  npm run build:cjs && npm publish --tag cjs ",
+    "publish:umd": "npm run prebuild &&  npm run build:umd && npm publish --tag umd ",
+    "publish:es": "npm run prebuild &&  npm run build:es && npm publish --tag es "
   },
   "repository": {
     "type": "git",
