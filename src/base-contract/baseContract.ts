@@ -1,5 +1,4 @@
 import { Account } from './../account/account';
-import { defaultConfiguration } from './../config/config';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
@@ -37,12 +36,10 @@ export class BaseContract {
     this.config = configuration;
     this.web3 = this.config.web3;
     if (environment === 'node'){
-      console.log('USING NODE ENV 🔥🔥🔥')
       import('@web-std/fetch').then(module => this.fetch = module.default)
       import('@web-std/blob').then(module => this.blob = module.Blob)
       import('@web-std/form-data').then(module => this.formData =  module.FormData)
     } else {
-      console.log('USING WEB ENV 🔥🔥🔥')
         this.fetch = fetch
         this.blob = Blob
         this.formData = FormData

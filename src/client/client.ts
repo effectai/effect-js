@@ -44,7 +44,6 @@ export class EffectClient {
      * @returns 
      */
     connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
-        console.log('Connecting account');
         
         try {
             let account;
@@ -63,19 +62,12 @@ export class EffectClient {
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
-
-            console.log('Effect Account.');
             
-
-            console.log(`Setting signature provider.`);
             this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
             this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
-            console.log(`Signature provider set.`);
 
             try {
-                console.log(`Getting vAccountByName, ${JSON.stringify(this.effectAccount)}`)
                 this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-                console.log(`Finished, vAccountByName, ${JSON.stringify(this.effectAccount)}`)
             } catch (e) {
                 // if account doesnt exists: openAccount
                 if (!this.effectAccount.vAccountRows) {

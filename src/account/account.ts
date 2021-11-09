@@ -1,6 +1,6 @@
 import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize, Numeric, JsonRpc } from 'eosjs'
+import { Api, Serialize, Numeric } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
@@ -43,7 +43,6 @@ export class Account extends BaseContract {
    * @param account - name of the account or bsc
    * @returns - object of the given account name
    */
-  // TODO: maybe do this in a better way?
   static getVAccountByName(account: string) {
     const vAccount = this.getVAccountByName(account)
     console.log(`🧑🏽‍🚒🧑🏽‍🚒\nAccount::this.getVaccountByName\n${vAccount}`);

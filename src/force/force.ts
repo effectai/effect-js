@@ -21,7 +21,6 @@ const ecc = require('eosjs-ecc')
 export class Force extends BaseContract {
   constructor(api: Api, configuration: EffectClientConfig) {
     super(api, configuration)
-    // const std_fetch = import('@web-std/fetch').then((module) => global.fetch = module)
   }
 
   /**
