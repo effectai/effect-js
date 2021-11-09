@@ -2,7 +2,6 @@ import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
-import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
@@ -10,11 +9,8 @@ import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rpc-interfaces';
-const BN = require('bn.js');
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
+import { Signature } from 'eosjs/dist/Signature';
 
-//  * > To state the facts frankly is not to despair the future nor indict the past. The prudent heir takes careful inventory of his legacies and gives a faithful accounting to those whom he owes an obligation of trust. -John F. Kennedy
 /**
  * > “And he read Principles of Accounting all morning, but just to make it interesting, he put lots of dragons in it.” ― Terry Pratchett, Wintersmith 
  *
@@ -145,10 +141,8 @@ export class Account extends BaseContract {
 
   /**
    * Deposit from account to vaccount
-   * @param fromAccount - account to deposit from
-   * @param toAccount - account to deposit to
-   * @param amount - amount, example: '10.0000'
-   * @returns
+   * @param amountEfx amount of tokens
+   * @returns transaction result
    */
   deposit = async (amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
@@ -183,14 +177,13 @@ export class Account extends BaseContract {
 
   /**
    * Withdraw from vaccount to account
-   * @param fromAccount - vaccount to withdraw from
-   * @param toAccount - account to withdraw to
-   * @param amount - amount, example: '10.0000'
-   * @param memo - optional memo
-   * @returns
+   * @param toAccount account to withdraw to
+   * @param amountEfx amount of tokens
+   * @param memo optional memo
+   * @returns transaction result
    */
   withdraw = async (toAccount: string, amountEfx: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    let sig;
+    let sig: Signature;
 
     await this.updatevAccountRows()
     const amount = convertToAsset(amountEfx)
@@ -207,29 +200,7 @@ export class Account extends BaseContract {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      const bytes = serialbuff.asUint8Array()
-
-      let paramsHash = ec.hash().update(bytes).digest()
-      paramsHash = Serialize.arrayToHex(paramsHash)
-
-      // For test purposes (sometimes different than MetaMask signature?)
-      // const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
-      // const sigg = keypair.sign(paramsHash)
-      // console.log('sig priv', sigg)
-      // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
-
-      try {
-        sig = await this.web3.eth.sign('0x' + paramsHash, fromAccount)
-      } catch (error) {
-        console.error(error)
-        return Promise.reject(error)
-      }
-
-      sig = utils.splitSignature(sig)
-      // TODO: figure out how to get Signature in right format without this hack
-      sig.r = new BN(sig.r.substring(2), 16)
-      sig.s = new BN(sig.s.substring(2), 16)
-      sig = Signature.fromElliptic(sig, 0)
+      sig = await this.generateSignature(serialbuff)
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
@@ -249,7 +220,7 @@ export class Account extends BaseContract {
               contract: this.config.efx_token_account
             },
             memo: memo,
-            sig: sig ? sig.toString() : null,
+            sig: isBscAddress(fromAccount) ? sig.toString() : null,
             fee: null
           },
         }]
@@ -266,12 +237,14 @@ export class Account extends BaseContract {
 
   /**
    * Transfer between vaccounts
-   * @param fromAccount - vaccount to transfer from
-   * @param toAccount - vaccount to transfer to
-   * @param amount - amount, example: '10.0000'
-   * @returns
+   * @param toAccount vaccount to transfer from
+   * @param toAccountId vaccount to transfer to
+   * @param amountEfx amount of tokens, example: '10.0000'
+   * @returns transaction result
    */
-  vtransfer = async (toAccount: string, toAccountId: number, amountEfx: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  vtransfer = async (toAccount: string, toAccountId: number, amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let sig: Signature;
+
     await this.updatevAccountRows()
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
@@ -280,7 +253,6 @@ export class Account extends BaseContract {
     const fromAccountId = this.effectAccount.vAccountRows[0].id
     const nonce = this.effectAccount.vAccountRows[0].nonce
 
-    let sig;
     if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(1)
@@ -290,7 +262,7 @@ export class Account extends BaseContract {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      sig = await this.generateSignature(serialbuff, options['address'])
+      sig = await this.generateSignature(serialbuff)
     }
 
     try {
@@ -323,27 +295,4 @@ export class Account extends BaseContract {
       throw new Error(err)
     }
   }
-
-  /**
-   * Recover BSC public key from signed message
-   * @param message
-   * @param signature
-   * @returns
-   */
-  recoverPublicKey = async (message: string, signature: string): Promise<object> => {
-    // recover public key
-    const hashedMsg = utils.hashMessage(message)
-    const pk = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
-    const address = utils.computeAddress(utils.arrayify(pk))
-
-    // compress public key
-    const keypair = ec.keyFromPublic(pk.substring(2), 'hex')
-    const compressed = keypair.getPublic().encodeCompressed('hex')
-
-    // RIPEMD160 hash public key
-    const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-    return { address, accountAddress }
-  }
-
 }

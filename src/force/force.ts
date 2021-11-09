@@ -1,6 +1,6 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize } from 'eosjs'
+import { Api, Serialize } from 'eosjs';
 import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
@@ -10,7 +10,9 @@ import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { Task } from '../types/task';
-const ecc = require('eosjs-ecc')
+import ecc from 'eosjs-ecc';
+import { Signature } from 'eosjs/dist/Signature';
+
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -111,7 +113,7 @@ export class Force extends BaseContract {
   getTaskResult = async (leafHash: string): Promise<Task> => {
     const submissions = await this.getReservations()
 
-    let task;
+    let task: Task | PromiseLike<Task>;
     submissions.rows.forEach(sub => {
       if (leafHash === sub.leaf_hash && sub.data) {
         task = sub
@@ -122,10 +124,10 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Get force campaigns
+   * Get campaign batches
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
-   * @returns - Campaign Table Rows Result
+   * @returns - Batch Table Rows Result
    */
   getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
     const config = {
@@ -169,16 +171,13 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Join campaign
-   * @param owner 
-   * @param accountId 
+   * Join a force Campaign.
    * @param campaignId 
-   * @param options 
-   * @returns 
+   * @returns transaction result
    */
   joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      let sig;
+      let sig: Signature
       const owner = this.effectAccount.accountName
 
       if (isBscAddress(owner)) {
@@ -186,7 +185,7 @@ export class Force extends BaseContract {
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
 
-        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
+        sig = await this.generateSignature(serialbuff)
       }
 
       return await this.api.transact({
@@ -242,32 +241,33 @@ export class Force extends BaseContract {
       }
     }
   } 
-
+/**
+ * 
+ * @param dataArray 
+ * @returns root of merkle tree
+ */
   getMerkleRoot = (dataArray) => {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, SHA256)
-    const root = tree.getRoot().toString('hex')
-
-    console.log(tree.toString())
-    return root
+    return tree.getRoot().toString('hex')
   }
 
   /**
-   * 
-   * @param campaignOwner
-   * @param campaignId
-   * @param batchId
-   * @param content
-   * @param repetitions
-   * @returns
+   * Creates a batch on a Campaign.
+   * @param campaignId 
+   * @param batchId 
+   * @param content 
+   * @returns transaction result
    */
+
   createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
+      let sig: Signature
+
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
       const campaignOwner = this.effectAccount.accountName
 
-      let sig;
       if (isBscAddress(campaignOwner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(8)
@@ -277,7 +277,7 @@ export class Force extends BaseContract {
         serialbuff.pushString(hash)
         serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
 
-        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
+        sig = await this.generateSignature(serialbuff)
       }
 
       return await this.api.transact({
@@ -308,27 +308,23 @@ export class Force extends BaseContract {
   }
 
   /**
-   * 
-   * @param owner 
-   * @param accountId 
-   * @param nonce 
-   * @param hash 
-   * @param quantity 
-   * @param options 
-   * @returns 
+   * creates a force Campaign.
+   * @param hash campaign data on IPFS
+   * @param quantity the amount of tokens rewarded
+   * @returns transaction result
    */
   createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      let sig;
+      let sig: Signature
       const owner = this.effectAccount.accountName
 
-      if (isBscAddress(owner)) {
+      if(isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
         serialbuff.pushString(hash)
-
-        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
+        
+        sig = await this.generateSignature(serialbuff)
       }
 
       return await this.api.transact({
@@ -360,14 +356,10 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Make campaign, uploadCampaign & createCampaign combined
-   * @param content
-   * @param owner
-   * @param accountId
-   * @param nonce
-   * @param quantity
-   * @param options
-   * @returns
+   * Makes a campaign (uploadCampaign & createCampaign combined)
+   * @param content 
+   * @param quantity 
+   * @returns 
    */
   makeCampaign = async (content: object, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
@@ -381,18 +373,18 @@ export class Force extends BaseContract {
   }
 
   /**
-   * 
-   * @param user 
+   * reserve a task in a batch
    * @param batchId 
    * @param taskIndex 
    * @param campaignId 
-   * @param accountId 
    * @param tasks 
-   * @param options 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+
     try {
+      let sig: Signature
+      
       const user = this.effectAccount.accountName
       const accountId = this.effectAccount.vAccountRows[0].id
 
@@ -405,7 +397,6 @@ export class Force extends BaseContract {
       const hexproof = proof.map(x => buf2hex(x.data))
       const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
-      let sig
       if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(6)
@@ -413,7 +404,7 @@ export class Force extends BaseContract {
         serialbuff.pushUint32(campaignId)
         serialbuff.pushUint32(batchId)
 
-        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
+        sig = await this.generateSignature(serialbuff)
       }
 
       return await this.api.transact({
@@ -446,18 +437,16 @@ export class Force extends BaseContract {
   }
 
   /**
-   * 
-   * @param user
-   * @param batchId
-   * @param submissionId
-   * @param data
-   * @param accountId
-   * @param options
-   * @returns
+   * Submits a Task in a Batch
+   * @param batchId 
+   * @param submissionId 
+   * @param data 
+   * @param accountId 
+   * @returns 
    */
   submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      let sig
+      let sig: Signature
       const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
       if (isBscAddress(user)) {
@@ -466,7 +455,7 @@ export class Force extends BaseContract {
         serialbuff.pushNumberAsUint64(submissionId)
         serialbuff.pushString(data)
 
-        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
+        sig = await this.generateSignature(serialbuff)
       }
 
       return await this.api.transact({
@@ -495,14 +484,19 @@ export class Force extends BaseContract {
     }
 
   }
-
-  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<object>): Promise<number> {
-    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+/**
+ * Get task index from merkle leaf
+ * @param leafHash 
+ * @param tasks 
+ * @returns 
+ */
+  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<Task>): Promise<number> {
+    const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
 
     const leaves = tasks.map(x => sha256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
-    let taskIndex;
+    let taskIndex: number;
 
     for (let i = 0; i < treeLeaves.length; i++) {
       if (treeLeaves[i].substring(2) === leafHash) {
@@ -511,5 +505,4 @@ export class Force extends BaseContract {
     }
     return taskIndex
   }
-
 }

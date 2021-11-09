@@ -5,5 +5,6 @@ export interface EffectAccount {
   publicKey: string;
   privateKey?: string;
   permission?: string;
+  provider?: string;
   vAccountRows: Array<vAccountRow>;
 }

@@ -1,4 +1,5 @@
 import { Account } from './../account/account';
+import { Account as EthAccount } from 'eth-lib/lib/account';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
@@ -6,7 +7,8 @@ import Web3 from 'web3';
 import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
-const BN = require('bn.js');
+import BN from 'bn.js';
+
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
@@ -107,31 +109,34 @@ export class BaseContract {
   }
 
   /**
-   * Generate Signature
-   * @param serialbuff
-   * @param address
-   * @returns 
+   * 
+   * @param serialbuff 
+   * @returns signature
    */
-  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
-    let sig
+  generateSignature = async (serialbuff: Serialize.SerialBuffer): Promise<Signature> => {
+    let sig = undefined
     const bytes = serialbuff.asUint8Array()
-
+  
     let paramsHash = ec.hash().update(bytes).digest()
     paramsHash = Serialize.arrayToHex(paramsHash)
-
+  
     try {
-      sig = await this.web3.eth.sign('0x' + paramsHash, address)
+      if(this.effectAccount.provider === 'burner-wallet') {
+        // TODO: figure out how to do this more clean later on.
+        sig = EthAccount.sign('0x' + paramsHash, this.web3.eth.accounts.wallet[0].privateKey);
+      } else {
+        sig = await this.web3.eth.sign('0x'+paramsHash, this.effectAccount.publicKey)
+      }
     } catch (error) {
-      console.error(error)
       return Promise.reject(error)
     }
-
+  
     sig = utils.splitSignature(sig)
     // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2), 16)
+    sig.r = new BN(sig.r.substring(2),16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
-
+  
     return sig
   }
 

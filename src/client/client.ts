@@ -8,7 +8,7 @@ import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import Web3 from 'web3';
 import { eosWalletAuth } from '../types/eosWalletAuth';
 import fetch from 'cross-fetch';
-const retry = require('async-retry')
+import retry from 'async-retry'
 
 export class EffectClient {
     api: Api;
