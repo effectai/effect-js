@@ -40,9 +40,9 @@ export class BaseContract {
       import('@web-std/blob').then(module => this.blob = module.Blob)
       import('@web-std/form-data').then(module => this.formData =  module.FormData)
     } else {
-        this.fetch = fetch
-        this.blob = Blob
-        this.formData = FormData
+      this.fetch = fetch
+      this.blob = Blob
+      this.formData = FormData
     }
   }
 
@@ -133,6 +133,37 @@ export class BaseContract {
     sig = Signature.fromElliptic(sig, 0)
 
     return sig
+  }
+
+  /**
+   * Get IPFS Content in JSON
+   * @param hash - hash of the IPFS content you want to fetch
+   * @param format - format of the content you are fetching.
+   * @returns content of the ipfs hash in your preferred format
+   */
+  getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
+    try {
+      // TODO: use this.fetch here
+      const data = await fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+      switch (format.toLowerCase()) {
+          case 'formdata':
+          case 'form':
+              return data.text()
+          case 'buffer':
+          case 'arraybuffer':
+          case 'array':
+              return data.arrayBuffer()
+          case 'blob':
+              return data.blob()
+          case 'text':
+              return data.text()
+          case 'json':
+              return data.json()
+      }
+        return data
+    } catch (error) {
+        console.error(error)
+    }
   }
 
 }
