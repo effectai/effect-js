@@ -155,8 +155,8 @@ export class Force extends BaseContract {
    * @param campaignId 
    * @returns 
    */
-  getCampaignJoins = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
-    const key = getCompositeKey(accountId, campaignId)
+  getCampaignJoins = async (campaignId: number): Promise<GetTableRowsResult> => {
+    const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
 
     const config = {
       code: this.config.force_contract,
@@ -259,7 +259,8 @@ export class Force extends BaseContract {
    * @param content 
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, batchId: number, content: any): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+
+  createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
 
@@ -380,6 +381,7 @@ export class Force extends BaseContract {
    * @returns 
    */
   reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+
     try {
       let sig: Signature
       
@@ -442,9 +444,10 @@ export class Force extends BaseContract {
    * @param accountId 
    * @returns 
    */
-  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
+      const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
       if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
