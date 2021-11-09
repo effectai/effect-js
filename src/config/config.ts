@@ -12,7 +12,9 @@ import Web3 from 'web3';
  */
 // TODO is there a more elegant way of building these multiple configuration objects? DRY?
 export const defaultConfiguration = (environment: string = 'testnet', config?: EffectClientConfig): EffectClientConfig => {
-    if (environment == 'testnet' || 'kylin') {
+
+
+    if (config.network === 'kylin') {
         return {
             network:                config.network                ?? "kylin",
             signatureProvider:      config.signatureProvider      ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
