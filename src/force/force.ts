@@ -153,8 +153,8 @@ export class Force extends BaseContract {
    * @param campaignId 
    * @returns 
    */
-  getCampaignJoins = async (accountId: number, campaignId: number): Promise<GetTableRowsResult> => {
-    const key = getCompositeKey(accountId, campaignId)
+  getCampaignJoins = async (campaignId: number): Promise<GetTableRowsResult> => {
+    const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
 
     const config = {
       code: this.config.force_contract,
@@ -176,7 +176,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  joinCampaign = async (campaignId: number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig;
       const owner = this.effectAccount.accountName
@@ -186,7 +186,7 @@ export class Force extends BaseContract {
         serialbuff.push(7)
         serialbuff.pushUint32(campaignId)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
       }
 
       return await this.api.transact({
@@ -261,7 +261,7 @@ export class Force extends BaseContract {
    * @param repetitions
    * @returns
    */
-  createBatch = async (campaignId: number, batchId: number, content, repetitions, options): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(content.tasks)
@@ -277,7 +277,7 @@ export class Force extends BaseContract {
         serialbuff.pushString(hash)
         serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
       }
 
       return await this.api.transact({
@@ -317,7 +317,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  createCampaign = async (hash: string, quantity: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig;
       const owner = this.effectAccount.accountName
@@ -328,7 +328,7 @@ export class Force extends BaseContract {
         serialbuff.push(0)
         serialbuff.pushString(hash)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
       }
 
       return await this.api.transact({
@@ -369,12 +369,12 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  makeCampaign = async (content: object, quantity: string, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  makeCampaign = async (content: object, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       // upload to ipfs
       const hash = await this.uploadCampaign(content)
       // create campaign
-      return await this.createCampaign(hash, quantity, options)
+      return await this.createCampaign(hash, quantity)
     } catch (err) {
       throw new Error(err)
     }
@@ -391,7 +391,7 @@ export class Force extends BaseContract {
    * @param options 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       const user = this.effectAccount.accountName
       const accountId = this.effectAccount.vAccountRows[0].id
@@ -413,7 +413,7 @@ export class Force extends BaseContract {
         serialbuff.pushUint32(campaignId)
         serialbuff.pushUint32(batchId)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
       }
 
       return await this.api.transact({
@@ -455,9 +455,10 @@ export class Force extends BaseContract {
    * @param options
    * @returns
    */
-  submitTask = async (batchId: number, submissionId: number, data: string, accountId: number, options: object): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig
+      const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
       if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
@@ -465,7 +466,7 @@ export class Force extends BaseContract {
         serialbuff.pushNumberAsUint64(submissionId)
         serialbuff.pushString(data)
 
-        sig = await this.generateSignature(serialbuff, options['address'])
+        sig = await this.generateSignature(serialbuff, this.effectAccount.publicKey)
       }
 
       return await this.api.transact({
