@@ -28,16 +28,16 @@ export class Force extends BaseContract {
    * @param accountId ID of  the given acccount
    * @returns the payment rows of the given `accountId`
    */
-  // TODO: if connectAccount is done use that accountId. make optional parameter accountId
-  getPendingBalance = async (accountId: number): Promise<GetTableRowsResult> => {
+  getPendingBalance = async (accountId?: number): Promise<GetTableRowsResult> => {
+    const id = this.effectAccount.vAccountRows ? this.effectAccount.vAccountRows[0].id : accountId
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
       table: 'payment',
       index_position: 3,
       key_type: 'i64',
-      lower_bound: accountId,
-      upper_bound: accountId
+      lower_bound: id,
+      upper_bound: id
     }
 
     return await this.api.rpc.get_table_rows(config)
