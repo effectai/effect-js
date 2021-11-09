@@ -115,30 +115,4 @@ export class EffectClient {
         }
     }
 
-    // TODO: move to generic helper file/class
-    /**
-     * Get IPFS Content in JSON
-     * @param hash - hash of the IPFS content you want to fetch
-     * @param format - format of the content you are fetching.
-     * @returns content of the ipfs hash in your preferred format
-     */
-    getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-        const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
-        switch (format.toLowerCase()) {
-            case 'formdata':
-            case 'form':
-                return data.text()
-            case 'buffer':
-            case 'arraybuffer':
-            case 'array':
-                return data.arrayBuffer()
-            case 'blob':
-                return data.blob()
-            case 'text':
-                return data.text()
-            case 'json':
-                return data.json()
-        }
-        return data
-    }
 }

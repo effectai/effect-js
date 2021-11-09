@@ -54,13 +54,6 @@ export class Account extends BaseContract {
     try {
       let accString: string;
 
-      console.log('getaccountbyname reuqest', {
-        code: this.config.account_contract,
-        scope: this.config.account_contract,
-      })
-
-      console.log('accountt', account)
-
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");

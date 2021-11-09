@@ -31,7 +31,7 @@ export class Force extends BaseContract {
    * @returns the payment rows of the given `accountId`
    */
   getPendingBalance = async (accountId?: number): Promise<GetTableRowsResult> => {
-    const id = this.effectAccount.vAccountRows ? this.effectAccount.vAccountRows[0].id : accountId
+    const id = this.effectAccount ? this.effectAccount.vAccountRows[0].id : accountId
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
