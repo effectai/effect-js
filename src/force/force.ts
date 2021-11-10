@@ -21,8 +21,8 @@ import { Signature } from 'eosjs/dist/Signature';
  * 
  */
 export class Force extends BaseContract {
-  constructor(api: Api, configuration: EffectClientConfig) {
-    super(api, configuration)
+  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
+    super(api, configuration, environment);
   }
 
   /**
@@ -73,9 +73,6 @@ export class Force extends BaseContract {
    * @returns - Submission Table Rows Result
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
-    if (this.effectAccount) {
-      console.log('Hey account', this.effectAccount)
-    }
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,

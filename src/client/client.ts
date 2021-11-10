@@ -32,7 +32,7 @@ export class EffectClient {
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
         this.account = new Account(this.api, this.config, environment)
-        this.force = new Force(this.api, this.config)
+        this.force = new Force(this.api, this.config, environment)
     }
 
     /**

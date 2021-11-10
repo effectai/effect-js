@@ -42,7 +42,7 @@ export class BaseContract {
       import('@web-std/blob').then(module => this.blob = module.Blob)
       import('@web-std/form-data').then(module => this.formData =  module.FormData)
     } else {
-      this.fetch = fetch
+      this.fetch = window.fetch.bind(window);
       this.blob = Blob
       this.formData = FormData
     }
@@ -148,8 +148,7 @@ export class BaseContract {
    */
   getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
     try {
-      // TODO: use this.fetch here
-      const data = await fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+      const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
       switch (format.toLowerCase()) {
           case 'formdata':
           case 'form':
