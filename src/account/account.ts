@@ -1,8 +1,6 @@
 import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
-import RIPEMD160 from "eosjs/dist/ripemd"
-import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'

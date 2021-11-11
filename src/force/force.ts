@@ -71,7 +71,7 @@ export class Force extends BaseContract {
 
   /**
    * Get campaign
-   * @param leafHash - id of campaign
+   * @param id - id of campaign
    * @returns Campaign
    */
   getCampaign = async (id: number): Promise<Campaign> => {

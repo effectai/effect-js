@@ -42,12 +42,11 @@ export class EffectClient {
      * @returns 
      */
     connectAccount = async (signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
-
         try {
             let account;
             let bscAddress;
             
-            // TODO look into this; why isnt 'web3 instanceof Web3' not working
+            // TODO look into this; why is 'web3 instanceof Web3' not working?
             if (web3) {
                 const message = 'Effect Account'
                 const signature = await this.sign(web3, message)
