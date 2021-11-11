@@ -60,7 +60,6 @@ export class Account extends BaseContract {
       } else {
         accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
-
       return (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,

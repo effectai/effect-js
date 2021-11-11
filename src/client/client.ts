@@ -9,7 +9,6 @@ import Web3 from 'web3';
 import { eosWalletAuth } from '../types/eosWalletAuth';
 import fetch from 'cross-fetch';
 import retry from 'async-retry'
-
 export class EffectClient {
     api: Api;
     account: Account;
@@ -43,31 +42,37 @@ export class EffectClient {
      * @param eosAccount 
      * @returns 
      */
-    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
-
+    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth, effectAccount?: EffectAccount): Promise<EffectAccount> => {
+        
         try {
             let account;
             let bscAddress;
+
             if (chain === 'bsc') {
                 const message = 'Effect Account'
-                const signature = await this.sign(web3, message)
-                bscAddress = web3.eth.accounts.wallet[0].address
+                const signature = await this.sign(web3, message, effectAccount)
                 account = await this.account.recoverPublicKey(message, signature)
 
-                // TODO: privateKey for burnerwallet?
-                this.effectAccount = { accountName: account.accountAddress, publicKey: bscAddress, privateKey: null, vAccountRows: null }
+                if (effectAccount && effectAccount.provider === 'burner-wallet') {
+                    this.effectAccount = { accountName: account.accountAddress, ...effectAccount }
+                } else {
+                    bscAddress = web3.eth.accounts.wallet[0].address
+                    this.effectAccount = { 
+                        accountName: account.accountAddress,
+                        address: bscAddress,
+                    }
+                }
+                
             } else if (signatureProvider) {
-                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, publicKey: eosAccount.publicKey, vAccountRows: null }
+                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
 
             await this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
             await this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
 
-            try {
-                this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-            } catch (e) {
-            }
+            this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+         
             // if account doesnt exists: openAccount
             if (!this.effectAccount.vAccountRows || !this.effectAccount.vAccountRows.length) {
                 const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
@@ -83,7 +88,6 @@ export class EffectClient {
                     }
                 })
             }
-
             return this.effectAccount
         } catch (error) {
             console.error(error)
@@ -97,13 +101,13 @@ export class EffectClient {
      * @param message 
      * @returns 
      */
-    sign = async (web3: Web3, message: string): Promise<string> => {
+    sign = async (web3: Web3, message: string, effectAccount?: EffectAccount): Promise<string> => {
         try {
             const address = web3.eth.accounts.wallet[0].address
             // TODO: how to detect if its a burner-wallet?
-            if (web3.currentProvider === 'burner-wallet') {
+            if (effectAccount && effectAccount.provider === 'burner-wallet') {
                 // TODO: need to find another solution to sign without giving the private key again
-                return (await web3.eth.accounts.sign(message, '')).signature
+                return (await web3.eth.accounts.sign(message, effectAccount.privateKey)).signature
             } else {
                 return await web3.eth.sign(message, address)
             }
