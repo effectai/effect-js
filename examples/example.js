@@ -1,4 +1,4 @@
-const { EffectClient, createAccount, createWallet } = require('./')
+const { EffectClient, createAccount, createWallet } = require('../dist/lib')
 
 const main = async () => {
     console.log('Starting...')
