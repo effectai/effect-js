@@ -42,7 +42,7 @@ export class EffectClient {
      * @param eosAccount 
      * @returns 
      */
-    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth, effectAccount?: EffectAccount): Promise<EffectAccount> => {
+    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
         
         try {
             let account;
@@ -50,17 +50,14 @@ export class EffectClient {
 
             if (chain === 'bsc') {
                 const message = 'Effect Account'
-                const signature = await this.sign(web3, message, effectAccount)
+                const signature = await this.sign(web3, message)
                 account = await this.account.recoverPublicKey(message, signature)
 
-                if (effectAccount && effectAccount.provider === 'burner-wallet') {
-                    this.effectAccount = { accountName: account.accountAddress, ...effectAccount }
-                } else {
-                    bscAddress = web3.eth.accounts.wallet[0].address
-                    this.effectAccount = { 
-                        accountName: account.accountAddress,
-                        address: bscAddress,
-                    }
+                this.effectAccount = { 
+                    accountName: account.accountAddress,
+                    address: web3.eth.accounts.wallet[0].address,
+                    privateKey: web3.eth.accounts.wallet[0].privateKey,
+                    provider: 'burner-wallet',
                 }
                 
             } else if (signatureProvider) {
@@ -101,13 +98,13 @@ export class EffectClient {
      * @param message 
      * @returns 
      */
-    sign = async (web3: Web3, message: string, effectAccount?: EffectAccount): Promise<string> => {
+    sign = async (web3: Web3, message: string): Promise<string> => {
         try {
             const address = web3.eth.accounts.wallet[0].address
-            // TODO: how to detect if its a burner-wallet?
-            if (effectAccount && effectAccount.provider === 'burner-wallet') {
-                // TODO: need to find another solution to sign without giving the private key again
-                return (await web3.eth.accounts.sign(message, effectAccount.privateKey)).signature
+            const privateKey = web3.eth.accounts.wallet[0].privateKey
+            
+            if (privateKey) {
+                return (await web3.eth.accounts.sign(message, privateKey)).signature
             } else {
                 return await web3.eth.sign(message, address)
             }

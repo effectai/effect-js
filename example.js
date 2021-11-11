@@ -13,15 +13,13 @@ const main = async () => {
     // Instantiating burnerwallet.
     const burnerwallet = new effectjs.BurnerWallet().addAccount()
     // OR
-
-    // const burnerWallet = new effectjs.BurnerWallet(
-    //     '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
+    // const burnerwallet = new effectjs.BurnerWallet(
+    //     '0x602df95949fc35d550100ab9e28142fceff2b42dd51f605ec92cd6f34a43af7a'
     // ).addAccount()
 
-    const web3 = burnerWallet.getWeb3()
-    const account = burnerWallet.getAccount()
+    const web3 = burnerwallet.getWeb3()
 
-    const effectAccount = await sdk.connectAccount('bsc', null, web3, account);
+    const effectAccount = sdk.connectAccount('bsc', null, web3);
     console.log(effectAccount)
 }
 
