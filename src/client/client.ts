@@ -16,7 +16,6 @@ export class EffectClient {
     effectAccount: EffectAccount;
     force: Force;
     config: EffectClientConfig;
-    environment: string;
     rpc: JsonRpc;
     fetch: any;
     blob: any;
@@ -24,8 +23,7 @@ export class EffectClient {
 
     constructor(environment: string = 'node', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
-        this.environment = environment;
-        this.config = defaultConfiguration(environment, configuration)
+        this.config = defaultConfiguration(configuration)
         const { signatureProvider, host } = this.config
 
         this.rpc = new JsonRpc(host, { fetch })

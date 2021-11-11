@@ -8,7 +8,6 @@ import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
-import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
