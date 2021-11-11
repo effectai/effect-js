@@ -38,7 +38,7 @@ export * from './utils/bscAddress'
 export * from './utils/asset'
 export * from './utils/compositeKey'
 export * from './utils/hex'
-export * from './utils/wallet'
+export * from './utils/bscWallet'
 
 /**
  * Types
