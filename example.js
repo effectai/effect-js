@@ -1,5 +1,4 @@
 const effectjs = require('./')
-const Web3 = require('web3')
 
 const main = async () => {
     console.log('Starting...')
@@ -14,7 +13,7 @@ const main = async () => {
     // Instantiating burnerwallet.
     const burnerwallet = new effectjs.BurnerWallet().addAccount()
     // OR
-    
+
     // const burnerWallet = new effectjs.BurnerWallet(
     //     '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
     // ).addAccount()
