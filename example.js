@@ -18,8 +18,10 @@ const main = async () => {
     const accountFromWallet = effectjs.addToBurnerWallet(web3, account)
     console.log(accountFromWallet)
 
-    const effectAccount = await sdk.connectAccount('bsc', null, web3);
+    const effectAccount = await sdk.connectAccount(null, web3);
     console.log(effectAccount)
+
+    console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 
 main()
