@@ -11,20 +11,16 @@ const main = async () => {
     const sdk = new effectjs.EffectClient('node', sdkOptions)
 
     // Instantiating burnerwallet.
-    // const burnerWallet = new effectjs.BurnerWallet().addAccount()
+    const burnerwallet = new effectjs.BurnerWallet().addAccount()
     // OR
+    // const burnerwallet = new effectjs.BurnerWallet(
+    //     '0x602df95949fc35d550100ab9e28142fceff2b42dd51f605ec92cd6f34a43af7a'
+    // ).addAccount()
 
-    const burnerWallet = new effectjs.BurnerWallet(
-        '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
-    ).addAccount()
-
-    const web3 = burnerWallet.getWeb3()
-    const account = burnerWallet.getAccount()
-
-    const effectAccount = await sdk.connectAccount(null, web3, null, account);
-
+    const web3 = burnerwallet.getWeb3()
+    const effectAccount = await sdk.connectAccount(null, web3);
+    
     console.log(effectAccount)
-
     console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 

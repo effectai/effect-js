@@ -1,9 +1,9 @@
 import Web3 from "web3";
-import { EffectAccount } from "../types/effectAccount";
+import { Account } from "web3-core/types/index";
 
 export class BurnerWallet {
     private web3: Web3
-    private account: EffectAccount
+    private account: Account
 
     constructor (privateKey?: string) {
         this.reset()
@@ -32,7 +32,6 @@ export class BurnerWallet {
         } else {
             this.account = this.web3.eth.accounts.create()
         }
-        this.account.provider = 'burner-wallet'
         return this
     }
 
@@ -47,14 +46,6 @@ export class BurnerWallet {
         this.web3.eth.accounts.wallet.create(0)
         this.web3.eth.accounts.wallet.add(this.account.privateKey)
         return this
-    }
-
-    /**
-     * retrieves account object
-     * @returns incomplete EffectAccount object, be sure to call sdk.connectAccount() to make it complete.
-     */
-    public getAccount(): EffectAccount {
-        return this.account
     }
     
     /**
