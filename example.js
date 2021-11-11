@@ -1,20 +1,22 @@
-const effectjs = require('./')
+const { EffectClient, createAccount, createWallet } = require('./')
 
 const main = async () => {
     console.log('Starting...')
-    const sdk = new effectjs.EffectClient('kylin')
+    const sdk = new EffectClient('kylin')
 
-    // Instantiating burnerwallet.
-    const burnerwallet = new effectjs.BurnerWallet().addAccount()
-    // OR
-    // const burnerwallet = new effectjs.BurnerWallet(
-    //     '0x602df95949fc35d550100ab9e28142fceff2b42dd51f605ec92cd6f34a43af7a'
-    // ).addAccount()
+    // Instantiating bsc account.
+    const account = createAccount(
+        // leave empty to generate new private key
+        '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
+    )
+    // Generate web3 instance from account with private key.
+    // Could also be the web3 object with a MetaMask connection etc.
+    const web3 = createWallet(account)
 
-    const web3 = burnerwallet.getWeb3()
-    const effectAccount = await sdk.connectAccount(null, web3);
-    
+    const effectAccount = await sdk.connectAccount(web3);
+
     console.log(effectAccount)
+
     console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 

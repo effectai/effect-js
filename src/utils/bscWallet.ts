@@ -26,7 +26,7 @@ export function createAccount(privateKey?: string): EffectAccount {
  * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet-add
  * @returns Web3
  */
-export function createWallet(account?: EffectAccount): Web3 {
+export function createWallet(account: EffectAccount): Web3 {
     const web3WithAccount = new Web3();
     web3WithAccount.eth.accounts.wallet.create(0)
     web3WithAccount.eth.accounts.wallet.add(account.privateKey)

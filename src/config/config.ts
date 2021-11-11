@@ -11,8 +11,7 @@ import Web3 from 'web3';
  * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet', apiKey: 'abc123', ipfs_node: 'https://ifps.effect.ai'})
  */
 // TODO is there a more elegant way of building these multiple configuration objects? DRY?
-export const defaultConfiguration = (environment: string = 'testnet', config?: EffectClientConfig): EffectClientConfig => {
-
+export const defaultConfiguration = (environment: string = 'testnet', config: any = {}): EffectClientConfig => {
     if (environment === 'mainnet' || environment === 'main') {
         // TODO add proper configuration values here.
         return {
