@@ -18,10 +18,9 @@ const main = async () => {
     // ).addAccount()
 
     const web3 = burnerwallet.getWeb3()
-
-    const effectAccount = sdk.connectAccount(null, web3);
+    const effectAccount = await sdk.connectAccount(null, web3);
+    
     console.log(effectAccount)
-
     console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 
