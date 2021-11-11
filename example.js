@@ -21,7 +21,7 @@ const main = async () => {
     const web3 = burnerWallet.getWeb3()
     const account = burnerWallet.getAccount()
 
-    const effectAccount = await sdk.connectAccount(null, web3, account);
+    const effectAccount = await sdk.connectAccount(null, web3, null, account);
 
     console.log(effectAccount)
 
