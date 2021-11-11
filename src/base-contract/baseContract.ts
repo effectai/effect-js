@@ -123,9 +123,9 @@ export class BaseContract {
     try {
       if(this.effectAccount.provider === 'burner-wallet') {
         // TODO: figure out how to do this more clean later on.
-        sig = EthAccount.sign('0x' + paramsHash, this.web3.eth.accounts.wallet[0].privateKey);
+        sig = EthAccount.sign('0x' + paramsHash, this.effectAccount.privateKey);
       } else {
-        sig = await this.web3.eth.sign('0x'+paramsHash, this.effectAccount.publicKey)
+        sig = await this.web3.eth.sign('0x'+paramsHash, this.effectAccount.address)
       }
     } catch (error) {
       return Promise.reject(error)
