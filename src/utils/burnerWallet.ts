@@ -1,46 +1,67 @@
 import Web3 from "web3";
-import { Account } from 'web3-core/types/index'
+import { EffectAccount } from "../types/effectAccount";
 
-/**
- * @param web3 Web3 object
- * @link https://web3js.readthedocs.io/en/v1.3.6/web3-eth-accounts.html#create
- * @returns Account object with private key and address.
- */
-export function createBurnerWallet(web3: Web3): Account {
-    return web3.eth.accounts.create()
-}
-/**
- * @param web3 Web3 object
- * @param privateKey String
- * @link https://web3js.readthedocs.io/en/v1.3.6/web3-eth-accounts.html#privatekeytoaccount
- * @returns Account object generated from private key.
- */
-export function privateKeyToBurnerWallet(web3: Web3, privateKey: string): Account {
-    return web3.eth.accounts.privateKeyToAccount(privateKey)
-}
+export class BurnerWallet {
+    private web3: Web3
+    private account: EffectAccount
 
-/**
- * 
- * @param web3 Web3 object
- * @param account Account
- * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet-add
- * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet-create
- * @returns newly added account from wallet.
- */
-export function addToBurnerWallet(web3: Web3, account: Account): Account {
-    // cannot leave input parameter empty, hence the 0 to create an empty wallet.
-    web3.eth.accounts.wallet.create(0)
-    web3.eth.accounts.wallet.add(account)
-    return web3.eth.accounts.wallet[account.address]
-}
+    constructor (privateKey?: string) {
+        this.reset()
+        this.create(privateKey)
+    }
 
-/**
- * 
- * @param web3 Web3 object
- * @param index number
- * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet
- * @returns Account object based of index in the wallet.
- */
-export function getAccountfromWallet(web3: Web3, index: number): Account {
-    return web3.eth.accounts.wallet[index]
+    /**
+     * Creates empty Web3 Object
+     * @returns this
+     */
+    public reset(): BurnerWallet {
+        this.web3 = new Web3('https://bsc-dataseed.binance.org')
+        return this
+    }
+
+    /**
+     * generate account (from privateKey if present).
+     * @param privateKey string
+     * @link https://web3js.readthedocs.io/en/v1.3.6/web3-eth-accounts.html#privatekeytoaccount
+     * @link https://web3js.readthedocs.io/en/v1.3.6/web3-eth-accounts.html#create
+     * @returns this
+     */
+    public create(privateKey?: string): BurnerWallet {
+        if (privateKey) {
+            this.account = this.web3.eth.accounts.privateKeyToAccount(privateKey)
+        } else {
+            this.account = this.web3.eth.accounts.create()
+        }
+        this.account.provider = 'burner-wallet'
+        return this
+    }
+
+    /**
+     * creates empty wallet, then adds account to the wallet
+     * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet-create
+     * @link https://web3js.readthedocs.io/en/v1.5.2/web3-eth-accounts.html#wallet-add
+     * @returns this
+     */
+    public addAccount(): BurnerWallet {
+        // cannot leave input parameter empty, hence the 0 to create an empty wallet.
+        this.web3.eth.accounts.wallet.create(0)
+        this.web3.eth.accounts.wallet.add(this.account.privateKey)
+        return this
+    }
+
+    /**
+     * retrieves account object
+     * @returns incomplete EffectAccount object, be sure to call sdk.connectAccount() to make it complete.
+     */
+    public getAccount(): EffectAccount {
+        return this.account
+    }
+    
+    /**
+     * retrieves web3 object
+     * @returns Web3 object
+     */
+    public getWeb3(): Web3 {
+        return this.web3
+    }
 }
