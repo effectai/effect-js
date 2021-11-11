@@ -53,8 +53,7 @@ export class EffectClient {
                 this.effectAccount = {
                     accountName: bscAccount.accountAddress,
                     address: web3.eth.accounts.wallet[0].address,
-                    privateKey: web3.eth.accounts.wallet[0].privateKey,
-                    provider: 'private-key' // How do we know this is a private-key/burner wallet? Could also be MetaMask right?
+                    privateKey: web3.eth.accounts.wallet[0].privateKey
                 }
 
             } else {

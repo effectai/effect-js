@@ -1,5 +1,5 @@
 import { Account } from './../account/account';
-import { Account as EthAccount } from 'eth-lib/lib/account';
+import * as EthAccount from 'eth-lib/lib/account';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize } from 'eosjs'
 import RIPEMD160 from "eosjs/dist/ripemd"
@@ -121,7 +121,7 @@ export class BaseContract {
     paramsHash = Serialize.arrayToHex(paramsHash)
 
     try {
-      if (this.effectAccount.provider === 'burner-wallet') {
+      if (this.effectAccount.privateKey) {
         // TODO: figure out how to do this more clean later on.
         sig = EthAccount.sign('0x' + paramsHash, this.effectAccount.privateKey);
       } else {
