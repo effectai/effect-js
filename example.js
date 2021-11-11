@@ -19,7 +19,8 @@ const main = async () => {
     console.log(accountFromWallet)
 
     const effectAccount = await sdk.connectAccount(null, web3);
-    
+    console.log(effectAccount)
+
     console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 
