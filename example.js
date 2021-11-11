@@ -11,14 +11,18 @@ const main = async () => {
     }
     const sdk = new effectjs.EffectClient('node', sdkOptions)
 
-    const web3 = new Web3('https://bsc-dataseed.binance.org')
+    // Instantiating burnerwallet.
+    const burnerwallet = new effectjs.BurnerWallet().addAccount()
+    // OR
+    
+    // const burnerWallet = new effectjs.BurnerWallet(
+    //     '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
+    // ).addAccount()
 
-    const account = effectjs.createBurnerWallet(web3)
-    // const account = effectjs.privateKeyToBurnerWallet(web3, '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d')
-    const accountFromWallet = effectjs.addToBurnerWallet(web3, account)
-    console.log(accountFromWallet)
+    const web3 = burnerWallet.getWeb3()
+    const account = burnerWallet.getAccount()
 
-    const effectAccount = await sdk.connectAccount('bsc', null, web3);
+    const effectAccount = await sdk.connectAccount('bsc', null, web3, account);
     console.log(effectAccount)
 }
 
