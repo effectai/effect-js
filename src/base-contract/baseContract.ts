@@ -78,7 +78,7 @@ export class BaseContract {
    * @param web3 
    * @returns 
    */
-  setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3?: Web3): Promise<void> => {
+  setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3: Web3): Promise<void> => {
     if (web3) {
       this.web3 = web3;
     }

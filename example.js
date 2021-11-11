@@ -22,7 +22,10 @@ const main = async () => {
     const account = burnerWallet.getAccount()
 
     const effectAccount = await sdk.connectAccount('bsc', null, web3, account);
+
     console.log(effectAccount)
+
+    console.log('getCampaign', await sdk.force.getCampaign(5))
 }
 
 main()
