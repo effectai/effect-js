@@ -15,7 +15,6 @@ export class EffectClient {
     effectAccount: EffectAccount;
     force: Force;
     config: EffectClientConfig;
-    environment: string;
     rpc: JsonRpc;
     fetch: any;
     blob: any;
@@ -23,11 +22,10 @@ export class EffectClient {
 
     constructor(environment: string = 'node', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
-        this.environment = environment;
-        this.config = defaultConfiguration(environment, configuration)
-        const { web3, signatureProvider, host } = this.config
+        this.config = defaultConfiguration(configuration)
+        const { signatureProvider, host } = this.config
 
-        this.rpc = new JsonRpc(host, { fetch: fetch })
+        this.rpc = new JsonRpc(host, { fetch })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
         this.account = new Account(this.api, this.config, environment)
@@ -42,13 +40,13 @@ export class EffectClient {
      * @param eosAccount 
      * @returns 
      */
-    connectAccount = async (chain: string, signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
-        
+    connectAccount = async (signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
         try {
             let account;
             let bscAddress;
-
-            if (chain === 'bsc') {
+            
+            // TODO look into this; why is 'web3 instanceof Web3' not working?
+            if (web3) {
                 const message = 'Effect Account'
                 const signature = await this.sign(web3, message)
                 account = await this.account.recoverPublicKey(message, signature)
@@ -102,7 +100,7 @@ export class EffectClient {
         try {
             const address = web3.eth.accounts.wallet[0].address
             const privateKey = web3.eth.accounts.wallet[0].privateKey
-            
+
             if (privateKey) {
                 return (await web3.eth.accounts.sign(message, privateKey)).signature
             } else {

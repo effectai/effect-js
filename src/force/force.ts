@@ -12,6 +12,7 @@ import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { Task } from '../types/task';
 import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
+import { Campaign } from '../types/campaign';
 
 
 /**
@@ -66,6 +67,26 @@ export class Force extends BaseContract {
     const data = await this.api.rpc.get_table_rows(config)
 
     return data;
+  }
+
+  /**
+   * Get campaign
+   * @param id - id of campaign
+   * @returns Campaign
+   */
+  getCampaign = async (id: number): Promise<Campaign> => {
+    const config = {
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
+      table: 'campaign',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
+    }
+
+    const campaign = await this.api.rpc.get_table_rows(config)
+
+    return campaign.rows[0];
   }
 
   /**
