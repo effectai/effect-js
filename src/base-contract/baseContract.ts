@@ -33,14 +33,14 @@ export class BaseContract {
    * @param configuration The configuration object for the client.
    * @param environment The environment to connect to, either 'node' or 'browser'
    */
-  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
+  constructor(api: Api, configuration: EffectClientConfig) {
     this.api = api;
     this.config = configuration;
     this.web3 = this.config.web3;
-    if (environment === 'node'){
+    if (typeof window === 'undefined') {
       import('@web-std/fetch').then(module => this.fetch = module.default)
       import('@web-std/blob').then(module => this.blob = module.Blob)
-      import('@web-std/form-data').then(module => this.formData =  module.FormData)
+      import('@web-std/form-data').then(module => this.formData = module.FormData)
     } else {
       this.fetch = window.fetch.bind(window);
       this.blob = Blob
@@ -116,27 +116,27 @@ export class BaseContract {
   generateSignature = async (serialbuff: Serialize.SerialBuffer): Promise<Signature> => {
     let sig = undefined
     const bytes = serialbuff.asUint8Array()
-  
+
     let paramsHash = ec.hash().update(bytes).digest()
     paramsHash = Serialize.arrayToHex(paramsHash)
-  
+
     try {
-      if(this.effectAccount.provider === 'burner-wallet') {
+      if (this.effectAccount.provider === 'burner-wallet') {
         // TODO: figure out how to do this more clean later on.
         sig = EthAccount.sign('0x' + paramsHash, this.effectAccount.privateKey);
       } else {
-        sig = await this.web3.eth.sign('0x'+paramsHash, this.effectAccount.address)
+        sig = await this.web3.eth.sign('0x' + paramsHash, this.effectAccount.address)
       }
     } catch (error) {
       return Promise.reject(error)
     }
-  
+
     sig = utils.splitSignature(sig)
     // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
+    sig.r = new BN(sig.r.substring(2), 16)
     sig.s = new BN(sig.s.substring(2), 16)
     sig = Signature.fromElliptic(sig, 0)
-  
+
     return sig
   }
 
@@ -150,23 +150,23 @@ export class BaseContract {
     try {
       const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
       switch (format.toLowerCase()) {
-          case 'formdata':
-          case 'form':
-              return data.text()
-          case 'buffer':
-          case 'arraybuffer':
-          case 'array':
-              return data.arrayBuffer()
-          case 'blob':
-              return data.blob()
-          case 'text':
-              return data.text()
-          case 'json':
-              return data.json()
+        case 'formdata':
+        case 'form':
+          return data.text()
+        case 'buffer':
+        case 'arraybuffer':
+        case 'array':
+          return data.arrayBuffer()
+        case 'blob':
+          return data.blob()
+        case 'text':
+          return data.text()
+        case 'json':
+          return data.json()
       }
-        return data
+      return data
     } catch (error) {
-        console.error(error)
+      console.error(error)
     }
   }
 

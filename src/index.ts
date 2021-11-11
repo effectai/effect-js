@@ -30,15 +30,15 @@ export * from './force/templateScript'
 export * from './config/config'
 
 
- /**
-  * Utility methods
-  */
+/**
+ * Utility methods
+ */
 export * from './utils/time'
 export * from './utils/bscAddress'
 export * from './utils/asset'
 export * from './utils/compositeKey'
 export * from './utils/hex'
-export * from './utils/burnerWallet'
+export * from './utils/wallet'
 
 /**
  * Types

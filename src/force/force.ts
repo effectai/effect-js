@@ -22,8 +22,8 @@ import { Campaign } from '../types/campaign';
  * 
  */
 export class Force extends BaseContract {
-  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
-    super(api, configuration, environment);
+  constructor(api: Api, configuration: EffectClientConfig) {
+    super(api, configuration);
   }
 
   /**
@@ -240,7 +240,7 @@ export class Force extends BaseContract {
     const blob = new this.blob([stringify], { type: 'text/json' })
     const formData = new this.formData()
     formData.append('file', blob.arrayBuffer())
-  
+
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
     } else {
@@ -249,7 +249,7 @@ export class Force extends BaseContract {
           method: 'POST',
           // @ts-ignore:next-line
           body: formData
-        }        
+        }
         const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
         return campaign as string
@@ -258,12 +258,12 @@ export class Force extends BaseContract {
         return null
       }
     }
-  } 
-/**
- * 
- * @param dataArray 
- * @returns root of merkle tree
- */
+  }
+  /**
+   * 
+   * @param dataArray 
+   * @returns root of merkle tree
+   */
   getMerkleRoot = (dataArray) => {
     const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
     const tree = new MerkleTree(leaves, SHA256)
@@ -336,12 +336,12 @@ export class Force extends BaseContract {
       let sig: Signature
       const owner = this.effectAccount.accountName
 
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(9)
         serialbuff.push(0)
         serialbuff.pushString(hash)
-        
+
         sig = await this.generateSignature(serialbuff)
       }
 
@@ -402,7 +402,7 @@ export class Force extends BaseContract {
 
     try {
       let sig: Signature
-      
+
       const user = this.effectAccount.accountName
       const accountId = this.effectAccount.vAccountRows[0].id
 
@@ -502,12 +502,12 @@ export class Force extends BaseContract {
     }
 
   }
-/**
- * Get task index from merkle leaf
- * @param leafHash 
- * @param tasks 
- * @returns 
- */
+  /**
+   * Get task index from merkle leaf
+   * @param leafHash 
+   * @param tasks 
+   * @returns 
+   */
   getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<Task>): Promise<number> {
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
 

@@ -20,54 +20,54 @@ export class EffectClient {
     blob: any;
     formData: any;
 
-    constructor(environment: string = 'node', configuration?: EffectClientConfig) {
+    constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
         // TODO: set relayer, after merge with relayer branch
-        this.config = defaultConfiguration(configuration)
+        this.config = defaultConfiguration(environment, configuration)
         const { signatureProvider, host } = this.config
 
         this.rpc = new JsonRpc(host, { fetch })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
-        this.account = new Account(this.api, this.config, environment)
-        this.force = new Force(this.api, this.config, environment)
+        this.account = new Account(this.api, this.config)
+        this.force = new Force(this.api, this.config)
     }
 
     /**
      * Connect Account to SDK
-     * @param chain 
-     * @param signatureProvider 
-     * @param web3
-     * @param eosAccount 
-     * @returns 
+     * @param provider 
+     * @param eosAccount
+     * @returns EffectAccount
      */
-    connectAccount = async (signatureProvider?: SignatureProvider, web3?: Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
+    connectAccount = async (provider: SignatureProvider | Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
         try {
-            let account;
-            let bscAddress;
-            
-            // TODO look into this; why is 'web3 instanceof Web3' not working?
-            if (web3) {
+            let web3;
+            let eosSignatureProvider;
+
+            if (provider instanceof Web3) {
+                let bscAccount;
+                web3 = provider;
                 const message = 'Effect Account'
                 const signature = await this.sign(web3, message)
-                account = await this.account.recoverPublicKey(message, signature)
+                bscAccount = await this.account.recoverPublicKey(message, signature)
 
-                this.effectAccount = { 
-                    accountName: account.accountAddress,
+                this.effectAccount = {
+                    accountName: bscAccount.accountAddress,
                     address: web3.eth.accounts.wallet[0].address,
                     privateKey: web3.eth.accounts.wallet[0].privateKey,
-                    provider: 'burner-wallet',
+                    provider: 'private-key' // How do we know this is a private-key/burner wallet? Could also be MetaMask right?
                 }
-                
-            } else if (signatureProvider) {
+
+            } else {
+                eosSignatureProvider = provider;
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
-                this.api = new Api({ rpc: this.rpc, signatureProvider: signatureProvider ? signatureProvider : null, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
+                this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
 
             await this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
             await this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
 
             this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-         
+
             // if account doesnt exists: openAccount
             if (!this.effectAccount.vAccountRows || !this.effectAccount.vAccountRows.length) {
                 const openedAccount = await this.account.openAccount(this.effectAccount.accountName)

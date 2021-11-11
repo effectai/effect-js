@@ -28,8 +28,8 @@ export class Account extends BaseContract {
   * @param configuration The configuration that is used to connect to Effect Network
   * @param web3 The web3 instance that is used to interact with BSC blockchain
   */
-  constructor(api: Api, configuration: EffectClientConfig, environment: string = 'node') {
-    super(api, configuration, environment)
+  constructor(api: Api, configuration: EffectClientConfig) {
+    super(api, configuration)
   }
 
   /**
@@ -126,10 +126,10 @@ export class Account extends BaseContract {
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
 
     } catch (err) {
       throw new Error(err)
@@ -222,10 +222,10 @@ export class Account extends BaseContract {
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
 
     } catch (err) {
       throw new Error(err)
@@ -283,10 +283,10 @@ export class Account extends BaseContract {
           },
         }]
       },
-      {
-        blocksBehind: 3,
-        expireSeconds: 60
-      });
+        {
+          blocksBehind: 3,
+          expireSeconds: 60
+        });
 
     } catch (err) {
       throw new Error(err)
