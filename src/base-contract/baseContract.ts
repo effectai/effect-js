@@ -8,6 +8,7 @@ import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
+import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -78,7 +79,7 @@ export class BaseContract {
    * @param web3 
    * @returns 
    */
-  setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3?: Web3): Promise<void> => {
+  setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3: Web3): Promise<void> => {
     if (web3) {
       this.web3 = web3;
     }
