@@ -48,7 +48,7 @@ export class Force extends BaseContract {
 
 
   /**
-   * Get force campaigns
+   * Get Force Campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
    * @returns - Campaign Table Rows Result
@@ -65,12 +65,17 @@ export class Force extends BaseContract {
       config.lower_bound = nextKey
     }
     const data = await this.api.rpc.get_table_rows(config)
+  
+    // Get Campaign Info.
+    for (let i = 0; i < data.rows.length; i++) {
+      data.rows[i] = await this.processCampaign(data.rows[i])
+    }
 
     return data;
   }
 
   /**
-   * Get campaign
+   * Get Campaign
    * @param id - id of campaign
    * @returns Campaign
    */
@@ -84,9 +89,29 @@ export class Force extends BaseContract {
       upper_bound: id,
     }
 
-    const campaign = await this.api.rpc.get_table_rows(config)
+    const campaignRow = await this.api.rpc.get_table_rows(config)
+    const campaign = await this.processCampaign(campaignRow.rows[0])
 
-    return campaign.rows[0];
+    return campaign
+  }
+
+  /**
+   * processCampaign
+   * @param campaign
+   * @returns
+   */
+  processCampaign = async (campaign: Campaign): Promise<Campaign> => {
+    try {
+      // field_0 represents the content type where:
+      // 0: IPFS
+      if (campaign.content.field_0 === 0 && campaign.content.field_1 !== '') {
+        // field_1 represents the IPFS hash
+        campaign.info = await this.getIpfsContent(campaign.content.field_1)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    return campaign
   }
 
   /**
