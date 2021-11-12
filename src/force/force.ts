@@ -13,6 +13,7 @@ import { Task } from '../types/task';
 import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
+import { Batch } from '../types/batch';
 
 
 /**
@@ -105,11 +106,13 @@ export class Force extends BaseContract {
       // field_0 represents the content type where:
       // 0: IPFS
       if (campaign.content.field_0 === 0 && campaign.content.field_1 !== '') {
+        console.log('campaign.content.field_1', campaign.content.field_1)
         // field_1 represents the IPFS hash
         campaign.info = await this.getIpfsContent(campaign.content.field_1)
+        console.log('campaign.info', campaign.info)
       }
     } catch (e) {
-      console.error(e)
+      console.error('processCampaign', e)
     }
     return campaign
   }
@@ -193,6 +196,24 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get Batches for Campaign
+   * @param campaignId 
+   * @returns 
+   */
+  getCampaignBatches = async (campaignId: number): Promise<Array<Batch>> => {
+    const batches = await this.getBatches('', -1)
+
+    const campaignBatches = []
+    batches.rows.forEach(batch => {
+      if (campaignId === parseInt(batch.campaign_id) && batch.campaign_id) {
+        campaignBatches.push(batch)
+      }
+    });
+
+    return campaignBatches;
+  }
+
+  /**
    * get campaign join table
    * @param accountId 
    * @param campaignId 
@@ -264,7 +285,7 @@ export class Force extends BaseContract {
     const stringify = JSON.stringify(campaignIpfs)
     const blob = new this.blob([stringify], { type: 'text/json' })
     const formData = new this.formData()
-    formData.append('file', blob.arrayBuffer())
+    formData.append('file', await blob.text())
 
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
@@ -272,12 +293,11 @@ export class Force extends BaseContract {
       try {
         const requestOptions: RequestInit = {
           method: 'POST',
-          // @ts-ignore:next-line
           body: formData
         }
         const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
-        return campaign as string
+        return campaign.Hash as string
       } catch (e) {
         console.error(`🔥🔥🔥: ${e}`)
         return null
