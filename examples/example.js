@@ -1,4 +1,3 @@
-const { exit } = require('process')
 const { EffectClient, createAccount, createWallet } = require('../dist/lib')
 
 const main = async () => {
