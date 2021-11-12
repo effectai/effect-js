@@ -252,7 +252,7 @@ export class Force extends BaseContract {
         }
         const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
-        return campaign as string
+        return campaign.Hash as string
       } catch (e) {
         console.error(`🔥🔥🔥: ${e}`)
         return null
