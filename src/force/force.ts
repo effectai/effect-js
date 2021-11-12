@@ -13,6 +13,7 @@ import { Task } from '../types/task';
 import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
+import { Batch } from '../types/batch';
 
 
 /**
@@ -48,7 +49,7 @@ export class Force extends BaseContract {
 
 
   /**
-   * Get force campaigns
+   * Get Force Campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
    * @returns - Campaign Table Rows Result
@@ -65,12 +66,17 @@ export class Force extends BaseContract {
       config.lower_bound = nextKey
     }
     const data = await this.api.rpc.get_table_rows(config)
+  
+    // Get Campaign Info.
+    for (let i = 0; i < data.rows.length; i++) {
+      data.rows[i] = await this.processCampaign(data.rows[i])
+    }
 
     return data;
   }
 
   /**
-   * Get campaign
+   * Get Campaign
    * @param id - id of campaign
    * @returns Campaign
    */
@@ -84,9 +90,31 @@ export class Force extends BaseContract {
       upper_bound: id,
     }
 
-    const campaign = await this.api.rpc.get_table_rows(config)
+    const campaignRow = await this.api.rpc.get_table_rows(config)
+    const campaign = await this.processCampaign(campaignRow.rows[0])
 
-    return campaign.rows[0];
+    return campaign
+  }
+
+  /**
+   * processCampaign
+   * @param campaign
+   * @returns
+   */
+  processCampaign = async (campaign: Campaign): Promise<Campaign> => {
+    try {
+      // field_0 represents the content type where:
+      // 0: IPFS
+      if (campaign.content.field_0 === 0 && campaign.content.field_1 !== '') {
+        console.log('campaign.content.field_1', campaign.content.field_1)
+        // field_1 represents the IPFS hash
+        campaign.info = await this.getIpfsContent(campaign.content.field_1)
+        console.log('campaign.info', campaign.info)
+      }
+    } catch (e) {
+      console.error('processCampaign', e)
+    }
+    return campaign
   }
 
   /**
@@ -168,6 +196,24 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get Batches for Campaign
+   * @param campaignId 
+   * @returns 
+   */
+  getCampaignBatches = async (campaignId: number): Promise<Array<Batch>> => {
+    const batches = await this.getBatches('', -1)
+
+    const campaignBatches = []
+    batches.rows.forEach(batch => {
+      if (campaignId === parseInt(batch.campaign_id) && batch.campaign_id) {
+        campaignBatches.push(batch)
+      }
+    });
+
+    return campaignBatches;
+  }
+
+  /**
    * get campaign join table
    * @param accountId 
    * @param campaignId 
@@ -239,7 +285,7 @@ export class Force extends BaseContract {
     const stringify = JSON.stringify(campaignIpfs)
     const blob = new this.blob([stringify], { type: 'text/json' })
     const formData = new this.formData()
-    formData.append('file', blob.arrayBuffer())
+    formData.append('file', await blob.text())
 
     if (blob.size > 10000000) {
       alert('Max file size allowed is 10 MB')
@@ -247,7 +293,6 @@ export class Force extends BaseContract {
       try {
         const requestOptions: RequestInit = {
           method: 'POST',
-          // @ts-ignore:next-line
           body: formData
         }
         const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
