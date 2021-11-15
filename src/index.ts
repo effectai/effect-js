@@ -1,16 +1,3 @@
-// const path = require('path')
-// const fs = require('fs')
-
-// const env = process.env.APP_ENV || process.env.NODE_ENV
-
-// const envPath = path.resolve(__dirname + '../../../', `.env.${env}`)
-// const defaultEnvPath = path.resolve(__dirname + '../../../', '.env.development')
-
-// const envFile = fs.existsSync(envPath) ? envPath : defaultEnvPath
-// require('dotenv').config({
-//   path: envFile
-// })
-
 /**
  * 🐰:  Do a Barrel Roll 🛢️🚀
  */
@@ -20,21 +7,44 @@
  */
 export * from './client/client'
 
-export * from './force/template'
+/**
+ * BaseContract
+ */
+export * from './base-contract/baseContract'
 
- /**
-  * Utility methods
-  */
+/**
+ * Account
+ */
+export * from './account/account'
+
+/**
+ * Template
+ */
+export * from './force/force'
+export * from './force/template'
+export * from './force/templateScript'
+
+/**
+ * Configuration
+ */
+export * from './config/config'
+
+
+/**
+ * Utility methods
+ */
 export * from './utils/time'
 export * from './utils/bscAddress'
 export * from './utils/asset'
 export * from './utils/compositeKey'
 export * from './utils/hex'
+export * from './utils/bscWallet'
 
 /**
  * Types
  */
 export * from './types/error'
 export * from './types/auth-token'
+export * from './types/client'
 export * from './types/effectClientConfig'
-// export * from '@dfuse/client/dist/types/types/transaction'
+export * from './types/transaction'

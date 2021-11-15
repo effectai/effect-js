@@ -1,10 +1,10 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.0.16",
+  "version": "0.0.26",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "module": "dist/libs/index.js",
-  "browser": "dist/libs/index.js",
+  "browser": "dist/libs/index.umd.js",
   "types": "dist/libs/index.d.ts",
   "files": [
     "dist/*"
@@ -12,17 +12,24 @@
   "scripts": {
     "test": "echo \"🔥\"",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
+    "webpack": "webpack -c webpack.config.js",
     "build": "npm run build:cjs",
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
+    "build:amd": "tsc --module amd",
+    "build:system": "tsc --module system",
     "watch": "tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
+    "docs:watch": "typedoc --watch",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
     "publish:latest": "npm version patch && npm run build && npm publish",
-    "publish:next": "npm version patch && npm run build && npm publish --tag next "
+    "publish:next": "npm run prebuild && npm version patch &&  npm run build && npm publish --tag next ",
+    "publish:cjs": "npm run prebuild && npm version patch &&  npm run build:cjs && npm publish --tag cjs ",
+    "publish:umd": "npm run prebuild && npm version patch &&  npm run build:umd && npm publish --tag umd ",
+    "publish:es": "npm run prebuild && npm version patch &&  npm run build:es && npm publish --tag es "
   },
   "repository": {
     "type": "git",
@@ -84,7 +91,6 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^7.0.1",
-    "node-fetch": "^2.6.1",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.8",
@@ -93,7 +99,12 @@
   },
   "dependencies": {
     "@dfuse/client": "^0.3.20",
-    "axios": "^0.23.0",
+    "@web-std/blob": "^2.0.1",
+    "@web-std/fetch": "^2.0.1",
+    "@web-std/form-data": "^2.0.0",
+    "async-retry": "^1.3.3",
+    "buffer": "^6.0.3",
+    "cross-fetch": "^3.1.4",
     "crypto-js": "^4.1.1",
     "dotenv": "^10.0.0",
     "elliptic": "^6.5.4",
@@ -101,7 +112,6 @@
     "eosjs-ecc": "^4.0.7",
     "ethers": "^5.4.7",
     "merkletreejs": "^0.2.24",
-    "node-fetch": "^2.6.1",
     "web3": "^1.5.3"
   }
 }

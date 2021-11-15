@@ -1,10 +1,11 @@
 # effect-js 🔥🔥🔥
 
-Javascript API for integration with [Effect.Network](https://effect.network)
+Javascript SDK for integration with [https://effect.network](https://effect.network)
+Take a look at our docs at the following link: [Docs](https://effectai.github.io/developer-docs/)
 
 # ✒️ Installation
 
-The official distribution for the package can be found at npm.
+The official distribution for the package can is available at npm. [npm](https://www.npmjs.com/package/effect-js)
 
 ```
 npm i --save @effectai/effect-js
@@ -32,7 +33,7 @@ const sdk = new effectSdk.EffectClient(options);
 sdk.account.openAccount('account_name')
 sdk.account.getVAccountByName('account_name')
 
-// from account, to vaccount, amount in EFX
+// from account, to vaccount, amount in **EFX**
 sdk.account.deposit('from_account_name', 'to_vaccount_name', '1.0000')
 
 // from vaccount, to account, amount in EFX

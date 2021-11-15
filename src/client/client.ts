@@ -1,53 +1,114 @@
 import { defaultConfiguration } from './../config/config';
-import { Api, JsonRpc, RpcError, Serialize } from 'eosjs'
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
+import { Api, JsonRpc } from 'eosjs'
 import { Account } from '../account/account'
 import { Force } from '../force/force'
 import { EffectClientConfig } from '../types/effectClientConfig'
-// import fetch from 'node-fetch' // fetch for node.js environment
-
+import { EffectAccount } from '../types/effectAccount';
+import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
+import Web3 from 'web3';
+import { eosWalletAuth } from '../types/eosWalletAuth';
+import fetch from 'cross-fetch';
+import retry from 'async-retry'
 export class EffectClient {
     api: Api;
     account: Account;
+    effectAccount: EffectAccount;
     force: Force;
     config: EffectClientConfig;
+    rpc: JsonRpc;
+    fetch: any;
+    blob: any;
+    formData: any;
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
+        // TODO: set relayer, after merge with relayer branch
         this.config = defaultConfiguration(environment, configuration)
-        // TODO clean up these variables?
-        const { web3, signatureProvider, host } = this.config
-        const rpc = new JsonRpc(host, {fetch})
+        const { signatureProvider, host } = this.config
 
-        // if it's web3 instance (bsc account) use the relayer as signatureProvider
-        this.api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()})
+        this.rpc = new JsonRpc(host, { fetch })
+        this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
-        this.account = new Account(this.api, environment, configuration, web3)
-        this.force = new Force(this.api, environment, configuration, web3)
+        this.account = new Account(this.api, this.config)
+        this.force = new Force(this.api, this.config)
     }
-    // TODO: move to generic helper file/class
+
     /**
-     * Get IPFS Content in JSON
-     * @param hash - hash of the IPFS content you want to fetch
-     * @param format - format of the content you are fetching.
-     * @returns content of the ipfs hash in your preferred format
+     * Connect Account to SDK
+     * @param provider 
+     * @param eosAccount
+     * @returns EffectAccount
      */
-    getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-        const data = await fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
-        switch (format.toLowerCase()) {
-            case 'formdata':
-            case 'form':
-                return data.text()
-            case 'buffer':
-            case 'arraybuffer':
-            case 'array':
-                return data.arrayBuffer()
-            case 'blob':
-                return data.blob()
-            case 'text':
-                return data.text()
-            case 'json':
-                return data.json()
+    connectAccount = async (provider: SignatureProvider | Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
+        try {
+            let web3;
+            let eosSignatureProvider;
+
+            if (provider instanceof Web3) {
+                let bscAccount;
+                web3 = provider;
+                const message = 'Effect Account'
+                const signature = await this.sign(web3, message)
+                bscAccount = await this.account.recoverPublicKey(message, signature)
+
+                this.effectAccount = {
+                    accountName: bscAccount.accountAddress,
+                    address: web3.eth.accounts.wallet[0].address,
+                    privateKey: web3.eth.accounts.wallet[0].privateKey
+                }
+
+            } else {
+                eosSignatureProvider = provider;
+                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
+                this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
+            }
+
+            await this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
+            await this.force.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
+
+            this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+
+            // if account doesnt exists: openAccount
+            if (!this.effectAccount.vAccountRows || !this.effectAccount.vAccountRows.length) {
+                const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
+                console.log('Opened account:', openedAccount);
+
+                await retry(async () => {
+                    console.log('getVAccountByName after openAccount')
+                    this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
+                }, {
+                    retries: 5,
+                    onRetry: (error, number) => {
+                        console.log('attempt', number, error)
+                    }
+                })
+            }
+            return this.effectAccount
+        } catch (error) {
+            console.error(error)
+            throw new Error(error)
         }
-        return data
     }
+
+    /**
+     * BSC Sign
+     * @param bsc 
+     * @param message 
+     * @returns 
+     */
+    sign = async (web3: Web3, message: string): Promise<string> => {
+        try {
+            const address = web3.eth.accounts.wallet[0].address
+            const privateKey = web3.eth.accounts.wallet[0].privateKey
+
+            if (privateKey) {
+                return (await web3.eth.accounts.sign(message, privateKey)).signature
+            } else {
+                return await web3.eth.sign(message, address)
+            }
+        } catch (error) {
+            console.error(error)
+            return Promise.reject(error)
+        }
+    }
+
 }

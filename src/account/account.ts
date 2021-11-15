@@ -1,28 +1,35 @@
-import { defaultConfiguration } from './../config/config';
+import { BaseContract } from '../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
-import RIPEMD160 from "eosjs/dist/ripemd"
-import Web3 from 'web3';
-import { Signature } from 'eosjs/dist/eosjs-key-conversions';
-import { utils } from 'ethers';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { nameToHex } from '../utils/hex'
-const axios = require('axios').default;
-const BN = require('bn.js');
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
+import { vAccountRow } from '../types/vAccountRow';
+import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
+import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { Signature } from 'eosjs/dist/Signature';
 
-export class Account {
-  api: Api;
-  web3: Web3;
+/**
+ * > “And he read Principles of Accounting all morning, but just to make it interesting, he put lots of dragons in it.” ― Terry Pratchett, Wintersmith 
+ *
+ * This class is used to interact with the virtual account system of Effect Network.
+ * The virtual account system is a system that allows you to create virtual accounts on the blockchain.
+ * This allows users to login with both their EOS and BSC addresses. 
+ * Then have one unififying interface from which transactions can be signed from the wallet of the user.
+ * 
+ */
+export class Account extends BaseContract {
   pub: string;
-  config: EffectClientConfig;
 
-  constructor(api: Api, environment: string = 'testnet', config?: EffectClientConfig, web3?: Web3) {
-    this.api = api;
-    this.web3 = config.web3 || web3;
-    this.config =  defaultConfiguration(environment, config);
+  /**
+  * @constructor Creates a new instance of Account
+  * @param api The EOS api instance that is used to send transactions to EOS blockchain
+  * @param environment The environment that is used to connect to mainnet or testnet blockchain, default is `testnet` which connects to `kylin`
+  * @param configuration The configuration that is used to connect to Effect Network
+  * @param web3 The web3 instance that is used to interact with BSC blockchain
+  */
+  constructor(api: Api, configuration: EffectClientConfig) {
+    super(api, configuration)
   }
 
   /**
@@ -30,31 +37,38 @@ export class Account {
    * @param account - name of the account or bsc
    * @returns - object of the given account name
    */
-  getVAccountByName = async (account: string): Promise<Array<object>> => {
-    try {
-      let accString;
+  static getVAccountByName(account: string) {
+    const vAccount = this.getVAccountByName(account)
+    console.log(`🧑🏽‍🚒🧑🏽‍🚒\nAccount::this.getVaccountByName\n${vAccount}`);
+    return vAccount
+  }
 
-      if(isBscAddress(account)) {
-        const address:string = account.length == 42 ? account.substring(2) : account;
+  /**
+   * Get a vaccount
+   * @param account - name of the account or bsc
+   * @returns - object of the given account name
+   */
+  getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
+    try {
+      let accString: string;
+
+      if (isBscAddress(account)) {
+        const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
       } else {
         accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
       }
+      return (await this.api.rpc.get_table_rows({
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
+        index_position: 2,
+        key_type: "sha256",
+        lower_bound: accString,
+        upper_bound: accString,
+        table: 'account',
+        json: true,
+      })).rows;
 
-      const resp = await this.api.rpc.get_table_rows({
-          code: this.config.account_contract,
-          scope: this.config.account_contract,
-          index_position: 2,
-          key_type: "sha256",
-          lower_bound: accString,
-          upper_bound: accString,
-          table: 'account',
-          json: true,
-      }).then((data) => {
-        return data.rows;
-      });
-
-      return resp;
     } catch (err) {
       throw new Error(err)
     }
@@ -65,9 +79,9 @@ export class Account {
    * @param id - id of the account
    * @returns - object of the given account id
    */
-  getVAccountById = async (id: number): Promise<Array<object>> => {
+  getVAccountById = async (id: number): Promise<Array<vAccountRow>> => {
     try {
-      const resp = await this.api.rpc.get_table_rows({
+      return (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,
         index_position: 1,
@@ -76,11 +90,8 @@ export class Account {
         upper_bound: id,
         table: 'account',
         json: true,
-      }).then((data) => {
-        return data.rows;
-      });
+      })).rows
 
-      return resp;
     } catch (err) {
       throw new Error(err)
     }
@@ -91,29 +102,28 @@ export class Account {
    * @param account - name or address of the account to open, for BSC addresses without 0x
    * @returns
    */
-  openAccount = async (account: string, permission: string): Promise<object> => {
+  // TODO: optional parameter signatureProvider, use relayer
+  openAccount = async (account: string, permission?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let type = 'name'
       let address: string
-      if(isBscAddress(account)) {
+      if (isBscAddress(account)) {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }
 
       const action = {
-        actions: [{
-          account: this.config.account_contract,
-          name: 'open',
-          authorization: [{
-            actor: type == 'address' ? this.config.eos_relayer : account,
-            permission: permission ? permission : this.config.eos_relayer_permission,
-          }],
-          data: {
-            acc: [type, type == 'address' ? address : account],
-            symbol: {contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol},
-            payer: type == 'address' ? this.config.eos_relayer : account,
-          },
-        }]
+        account: this.config.account_contract,
+        name: 'open',
+        authorization: [{
+          actor: type == 'address' ? this.config.eos_relayer : account,
+          permission: isBscAddress(account) ? this.config.eos_relayer_permission : permission
+        }],
+        data: {
+          acc: [type, type == 'address' ? address : account],
+          symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
+          payer: type == 'address' ? this.config.eos_relayer : account,
+        }
       }
       return this.sendTransaction(account, action);
     } catch (err) {
@@ -123,21 +133,23 @@ export class Account {
 
   /**
    * Deposit from account to vaccount
-   * @param fromAccount - account to deposit from
-   * @param toAccount - account to deposit to
-   * @param amount - amount, example: '10.0000'
-   * @returns
+   * @param amountEfx amount of tokens
+   * @returns transaction result
    */
-  deposit = async (fromAccount: string, accountId: number, amountEfx: string, permission: string): Promise<object> => {
+  deposit = async (amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
+      const fromAccount = this.effectAccount.accountName;
+      const accountId = this.effectAccount.vAccountRows[0].id
+
       const amount = convertToAsset(amountEfx)
-      const result = await this.api.transact({
+      await this.updatevAccountRows()
+      return await this.api.transact({
         actions: [{
           account: this.config.efx_token_account,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
+            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             from: fromAccount,
@@ -150,7 +162,6 @@ export class Account {
         blocksBehind: 3,
         expireSeconds: 30,
       });
-      return result;
     } catch (err) {
       throw new Error(err)
     }
@@ -158,16 +169,21 @@ export class Account {
 
   /**
    * Withdraw from vaccount to account
-   * @param fromAccount - vaccount to withdraw from
-   * @param toAccount - account to withdraw to
-   * @param amount - amount, example: '10.0000'
-   * @param memo - optional memo
-   * @returns
+   * @param toAccount account to withdraw to
+   * @param amountEfx amount of tokens
+   * @param memo optional memo
+   * @returns transaction result
    */
-  withdraw = async (fromAccount: string, accountId: number, nonce: number, toAccount: string, amountEfx: string, permission: string, memo?: string): Promise<any> => {
-    let sig;
+  withdraw = async (toAccount: string, amountEfx: string, memo?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let sig: Signature;
+
+    await this.updatevAccountRows()
     const amount = convertToAsset(amountEfx)
-    if(isBscAddress(fromAccount)) {
+    const fromAccount = this.effectAccount.accountName;
+    const accountId = this.effectAccount.vAccountRows[0].id
+    const nonce = this.effectAccount.vAccountRows[0].nonce
+
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(2)
       serialbuff.pushUint32(nonce)
@@ -176,52 +192,28 @@ export class Account {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      const bytes = serialbuff.asUint8Array()
-
-      let paramsHash = ec.hash().update(bytes).digest()
-      paramsHash = Serialize.arrayToHex(paramsHash)
-
-      // For test purposes (sometimes different than MetaMask signature?)
-      // const keypair = ec.keyFromPrivate('cae6024c1d21c0a9442b85fc411b2c9aea43884c777310ac2d57d8f0621f99c2')
-      // const sigg = keypair.sign(paramsHash)
-      // console.log('sig priv', sigg)
-      // console.log('eos format sig with priv', Signature.fromElliptic(sigg, 0).toString())
-
-      try {
-        sig = await this.web3.eth.sign('0x'+paramsHash, fromAccount)
-      } catch (error) {
-        console.error(error)
-        return Promise.reject(error)
-      }
-
-      sig = utils.splitSignature(sig)
-      // TODO: figure out how to get Signature in right format without this hack
-      sig.r = new BN(sig.r.substring(2),16)
-      sig.s = new BN(sig.s.substring(2), 16)
-      sig = Signature.fromElliptic(sig, 0)
+      sig = await this.generateSignature(serialbuff)
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
       const action = {
-        actions: [{
-          account: this.config.account_contract,
-          name: 'withdraw',
-          authorization: [{
-            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: permission ? permission : this.config.eos_relayer_permission,
-          }],
-          data: {
-            from_id: accountId,
-            to_account: toAccount,
-            quantity: {
-              quantity: amount + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            memo: memo,
-            sig: sig ? sig.toString() : null,
-            fee: null
+        account: this.config.account_contract,
+        name: 'withdraw',
+        authorization: [{
+          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          from_id: accountId,
+          to_account: toAccount,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
+          memo: memo,
+          sig: isBscAddress(fromAccount) ? sig.toString() : null,
+          fee: null
+        },
       }
       return this.sendTransaction(fromAccount, action)
     } catch (err) {
@@ -231,18 +223,23 @@ export class Account {
 
   /**
    * Transfer between vaccounts
-   * @param fromAccount - vaccount to transfer from
-   * @param toAccount - vaccount to transfer to
-   * @param amount - amount, example: '10.0000'
-   * @returns
+   * @param toAccount vaccount to transfer from
+   * @param toAccountId vaccount to transfer to
+   * @param amountEfx amount of tokens, example: '10.0000'
+   * @returns transaction result
    */
-  vtransfer = async (fromAccount: string, fromAccountId: number, nonce:number, toAccount: string, toAccountId:number, amountEfx: string, options: object): Promise<object> => {
+  vtransfer = async (toAccount: string, toAccountId: number, amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let sig: Signature;
+
+    await this.updatevAccountRows()
     const balanceTo: object = await this.getVAccountByName(toAccount)
     const balanceIndexTo: number = balanceTo[0].id
     const amount = convertToAsset(amountEfx)
+    const fromAccount = this.effectAccount.accountName;
+    const fromAccountId = this.effectAccount.vAccountRows[0].id
+    const nonce = this.effectAccount.vAccountRows[0].nonce
 
-    let sig;
-    if(isBscAddress(fromAccount)) {
+    if (isBscAddress(fromAccount)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(1)
       serialbuff.pushUint32(nonce)
@@ -251,7 +248,7 @@ export class Account {
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
-      sig = await this.generateSignature(serialbuff, options['address'])
+      sig = await this.generateSignature(serialbuff)
     }
 
     try {
@@ -260,7 +257,7 @@ export class Account {
         name: 'vtransfer',
         authorization: [{
           actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-          permission: options['permission'] ? options['permission'] : this.config.eos_relayer_permission,
+          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission,
         }],
         data: {
           from_id: fromAccountId,
@@ -279,77 +276,4 @@ export class Account {
       throw new Error(err)
     }
   }
-
-  /**
-   * Recover BSC public key from signed message
-   * @param message
-   * @param signature
-   * @returns
-   */
-  recoverPublicKey = async (message: string, signature: string): Promise<object> => {
-    // recover public key
-    const hashedMsg = utils.hashMessage(message)
-    const pk = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
-    const address = utils.computeAddress(utils.arrayify(pk))
-
-    // compress public key
-    const keypair = ec.keyFromPublic(pk.substring(2), 'hex')
-    const compressed = keypair.getPublic().encodeCompressed('hex')
-
-    // RIPEMD160 hash public key
-    const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-    return { address, accountAddress }
-  }
-
-  /**
-   * Generate Signature
-   * @param serialbuff
-   * @param address
-   * @returns 
-   */
-  generateSignature = async (serialbuff: Serialize.SerialBuffer, address: string): Promise<Signature> => {
-    let sig
-    const bytes = serialbuff.asUint8Array()
-
-    let paramsHash = ec.hash().update(bytes).digest()
-    paramsHash = Serialize.arrayToHex(paramsHash)
-
-    try {
-      sig = await this.web3.eth.sign('0x'+paramsHash, address)
-    } catch (error) {
-      console.error(error)
-      return Promise.reject(error)
-    }
-
-    sig = utils.splitSignature(sig)
-    // TODO: figure out how to get Signature in right format without this hack
-    sig.r = new BN(sig.r.substring(2),16)
-    sig.s = new BN(sig.s.substring(2), 16)
-    sig = Signature.fromElliptic(sig, 0)
-
-    return sig
-  }
-
-  sendTransaction = async function (owner: string, action: object): Promise<any> {
-    if(isBscAddress(owner)) {
-     // post to relayer
-     return await axios.post(this.config.eos_relayer_url + '/transaction', action)
-     .then(function (response) {
-       console.log('return this', response.data)
-       return response.data;
-     })
-     .catch(function (error) {
-       console.log(error);
-     });
-   } else {
-     return await this.api.transact({
-       actions: [action]
-     }, {
-       blocksBehind: 3,
-       expireSeconds: 30,
-     });
-   }
- }
-
 }

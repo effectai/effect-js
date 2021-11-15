@@ -11,49 +11,52 @@ import Web3 from 'web3';
  * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet', apiKey: 'abc123', ipfs_node: 'https://ifps.effect.ai'})
  */
 // TODO is there a more elegant way of building these multiple configuration objects? DRY?
-export const defaultConfiguration = (environment: string = 'testnet', config?: EffectClientConfig): EffectClientConfig => {
-    if (environment == 'testnet' || 'kylin') {
-        return {
-            network:                config.network                ?? "kylin",
-            signatureProvider:      config.signatureProvider      ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
-            host:                   config.host                   ?? 'api.kylin.alohaeos.com',
-            web3:                   config.web3                   ?? new Web3, // TODO double check this, I think it should be something else.
-            apiKey:                 config.apiKey                 ?? '',
-            secure:                 config.secure                 ?? false,
-            authentication:         config.authentication         ?? false,
-            authUrl:                config.authUrl                ?? '',
-            ipfs_node:              config.ipfs_node              ?? 'https://ipfs.effect.ai',
-            force_contract:         config.force_contract         ?? "forceonkyli2",
-            account_contract:       config.account_contract       ?? 'acckylin1111',
-            efx_token_account:      config.efx_token_account      ?? "tokenonkylin",
-            efx_symbol:             config.efx_symbol             ?? "UTL",
-            efx_precision:          config.efx_precision          ?? 4,
-            efx_extended_symbol:    config.efx_extended_symbol    ?? '4,UTL',
-            eos_relayer:            config.eos_relayer            ?? "pixeos1gswap",
-            eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url:        config.eos_relayer_url        ?? "http://localhost:3001"
-        }
-    } else {
+export const defaultConfiguration = (environment: string = 'testnet', config: any = {}): EffectClientConfig => {
+    if (environment === 'mainnet' || environment === 'main') {
         // TODO add proper configuration values here.
         return {
-            network:                config.network                ?? "mainnet",
-            signatureProvider:      config.signatureProvider      ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
-            host:                   config.host                   ?? 'eos.greymass.com',
-            web3:                   config.web3                   ?? new Web3, // TODO double check this, I think it should be something else.
-            apiKey:                 config.apiKey                 ?? '',
-            secure:                 config.secure                 ?? false,
-            authentication:         config.authentication         ?? false,
-            authUrl:                config.authUrl                ?? '',
-            ipfs_node:              config.ipfs_node              ?? 'https://ipfs.effect.ai',
-            force_contract:         config.force_contract         ?? "forceonkyli2",
-            account_contract:       config.account_contract       ?? 'acckylin1111',
-            efx_token_account:      config.efx_token_account      ?? "tokenonkylin",
-            efx_symbol:             config.efx_symbol             ?? "EFX",
-            efx_precision:          config.efx_precision          ?? 4,
-            efx_extended_symbol:    config.efx_extended_symbol    ?? '4,EFX',
-            eos_relayer:            config.eos_relayer            ?? "pixeos1gswap",
+            network: config.network ?? "mainnet",
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
+            host: config.host ?? 'https://eos.greymass.com',
+            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            apiKey: config.apiKey ?? '',
+            secure: config.secure ?? false,
+            authentication: config.authentication ?? false,
+            authUrl: config.authUrl ?? '',
+            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
+            force_contract: config.force_contract ?? "forceonkyli2",
+            account_contract: config.account_contract ?? 'acckylin1111',
+            efx_token_account: config.efx_token_account ?? "tokenonkylin",
+            efx_symbol: config.efx_symbol ?? "EFX",
+            efx_precision: config.efx_precision ?? 4,
+            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
+            eos_relayer: config.eos_relayer ?? "pixeos1gswap",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url:        config.eos_relayer_url        ?? "http://localhost:3001"
+            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001"
         }
+    } else if (environment === 'testnet' || environment === 'kylin' || environment === 'test') {
+        return {
+            network: config.network ?? "kylin",
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
+            host: config.host ?? 'https://api.kylin.alohaeos.com',
+            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            apiKey: config.apiKey ?? '',
+            secure: config.secure ?? false,
+            authentication: config.authentication ?? false,
+            authUrl: config.authUrl ?? '',
+            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
+            force_contract: config.force_contract ?? "forceonkyli2",
+            account_contract: config.account_contract ?? 'acckylin1111',
+            efx_token_account: config.efx_token_account ?? "tokenonkylin",
+            efx_symbol: config.efx_symbol ?? "UTL",
+            efx_precision: config.efx_precision ?? 4,
+            efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
+            eos_relayer: config.eos_relayer ?? "jabbarndcn22",
+            eos_relayer_permission: config.eos_relayer_permission ?? "active",
+            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001"
+        }
+    } else {
+        console.log('no default config is being used, make sure you specified all config')
+        return config;
     }
 }

@@ -1,6 +1,6 @@
 import { Serialize, Numeric } from 'eosjs'
 /**
- * Create composite key with `account id` and `campaign id`
+ * Utility function: Create composite key with `account id` and `campaign id`
  * @param accountId ID of account logged in
  * @param campaignId ID of the campaign
  * @returns uint 64 bit number
