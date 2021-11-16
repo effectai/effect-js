@@ -241,7 +241,6 @@ export class Force extends BaseContract {
    */
   joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      this.isAccountConnected()
       let sig: Signature
       const owner = this.effectAccount.accountName
 
@@ -284,7 +283,6 @@ export class Force extends BaseContract {
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     try { 
-      this.isAccountConnected()
       const stringify = JSON.stringify(campaignIpfs)
       const blob = new this.blob([stringify], { type: 'text/json' })
       const formData = new this.formData()
@@ -327,7 +325,6 @@ export class Force extends BaseContract {
 
   createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      this.isAccountConnected()
       let sig: Signature
 
       const hash = await this.uploadCampaign(content)
@@ -381,7 +378,6 @@ export class Force extends BaseContract {
    */
   createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      this.isAccountConnected()
       let sig: Signature
       const owner = this.effectAccount.accountName
 
@@ -449,7 +445,6 @@ export class Force extends BaseContract {
    */
   reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      this.isAccountConnected()
       let sig: Signature
 
       const user = this.effectAccount.accountName
@@ -512,7 +507,6 @@ export class Force extends BaseContract {
    */
   submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
-      this.isAccountConnected()
       let sig: Signature
       const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
