@@ -21,7 +21,6 @@ export class EffectClient {
     formData: any;
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
-        // TODO: set relayer, after merge with relayer branch
         this.config = defaultConfiguration(environment, configuration)
         const { signatureProvider, host } = this.config
 
@@ -43,7 +42,8 @@ export class EffectClient {
             let web3;
             let eosSignatureProvider;
 
-            if (provider instanceof Web3) {
+            // @ts-ignore
+            if (provider.eth) {
                 let bscAccount;
                 web3 = provider;
                 const message = 'Effect Account'
@@ -52,10 +52,9 @@ export class EffectClient {
 
                 this.effectAccount = {
                     accountName: bscAccount.accountAddress,
-                    address: web3.eth.accounts.wallet[0].address,
-                    privateKey: web3.eth.accounts.wallet[0].privateKey
+                    address: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0],
+                    privateKey: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
                 }
-
             } else {
                 eosSignatureProvider = provider;
                 this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
@@ -97,8 +96,8 @@ export class EffectClient {
      */
     sign = async (web3: Web3, message: string): Promise<string> => {
         try {
-            const address = web3.eth.accounts.wallet[0].address
-            const privateKey = web3.eth.accounts.wallet[0].privateKey
+            const address = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0]
+            const privateKey = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
 
             if (privateKey) {
                 return (await web3.eth.accounts.sign(message, privateKey)).signature

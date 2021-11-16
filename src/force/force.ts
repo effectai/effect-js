@@ -106,10 +106,8 @@ export class Force extends BaseContract {
       // field_0 represents the content type where:
       // 0: IPFS
       if (campaign.content.field_0 === 0 && campaign.content.field_1 !== '') {
-        console.log('campaign.content.field_1', campaign.content.field_1)
         // field_1 represents the IPFS hash
         campaign.info = await this.getIpfsContent(campaign.content.field_1)
-        console.log('campaign.info', campaign.info)
       }
     } catch (e) {
       console.error('processCampaign', e)
