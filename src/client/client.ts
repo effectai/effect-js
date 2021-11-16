@@ -98,11 +98,10 @@ export class EffectClient {
         try {
             const address = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0]
             const privateKey = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
-
             if (privateKey) {
                 return (await web3.eth.accounts.sign(message, privateKey)).signature
             } else {
-                return await web3.eth.sign(message, address)
+                return await web3.eth.personal.sign(message, address, '')
             }
         } catch (error) {
             console.error(error)
