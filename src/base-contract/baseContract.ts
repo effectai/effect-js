@@ -48,8 +48,13 @@ export class BaseContract {
     }
   }
 
-  isAccountIsConnected(): boolean {
-    return this.effectAccount ? true : false
+  isAccountConnected(): boolean {
+    if (!this.effectAccount) {
+      console.error(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw 'No account connected.'
+    } else {
+      return true
+    }
   }
 
   /**
@@ -57,17 +62,13 @@ export class BaseContract {
   * @returns {Promise<number>} Nonce to be used with each transaction
   */
   updatevAccountRows = async (): Promise<EffectAccount> => {
-    if (!this.isAccountIsConnected()) {
-      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
-      throw new Error('No account connected.')
-    } else {
-      try {
-        const account = this.effectAccount.accountName;
-        this.effectAccount.vAccountRows = Account.getVAccountByName(account)
-        return this.effectAccount
-      } catch (err) {
-        throw new Error(err)
-      }
+    try {
+      this.isAccountConnected()
+      const account = this.effectAccount.accountName;
+      this.effectAccount.vAccountRows = Account.getVAccountByName(account)
+      return this.effectAccount
+    } catch (err) {
+      throw new Error(err)
     }
   }
 
