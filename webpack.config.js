@@ -45,7 +45,4 @@ module.exports = {
     library: 'effectsdk',
     umdNamedDefine: true
   }
-  optimizations: {
-      runTimeChunk: 'single'
-  }
 };
