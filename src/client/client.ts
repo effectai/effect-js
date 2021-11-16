@@ -9,6 +9,7 @@ import Web3 from 'web3';
 import { eosWalletAuth } from '../types/eosWalletAuth';
 import fetch from 'cross-fetch';
 import retry from 'async-retry'
+import { MiddlewareManager } from 'js-middleware';
 export class EffectClient {
     api: Api;
     account: Account;
@@ -29,8 +30,19 @@ export class EffectClient {
 
         this.account = new Account(this.api, this.config)
         this.force = new Force(this.api, this.config)
-    }
 
+        const accountMiddleWare = new MiddlewareManager(this.account)
+        const forceMiddleWare = new MiddlewareManager(this.force)
+
+        accountMiddleWare.use('updatevAccountRows', this.account.isAccountConnected)
+        forceMiddleWare.use('joinCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('uploadCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('createCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('createBatch', this.force.isAccountConnected)
+        forceMiddleWare.use('reserveTask', this.force.isAccountConnected)
+        forceMiddleWare.use('submitTask', this.force.isAccountConnected)
+    
+    }
     /**
      * Connect Account to SDK
      * @param provider 
