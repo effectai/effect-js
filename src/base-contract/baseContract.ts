@@ -124,7 +124,7 @@ export class BaseContract {
         // TODO: figure out how to do this more clean later on.
         sig = EthAccount.sign('0x' + paramsHash, this.effectAccount.privateKey);
       } else {
-        sig = await this.web3.eth.sign('0x' + paramsHash, this.effectAccount.address)
+        sig = await this.web3.eth.personal.sign('0x' + paramsHash, this.effectAccount.address, '')
       }
     } catch (error) {
       return Promise.reject(error)
