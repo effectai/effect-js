@@ -51,7 +51,6 @@ export class Account extends BaseContract {
   getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
     try {
       let accString: string;
-
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
         accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
