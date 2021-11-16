@@ -240,39 +240,44 @@ export class Force extends BaseContract {
    * @returns transaction result
    */
   joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    try {
-      let sig: Signature
-      const owner = this.effectAccount.accountName
-
-      if (isBscAddress(owner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(7)
-        serialbuff.pushUint32(campaignId)
-
-        sig = await this.generateSignature(serialbuff)
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        let sig: Signature
+        const owner = this.effectAccount.accountName
+  
+        if (isBscAddress(owner)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(7)
+          serialbuff.pushUint32(campaignId)
+  
+          sig = await this.generateSignature(serialbuff)
+        }
+  
+        return await this.api.transact({
+          actions: [{
+            account: this.config.force_contract,
+            name: 'joincampaign',
+            authorization: [{
+              actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+              permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            }],
+            data: {
+              account_id: this.effectAccount.vAccountRows[0].id,
+              campaign_id: campaignId,
+              payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+              sig: isBscAddress(owner) ? sig.toString() : null
+            },
+          }]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      } catch (err) {
+        throw new Error(err)
       }
-
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'joincampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            account_id: this.effectAccount.vAccountRows[0].id,
-            campaign_id: campaignId,
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    } catch (err) {
-      throw new Error(err)
     }
   }
 
@@ -282,25 +287,30 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    const stringify = JSON.stringify(campaignIpfs)
-    const blob = new this.blob([stringify], { type: 'text/json' })
-    const formData = new this.formData()
-    formData.append('file', await blob.text())
-
-    if (blob.size > 10000000) {
-      alert('Max file size allowed is 10 MB')
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
     } else {
-      try {
-        const requestOptions: RequestInit = {
-          method: 'POST',
-          body: formData
+      const stringify = JSON.stringify(campaignIpfs)
+      const blob = new this.blob([stringify], { type: 'text/json' })
+      const formData = new this.formData()
+      formData.append('file', await blob.text())
+
+      if (blob.size > 10000000) {
+        alert('Max file size allowed is 10 MB')
+      } else {
+        try {
+          const requestOptions: RequestInit = {
+            method: 'POST',
+            body: formData
+          }
+          const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
+          const campaign = await response.json()
+          return campaign.Hash as string
+        } catch (e) {
+          console.error(`🔥🔥🔥: ${e}`)
+          return null
         }
-        const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
-        const campaign = await response.json()
-        return campaign.Hash as string
-      } catch (e) {
-        console.error(`🔥🔥🔥: ${e}`)
-        return null
       }
     }
   }
@@ -324,49 +334,54 @@ export class Force extends BaseContract {
    */
 
   createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    try {
-      let sig: Signature
-
-      const hash = await this.uploadCampaign(content)
-      const merkleRoot = this.getMerkleRoot(content.tasks)
-      const campaignOwner = this.effectAccount.accountName
-
-      if (isBscAddress(campaignOwner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(8)
-        serialbuff.pushUint32(batchId)
-        serialbuff.pushUint32(campaignId)
-        serialbuff.push(0)
-        serialbuff.pushString(hash)
-        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
-
-        sig = await this.generateSignature(serialbuff)
-      }
-
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkbatch',
-          authorization: [{
-            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            id: batchId,
-            campaign_id: campaignId,
-            content: { field_0: 0, field_1: hash },
-            task_merkle_root: merkleRoot,
-            num_tasks: content.tasks.length,
-            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: isBscAddress(campaignOwner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    } catch (err) {
-      throw new Error(err)
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        let sig: Signature
+  
+        const hash = await this.uploadCampaign(content)
+        const merkleRoot = this.getMerkleRoot(content.tasks)
+        const campaignOwner = this.effectAccount.accountName
+  
+        if (isBscAddress(campaignOwner)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(8)
+          serialbuff.pushUint32(batchId)
+          serialbuff.pushUint32(campaignId)
+          serialbuff.push(0)
+          serialbuff.pushString(hash)
+          serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
+  
+          sig = await this.generateSignature(serialbuff)
+        }
+  
+        return await this.api.transact({
+          actions: [{
+            account: this.config.force_contract,
+            name: 'mkbatch',
+            authorization: [{
+              actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+              permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            }],
+            data: {
+              id: batchId,
+              campaign_id: campaignId,
+              content: { field_0: 0, field_1: hash },
+              task_merkle_root: merkleRoot,
+              num_tasks: content.tasks.length,
+              payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+              sig: isBscAddress(campaignOwner) ? sig.toString() : null
+            },
+          }]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      } catch (err) {
+        throw new Error(err)
+      }  
     }
   }
 
@@ -377,44 +392,49 @@ export class Force extends BaseContract {
    * @returns transaction result
    */
   createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    try {
-      let sig: Signature
-      const owner = this.effectAccount.accountName
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        let sig: Signature
+        const owner = this.effectAccount.accountName
 
-      if (isBscAddress(owner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(9)
-        serialbuff.push(0)
-        serialbuff.pushString(hash)
+        if (isBscAddress(owner)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(9)
+          serialbuff.push(0)
+          serialbuff.pushString(hash)
 
-        sig = await this.generateSignature(serialbuff)
-      }
+          sig = await this.generateSignature(serialbuff)
+        }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkcampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
-            content: { field_0: 0, field_1: hash },
-            reward: {
-              quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
+        return await this.api.transact({
+          actions: [{
+            account: this.config.force_contract,
+            name: 'mkcampaign',
+            authorization: [{
+              actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+              permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            }],
+            data: {
+              owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+              content: { field_0: 0, field_1: hash },
+              reward: {
+                quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+                contract: this.config.efx_token_account
+              },
+              payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+              sig: isBscAddress(owner) ? sig.toString() : null
             },
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    } catch (err) {
-      throw new Error(err)
+          }]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      } catch (err) {
+        throw new Error(err)
+      }
     }
   }
 
@@ -444,59 +464,62 @@ export class Force extends BaseContract {
    * @returns 
    */
   reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        let sig: Signature
 
-    try {
-      let sig: Signature
+        const user = this.effectAccount.accountName
+        const accountId = this.effectAccount.vAccountRows[0].id
 
-      const user = this.effectAccount.accountName
-      const accountId = this.effectAccount.vAccountRows[0].id
+        const buf2hex = x => x.toString('hex')
+        const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
-      const buf2hex = x => x.toString('hex')
-      const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+        const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+        const tree = new MerkleTree(leaves, sha256)
+        const proof = tree.getProof(leaves[taskIndex])
+        const hexproof = proof.map(x => buf2hex(x.data))
+        const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
 
-      const leaves = tasks.map(x => sha256(JSON.stringify(x)))
-      const tree = new MerkleTree(leaves, sha256)
-      const proof = tree.getProof(leaves[taskIndex])
-      const hexproof = proof.map(x => buf2hex(x.data))
-      const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+        if (isBscAddress(user)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(6)
+          serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
+          serialbuff.pushUint32(campaignId)
+          serialbuff.pushUint32(batchId)
 
-      if (isBscAddress(user)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(6)
-        serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
-        serialbuff.pushUint32(campaignId)
-        serialbuff.pushUint32(batchId)
+          sig = await this.generateSignature(serialbuff)
+        }
 
-        sig = await this.generateSignature(serialbuff)
-      }
-
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'reservetask',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            proof: hexproof,
-            position: pos,
-            data: stringToHex(JSON.stringify(tasks[taskIndex])),
-            campaign_id: campaignId,
-            batch_id: batchId,
-            account_id: accountId,
-            payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    } catch (error) {
-      throw new Error(error);
+        return await this.api.transact({
+          actions: [{
+            account: this.config.force_contract,
+            name: 'reservetask',
+            authorization: [{
+              actor: isBscAddress(user) ? this.config.eos_relayer : user,
+              permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            }],
+            data: {
+              proof: hexproof,
+              position: pos,
+              data: stringToHex(JSON.stringify(tasks[taskIndex])),
+              campaign_id: campaignId,
+              batch_id: batchId,
+              account_id: accountId,
+              payer: isBscAddress(user) ? this.config.eos_relayer : user,
+              sig: isBscAddress(user) ? sig.toString() : null
+            },
+          }]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      } catch (error) {
+        throw new Error(error);
+      }      
     }
-
   }
 
   /**
@@ -508,44 +531,48 @@ export class Force extends BaseContract {
    * @returns 
    */
   submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    try {
-      let sig: Signature
-      const accountId = this.effectAccount.vAccountRows[0].id
-      const user = this.effectAccount.accountName
-      if (isBscAddress(user)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(5)
-        serialbuff.pushNumberAsUint64(submissionId)
-        serialbuff.pushString(data)
+    if (!this.isAccountIsConnected()) {
+      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
+      throw new Error('No account connected.')
+    } else {
+      try {
+        let sig: Signature
+        const accountId = this.effectAccount.vAccountRows[0].id
+        const user = this.effectAccount.accountName
+        if (isBscAddress(user)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(5)
+          serialbuff.pushNumberAsUint64(submissionId)
+          serialbuff.pushString(data)
 
-        sig = await this.generateSignature(serialbuff)
+          sig = await this.generateSignature(serialbuff)
+        }
+
+        return await this.api.transact({
+          actions: [{
+            account: this.config.force_contract,
+            name: 'submittask',
+            authorization: [{
+              actor: isBscAddress(user) ? this.config.eos_relayer : user,
+              permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            }],
+            data: {
+              task_id: submissionId,
+              data: data,
+              account_id: accountId,
+              batch_id: batchId,
+              payer: isBscAddress(user) ? this.config.eos_relayer : user,
+              sig: isBscAddress(user) ? sig.toString() : null
+            },
+          }]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      } catch (error) {
+        throw new Error(error);
       }
-
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'submittask',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            task_id: submissionId,
-            data: data,
-            account_id: accountId,
-            batch_id: batchId,
-            payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    } catch (error) {
-      throw new Error(error);
     }
-
   }
   /**
    * Get task index from merkle leaf
