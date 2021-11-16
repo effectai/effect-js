@@ -113,6 +113,7 @@
     "eosjs": "^22.1.0",
     "eosjs-ecc": "^4.0.7",
     "ethers": "^5.4.7",
+    "js-middleware": "^0.3.1",
     "merkletreejs": "^0.2.24",
     "web3": "^1.5.3"
   }
