@@ -48,7 +48,7 @@ export class BaseContract {
     }
   }
 
-  isAccountConnected = next => (...args) => {
+  isAccountConnected = target => next => (...args) => {
     if (!this.effectAccount) {
       console.error(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.effectAccount\n${this.effectAccount}`)
       throw 'No account connected.'
