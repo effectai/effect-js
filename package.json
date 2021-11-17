@@ -12,8 +12,8 @@
   "scripts": {
     "test": "echo \"🔥\"",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "webpack": "webpack -c webpack.config.js",
-    "webpack:watch": "webpack -c webpack.config.js -w",
+    "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
+    "webpack:dev": "webpack --mode development -c webpack.config.js",
     "build": "npm run build:cjs",
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
