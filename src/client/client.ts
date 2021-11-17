@@ -53,12 +53,14 @@ export class EffectClient {
         try {
             let web3;
             let eosSignatureProvider;
-
+            if (!provider) {
+                throw new Error('Please provide a BSC Web3 or EOS SignatureProvider')
+            }
             // @ts-ignore
             if (provider.eth) {
                 let bscAccount;
+                web3 = provider;
                 if (!account) {
-                    web3 = provider;
                     const message = 'Effect Account'
                     const signature = await this.sign(web3, message)
                     bscAccount = await this.account.recoverPublicKey(message, signature)
