@@ -3,7 +3,7 @@
   "version": "0.0.34",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
-  "module": "dist/libs/index.js",
+  "module": "dist/index.umd.js",
   "browser": "dist/index.umd.js",
   "types": "dist/libs/index.d.ts",
   "files": [
