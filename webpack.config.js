@@ -3,7 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: './dist/lib/index.js',
   devtool: 'inline-source-map',
   module: {
     rules: [{
@@ -45,8 +45,6 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
     library: 'effectsdk',
-    libraryExport: 'default',
-    umdNamedDefine: true,
     globalObject: 'this',
     libraryTarget: 'umd'
   }
