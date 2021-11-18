@@ -178,15 +178,16 @@ export class BaseContract {
    */
   sendTransaction = async function (owner: string, action: object): Promise<any> {
     if(isBscAddress(owner)) {
-     // post to relayer
-     return await this.fetch(this.config.eos_relayer_url + '/transaction', {
+      // post to relayer
+      return this.fetch(this.config.eos_relayer_url + '/transaction', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(action)
-      });
+      }).then(response=>response.json())
+      .then(data=>{ return JSON.parse(data) })
    } else {
      return await this.api.transact({
        actions: [action]
