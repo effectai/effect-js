@@ -53,7 +53,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
             eos_relayer: config.eos_relayer ?? "jabbarndcn22",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001"
+            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app"
         }
     } else {
         console.log('no default config is being used, make sure you specified all config')
