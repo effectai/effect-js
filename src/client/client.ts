@@ -9,6 +9,7 @@ import Web3 from 'web3';
 import { eosWalletAuth } from '../types/eosWalletAuth';
 import fetch from 'cross-fetch';
 import retry from 'async-retry'
+import { MiddlewareManager } from 'js-middleware';
 export class EffectClient {
     api: Api;
     account: Account;
@@ -21,7 +22,6 @@ export class EffectClient {
     formData: any;
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
-        // TODO: set relayer, after merge with relayer branch
         this.config = defaultConfiguration(environment, configuration)
         const { signatureProvider, host } = this.config
 
@@ -30,35 +30,50 @@ export class EffectClient {
 
         this.account = new Account(this.api, this.config)
         this.force = new Force(this.api, this.config)
-    }
 
+        const accountMiddleWare = new MiddlewareManager(this.account)
+        const forceMiddleWare = new MiddlewareManager(this.force)
+
+        accountMiddleWare.use('updatevAccountRows', this.account.isAccountConnected)
+        forceMiddleWare.use('joinCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('uploadCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('createCampaign', this.force.isAccountConnected)
+        forceMiddleWare.use('createBatch', this.force.isAccountConnected)
+        forceMiddleWare.use('reserveTask', this.force.isAccountConnected)
+        forceMiddleWare.use('submitTask', this.force.isAccountConnected)
+
+    }
     /**
      * Connect Account to SDK
      * @param provider 
      * @param eosAccount
      * @returns EffectAccount
      */
-    connectAccount = async (provider: SignatureProvider | Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
+    connectAccount = async (provider: SignatureProvider | Web3, account?: eosWalletAuth): Promise<EffectAccount> => {
         try {
             let web3;
             let eosSignatureProvider;
-
-            if (provider instanceof Web3) {
+            if (!provider) {
+                throw new Error('Please provide a BSC Web3 or EOS SignatureProvider')
+            }
+            // @ts-ignore
+            if (provider.eth) {
                 let bscAccount;
                 web3 = provider;
-                const message = 'Effect Account'
-                const signature = await this.sign(web3, message)
-                bscAccount = await this.account.recoverPublicKey(message, signature)
-
-                this.effectAccount = {
-                    accountName: bscAccount.accountAddress,
-                    address: web3.eth.accounts.wallet[0].address,
-                    privateKey: web3.eth.accounts.wallet[0].privateKey
+                if (!account || !account.accountName) {
+                    const message = 'Effect Account'
+                    const signature = await this.sign(web3, message)
+                    bscAccount = await this.account.recoverPublicKey(message, signature)
                 }
 
+                this.effectAccount = {
+                    accountName: bscAccount ? bscAccount.accountName : account.accountName,
+                    address: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0],
+                    privateKey: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
+                }
             } else {
                 eosSignatureProvider = provider;
-                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
+                this.effectAccount = { accountName: account.accountName, permission: account.permission, address: account.publicKey }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
 
@@ -97,13 +112,12 @@ export class EffectClient {
      */
     sign = async (web3: Web3, message: string): Promise<string> => {
         try {
-            const address = web3.eth.accounts.wallet[0].address
-            const privateKey = web3.eth.accounts.wallet[0].privateKey
-
+            const address = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0]
+            const privateKey = web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
             if (privateKey) {
                 return (await web3.eth.accounts.sign(message, privateKey)).signature
             } else {
-                return await web3.eth.sign(message, address)
+                return await web3.eth.personal.sign(message, address, '')
             }
         } catch (error) {
             console.error(error)

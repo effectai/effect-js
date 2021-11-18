@@ -49,8 +49,12 @@ export class BaseContract {
     }
   }
 
-  isAccountIsConnected(): boolean {
-    return this.effectAccount ? true : false
+  isAccountConnected = target => next => (...args) => {
+    if (!this.effectAccount) {
+      console.error(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.effectAccount\n${this.effectAccount}`)
+      throw 'No account connected.'
+    }
+    return next(...args)
   }
 
   /**
@@ -58,17 +62,12 @@ export class BaseContract {
   * @returns {Promise<number>} Nonce to be used with each transaction
   */
   updatevAccountRows = async (): Promise<EffectAccount> => {
-    if (!this.isAccountIsConnected()) {
-      console.log(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.EffectAccount\n${this.effectAccount}`)
-      throw new Error('No account connected.')
-    } else {
-      try {
-        const account = this.effectAccount.accountName;
-        this.effectAccount.vAccountRows = Account.getVAccountByName(account)
-        return this.effectAccount
-      } catch (err) {
-        throw new Error(err)
-      }
+    try {
+      const account = this.effectAccount.accountName;
+      this.effectAccount.vAccountRows = Account.getVAccountByName(account)
+      return this.effectAccount
+    } catch (err) {
+      throw new Error(err)
     }
   }
 
@@ -105,8 +104,8 @@ export class BaseContract {
 
     // RIPEMD160 hash public key
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-    return { address, accountAddress }
+    const accountName = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return { address, accountName }
   }
 
   /**

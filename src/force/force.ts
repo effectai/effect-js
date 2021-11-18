@@ -106,10 +106,8 @@ export class Force extends BaseContract {
       // field_0 represents the content type where:
       // 0: IPFS
       if (campaign.content.field_0 === 0 && campaign.content.field_1 !== '') {
-        console.log('campaign.content.field_1', campaign.content.field_1)
         // field_1 represents the IPFS hash
         campaign.info = await this.getIpfsContent(campaign.content.field_1)
-        console.log('campaign.info', campaign.info)
       }
     } catch (e) {
       console.error('processCampaign', e)
@@ -279,15 +277,15 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    const stringify = JSON.stringify(campaignIpfs)
-    const blob = new this.blob([stringify], { type: 'text/json' })
-    const formData = new this.formData()
-    formData.append('file', await blob.text())
+    try { 
+      const stringify = JSON.stringify(campaignIpfs)
+      const blob = new this.blob([stringify], { type: 'text/json' })
+      const formData = new this.formData()
+      formData.append('file', await blob.text())
 
-    if (blob.size > 10000000) {
-      alert('Max file size allowed is 10 MB')
-    } else {
-      try {
+      if (blob.size > 10000000) {
+        throw 'Max file size allowed is 10 MB'
+      } else {
         const requestOptions: RequestInit = {
           method: 'POST',
           body: formData
@@ -295,10 +293,10 @@ export class Force extends BaseContract {
         const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
         return campaign.Hash as string
-      } catch (e) {
-        console.error(`🔥🔥🔥: ${e}`)
-        return null
       }
+    } catch (err) {
+      console.error(`🔥🔥🔥: ${err}`)
+      return new Error(err).message
     }
   }
   /**
@@ -361,7 +359,7 @@ export class Force extends BaseContract {
       return await this.sendTransaction(campaignOwner, action);
     } catch (err) {
       throw new Error(err)
-    }
+    }  
   }
 
   /**
@@ -437,7 +435,6 @@ export class Force extends BaseContract {
    * @returns 
    */
   reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-
     try {
       let sig: Signature
 
@@ -485,8 +482,7 @@ export class Force extends BaseContract {
       return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
-    }
-
+    }      
   }
 
   /**
@@ -531,7 +527,6 @@ export class Force extends BaseContract {
     } catch (error) {
       throw new Error(error);
     }
-
   }
   /**
    * Get task index from merkle leaf

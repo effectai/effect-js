@@ -4,6 +4,8 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: './src/index.ts',
+  // mode: 'development',
+  // mode: 'production', // output is minified.
   devtool: 'inline-source-map',
   module: {
     rules: [{
@@ -44,8 +46,5 @@ module.exports = {
     libraryTarget: 'umd',
     library: 'effectsdk',
     umdNamedDefine: true
-  }
-  optimizations: {
-      runTimeChunk: 'single'
   }
 };
