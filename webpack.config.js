@@ -4,12 +4,14 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: './src/index.ts',
-  // mode: 'development',
-  // mode: 'production', // output is minified.
   devtool: 'inline-source-map',
   module: {
     rules: [{
       test: /\.tsx?$/,
+      resolve: {
+        fullySpecified: false,
+        extensions: ['.ts', '.tsx', '.js', '.json']
+      },
       use: {
         loader: 'ts-loader',
         options: {
@@ -40,11 +42,12 @@ module.exports = {
     }
   },
   output: {
-    filename: 'index.umd.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
-    // path: './dist/',
-    libraryTarget: 'umd',
     library: 'effectsdk',
-    umdNamedDefine: true
+    libraryExport: 'default',
+    umdNamedDefine: true,
+    globalObject: 'this',
+    libraryTarget: 'umd'
   }
 };
