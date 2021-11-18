@@ -1,10 +1,10 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.0.26",
+  "version": "0.0.34",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "module": "dist/libs/index.js",
-  "browser": "dist/libs/index.umd.js",
+  "browser": "dist/index.umd.js",
   "types": "dist/libs/index.d.ts",
   "files": [
     "dist/*"
@@ -12,7 +12,8 @@
   "scripts": {
     "test": "echo \"🔥\"",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "webpack": "webpack -c webpack.config.js",
+    "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
+    "webpack:dev": "webpack --mode development -c webpack.config.js",
     "build": "npm run build:cjs",
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
@@ -81,6 +82,9 @@
     "@types/text-encoding": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
+    "assert": "^2.0.0",
+    "browserify-zlib": "^0.2.0",
+    "crypto-browserify": "^3.12.0",
     "dotenv": "^10.0.0",
     "eosjs": "^22.1.0",
     "eslint": "^7.31.0",
@@ -90,12 +94,20 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
+    "https-browserify": "^1.0.0",
     "husky": "^7.0.1",
+    "os-browserify": "^0.3.0",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "ts-loader": "^9.2.6",
     "ts-node-dev": "^1.1.8",
     "typedoc": "^0.21.4",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "url": "^0.11.0",
+    "webpack": "^5.64.1",
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
     "@dfuse/client": "^0.3.20",

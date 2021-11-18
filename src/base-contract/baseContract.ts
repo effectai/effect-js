@@ -48,7 +48,7 @@ export class BaseContract {
     }
   }
 
-  isAccountConnected = next => (...args) => {
+  isAccountConnected = target => next => (...args) => {
     if (!this.effectAccount) {
       console.error(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.effectAccount\n${this.effectAccount}`)
       throw 'No account connected.'
@@ -103,8 +103,8 @@ export class BaseContract {
 
     // RIPEMD160 hash public key
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-    return { address, accountAddress }
+    const accountName = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return { address, accountName }
   }
 
   /**

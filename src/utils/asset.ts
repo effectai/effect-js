@@ -10,7 +10,7 @@ export function convertToAsset(amount: string): string {
     // TODO: how to get config in utils?
     // this.config.efx_precision
     const precision = 4
-    const part = amount.split('.')
+    const part = amount.toString().split('.')
 
     if (part.length === 1) {
       return `${part[0]}.${'0'.repeat(precision)}`

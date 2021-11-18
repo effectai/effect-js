@@ -41,7 +41,7 @@ export class EffectClient {
         forceMiddleWare.use('createBatch', this.force.isAccountConnected)
         forceMiddleWare.use('reserveTask', this.force.isAccountConnected)
         forceMiddleWare.use('submitTask', this.force.isAccountConnected)
-    
+
     }
     /**
      * Connect Account to SDK
@@ -49,27 +49,31 @@ export class EffectClient {
      * @param eosAccount
      * @returns EffectAccount
      */
-    connectAccount = async (provider: SignatureProvider | Web3, eosAccount?: eosWalletAuth): Promise<EffectAccount> => {
+    connectAccount = async (provider: SignatureProvider | Web3, account?: eosWalletAuth): Promise<EffectAccount> => {
         try {
             let web3;
             let eosSignatureProvider;
-
+            if (!provider) {
+                throw new Error('Please provide a BSC Web3 or EOS SignatureProvider')
+            }
             // @ts-ignore
             if (provider.eth) {
                 let bscAccount;
                 web3 = provider;
-                const message = 'Effect Account'
-                const signature = await this.sign(web3, message)
-                bscAccount = await this.account.recoverPublicKey(message, signature)
+                if (!account) {
+                    const message = 'Effect Account'
+                    const signature = await this.sign(web3, message)
+                    bscAccount = await this.account.recoverPublicKey(message, signature)
+                }
 
                 this.effectAccount = {
-                    accountName: bscAccount.accountAddress,
+                    accountName: bscAccount ? bscAccount.accountName : account.accountName,
                     address: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].address : (await web3.eth.getAccounts())[0],
                     privateKey: web3.eth.accounts.wallet[0] ? web3.eth.accounts.wallet[0].privateKey : null
                 }
             } else {
                 eosSignatureProvider = provider;
-                this.effectAccount = { accountName: eosAccount.accountName, permission: eosAccount.permission, address: eosAccount.publicKey }
+                this.effectAccount = { accountName: account.accountName, permission: account.permission, address: account.publicKey }
                 this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
             }
 
