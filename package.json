@@ -14,7 +14,7 @@
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
     "webpack:dev": "webpack --mode development -c webpack.config.js",
-    "build": "npm run build:cjs",
+    "build": "npm run build:cjs && npm run webpack",
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
