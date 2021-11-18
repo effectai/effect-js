@@ -25,7 +25,7 @@
     "docs:watch": "typedoc --watch",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
-    "publish": "npm run prebuid && npm version patch && npm run build && npm run webpack && npm publish",
+    "publish": "npm run prebuild && npm version patch && npm run build && npm run webpack && npm publish",
     "publish:next": "npm run prebuild && npm version patch &&  npm run build && && npm run webpack npm publish --tag next ",
     "publish:cjs": "npm run prebuild && npm version patch &&  npm run build:cjs && && npm run webpack npm publish --tag cjs ",
     "publish:umd": "npm run prebuild && npm version patch &&  npm run build:umd && && npm run webpack npm publish --tag umd ",
