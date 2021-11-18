@@ -20,27 +20,50 @@ npm run build
 
 # Quick start
 ```
-const effectSdk = require('@effectai/effect-js')
+const sdk = new EffectClient('testnet')
 
-const signatureProvider = new JsSignatureProvider([PRIVATE_KEY])
-const options = {
-  network: "kylin",
-  host: 'https://api.kylin.alohaeos.com',
-  signatureProvider: signatureProvider
+// Instantiating bsc account.
+const account = createAccount(
+    // leave empty to generate new private key
+    '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
+)
+
+// Generate web3 instance from account with private key.
+// Could also be the web3 object with a MetaMask connection etc.
+const web3 = createWallet(account)
+
+// Connect web3 account to SDK
+const effectAccount = await sdk.connectAccount(web3);
+
+const newCampaign = {
+    title: 'Random Title',
+    description: 'Networked well-modulated instruction set',
+    instructions: `American whole magazine truth stop whose.`,
+    template: `<div id="task">
+                <image src='` + '${image_url}' + `'></image>
+                <h2>Image Classification</h2>
+                <option submit name="button-answer" type="button" 
+                  :options="['Cat','Dog','Mechanical Turk','Other']" 
+                  label="What do you see in the picture above?">
+                </option>
+              </div>`,
+    image: 'https://ipfs.effect.ai/ipfs/bafkreiggnttdaxleeii6cdt23i4e24pfcvzyrndf5kzfbqgf3fxjryj5s4',
+    category: 'Image Labeling',
+    example_task: {'image_url': 'https://ipfs.effect.ai/ipfs/bafkreidrxwhqsxa22uyjamz7qq3lh7pv2eg3ykodju6n7cgprmjpal2oga'},
+    version: 1,
+    reward: 10
 }
-const sdk = new effectSdk.EffectClient(options);
 
-sdk.account.openAccount('account_name')
-sdk.account.getVAccountByName('account_name')
+// Create campaign.
+// campaign object, reward efx per task
+const makeCampaign = await sdk.force.makeCampaign(newCampaign, '10')
+console.log('makeCampaign', makeCampaign)
 
-// from account, to vaccount, amount in **EFX**
-sdk.account.deposit('from_account_name', 'to_vaccount_name', '1.0000')
+// Get Campaigns
+// nextKey, limit
+const campaigns = await sdk.force.getCampaigns('', 100)
+console.log('Campaigns', campaigns)
 
-// from vaccount, to account, amount in EFX
-sdk.account.withdraw('from_vaccount_name', 'to_account_name', '1.0000')
-
-// from vaccount, to vaccount, amount in EFX
-sdk.account.vtransfer('from_vaccount_name', 'to_vaccount_name', '1.0000')
 ```
 
 # Development

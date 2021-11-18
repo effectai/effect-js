@@ -60,7 +60,7 @@ export class EffectClient {
             if (provider.eth) {
                 let bscAccount;
                 web3 = provider;
-                if (!account) {
+                if (!account || !account.accountName) {
                     const message = 'Effect Account'
                     const signature = await this.sign(web3, message)
                     bscAccount = await this.account.recoverPublicKey(message, signature)
