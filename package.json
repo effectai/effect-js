@@ -25,11 +25,11 @@
     "docs:watch": "typedoc --watch",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
-    "publish": "npm run prebuild && npm version patch && npm run build && npm run webpack && npm publish",
-    "publish:next": "npm run prebuild && npm version patch &&  npm run build && && npm run webpack npm publish --tag next ",
-    "publish:cjs": "npm run prebuild && npm version patch &&  npm run build:cjs && && npm run webpack npm publish --tag cjs ",
-    "publish:umd": "npm run prebuild && npm version patch &&  npm run build:umd && && npm run webpack npm publish --tag umd ",
-    "publish:es": "npm run prebuild && npm version patch &&  npm run build:es && && npm run webpack npm publish --tag es "
+    "publish:public": "npm run prebuild && npm version patch && npm run build && npm run webpack && npm publish --access public",
+    "publish:next": "npm run prebuild && npm version patch &&  npm run build && npm run webpack && npm publish --tag next ",
+    "publish:cjs": "npm run prebuild && npm version patch &&  npm run build:cjs && npm run webpack && npm publish --tag cjs ",
+    "publish:umd": "npm run prebuild && npm version patch &&  npm run build:umd && npm run webpack && npm publish --tag umd ",
+    "publish:es": "npm run prebuild && npm version patch &&  npm run build:es && npm run webpack && npm publish --tag es "
   },
   "repository": {
     "type": "git",
