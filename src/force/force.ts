@@ -52,9 +52,10 @@ export class Force extends BaseContract {
    * Get Force Campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
+   * @param processCampaign - get campaign content from ipfs
    * @returns - Campaign Table Rows Result
    */
-  getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+  getCampaigns = async (nextKey, limit = 20, processCampaign: boolean = true): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -65,22 +66,25 @@ export class Force extends BaseContract {
     if (nextKey) {
       config.lower_bound = nextKey
     }
-    const data = await this.api.rpc.get_table_rows(config)
-  
-    // Get Campaign Info.
-    for (let i = 0; i < data.rows.length; i++) {
-      data.rows[i] = await this.processCampaign(data.rows[i])
+    const campaigns = await this.api.rpc.get_table_rows(config)
+
+    if (processCampaign) {
+      // Get Campaign Info.
+      for (let i = 0; i < campaigns.rows.length; i++) {
+        campaigns.rows[i] = await this.processCampaign(campaigns.rows[i])
+      }
     }
 
-    return data;
+    return campaigns;
   }
 
   /**
    * Get Campaign
    * @param id - id of campaign
+   * @param processCampaign - get campaign content from ipfs
    * @returns Campaign
    */
-  getCampaign = async (id: number): Promise<Campaign> => {
+  getCampaign = async (id: number, processCampaign: boolean = true): Promise<Campaign> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -90,10 +94,48 @@ export class Force extends BaseContract {
       upper_bound: id,
     }
 
-    const campaignRow = await this.api.rpc.get_table_rows(config)
-    const campaign = await this.processCampaign(campaignRow.rows[0])
+    let campaign = (await this.api.rpc.get_table_rows(config)).rows[0]
+    if (processCampaign) {
+      campaign = await this.processCampaign(campaign)  
+    }
 
     return campaign
+  }
+
+  /**
+   * Get Last Campaign of connected account
+   * @param processCampaign - get campaign content from ipfs
+   * @returns Campaign
+   */
+  getMyLastCampaign = async (processCampaign: boolean = true): Promise<Campaign> => {
+    try {
+      const config = {
+        code: this.config.force_contract,
+        scope: this.config.force_contract,
+        table: 'campaign',
+        key_type: 'i64',
+        limit: 20,
+        reverse: true
+      }
+     
+      const campaigns = await this.api.rpc.get_table_rows(config)
+  
+      let campaign: Campaign
+      for (let c of campaigns.rows) {
+        if (this.effectAccount.accountName === c.owner[1]) {
+          campaign = c
+          break;
+        }
+      }
+
+      if (processCampaign) {
+        campaign = await this.processCampaign(campaign)  
+      }
+  
+      return campaign
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 
   /**
