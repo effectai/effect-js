@@ -10,6 +10,7 @@ import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
 import retry from 'async-retry'
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
+import { isBscAddress } from '../utils/bscAddress'
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -192,4 +193,32 @@ export class BaseContract {
     })
     return transaction.transactions
   }
+  
+  /*
+   * @param owner 
+   * @param action 
+   * @returns 
+   */
+  sendTransaction = async function (owner: string, action: object): Promise<any> {
+    if(isBscAddress(owner)) {
+      // post to relayer
+      return this.fetch(this.config.eos_relayer_url + '/transaction', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(action)
+      }).then(response=>response.json())
+      .then(data=>{ return JSON.parse(data) })
+   } else {
+     return await this.api.transact({
+       actions: [action]
+     }, {
+       blocksBehind: 3,
+       expireSeconds: 30,
+     });
+   }
+ }
+
 }

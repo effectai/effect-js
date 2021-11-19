@@ -250,25 +250,22 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'joincampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            account_id: this.effectAccount.vAccountRows[0].id,
-            campaign_id: campaignId,
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'joincampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          account_id: this.effectAccount.vAccountRows[0].id,
+          campaign_id: campaignId,
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      }
+
+      return await this.sendTransaction(owner, action);
     } catch (err) {
       throw new Error(err)
     }
@@ -341,28 +338,25 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkbatch',
-          authorization: [{
-            actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            id: batchId,
-            campaign_id: campaignId,
-            content: { field_0: 0, field_1: hash },
-            task_merkle_root: merkleRoot,
-            num_tasks: content.tasks.length,
-            payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-            sig: isBscAddress(campaignOwner) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'mkbatch',
+        authorization: [{
+          actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+          permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          id: batchId,
+          campaign_id: campaignId,
+          content: { field_0: 0, field_1: hash },
+          task_merkle_root: merkleRoot,
+          num_tasks: content.tasks.length,
+          payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+          sig: isBscAddress(campaignOwner) ? sig.toString() : null
+        },
+      }
+
+      return await this.sendTransaction(campaignOwner, action);
     } catch (err) {
       throw new Error(err)
     }  
@@ -388,29 +382,28 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'mkcampaign',
-          authorization: [{
-            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
-            content: { field_0: 0, field_1: hash },
-            reward: {
-              quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-            sig: isBscAddress(owner) ? sig.toString() : null
+      const action = {
+        account: this.config.force_contract,
+        name: 'mkcampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+          content: { field_0: 0, field_1: hash },
+          reward: {
+            quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        },
+        payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null,
+      }
+      
+      return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -467,29 +460,26 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'reservetask',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            proof: hexproof,
-            position: pos,
-            data: stringToHex(JSON.stringify(tasks[taskIndex])),
-            campaign_id: campaignId,
-            batch_id: batchId,
-            account_id: accountId,
-            payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'reservetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          proof: hexproof,
+          position: pos,
+          data: stringToHex(JSON.stringify(tasks[taskIndex])),
+          campaign_id: campaignId,
+          batch_id: batchId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }
+
+      return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
     }      
@@ -517,27 +507,23 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      return await this.api.transact({
-        actions: [{
-          account: this.config.force_contract,
-          name: 'submittask',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            task_id: submissionId,
-            data: data,
-            account_id: accountId,
-            batch_id: batchId,
-            payer: isBscAddress(user) ? this.config.eos_relayer : user,
-            sig: isBscAddress(user) ? sig.toString() : null
-          },
-        }]
-      }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
+      const action = {
+        account: this.config.force_contract,
+        name: 'submittask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: submissionId,
+          data: data,
+          account_id: accountId,
+          batch_id: batchId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }
+      return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
     }

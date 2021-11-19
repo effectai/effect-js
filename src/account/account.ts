@@ -110,26 +110,21 @@ export class Account extends BaseContract {
         type = 'address'
         address = account.length == 42 ? account.substring(2) : account;
       }
-      return await this.api.transact({
-        actions: [{
-          account: this.config.account_contract,
-          name: 'open',
-          authorization: [{
-            actor: type == 'address' ? this.config.eos_relayer : account,
-            permission: isBscAddress(account) ? this.config.eos_relayer_permission : permission
-          }],
-          data: {
-            acc: [type, type == 'address' ? address : account],
-            symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
-            payer: type == 'address' ? this.config.eos_relayer : account,
-          },
-        }]
-      },
-        {
-          blocksBehind: 3,
-          expireSeconds: 60
-        });
 
+      const action = {
+        account: this.config.account_contract,
+        name: 'open',
+        authorization: [{
+          actor: type == 'address' ? this.config.eos_relayer : account,
+          permission: isBscAddress(account) ? this.config.eos_relayer_permission : permission
+        }],
+        data: {
+          acc: [type, type == 'address' ? address : account],
+          symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
+          payer: type == 'address' ? this.config.eos_relayer : account,
+        }
+      }
+      return this.sendTransaction(account, action);
     } catch (err) {
       throw new Error(err)
     }
@@ -200,32 +195,26 @@ export class Account extends BaseContract {
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
-      return await this.api.transact({
-        actions: [{
-          account: this.config.account_contract,
-          name: 'withdraw',
-          authorization: [{
-            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            from_id: accountId,
-            to_account: toAccount,
-            quantity: {
-              quantity: amount + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            memo: memo,
-            sig: isBscAddress(fromAccount) ? sig.toString() : null,
-            fee: null
+      const action = {
+        account: this.config.account_contract,
+        name: 'withdraw',
+        authorization: [{
+          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          from_id: accountId,
+          to_account: toAccount,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
-      },
-        {
-          blocksBehind: 3,
-          expireSeconds: 60
-        });
-
+          memo: memo,
+          sig: isBscAddress(fromAccount) ? sig.toString() : null,
+          fee: null
+        },
+      }
+      return this.sendTransaction(fromAccount, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -262,31 +251,26 @@ export class Account extends BaseContract {
     }
 
     try {
-      return await this.api.transact({
-        actions: [{
-          account: this.config.account_contract,
-          name: 'vtransfer',
-          authorization: [{
-            actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission,
-          }],
-          data: {
-            from_id: fromAccountId,
-            to_id: balanceIndexTo,
-            quantity: {
-              quantity: amount + ' ' + this.config.efx_symbol,
-              contract: this.config.efx_token_account
-            },
-            sig: isBscAddress(fromAccount) ? sig.toString() : null,
-            fee: null
+      const action = {
+        account: this.config.account_contract,
+        name: 'vtransfer',
+        authorization: [{
+          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
+          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission,
+        }],
+        data: {
+          from_id: fromAccountId,
+          to_id: balanceIndexTo,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
           },
-        }]
-      },
-        {
-          blocksBehind: 3,
-          expireSeconds: 60
-        });
+          sig: isBscAddress(fromAccount) ? sig.toString() : null,
+          fee: null
+        },
+      }
 
+      return this.sendTransaction(fromAccount, action)
     } catch (err) {
       throw new Error(err)
     }
