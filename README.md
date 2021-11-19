@@ -19,7 +19,7 @@ npm run build
 ```
 
 # Quick start
-```
+```javascript
 const sdk = new EffectClient('testnet')
 
 // Instantiating bsc account.
