@@ -55,7 +55,7 @@ export class Force extends BaseContract {
    * @param processCampaign - get campaign content from ipfs
    * @returns - Campaign Table Rows Result
    */
-  getCampaigns = async (nextKey, limit = 20, processCampaign: boolean = true): Promise<Array<Campaign>> => {
+  getCampaigns = async (nextKey, limit = 20, processCampaign: boolean = true): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -66,12 +66,12 @@ export class Force extends BaseContract {
     if (nextKey) {
       config.lower_bound = nextKey
     }
-    const campaigns = (await this.api.rpc.get_table_rows(config)).rows
+    const campaigns = await this.api.rpc.get_table_rows(config)
 
     if (processCampaign) {
       // Get Campaign Info.
-      for (let i = 0; i < campaigns.length; i++) {
-        campaigns[i] = await this.processCampaign(campaigns[i])
+      for (let i = 0; i < campaigns.rows.length; i++) {
+        campaigns.rows[i] = await this.processCampaign(campaigns.rows[i])
       }
     }
 
