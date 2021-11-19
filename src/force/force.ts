@@ -97,6 +97,39 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get Last Campaign of connected account
+   * @returns Campaign
+   */
+  getMyLastCampaign = async (): Promise<Campaign> => {
+    try {
+      const config = {
+        code: this.config.force_contract,
+        scope: this.config.force_contract,
+        table: 'campaign',
+        key_type: 'i64',
+        limit: 20,
+        reverse: true
+      }
+     
+      const campaigns = await this.api.rpc.get_table_rows(config)
+  
+      let lastCampaign: Campaign
+      for (let c of campaigns.rows) {
+        if (this.effectAccount.accountName === c.owner[1]) {
+          lastCampaign = c
+          break;
+        }
+      }
+  
+      const campaign = await this.processCampaign(lastCampaign)
+  
+      return campaign
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
    * processCampaign
    * @param campaign
    * @returns
