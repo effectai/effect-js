@@ -108,5 +108,10 @@ export interface EffectClientConfig {
     */
    eos_relayer_permission: string
 
+     /**
+      * Relayer url
+      */
+     eos_relayer_url
+
 }
 
