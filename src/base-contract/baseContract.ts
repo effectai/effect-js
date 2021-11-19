@@ -8,6 +8,8 @@ import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
+import retry from 'async-retry'
+import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -72,10 +74,9 @@ export class BaseContract {
 
   /**
    * 
-   * @param rpc 
-   * @param signatureProvider 
+   * @param effectAccount 
+   * @param api 
    * @param web3 
-   * @returns 
    */
   setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3: Web3): Promise<void> => {
     if (web3) {
@@ -169,4 +170,26 @@ export class BaseContract {
     }
   }
 
+  /**
+   * 
+   * @param tx
+   * @param irreversible
+   * @param maxTimeout
+   */
+  waitTransaction = async function (tx: string, irreversible?: boolean, maxTimeout?: number): Promise<Transaction> {
+    let transaction
+    await retry(async () => {
+      console.log('history_get_transaction', tx)
+      transaction = await this.api.rpc.get_block(198442740)
+      if (!transaction || irreversible && !transaction.confirmed) {
+        throw new Error('Transaction not ready yet')
+      }
+    }, {
+        retries: 10,
+        onRetry: (error, number) => {
+          console.log('attempt', number, error)
+        }
+    })
+    return transaction.transactions
+  }
 }
