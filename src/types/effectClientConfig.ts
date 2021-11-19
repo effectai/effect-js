@@ -111,7 +111,7 @@ export interface EffectClientConfig {
      /**
       * Relayer url
       */
-     eos_relayer_url
+     eos_relayer_url: string
 
 }
 
