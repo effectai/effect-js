@@ -147,27 +147,23 @@ export class BaseContract {
    * @returns content of the ipfs hash in your preferred format
    */
   getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-    try {
-      const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
-      switch (format.toLowerCase()) {
-        case 'formdata':
-        case 'form':
-          return data.text()
-        case 'buffer':
-        case 'arraybuffer':
-        case 'array':
-          return data.arrayBuffer()
-        case 'blob':
-          return data.blob()
-        case 'text':
-          return data.text()
-        case 'json':
-          return data.json()
-      }
-      return data
-    } catch (error) {
-      console.error(error)
+    const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+    switch (format.toLowerCase()) {
+      case 'formdata':
+      case 'form':
+        return data.text()
+      case 'buffer':
+      case 'arraybuffer':
+      case 'array':
+        return data.arrayBuffer()
+      case 'blob':
+        return data.blob()
+      case 'text':
+        return data.text()
+      case 'json':
+        return data.json()
     }
+    return data
   }
 
   /**
@@ -178,7 +174,7 @@ export class BaseContract {
    */
   sendTransaction = async function (owner: string, action: object): Promise<any> {
     try {
-      if(isBscAddress(owner)) {
+      if (isBscAddress(owner)) {
         // post to relayer
         return this.fetch(this.config.eos_relayer_url + '/transaction', {
           method: 'POST',
@@ -187,19 +183,19 @@ export class BaseContract {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(action)
-        }).then(response=>response.json())
-        .then(data=>{ return JSON.parse(data) })
-     } else {
-       return await this.api.transact({
-         actions: [action]
-       }, {
-         blocksBehind: 3,
-         expireSeconds: 30,
-       });
-     }
+        }).then(response => response.json())
+          .then(data => { return JSON.parse(data) })
+      } else {
+        return await this.api.transact({
+          actions: [action]
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+      }
     } catch (error) {
       throw new Error(error)
     }
- }
+  }
 
 }
