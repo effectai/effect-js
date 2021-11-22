@@ -2,6 +2,7 @@
 
 Javascript SDK for integration with [https://effect.network](https://effect.network)
 Take a look at our docs at the following link: [Docs](https://effectai.github.io/developer-docs/)
+The API reference is available here: [SDK-Reference](https://effectai.github.io/effect-js/)
 
 # ✒️ Installation
 
@@ -9,13 +10,6 @@ The official distribution for the package can is available at npm. [npm](https:/
 
 ```
 npm i --save @effectai/effect-js
-```
-
-# Install & build
-Build the `package-lock.json`.
-```
-npm ci 
-npm run build
 ```
 
 # Quick start
