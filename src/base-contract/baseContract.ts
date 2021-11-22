@@ -187,7 +187,7 @@ export class BaseContract {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(action)
+          body: JSON.stringify(actions)
         }).then(response=>response.json())
         .then(data=>{ return JSON.parse(data) })
      } else {
