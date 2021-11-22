@@ -4,6 +4,7 @@ import { Api, Serialize, Numeric } from 'eosjs';
 import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
+import CryptoJS from 'crypto-js/core';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
@@ -46,7 +47,6 @@ export class Force extends BaseContract {
 
     return await this.api.rpc.get_table_rows(config)
   }
-
 
   /**
    * Get Force Campaigns
@@ -117,9 +117,9 @@ export class Force extends BaseContract {
         limit: 20,
         reverse: true
       }
-     
+
       const campaigns = await this.api.rpc.get_table_rows(config)
-  
+
       let campaign: Campaign
       for (let c of campaigns.rows) {
         if (this.effectAccount.accountName === c.owner[1]) {
@@ -129,9 +129,9 @@ export class Force extends BaseContract {
       }
 
       if (processCampaign) {
-        campaign = await this.processCampaign(campaign)  
+        campaign = await this.processCampaign(campaign)
       }
-  
+
       return campaign
     } catch (error) {
       throw new Error(error)
@@ -237,8 +237,8 @@ export class Force extends BaseContract {
 
   /**
    * Get Batches for Campaign
-   * @param campaignId 
-   * @returns 
+   * @param campaignId
+   * @returns
    */
   getCampaignBatches = async (campaignId: number): Promise<Array<Batch>> => {
     const batches = await this.getBatches('', -1)
@@ -255,9 +255,9 @@ export class Force extends BaseContract {
 
   /**
    * get campaign join table
-   * @param accountId 
-   * @param campaignId 
-   * @returns 
+   * @param accountId
+   * @param campaignId
+   * @returns
    */
   getCampaignJoins = async (campaignId: number): Promise<GetTableRowsResult> => {
     const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
@@ -341,31 +341,38 @@ export class Force extends BaseContract {
       return new Error(err).message
     }
   }
+
   /**
-   * 
-   * @param dataArray 
+   * Get the the root hash of a merkle tree given the leaf data
+   * @param campaignId the campaign to create the merkle root for
+   * @param batchId the batch to create the merkle root for
+   * @param dataArray task data
    * @returns root of merkle tree
    */
-  getMerkleRoot = (dataArray) => {
-    const leaves = dataArray.map(x => SHA256(JSON.stringify(x)))
-    const tree = new MerkleTree(leaves, SHA256)
+  getMerkleRoot = (campaignId: number, batchId: number, dataArray: object[]) : string => {
+    const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
+    const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
+    const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
+
+    const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+    const tree = new MerkleTree(leaves, sha256)
+
     return tree.getRoot().toString('hex')
   }
 
   /**
    * Creates a batch on a Campaign.
-   * @param campaignId 
-   * @param batchId 
-   * @param content 
+   * @param campaignId
+   * @param batchId
+   * @param content
    * @returns transaction result
    */
-
   createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
 
       const hash = await this.uploadCampaign(content)
-      const merkleRoot = this.getMerkleRoot(content.tasks)
+      const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
       const campaignOwner = this.effectAccount.accountName
 
       if (isBscAddress(campaignOwner)) {
@@ -493,7 +500,7 @@ export class Force extends BaseContract {
         payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
         sig: isBscAddress(owner) ? sig.toString() : null,
       }
-      
+
       return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
@@ -533,9 +540,14 @@ export class Force extends BaseContract {
       const accountId = this.effectAccount.vAccountRows[0].id
 
       const buf2hex = x => x.toString('hex')
+      const hex2bytes = x => Serialize.hexToUint8Array(x)
       const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
 
-      const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+      const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
+      const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
+
+      const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+
       const tree = new MerkleTree(leaves, sha256)
       const proof = tree.getProof(leaves[taskIndex])
       const hexproof = proof.map(x => buf2hex(x.data))
@@ -544,14 +556,14 @@ export class Force extends BaseContract {
       if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(6)
-        serialbuff.pushUint8ArrayChecked(leaves[taskIndex], 32)
+        serialbuff.pushUint8ArrayChecked(hex2bytes(CryptoJS.enc.Hex.stringify(leaves[taskIndex])), 32)
         serialbuff.pushUint32(campaignId)
         serialbuff.pushUint32(batchId)
 
         sig = await this.generateSignature(serialbuff)
       }
 
-      const action = {
+      const action = [{
         account: this.config.force_contract,
         name: 'reservetask',
         authorization: [{
@@ -561,19 +573,18 @@ export class Force extends BaseContract {
         data: {
           proof: hexproof,
           position: pos,
-          data: stringToHex(JSON.stringify(tasks[taskIndex])),
+          data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(tasks[taskIndex])),
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
           payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: isBscAddress(user) ? sig.toString() : null
         }
-      }
-
+      }]
       return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
-    }      
+    }
   }
 
   /**
