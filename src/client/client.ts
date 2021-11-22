@@ -41,7 +41,7 @@ export class EffectClient {
         forceMiddleWare.use('createBatch', this.force.isAccountConnected)
         forceMiddleWare.use('reserveTask', this.force.isAccountConnected)
         forceMiddleWare.use('submitTask', this.force.isAccountConnected)
-
+        forceMiddleWare.use('getCampaignJoins', this.force.isAccountConnected)
     }
     /**
      * Connect Account to SDK
