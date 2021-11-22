@@ -15,8 +15,8 @@ const ec = new EC('secp256k1');
 
 /**
  * > “Elinor agreed to it all, for she did not think he deserved the compliment of rational opposition.” ― Jane Austen
- * 
- * The BaseContract class is the base class for Accounts and Force classes. 
+ *
+ * The BaseContract class is the base class for Accounts and Force classes.
  * It's main functionality is to handle the signatures and the connection to the network.
  */
 export class BaseContract {
@@ -29,7 +29,7 @@ export class BaseContract {
   formData: any;
 
   /**
-   * Constructor for the BaseContract class. 
+   * Constructor for the BaseContract class.
    * @param api The EOSIO API
    * @param configuration The configuration object for the client.
    * @param environment The environment to connect to, either 'node' or 'browser'
@@ -72,11 +72,11 @@ export class BaseContract {
   }
 
   /**
-   * 
-   * @param rpc 
-   * @param signatureProvider 
-   * @param web3 
-   * @returns 
+   *
+   * @param rpc
+   * @param signatureProvider
+   * @param web3
+   * @returns
    */
   setSignatureProvider = async (effectAccount: EffectAccount, api: Api, web3: Web3): Promise<void> => {
     if (web3) {
@@ -109,8 +109,8 @@ export class BaseContract {
   }
 
   /**
-   * 
-   * @param serialbuff 
+   *
+   * @param serialbuff
    * @returns signature
    */
   generateSignature = async (serialbuff: Serialize.SerialBuffer): Promise<Signature> => {
@@ -147,55 +147,56 @@ export class BaseContract {
    * @returns content of the ipfs hash in your preferred format
    */
   getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-    try {
-      const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
-      switch (format.toLowerCase()) {
-        case 'formdata':
-        case 'form':
-          return data.text()
-        case 'buffer':
-        case 'arraybuffer':
-        case 'array':
-          return data.arrayBuffer()
-        case 'blob':
-          return data.blob()
-        case 'text':
-          return data.text()
-        case 'json':
-          return data.json()
-      }
-      return data
-    } catch (error) {
-      console.error(error)
+    const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+    switch (format.toLowerCase()) {
+      case 'formdata':
+      case 'form':
+        return data.text()
+      case 'buffer':
+      case 'arraybuffer':
+      case 'array':
+        return data.arrayBuffer()
+      case 'blob':
+        return data.blob()
+      case 'text':
+        return data.text()
+      case 'json':
+        return data.json()
     }
+    return data
   }
 
   /**
-   * 
-   * @param owner 
-   * @param action 
-   * @returns 
+   *
+   * @param owner
+   * @param action
+   * @returns
    */
-  sendTransaction = async function (owner: string, action: object): Promise<any> {
-    if(isBscAddress(owner)) {
-      // post to relayer
-      return this.fetch(this.config.eos_relayer_url + '/transaction', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(action)
-      }).then(response=>response.json())
-      .then(data=>{ return JSON.parse(data) })
-   } else {
-     return await this.api.transact({
-       actions: [action]
-     }, {
-       blocksBehind: 3,
-       expireSeconds: 30,
-     });
-   }
- }
+  sendTransaction = async function (owner: string, action: object | object[]): Promise<any> {
+    let actions = [].concat(action)
+    try {
+      if (isBscAddress(owner)) {
+        // post to relayer
+        return this.fetch(this.config.eos_relayer_url + '/transaction', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(actions)
+        }).then(response=>response.json())
+        .then(data=>{ return JSON.parse(data) })
+     } else {
+       return await this.api.transact({
+         actions
+       }, {
+         blocksBehind: 3,
+         expireSeconds: 30,
+       });
+     }
 
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 }

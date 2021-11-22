@@ -108,10 +108,15 @@ export interface EffectClientConfig {
     */
    eos_relayer_permission: string
 
-     /**
-      * Relayer url
-      */
-     eos_relayer_url: string
+   /**
+    * Relayer url
+    */
+   eos_relayer_url: string
+
+
+  /**
+   * The Vaccount ID of the Force EOS account
+   */
+  force_vaccount_id
 
 }
-
