@@ -177,16 +177,15 @@ export class BaseContract {
 
   /**
    * 
-   * @param tx
-   * @param irreversible
-   * @param maxTimeout
+   * @param tx 
+   * @param irreversible 
+   * @returns 
    */
-  waitTransaction = async function (tx: string, irreversible?: boolean, maxTimeout?: number): Promise<Transaction> {
+  waitTransaction = async function (tx: string, irreversible?: boolean): Promise<Transaction> {
     let transaction
     await retry(async () => {
-      console.log('history_get_transaction', tx)
-      transaction = await this.api.rpc.get_block(198442740)
-      if (!transaction || irreversible && !transaction.confirmed) {
+      transaction = await this.api.rpc.history_get_transaction(tx)
+      if (!transaction || irreversible && !transaction.irreversible || !transaction.block_num || transaction.trx.receipt.status !== 'executed') {
         throw new Error('Transaction not ready yet')
       }
     }, {
@@ -195,7 +194,7 @@ export class BaseContract {
           console.log('attempt', number, error)
         }
     })
-    return transaction.transactions
+    return transaction
   }
   
   /*
