@@ -1,6 +1,6 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize } from 'eosjs';
+import { Api, Serialize, Numeric } from 'eosjs';
 import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
@@ -18,9 +18,9 @@ import { Batch } from '../types/batch';
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
- * It is used for campaign creation, publishing and related campaign functions. 
+ * It is used for campaign creation, publishing and related campaign functions.
  * These are the main methods that are needed in order to interact with Effect Network.
- * 
+ *
  */
 export class Force extends BaseContract {
   constructor(api: Api, configuration: EffectClientConfig) {
@@ -96,7 +96,7 @@ export class Force extends BaseContract {
 
     let campaign = (await this.api.rpc.get_table_rows(config)).rows[0]
     if (processCampaign) {
-      campaign = await this.processCampaign(campaign)  
+      campaign = await this.processCampaign(campaign)
     }
 
     return campaign
@@ -380,28 +380,77 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      const action = {
+      // TODO: below code copied from vaccount module, can we just call that code?
+      let vaccSig: Signature;
+      // TOOD: updatevAccountRows below gives a "Maximum call stacksize exceeded". Why?
+      // await this.updatevAccountRows()
+      const amount = convertToAsset("50")
+      const fromAccount = this.effectAccount.accountName
+      const toAccountId = this.config.force_vaccount_id
+      const fromAccountId = this.effectAccount.vAccountRows[0].id
+      const nonce = this.effectAccount.vAccountRows[0].nonce
+      if (isBscAddress(fromAccount)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(1)
+        serialbuff.pushUint32(nonce)
+        serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
+        serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
+        serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
+        serialbuff.pushName(this.config.efx_token_account)
+
+        vaccSig = await this.generateSignature(serialbuff)
+      }
+
+      let batchPk = getCompositeKey(batchId, campaignId)
+
+      const authorization = [{
+        actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+        permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+      }]
+
+      const actions = [{
         account: this.config.force_contract,
         name: 'mkbatch',
-        authorization: [{
-          actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-          permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-        }],
+        authorization,
         data: {
           id: batchId,
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
           task_merkle_root: merkleRoot,
-          num_tasks: content.tasks.length,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
-      }
+      }, {
+        account: this.config.account_contract,
+        name: 'vtransfer',
+        authorization,
+        data: {
+          from_id: fromAccountId,
+          to_id: toAccountId,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account,
+          },
+          sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
+          fee: null,
+          memo: batchPk
+        },
+      }, {
+        account: this.config.force_contract,
+        name: 'publishbatch',
+        authorization,
+        data: {
+          account_id: this.effectAccount.vAccountRows[0].id,
+          batch_id: batchPk,
+          num_tasks: content.tasks.length,
+          sig: null
+        },
+      }]
 
-      return await this.sendTransaction(campaignOwner, action);
+      return await this.sendTransaction(campaignOwner, actions);
     } catch (err) {
       throw new Error(err)
-    }  
+    }
   }
 
   /**
