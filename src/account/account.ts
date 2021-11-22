@@ -10,13 +10,13 @@ import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rp
 import { Signature } from 'eosjs/dist/Signature';
 
 /**
- * > “And he read Principles of Accounting all morning, but just to make it interesting, he put lots of dragons in it.” ― Terry Pratchett, Wintersmith 
+ * > “And he read Principles of Accounting all morning, but just to make it interesting, he put lots of dragons in it.” ― Terry Pratchett, Wintersmith
  *
  * This class is used to interact with the virtual account system of Effect Network.
  * The virtual account system is a system that allows you to create virtual accounts on the blockchain.
- * This allows users to login with both their EOS and BSC addresses. 
+ * This allows users to login with both their EOS and BSC addresses.
  * Then have one unififying interface from which transactions can be signed from the wallet of the user.
- * 
+ *
  */
 export class Account extends BaseContract {
   pub: string;
@@ -265,6 +265,7 @@ export class Account extends BaseContract {
             quantity: amount + ' ' + this.config.efx_symbol,
             contract: this.config.efx_token_account
           },
+          memo: "",
           sig: isBscAddress(fromAccount) ? sig.toString() : null,
           fee: null
         },

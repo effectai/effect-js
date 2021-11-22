@@ -1,6 +1,6 @@
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { Api, Serialize } from 'eosjs';
+import { Api, Serialize, Numeric } from 'eosjs';
 import { GetTableRowsResult, PushTransactionArgs, ReadOnlyTransactResult } from "eosjs/dist/eosjs-rpc-interfaces";
 import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
@@ -18,9 +18,9 @@ import { Batch } from '../types/batch';
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
- * It is used for campaign creation, publishing and related campaign functions. 
+ * It is used for campaign creation, publishing and related campaign functions.
  * These are the main methods that are needed in order to interact with Effect Network.
- * 
+ *
  */
 export class Force extends BaseContract {
   constructor(api: Api, configuration: EffectClientConfig) {
@@ -52,9 +52,10 @@ export class Force extends BaseContract {
    * Get Force Campaigns
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
+   * @param processCampaign - get campaign content from ipfs
    * @returns - Campaign Table Rows Result
    */
-  getCampaigns = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+  getCampaigns = async (nextKey, limit = 20, processCampaign: boolean = true): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -65,22 +66,25 @@ export class Force extends BaseContract {
     if (nextKey) {
       config.lower_bound = nextKey
     }
-    const data = await this.api.rpc.get_table_rows(config)
-  
-    // Get Campaign Info.
-    for (let i = 0; i < data.rows.length; i++) {
-      data.rows[i] = await this.processCampaign(data.rows[i])
+    const campaigns = await this.api.rpc.get_table_rows(config)
+
+    if (processCampaign) {
+      // Get Campaign Info.
+      for (let i = 0; i < campaigns.rows.length; i++) {
+        campaigns.rows[i] = await this.processCampaign(campaigns.rows[i])
+      }
     }
 
-    return data;
+    return campaigns;
   }
 
   /**
    * Get Campaign
    * @param id - id of campaign
+   * @param processCampaign - get campaign content from ipfs
    * @returns Campaign
    */
-  getCampaign = async (id: number): Promise<Campaign> => {
+  getCampaign = async (id: number, processCampaign: boolean = true): Promise<Campaign> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -90,10 +94,48 @@ export class Force extends BaseContract {
       upper_bound: id,
     }
 
-    const campaignRow = await this.api.rpc.get_table_rows(config)
-    const campaign = await this.processCampaign(campaignRow.rows[0])
+    let campaign = (await this.api.rpc.get_table_rows(config)).rows[0]
+    if (processCampaign) {
+      campaign = await this.processCampaign(campaign)
+    }
 
     return campaign
+  }
+
+  /**
+   * Get Last Campaign of connected account
+   * @param processCampaign - get campaign content from ipfs
+   * @returns Campaign
+   */
+  getMyLastCampaign = async (processCampaign: boolean = true): Promise<Campaign> => {
+    try {
+      const config = {
+        code: this.config.force_contract,
+        scope: this.config.force_contract,
+        table: 'campaign',
+        key_type: 'i64',
+        limit: 20,
+        reverse: true
+      }
+
+      const campaigns = await this.api.rpc.get_table_rows(config)
+
+      let campaign: Campaign
+      for (let c of campaigns.rows) {
+        if (this.effectAccount.accountName === c.owner[1]) {
+          campaign = c
+          break;
+        }
+      }
+
+      if (processCampaign) {
+        campaign = await this.processCampaign(campaign)
+      }
+
+      return campaign
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 
   /**
@@ -110,6 +152,7 @@ export class Force extends BaseContract {
         campaign.info = await this.getIpfsContent(campaign.content.field_1)
       }
     } catch (e) {
+      campaign.info = null
       console.error('processCampaign', e)
     }
     return campaign
@@ -277,7 +320,7 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    try { 
+    try {
       const stringify = JSON.stringify(campaignIpfs)
       const blob = new this.blob([stringify], { type: 'text/json' })
       const formData = new this.formData()
@@ -338,28 +381,77 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      const action = {
+      // TODO: below code copied from vaccount module, can we just call that code?
+      let vaccSig: Signature;
+      // TOOD: updatevAccountRows below gives a "Maximum call stacksize exceeded". Why?
+      // await this.updatevAccountRows()
+      const amount = convertToAsset("50")
+      const fromAccount = this.effectAccount.accountName
+      const toAccountId = this.config.force_vaccount_id
+      const fromAccountId = this.effectAccount.vAccountRows[0].id
+      const nonce = this.effectAccount.vAccountRows[0].nonce
+      if (isBscAddress(fromAccount)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(1)
+        serialbuff.pushUint32(nonce)
+        serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
+        serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
+        serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
+        serialbuff.pushName(this.config.efx_token_account)
+
+        vaccSig = await this.generateSignature(serialbuff)
+      }
+
+      let batchPk = getCompositeKey(batchId, campaignId)
+
+      const authorization = [{
+        actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+        permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+      }]
+
+      const actions = [{
         account: this.config.force_contract,
         name: 'mkbatch',
-        authorization: [{
-          actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-          permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
-        }],
+        authorization,
         data: {
           id: batchId,
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
           task_merkle_root: merkleRoot,
-          num_tasks: content.tasks.length,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
-      }
+      }, {
+        account: this.config.account_contract,
+        name: 'vtransfer',
+        authorization,
+        data: {
+          from_id: fromAccountId,
+          to_id: toAccountId,
+          quantity: {
+            quantity: amount + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account,
+          },
+          sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
+          fee: null,
+          memo: batchPk
+        },
+      }, {
+        account: this.config.force_contract,
+        name: 'publishbatch',
+        authorization,
+        data: {
+          account_id: this.effectAccount.vAccountRows[0].id,
+          batch_id: batchPk,
+          num_tasks: content.tasks.length,
+          sig: null
+        },
+      }]
 
-      return await this.sendTransaction(campaignOwner, action);
+      return await this.sendTransaction(campaignOwner, actions);
     } catch (err) {
       throw new Error(err)
-    }  
+    }
   }
 
   /**
@@ -402,7 +494,7 @@ export class Force extends BaseContract {
         payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
         sig: isBscAddress(owner) ? sig.toString() : null,
       }
-      
+
       return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
@@ -482,7 +574,7 @@ export class Force extends BaseContract {
       return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
-    }      
+    }
   }
 
   /**
