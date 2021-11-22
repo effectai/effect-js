@@ -117,9 +117,9 @@ export class Force extends BaseContract {
         limit: 20,
         reverse: true
       }
-     
+
       const campaigns = await this.api.rpc.get_table_rows(config)
-  
+
       let campaign: Campaign
       for (let c of campaigns.rows) {
         if (this.effectAccount.accountName === c.owner[1]) {
@@ -129,9 +129,9 @@ export class Force extends BaseContract {
       }
 
       if (processCampaign) {
-        campaign = await this.processCampaign(campaign)  
+        campaign = await this.processCampaign(campaign)
       }
-  
+
       return campaign
     } catch (error) {
       throw new Error(error)
@@ -152,6 +152,7 @@ export class Force extends BaseContract {
         campaign.info = await this.getIpfsContent(campaign.content.field_1)
       }
     } catch (e) {
+      campaign.info = null
       console.error('processCampaign', e)
     }
     return campaign
@@ -319,7 +320,7 @@ export class Force extends BaseContract {
    * @returns 
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
-    try { 
+    try {
       const stringify = JSON.stringify(campaignIpfs)
       const blob = new this.blob([stringify], { type: 'text/json' })
       const formData = new this.formData()
@@ -493,7 +494,7 @@ export class Force extends BaseContract {
         payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
         sig: isBscAddress(owner) ? sig.toString() : null,
       }
-      
+
       return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
@@ -573,7 +574,7 @@ export class Force extends BaseContract {
       return await this.sendTransaction(user, action);
     } catch (error) {
       throw new Error(error);
-    }      
+    }
   }
 
   /**
