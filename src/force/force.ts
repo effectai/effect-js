@@ -444,7 +444,7 @@ export class Force extends BaseContract {
           account_id: this.effectAccount.vAccountRows[0].id,
           batch_id: batchPk,
           num_tasks: content.tasks.length,
-          sig: null
+          sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
         },
       }]
 
