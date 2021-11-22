@@ -32,7 +32,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
             eos_relayer: config.eos_relayer ?? "pixeos1gswap",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001"
+            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001",
+            force_vaccount_id: config.force_vaccount_id
         }
     } else if (environment === 'testnet' || environment === 'kylin' || environment === 'test') {
         return {
@@ -46,12 +47,13 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             authUrl: config.authUrl ?? '',
             ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
             force_contract: config.force_contract ?? "forceonkyli2",
+            force_vaccount_id: config.force_vaccount_id ?? 163,
             account_contract: config.account_contract ?? 'acckylin1111',
             efx_token_account: config.efx_token_account ?? "tokenonkylin",
             efx_symbol: config.efx_symbol ?? "UTL",
             efx_precision: config.efx_precision ?? 4,
             efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
-            eos_relayer: config.eos_relayer ?? "jabbarndcn22",
+            eos_relayer: config.eos_relayer ?? "kylinrelayer",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
             eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app"
         }
