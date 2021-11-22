@@ -18,8 +18,6 @@ const main = async () => {
 
     console.log('effectAccount', effectAccount)
 
-    console.log(await sdk.force.waitTransaction('875ed3a0880122a1d06826c088566f603d2009bae32fe6ef6492dc2992443349'))
-
     const campaignToIpfs = {
         title: 'Random Title',
         description: 'Networked well-modulated instruction set',
@@ -37,6 +35,13 @@ const main = async () => {
         reward: 1
     }
 
+    // Create campaign.
+    // campaign object, reward
+    const makeCampaign = await sdk.force.makeCampaign(campaignToIpfs, '11')
+    console.log('makeCampaign', makeCampaign)
+
+    await sdk.force.waitTransaction(makeCampaign.transaction_id)
+
     // Get last created campaign by connected user
     const campaign = await sdk.force.getMyLastCampaign()
     console.log('Campaign', campaign)
@@ -44,10 +49,6 @@ const main = async () => {
     // Get Campaign Batches.
     const batches = await sdk.force.getCampaignBatches(campaign.id)
     console.log(`Batches for campaign ${campaign.id}`, batches)
-
-    // Get Campaign Batches.
-    const batches = await sdk.force.getCampaignBatches(campaignId)
-    console.log(`Batches for campaign ${campaignId}`, batches)
 
     const content = {
         'tasks': [
