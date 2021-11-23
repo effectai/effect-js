@@ -197,29 +197,37 @@ export class BaseContract {
    */
   sendTransaction = async function (owner: string, action: object | object[]): Promise<any> {
     let actions = [].concat(action)
-    try {
-      if (isBscAddress(owner)) {
-        // post to relayer
-        return this.fetch(this.config.eos_relayer_url + '/transaction', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(actions)
-        }).then(response=>response.json())
-        .then(data=>{ return JSON.parse(data) })
-     } else {
-       return await this.api.transact({
-         actions
-       }, {
-         blocksBehind: 3,
-         expireSeconds: 30,
-       });
-     }
-
-    } catch (error) {
-      throw new Error(error)
+    if (isBscAddress(owner)) {
+      // post to relayer
+      return await this.fetch(this.config.eos_relayer_url + '/transaction', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(actions)
+      }).then(response => {
+        if (response.status === 200) {
+          return response.json()
+        } else {
+          return Promise.reject(response);
+        }
+      })
+      .then(data => { return JSON.parse(data) })
+      .catch((response)=>{
+        return response.json().then((err: any) => {
+          return Promise.reject(err)
+        })
+      })
+    } else {
+      return await this.api.transact({
+        actions
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      }).catch((err)=>{
+        return Promise.reject(err)
+      });
     }
   }
 }
