@@ -74,7 +74,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_token_account: config.efx_token_account ?? "efxtoken1112",
             efx_symbol: config.efx_symbol ?? "EFX",
             efx_precision: config.efx_precision ?? 4,
-            efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
+            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
             eos_relayer: config.eos_relayer ?? "efxrelayer11",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
             eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app"
