@@ -41,7 +41,7 @@ export class EffectClient {
         forceMiddleWare.use('createBatch', this.force.isAccountConnected)
         forceMiddleWare.use('reserveTask', this.force.isAccountConnected)
         forceMiddleWare.use('submitTask', this.force.isAccountConnected)
-
+        forceMiddleWare.use('getCampaignJoins', this.force.isAccountConnected)
     }
     /**
      * Connect Account to SDK
@@ -84,7 +84,7 @@ export class EffectClient {
 
             // if account doesnt exists: openAccount
             if (!this.effectAccount.vAccountRows || !this.effectAccount.vAccountRows.length) {
-                const openedAccount = await this.account.openAccount(this.effectAccount.accountName)
+                const openedAccount = await this.account.openAccount(this.effectAccount.accountName, this.effectAccount.permission)
                 console.log('Opened account:', openedAccount);
 
                 await retry(async () => {

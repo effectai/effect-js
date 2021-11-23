@@ -8,6 +8,8 @@ import { Signature } from 'eosjs/dist/eosjs-key-conversions';
 import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
+import retry from 'async-retry'
+import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { isBscAddress } from '../utils/bscAddress'
 
 const EC = require('elliptic').ec;
@@ -167,7 +169,28 @@ export class BaseContract {
   }
 
   /**
-   *
+   * 
+   * @param tx 
+   * @param irreversible 
+   * @returns 
+   */
+  waitTransaction = async function (tx: string, irreversible?: boolean): Promise<Transaction> {
+    let transaction
+    await retry(async () => {
+      transaction = await this.api.rpc.history_get_transaction(tx)
+      if (!transaction || irreversible && !transaction.irreversible || !transaction.block_num || transaction.trx.receipt.status !== 'executed') {
+        throw new Error('Transaction not ready yet')
+      }
+    }, {
+        retries: 10,
+        onRetry: (error, number) => {
+          console.log('attempt', number, error)
+        }
+    })
+    return transaction
+  }
+  
+  /*
    * @param owner
    * @param action
    * @returns
