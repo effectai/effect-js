@@ -454,7 +454,8 @@ export class Force extends BaseContract {
         data: {
           account_id: this.effectAccount.vAccountRows[0].id,
           batch_id: batchPk,
-          num_tasks: content.tasks.length
+          num_tasks: content.tasks.length,
+          sig: null
         },
       }]
 
@@ -502,7 +503,7 @@ export class Force extends BaseContract {
           sig: isBscAddress(owner) ? sig.toString() : null
         }
       }
-      
+
       return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
