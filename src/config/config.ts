@@ -39,6 +39,28 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
         return {
             network: config.network ?? "kylin",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
+            host: config.host ?? 'https://api.kylin.alohaeos.com',
+            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            apiKey: config.apiKey ?? '',
+            secure: config.secure ?? false,
+            authentication: config.authentication ?? false,
+            authUrl: config.authUrl ?? '',
+            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
+            force_contract: config.force_contract ?? "forceonkyli2",
+            force_vaccount_id: config.force_vaccount_id ?? 163,
+            account_contract: config.account_contract ?? 'acckylin1111',
+            efx_token_account: config.efx_token_account ?? "tokenonkylin",
+            efx_symbol: config.efx_symbol ?? "UTL",
+            efx_precision: config.efx_precision ?? 4,
+            efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
+            eos_relayer: config.eos_relayer ?? "kylinrelayer",
+            eos_relayer_permission: config.eos_relayer_permission ?? "active",
+            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app"
+        }
+    } else if (environment === 'jungle' || environment === 'jungle3') {
+        return {
+            network: config.network ?? "jungle",
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
             host: config.host ?? 'https://jungle3.greymass.com',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
@@ -50,7 +72,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             force_vaccount_id: config.force_vaccount_id ?? 163,
             account_contract: config.account_contract ?? 'efxaccount11',
             efx_token_account: config.efx_token_account ?? "efxtoken1111",
-            efx_symbol: config.efx_symbol ?? "UTL",
+            efx_symbol: config.efx_symbol ?? "EFX",
             efx_precision: config.efx_precision ?? 4,
             efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
             eos_relayer: config.eos_relayer ?? "efxrelayer11",
