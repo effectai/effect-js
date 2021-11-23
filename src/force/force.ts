@@ -525,6 +525,7 @@ export class Force extends BaseContract {
       if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(10)
+        serialbuff.pushUint32(campaignId)
         serialbuff.push(0)
         serialbuff.pushString(hash)
 
