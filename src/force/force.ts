@@ -6,7 +6,7 @@ import { MerkleTree } from 'merkletreejs';
 import SHA256 from 'crypto-js/sha256';
 import CryptoJS from 'crypto-js/core';
 import { isBscAddress } from '../utils/bscAddress'
-import { convertToAsset } from '../utils/asset'
+import { convertToAsset, parseAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
 import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
@@ -277,7 +277,7 @@ export class Force extends BaseContract {
 
   /**
    * Join a force Campaign.
-   * @param campaignId 
+   * @param campaignId
    * @returns transaction result
    */
   joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
@@ -316,8 +316,8 @@ export class Force extends BaseContract {
 
   /**
    * Upload campaign data to ipfs
-   * @param campaignIpfs 
-   * @returns 
+   * @param campaignIpfs
+   * @returns
    */
   uploadCampaign = async (campaignIpfs: object): Promise<string> => {
     try {
@@ -388,11 +388,15 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
+      const campaign = await this.getCampaign(campaignId)
+      const [reward, symbol] = parseAsset(campaign.reward.quantity)
+      const batchPrice = reward * content.tasks.length * repetitions
+
       // TODO: below code copied from vaccount module, can we just call that code?
       let vaccSig: Signature;
       // TOOD: updatevAccountRows below gives a "Maximum call stacksize exceeded". Why?
       // await this.updatevAccountRows()
-      const amount = convertToAsset("50")
+      const amount = convertToAsset(batchPrice.toString())
       const fromAccount = this.effectAccount.accountName
       const toAccountId = this.config.force_vaccount_id
       const fromAccountId = this.effectAccount.vAccountRows[0].id
@@ -450,8 +454,7 @@ export class Force extends BaseContract {
         data: {
           account_id: this.effectAccount.vAccountRows[0].id,
           batch_id: batchPk,
-          num_tasks: content.tasks.length,
-          sig: null
+          num_tasks: content.tasks.length
         },
       }]
 

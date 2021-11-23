@@ -5,6 +5,9 @@ export interface Campaign {
     field_0: number;
     field_1: string;
   };
-  reward: object;
+  reward: {
+    quantity: string;
+    contract: string;
+  };
   info?: object
 }
