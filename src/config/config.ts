@@ -71,7 +71,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             force_contract: config.force_contract ?? "efxforce1111",
             force_vaccount_id: config.force_vaccount_id ?? 163,
             account_contract: config.account_contract ?? 'efxaccount11',
-            efx_token_account: config.efx_token_account ?? "efxtoken1111",
+            efx_token_account: config.efx_token_account ?? "efxtoken1112",
             efx_symbol: config.efx_symbol ?? "EFX",
             efx_precision: config.efx_precision ?? 4,
             efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
