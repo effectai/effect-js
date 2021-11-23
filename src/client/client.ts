@@ -86,16 +86,9 @@ export class EffectClient {
             if (!this.effectAccount.vAccountRows || !this.effectAccount.vAccountRows.length) {
                 const openedAccount = await this.account.openAccount(this.effectAccount.accountName, this.effectAccount.permission)
                 console.log('Opened account:', openedAccount);
-
-                await retry(async () => {
-                    console.log('getVAccountByName after openAccount')
-                    this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
-                }, {
-                    retries: 5,
-                    onRetry: (error, number) => {
-                        console.log('attempt', number, error)
-                    }
-                })
+                // @ts-ignore
+                await this.force.waitTransaction(openedAccount.transaction_id)
+                this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
             }
             return this.effectAccount
         } catch (error) {
