@@ -39,14 +39,18 @@ const main = async () => {
       title: 'Random Title',
       description: 'Networked well-modulated instruction set',
       instructions: `American whole magazine truth stop whose.`,
-      template: `<div id="task">
-                  <image src='` + '${image_url}' + `'></image>
-                  <h2>Image Classification</h2>
-                  <option submit name="button-answer" type="button" 
-                    :options="['Cat','Dog','Mechanical Turk','Other']" 
-                    label="What do you see in the picture above?">
-                  </option>
-                </div>`,
+      template: `<div>
+                <image src='` + '${image_url}' + `'></image>
+                <h2>What do you see in the picture above? 🐸</h2>
+                <input type='radio' name='radio-answer' id="original" label=''>Stars 🤩</input><br>
+                <input type='radio' name='radio-answer' id="original" label=''>Mechanical Turk 😏</input><br>
+                <input type='radio' name='radio-answer' id="original" label=''>Dog 🤐</input> <br>
+                <input type='radio' name='radio-answer' id="original" label=''>Cat 😵</input><br>
+                <hr>
+                <button type="submit">Submit</button> 
+              </div>
+              <script></script>
+              <style></style>`,      
       image: 'https://ipfs.effect.ai/ipfs/bafkreiggnttdaxleeii6cdt23i4e24pfcvzyrndf5kzfbqgf3fxjryj5s4',
       category: 'Image Labeling',
       example_task: {'image_url': 'https://ipfs.effect.ai/ipfs/bafkreidrxwhqsxa22uyjamz7qq3lh7pv2eg3ykodju6n7cgprmjpal2oga'},
