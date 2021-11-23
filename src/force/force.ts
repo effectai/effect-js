@@ -500,9 +500,54 @@ export class Force extends BaseContract {
           },
           payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
           sig: isBscAddress(owner) ? sig.toString() : null
-        },
-        payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
-        sig: isBscAddress(owner) ? sig.toString() : null,
+        }
+      }
+      
+      return await this.sendTransaction(owner, action)
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * updates a force Campaign.
+   * @param campaignId existing campaign ID
+   * @param hash campaign data on IPFS
+   * @param quantity the amount of tokens rewarded
+   * @returns transaction result
+   */
+   editCampaign = async (campaignId: number, hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(10)
+        serialbuff.push(0)
+        serialbuff.pushString(hash)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = {
+        account: this.config.force_contract,
+        name: 'editcampaign',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          campaign_id: campaignId,
+          owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+          content: { field_0: 0, field_1: hash },
+          reward: {
+            quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
+            contract: this.config.efx_token_account
+          },
+          payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
       }
 
       return await this.sendTransaction(owner, action)
