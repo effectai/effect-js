@@ -1,4 +1,7 @@
-# effect-js 🔥🔥🔥
+<p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
+
+
+# 🔥 effect-js 
 
 Javascript SDK for integration with [https://effect.network](https://effect.network)  
 You can take a look at our docs at the following link: [Docs](https://effectai.github.io/developer-docs/)  
@@ -6,13 +9,13 @@ The SDK reference is available here: [SDK-Reference](https://effectai.github.io/
 
 # ✒️ Installation
 
-The official distribution for the package can is available at npm. [npm](https://www.npmjs.com/package/effect-js)
+The official distribution for the package can is available at [npm](https://www.npmjs.com/package/effect-js).
 
-```
+```bash
 npm i @effectai/effect-js
 ```
 
-# Quick start
+# 🏎 Quick start
 ```javascript
 //Require, import also available
 const effectsdk = require('@effectai/effect-js');
@@ -66,38 +69,38 @@ main()
 
 ```
 
-# Development
+# 🦋 Development
 The best way to get to know how this module works is by adding features while you can run it. So there are some examples provided to provide an idea of how to create a transaction with the Effect Network.
 
 Clone the project
-```
+```bash
 git clone git@github.com:dfuse-io/client-js.git
 ```
 Install dependencies and dev-dependencies
-```
+```bash
 npm install
 ```
 It is now possible to start compiling the typescript files to the module spec of your choice, for now, the following module spec's are supported: [ESM, CommonJS, UMD]
-```
+```bash
 npm run build:cjs # commonjs
 npm run build:esm # esm
 npm run build:umd # umd
 ```
 Link it. Now it is possible to use `npm link` in order to link the compiled typescript code to your own project, from the directory of your project, run the following command.
-```
+```bash
 npm link /path/to/effect-js/
 ```
 From your project folder, you should be able to import the compiled code from `effect-js`. Depending on your environment, use `import` or `require` as needed.
 
-# Publishing
+# 🗞 Publishing
 Run the following command to build the source, increment the version, and publish the `dist` transpiled code and types to the npm repository, assuming you have the correct credentials.
 
 Make sure the git is clean, and everything has been committed, and run the following.
-```
+```bash
 npm run publish:public
 ```
 Running `publish:next` will publish a pre-release of the sdk to the npm repository. Users will need to explicitly opt-in in order to use it.
-```
+```bash
 npm run publish:next
 ```
 
