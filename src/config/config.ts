@@ -60,7 +60,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
     } else if (environment === 'jungle' || environment === 'jungle3') {
         return {
             network: config.network ?? "jungle",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KiS67ujRiD8JSocMDd8JgqurPs5tpPjiezKtM6Jb3z8oTWULWd']),
             host: config.host ?? 'https://jungle3.greymass.com',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
