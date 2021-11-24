@@ -69,7 +69,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             authUrl: config.authUrl ?? '',
             ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
             force_contract: config.force_contract ?? "efxforce1111",
-            force_vaccount_id: config.force_vaccount_id ?? 163,
+            force_vaccount_id: config.force_vaccount_id ?? 66,
             account_contract: config.account_contract ?? 'efxaccount11',
             efx_token_account: config.efx_token_account ?? "efxtoken1112",
             efx_symbol: config.efx_symbol ?? "EFX",
