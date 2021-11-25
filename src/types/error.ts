@@ -30,3 +30,11 @@ export class EffectApiError extends EffectError implements ErrorData {
         this.trace_id = data.trace_id
     }
 }
+
+export class HistoryNotSupportedError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "HistoryNotSupportedError";
+        Object.setPrototypeOf(this, HistoryNotSupportedError.prototype);
+    }
+}

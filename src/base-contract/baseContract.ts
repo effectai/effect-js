@@ -11,6 +11,8 @@ import BN from 'bn.js';
 import retry from 'async-retry'
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { isBscAddress } from '../utils/bscAddress'
+import { HistoryNotSupportedError } from '../types/error';
+import wait from 'wait';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -169,24 +171,42 @@ export class BaseContract {
   }
 
   /**
-   * 
+   * Wait for transaction on blockchain to complete
    * @param tx 
    * @param irreversible 
    * @returns 
    */
   waitTransaction = async function (tx: string, irreversible?: boolean): Promise<Transaction> {
     let transaction
-    await retry(async () => {
-      transaction = await this.api.rpc.history_get_transaction(tx)
-      if (!transaction || irreversible && !transaction.irreversible || !transaction.block_num || transaction.trx.receipt.status !== 'executed') {
-        throw new Error('Transaction not ready yet')
+    try {
+      await retry(async (bail) => {
+        console.log('Waiting for transaction...')
+        transaction = await this.api.rpc.history_get_transaction(tx).then((transaction) => {
+          if (!transaction || irreversible && !transaction.irreversible || !transaction.block_num || transaction.trx.receipt.status !== 'executed') {
+            throw new Error('Transaction not ready yet')
+          }
+        }).catch((err) => {
+          // bail if status code is 404. bail if there's another error which is not 'not found'. 
+          // retry on 'not found'
+          if (err.json.code === 404) {
+            bail(new HistoryNotSupportedError("This node doesn't support history of transactions"))
+            return
+          } else if(err.json.error !== 'not found') {
+            bail(new Error(err))
+            return
+          }
+          throw new Error(err.json.error)
+        })
+      }, {
+          retries: 10
+      })
+    } catch (err) {
+      if (err instanceof HistoryNotSupportedError) {
+        console.error(err)
+        // if history is not supported (e.g), wait 3 seconds for transaction to complete
+        await wait(3000);
       }
-    }, {
-        retries: 10,
-        onRetry: (error, number) => {
-          console.log('attempt', number, error)
-        }
-    })
+    }
     return transaction
   }
   
