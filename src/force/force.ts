@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs';
@@ -15,6 +16,7 @@ import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
+
 
 
 /**
@@ -376,6 +378,10 @@ export class Force extends BaseContract {
       const batches = await this.getCampaignBatches(campaignId);
       if (batches.length) {
         batchId = parseInt(Math.max.apply(Math, batches.map(function(b) { return b.id; }))) + 1
+      }
+
+      for (let i in content.tasks) {
+        content.tasks[i].link_id = uuidv4();
       }
 
       const hash = await this.uploadCampaign(content)
