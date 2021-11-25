@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { BaseContract } from './../base-contract/baseContract';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs';
@@ -15,6 +16,7 @@ import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
+
 
 
 /**
@@ -371,6 +373,10 @@ export class Force extends BaseContract {
   createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
+
+      for (let i in content.tasks) {
+        content.tasks[i].link_id = uuidv4();
+      }
 
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
