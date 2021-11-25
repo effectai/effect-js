@@ -203,7 +203,7 @@ export class BaseContract {
     } catch (err) {
       if (err instanceof HistoryNotSupportedError) {
         console.error(err)
-        // if history is not supported (e.g), wait 3 seconds for transaction to complete
+        // if history is not supported, force to wait 3 seconds to give the transaction to complete
         await wait(3000);
       }
     }

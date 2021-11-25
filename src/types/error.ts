@@ -30,7 +30,9 @@ export class EffectApiError extends EffectError implements ErrorData {
         this.trace_id = data.trace_id
     }
 }
-
+/**
+ * Error to throw when the used node doesn't support history of transactions.
+ */
 export class HistoryNotSupportedError extends Error {
     constructor(message) {
         super(message);
