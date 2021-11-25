@@ -368,9 +368,15 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, batchId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
+      let batchId: number = 0
+
+      const batches = await this.getCampaignBatches(campaignId);
+      if (batches.length) {
+        batchId = parseInt(Math.max.apply(Math, batches.map(function(b) { return b.id; }))) + 1
+      }
 
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
