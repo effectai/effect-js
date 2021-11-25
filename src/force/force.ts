@@ -699,10 +699,12 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  getTaskIndexFromLeaf = async function (leafHash: string, tasks: Array<Task>): Promise<number> {
+  getTaskIndexFromLeaf = async function (campaignId: number, batchId:number, leafHash: string, tasks: Array<Task>): Promise<number> {
+    const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
+    const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
 
-    const leaves = tasks.map(x => sha256(JSON.stringify(x)))
+    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
     let taskIndex: number;
