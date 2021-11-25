@@ -62,7 +62,7 @@ const main = async () => {
         const repetitions = 1
         // Create batch for campaign.
         // same here as for campaign, id of batch needs to be returned
-        const batch = await sdk.force.createBatch(campaign.id, batches.length, content, repetitions)
+        const batch = await sdk.force.createBatch(campaign.id, content, repetitions)
         console.log('createBatch', batch)
 
         // Get task submissions of batch.

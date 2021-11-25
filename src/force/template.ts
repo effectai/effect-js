@@ -71,6 +71,6 @@ export class Template {
     }
 
     private wrapForm() {
-        this.rendered = `<meta charset="UTF-8" /><form id="FORCE_FORM">${this.rendered}</form>`;
+        this.rendered = `<meta charset="UTF-8" /><style>html {overflow-y: auto !important;}</style><form id="FORCE_FORM">${this.rendered}</form>`;
     }
 }
