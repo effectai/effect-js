@@ -4,7 +4,20 @@
 # 🔥 effect-js 
 
 Javascript SDK for integration with [https://effect.network](https://effect.network)  
-You can take a look at our docs at the following link: [Docs](https://effectai.github.io/developer-docs/)  
+
+
+# Hackathon
+Join the hackathon and get your first effect-js project running!
+[Join at DevPost](https://effect-network-hackathon.devpost.com/)
+
+# Boilerplate Demo
+A demo of the browser boilerplate can be found at the following link:
+[Hackathon Browser BoilerPlate Demo](https://effectai.github.io/hackathon-boilerplate/)
+
+# Quickstart
+Take a look at the [quickstart guide](https://developer.effect.network/quickstart/) in order to understand how to install and use the library.
+
+# SDK-Reference
 The SDK reference is available here: [SDK-Reference](https://effectai.github.io/effect-js/)  
 
 # ✒️ Installation
@@ -16,6 +29,8 @@ npm i @effectai/effect-js
 ```
 
 # 🏎 Quick start
+Simple example of how to use the library in order to create a wallet and publish a campaign on the platform. 
+
 ```javascript
 //Require, import also available
 const effectsdk = require('@effectai/effect-js');
@@ -24,7 +39,7 @@ const client = new effectsdk.EffectClient('testnet')
 // Instantiating bsc account.
 const account = effectsdk.createAccount(
     // leave empty to generate new private key, or use existing private
-    '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
+    'YourVeryPrivateKeyHere'
 )
 
 // Generate web3 instance from account with private key.
