@@ -13,6 +13,8 @@ import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { isBscAddress } from '../utils/bscAddress'
 import { HistoryNotSupportedError } from '../types/error';
 import wait from 'wait';
+import { nameToHex } from '../utils/hex'
+import { vAccountRow } from '../types/vAccountRow';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -68,8 +70,38 @@ export class BaseContract {
   updatevAccountRows = async (): Promise<EffectAccount> => {
     try {
       const account = this.effectAccount.accountName;
-      this.effectAccount.vAccountRows = Account.getVAccountByName(account)
+      this.effectAccount.vAccountRows = await this.getVAccountByName(account)
       return this.effectAccount
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * Get a vaccount
+   * @param account - name of the account or bsc
+   * @returns - object of the given account name
+   */
+  getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
+    try {
+      let accString: string;
+      if (isBscAddress(account)) {
+        const address: string = account.length == 42 ? account.substring(2) : account;
+        accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
+      } else {
+        accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
+      }
+      return (await this.api.rpc.get_table_rows({
+        code: this.config.account_contract,
+        scope: this.config.account_contract,
+        index_position: 2,
+        key_type: "sha256",
+        lower_bound: accString,
+        upper_bound: accString,
+        table: 'account',
+        json: true,
+      })).rows;
+
     } catch (err) {
       throw new Error(err)
     }

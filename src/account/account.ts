@@ -3,7 +3,6 @@ import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize, Numeric } from 'eosjs'
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset } from '../utils/asset'
-import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { ReadOnlyTransactResult, PushTransactionArgs } from 'eosjs/dist/eosjs-rpc-interfaces';
@@ -30,47 +29,6 @@ export class Account extends BaseContract {
   */
   constructor(api: Api, configuration: EffectClientConfig) {
     super(api, configuration)
-  }
-
-  /**
-   * Get a vaccount
-   * @param account - name of the account or bsc
-   * @returns - object of the given account name
-   */
-  static getVAccountByName(account: string) {
-    const vAccount = this.getVAccountByName(account)
-    console.log(`🧑🏽‍🚒🧑🏽‍🚒\nAccount::this.getVaccountByName\n${vAccount}`);
-    return vAccount
-  }
-
-  /**
-   * Get a vaccount
-   * @param account - name of the account or bsc
-   * @returns - object of the given account name
-   */
-  getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
-    try {
-      let accString: string;
-      if (isBscAddress(account)) {
-        const address: string = account.length == 42 ? account.substring(2) : account;
-        accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
-      } else {
-        accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
-      }
-      return (await this.api.rpc.get_table_rows({
-        code: this.config.account_contract,
-        scope: this.config.account_contract,
-        index_position: 2,
-        key_type: "sha256",
-        lower_bound: accString,
-        upper_bound: accString,
-        table: 'account',
-        json: true,
-      })).rows;
-
-    } catch (err) {
-      throw new Error(err)
-    }
   }
 
   /**

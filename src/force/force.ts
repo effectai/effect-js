@@ -370,7 +370,7 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, content, repetitions: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
       let batchId: number = 0
@@ -406,8 +406,7 @@ export class Force extends BaseContract {
 
       // TODO: below code copied from vaccount module, can we just call that code?
       let vaccSig: Signature;
-      // TOOD: updatevAccountRows below gives a "Maximum call stacksize exceeded". Why?
-      // await this.updatevAccountRows()
+      await this.updatevAccountRows()
       const amount = convertToAsset(batchPrice.toString())
       const fromAccount = this.effectAccount.accountName
       const toAccountId = this.config.force_vaccount_id
