@@ -9,7 +9,6 @@ import CryptoJS from 'crypto-js/core';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset, parseAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
-import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { Task } from '../types/task';
 import ecc from 'eosjs-ecc';
@@ -357,7 +356,7 @@ export class Force extends BaseContract {
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
 
-    const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+    const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
 
     return tree.getRoot().toString('hex')
@@ -383,7 +382,6 @@ export class Force extends BaseContract {
       for (let i in content.tasks) {
         content.tasks[i].link_id = uuidv4();
       }
-
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
       const campaignOwner = this.effectAccount.accountName
@@ -594,7 +592,7 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
 
@@ -608,7 +606,7 @@ export class Force extends BaseContract {
       const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
       const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
 
-      const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+      const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
 
       const tree = new MerkleTree(leaves, sha256)
       const proof = tree.getProof(leaves[taskIndex])
@@ -635,7 +633,7 @@ export class Force extends BaseContract {
         data: {
           proof: hexproof,
           position: pos,
-          data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(tasks[taskIndex])),
+          data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(tasks[taskIndex]))),
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
@@ -703,7 +701,7 @@ export class Force extends BaseContract {
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
 
-    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
     let taskIndex: number;
