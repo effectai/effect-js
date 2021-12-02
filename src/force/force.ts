@@ -475,6 +475,45 @@ export class Force extends BaseContract {
   }
 
   /**
+   * deletes a batch from a force Campaign.
+   * @param campaignId existing campaign ID
+   * @returns transaction result
+   */
+  deleteBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(12)
+        serialbuff.pushUint32(id)
+        serialbuff.pushUint32(campaignId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = {
+        account: this.config.force_contract,
+        name: 'rmbatch',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          id: id,
+          campaign_id: campaignId,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      }
+
+      return await this.sendTransaction(owner, action)
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
    * creates a force Campaign.
    * @param hash campaign data on IPFS
    * @param quantity the amount of tokens rewarded
@@ -566,6 +605,44 @@ export class Force extends BaseContract {
       throw new Error(err)
     }
   }
+
+    /**
+   * deletes a force Campaign.
+   * @param campaignId existing campaign ID
+   * @returns transaction result
+   */
+     deleteCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      try {
+        let sig: Signature
+        const owner = this.effectAccount.accountName
+  
+        if (isBscAddress(owner)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(11)
+          serialbuff.pushUint32(campaignId)
+  
+          sig = await this.generateSignature(serialbuff)
+        }
+  
+        const action = {
+          account: this.config.force_contract,
+          name: 'rmcampaign',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            campaign_id: campaignId,
+            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+  
+        return await this.sendTransaction(owner, action)
+      } catch (err) {
+        throw new Error(err)
+      }
+    }
 
   /**
    * Makes a campaign (uploadCampaign & createCampaign combined)
