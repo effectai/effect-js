@@ -15,7 +15,7 @@ import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
-
+import retry from 'async-retry'
 
 
 /**
@@ -210,6 +210,31 @@ export class Force extends BaseContract {
 
     return task;
   }
+
+  /**
+   * pollTaskResult
+   * @param leafHash
+   * @param taskResultFound
+   */
+   pollTaskResult = async (leafHash: string, taskResultFound: Function): Promise<any> => {
+      try {
+        let task: Task | PromiseLike<Task>;
+        await retry(async () => {
+          const submissions = await this.getReservations()
+          for (let sub of submissions.rows) {
+            if (leafHash === sub.leaf_hash && sub.data) {
+              return taskResultFound(sub)
+            }
+          }
+          throw new Error(`Task ${leafHash} not found yet...`)
+        }, {
+            retries: 10
+        })
+
+      } catch (err) {
+        throw new Error(err)
+      }
+    }
 
   /**
    * Get campaign batches

@@ -1,4 +1,3 @@
-import { Account } from './../account/account';
 import * as EthAccount from 'eth-lib/lib/account';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { Api, Serialize } from 'eosjs'
