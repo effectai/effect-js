@@ -9,14 +9,13 @@ import CryptoJS from 'crypto-js/core';
 import { isBscAddress } from '../utils/bscAddress'
 import { convertToAsset, parseAsset } from '../utils/asset'
 import { getCompositeKey } from '../utils/compositeKey'
-import { stringToHex } from '../utils/hex'
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 import { Task } from '../types/task';
 import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
-
+import retry from 'async-retry'
 
 
 /**
@@ -213,6 +212,31 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Poll individual task result
+   * @param leafHash leaf hash of task
+   * @param taskResultFound callback function
+   * @param maxTimeout in milliseconds, default 1200000
+   * @param interval between retries in milliseconds, default 10000
+   */
+  pollTaskResult = async (leafHash: string, taskResultFound: Function, maxTimeout = 120000, interval = 10000): Promise<any> => {
+    await retry(async () => {
+      const submissions = await this.getReservations()
+      for (let sub of submissions.rows) {
+        if (leafHash === sub.leaf_hash && sub.data) {
+          return taskResultFound(sub)
+        }
+      }
+      console.log(`Task ${leafHash} not found yet...`)
+      throw new Error(`Task ${leafHash} not found yet...`)
+    }, {
+        retries: Math.round(maxTimeout / interval),
+        factor: 1,
+        randomize: false,
+        minTimeout: interval
+    })
+  }
+
+  /**
    * Get campaign batches
    * @param nextKey - key to start searching from
    * @param limit - max number of rows to return
@@ -357,7 +381,7 @@ export class Force extends BaseContract {
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
 
-    const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+    const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
 
     return tree.getRoot().toString('hex')
@@ -370,7 +394,7 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, content, repetitions): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, content, repetitions: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
       let batchId: number = 0
@@ -383,7 +407,6 @@ export class Force extends BaseContract {
       for (let i in content.tasks) {
         content.tasks[i].link_id = uuidv4();
       }
-
       const hash = await this.uploadCampaign(content)
       const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
       const campaignOwner = this.effectAccount.accountName
@@ -406,8 +429,7 @@ export class Force extends BaseContract {
 
       // TODO: below code copied from vaccount module, can we just call that code?
       let vaccSig: Signature;
-      // TOOD: updatevAccountRows below gives a "Maximum call stacksize exceeded". Why?
-      // await this.updatevAccountRows()
+      await this.updatevAccountRows()
       const amount = convertToAsset(batchPrice.toString())
       const fromAccount = this.effectAccount.accountName
       const toAccountId = this.config.force_vaccount_id
@@ -472,6 +494,45 @@ export class Force extends BaseContract {
       }]
 
       return await this.sendTransaction(campaignOwner, actions);
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * deletes a batch from a force Campaign.
+   * @param campaignId existing campaign ID
+   * @returns transaction result
+   */
+  deleteBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(12)
+        serialbuff.pushUint32(id)
+        serialbuff.pushUint32(campaignId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = {
+        account: this.config.force_contract,
+        name: 'rmbatch',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          id: id,
+          campaign_id: campaignId,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      }
+
+      return await this.sendTransaction(owner, action)
     } catch (err) {
       throw new Error(err)
     }
@@ -570,6 +631,44 @@ export class Force extends BaseContract {
     }
   }
 
+    /**
+   * deletes a force Campaign.
+   * @param campaignId existing campaign ID
+   * @returns transaction result
+   */
+     deleteCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      try {
+        let sig: Signature
+        const owner = this.effectAccount.accountName
+  
+        if (isBscAddress(owner)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(11)
+          serialbuff.pushUint32(campaignId)
+  
+          sig = await this.generateSignature(serialbuff)
+        }
+  
+        const action = {
+          account: this.config.force_contract,
+          name: 'rmcampaign',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            campaign_id: campaignId,
+            owner: [isBscAddress(owner) ? 'address' : 'name', owner],
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+  
+        return await this.sendTransaction(owner, action)
+      } catch (err) {
+        throw new Error(err)
+      }
+    }
+
   /**
    * Makes a campaign (uploadCampaign & createCampaign combined)
    * @param content 
@@ -595,7 +694,7 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<Task>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
 
@@ -609,7 +708,7 @@ export class Force extends BaseContract {
       const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
       const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
 
-      const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+      const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
 
       const tree = new MerkleTree(leaves, sha256)
       const proof = tree.getProof(leaves[taskIndex])
@@ -636,7 +735,7 @@ export class Force extends BaseContract {
         data: {
           proof: hexproof,
           position: pos,
-          data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(tasks[taskIndex])),
+          data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(tasks[taskIndex]))),
           campaign_id: campaignId,
           batch_id: batchId,
           account_id: accountId,
@@ -704,7 +803,7 @@ export class Force extends BaseContract {
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
 
-    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(x))))
+    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
     let taskIndex: number;
