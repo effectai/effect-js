@@ -82,7 +82,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
     } else if (environment === 'local') {
         return {
             network: config.network ?? "local",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KiS67ujRiD8JSocMDd8JgqurPs5tpPjiezKtM6Jb3z8oTWULWd']),
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3']),
             host: config.host ?? 'http://localhost:8888',
             web3: config.web3 ?? new Web3, 
             apiKey: config.apiKey ?? '',
