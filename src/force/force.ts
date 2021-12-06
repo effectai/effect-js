@@ -15,7 +15,7 @@ import ecc from 'eosjs-ecc';
 import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
-
+import retry from 'async-retry'
 
 
 /**
@@ -209,6 +209,31 @@ export class Force extends BaseContract {
     });
 
     return task;
+  }
+
+  /**
+   * Poll individual task result
+   * @param leafHash leaf hash of task
+   * @param taskResultFound callback function
+   * @param maxTimeout in milliseconds, default 1200000
+   * @param interval between retries in milliseconds, default 10000
+   */
+  pollTaskResult = async (leafHash: string, taskResultFound: Function, maxTimeout = 120000, interval = 10000): Promise<any> => {
+    await retry(async () => {
+      const submissions = await this.getReservations()
+      for (let sub of submissions.rows) {
+        if (leafHash === sub.leaf_hash && sub.data) {
+          return taskResultFound(sub)
+        }
+      }
+      console.log(`Task ${leafHash} not found yet...`)
+      throw new Error(`Task ${leafHash} not found yet...`)
+    }, {
+        retries: Math.round(maxTimeout / interval),
+        factor: 1,
+        randomize: false,
+        minTimeout: interval
+    })
   }
 
   /**
