@@ -79,6 +79,28 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
             eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app"
         }
+    } else if (environment === 'local') {
+        return {
+            network: config.network ?? "local",
+            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KiS67ujRiD8JSocMDd8JgqurPs5tpPjiezKtM6Jb3z8oTWULWd']),
+            host: config.host ?? 'http://localhost:8888',
+            web3: config.web3 ?? new Web3, 
+            apiKey: config.apiKey ?? '',
+            secure: config.secure ?? false,
+            authentication: config.authentication ?? false,
+            authUrl: config.authUrl ?? '',
+            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
+            force_contract: config.force_contract ?? "effect.force",
+            force_vaccount_id: config.force_vaccount_id ?? 1, // TODO When spinning up the local node, the first account created should be the force_account.
+            account_contract: config.account_contract ?? 'effect.accnt',
+            efx_token_account: config.efx_token_account ?? "effect.token",
+            efx_symbol: config.efx_symbol ?? "EFX",
+            efx_precision: config.efx_precision ?? 4,
+            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
+            eos_relayer: config.eos_relayer ?? "effect.relay",
+            eos_relayer_permission: config.eos_relayer_permission ?? "active",
+            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001" // TODO deploy the local relayer service.
+        }
     } else {
         console.log('no default config is being used, make sure you specified all config')
         return config;
