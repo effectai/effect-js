@@ -249,7 +249,7 @@ export class Force extends BaseContract {
    * @param limit - max number of rows to return
    * @returns - Batch Table Rows Result
    */
-  getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = true): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -260,13 +260,20 @@ export class Force extends BaseContract {
     if (nextKey) {
       config.lower_bound = nextKey
     }
-    const data = await this.api.rpc.get_table_rows(config)
+    const batches = await this.api.rpc.get_table_rows(config)
 
-    data.rows.forEach(batch => {
+    batches.rows.forEach(batch => {
       batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
     });
 
-    return data;
+    if (processBatch) {
+      // Get Campaign Info.
+      for (let i = 0; i < batches.rows.length; i++) {
+        batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
+      }
+    }
+
+    return batches;
   }
 
   /**
