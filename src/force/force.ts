@@ -176,12 +176,12 @@ export class Force extends BaseContract {
   }
 
   /**
-   * 
+   * Get submissions of batch
    * @param batchId 
-   * @param category 
+   * @param category , can be all, submissions or reservations
    * @returns 
    */
-  getSubmissionsForBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
+  getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
 
     const batchSubmissions = []
