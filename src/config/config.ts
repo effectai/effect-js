@@ -91,7 +91,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             authUrl: config.authUrl ?? '',
             ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
             force_contract: config.force_contract ?? "effect.force",
-            force_vaccount_id: config.force_vaccount_id ?? 1, // TODO When spinning up the local node, the first account created should be the force_account.
+            force_vaccount_id: config.force_vaccount_id ?? 0, // TODO When spinning up the local node, the first account created should be the force_account.
             account_contract: config.account_contract ?? 'effect.accnt',
             efx_token_account: config.efx_token_account ?? "effect.token",
             efx_symbol: config.efx_symbol ?? "EFX",
