@@ -194,6 +194,42 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get task reservations of batch
+   * @param batchId
+   * @returns
+   */
+   getTaskReservationsForBatch = async (batchId: number): Promise<Array<Task>> => {
+    const submissions = await this.getReservations()
+
+    const batchReservations = []
+    submissions.rows.forEach(sub => {
+      if (batchId === parseInt(sub.batch_id) && !sub.data) {
+        batchReservations.push(sub)
+      }
+    });
+
+    return batchReservations;
+  }
+
+   /**
+   * Get task reservations & submissions of batch
+   * @param batchId
+   * @returns
+   */
+  getSubmissionsAndReservationsForBatch = async (batchId: number): Promise<Array<Task>> => {
+    const submissions = await this.getReservations()
+
+    const batchReservations = []
+    submissions.rows.forEach(sub => {
+      if (batchId === parseInt(sub.batch_id)) {
+        batchReservations.push(sub)
+      }
+    });
+
+    return batchReservations;
+  }
+
+  /**
    * Get individual task result
    * @param leafHash - leafHash of task
    * @returns Task
