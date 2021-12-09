@@ -286,7 +286,7 @@ export class Force extends BaseContract {
     });
 
     if (processBatch) {
-      // Get Campaign Info.
+      // Get Batch Reservations
       for (let i = 0; i < batches.rows.length; i++) {
         batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
       }
