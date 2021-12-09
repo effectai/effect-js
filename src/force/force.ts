@@ -271,8 +271,9 @@ export class Force extends BaseContract {
     const batches = await this.getBatches('', -1)
 
     const campaignBatches = []
+    
     batches.rows.forEach(batch => {
-      if (campaignId === parseInt(batch.campaign_id) && batch.campaign_id) {
+      if (campaignId === parseInt(batch.campaign_id)) {
         campaignBatches.push(batch)
       }
     });
