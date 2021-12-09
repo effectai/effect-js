@@ -201,6 +201,25 @@ export class Force extends BaseContract {
   } 
 
   /**
+   * OLD
+   * Get task submissions of batch
+   * @param batchId
+   * @returns
+   */
+     getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<Task>> => {
+      const submissions = await this.getReservations()
+  
+      const batchSubmissions = []
+      submissions.rows.forEach(sub => {
+        if (batchId === parseInt(sub.batch_id) && sub.data) {
+          batchSubmissions.push(sub)
+        }
+      });
+  
+      return batchSubmissions;
+    }
+
+  /**
    * Get individual task result
    * @param leafHash - leafHash of task
    * @returns Task
