@@ -793,6 +793,45 @@ export class Force extends BaseContract {
       throw new Error(error);
     }
   }
+
+  /**
+   * Receive tokens from completed tasks.
+   * @returns 
+   */
+     payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      try {
+        let sig: Signature
+        const accountId = this.effectAccount.vAccountRows[0].id
+        const user = this.effectAccount.accountName
+        const now_in_seconds = parseInt(((Date.now() / 1000)).toFixed(0))
+        
+        if (isBscAddress(user)) {
+          const serialbuff = new Serialize.SerialBuffer()
+          serialbuff.push(13)
+          serialbuff.pushUint32(accountId)
+          serialbuff.pushUint32(now_in_seconds)
+  
+          sig = await this.generateSignature(serialbuff)
+        }
+        const action = {
+          account: this.config.force_contract,
+          name: 'payout',
+          authorization: [{
+            actor: isBscAddress(user) ? this.config.eos_relayer : user,
+            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            account_id: accountId,
+            date_in_sec: now_in_seconds,
+            sig: isBscAddress(user) ? sig.toString() : null,
+            fee: null
+          }
+        }
+        return await this.sendTransaction(user, action);
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
   /**
    * Get task index from merkle leaf
    * @param leafHash 
