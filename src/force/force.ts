@@ -176,6 +176,29 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get reservations of connected user
+   * @returns
+   */
+  getMyReservations = async (): Promise<Array<Task>> => {
+    try {
+      const submissions = await this.getReservations()
+
+      const reservations = []
+      submissions.rows.forEach(sub => {
+        if (this.effectAccount.vAccountRows[0].id === parseInt(sub.account_id)) {
+          if (!sub.data) {
+            reservations.push(sub)
+          }
+        }
+      });
+
+      return reservations;
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
    * Get submissions of batch
    * @param batchId 
    * @param category , can be all, submissions or reservations
