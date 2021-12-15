@@ -807,6 +807,88 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Release a task reservation.
+   * @param taskId 
+   * @returns 
+   */
+  releaseTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(14)
+        serialbuff.pushNumberAsUint64(taskId)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = [{
+        account: this.config.force_contract,
+        name: 'releasetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }]
+      return await this.sendTransaction(user, action);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Reclaim a released task reservation.
+   * @param taskId 
+   * @returns 
+   */
+   reclaimTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(15)
+        serialbuff.pushNumberAsUint64(taskId)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = [{
+        account: this.config.force_contract,
+        name: 'reclaimtask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }]
+      return await this.sendTransaction(user, action);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
    * Submits a Task in a Batch
    * @param batchId 
    * @param submissionId 
