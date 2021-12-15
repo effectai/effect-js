@@ -803,13 +803,11 @@ export class Force extends BaseContract {
         let sig: Signature
         const accountId = this.effectAccount.vAccountRows[0].id
         const user = this.effectAccount.accountName
-        const now_in_seconds = parseInt(((Date.now() / 1000)).toFixed(0))
         
         if (isBscAddress(user)) {
           const serialbuff = new Serialize.SerialBuffer()
           serialbuff.push(13)
           serialbuff.pushUint32(accountId)
-          serialbuff.pushUint32(now_in_seconds)
   
           sig = await this.generateSignature(serialbuff)
         }
@@ -822,9 +820,7 @@ export class Force extends BaseContract {
           }],
           data: {
             account_id: accountId,
-            date_in_sec: now_in_seconds,
-            sig: isBscAddress(user) ? sig.toString() : null,
-            fee: null
+            sig: isBscAddress(user) ? sig.toString() : null
           }
         }
         return await this.sendTransaction(user, action);
