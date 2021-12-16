@@ -86,7 +86,7 @@ export class EffectClient {
                 const openedAccount = await this.account.openAccount(this.effectAccount.accountName, this.effectAccount.permission)
                 console.log('Opened account:', openedAccount);
                 // @ts-ignore
-                await this.force.waitTransaction(openedAccount.transaction_id)
+                await this.force.waitTransaction(openedAccount)
                 this.effectAccount.vAccountRows = await this.account.getVAccountByName(this.effectAccount.accountName)
             }
             return this.effectAccount
