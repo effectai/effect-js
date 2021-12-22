@@ -441,7 +441,7 @@ export class Force extends BaseContract {
     const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
 
-    return { root: tree.getRoot().toString('hex'), tree, leaves }
+    return { root: tree.getRoot().toString('hex'), tree, leaves: tree.getHexLeaves() }
   }
 
   /**
