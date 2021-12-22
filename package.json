@@ -10,8 +10,8 @@
     "dist/*"
   ],
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
     "webpack:dev": "webpack --mode development -c webpack.config.js",
