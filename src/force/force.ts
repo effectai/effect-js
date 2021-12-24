@@ -433,7 +433,7 @@ export class Force extends BaseContract {
    * @param dataArray task data
    * @returns root of merkle tree
    */
-  getMerkleRoot = (campaignId: number, batchId: number, dataArray: object[]) : string => {
+  getMerkleTree = (campaignId: number, batchId: number, dataArray: object[]) : any => {
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
@@ -441,7 +441,7 @@ export class Force extends BaseContract {
     const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
 
-    return tree.getRoot().toString('hex')
+    return { root: tree.getRoot().toString('hex'), tree, leaves: tree.getHexLeaves() }
   }
 
   /**
@@ -451,7 +451,7 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, content, repetitions: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, content, repetitions: number): Promise<any> => {
     try {
       let sig: Signature
       let batchId: number = 0
@@ -465,7 +465,7 @@ export class Force extends BaseContract {
         content.tasks[i].link_id = uuidv4();
       }
       const hash = await this.uploadCampaign(content)
-      const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
+      const {root, leaves} = this.getMerkleTree(campaignId, batchId, content.tasks)
       const campaignOwner = this.effectAccount.accountName
 
       if (isBscAddress(campaignOwner)) {
@@ -475,7 +475,7 @@ export class Force extends BaseContract {
         serialbuff.pushUint32(campaignId)
         serialbuff.push(0)
         serialbuff.pushString(hash)
-        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
+        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(root), 32)
 
         sig = await this.generateSignature(serialbuff)
       }
@@ -519,7 +519,7 @@ export class Force extends BaseContract {
           id: batchId,
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
-          task_merkle_root: merkleRoot,
+          task_merkle_root: root,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
@@ -549,8 +549,13 @@ export class Force extends BaseContract {
           sig: null
         },
       }]
+      const transaction = await this.sendTransaction(campaignOwner, actions);
+      return {
+        transaction,
+        id: batchId,
+        leaves
 
-      return await this.sendTransaction(campaignOwner, actions);
+      }
     } catch (err) {
       throw new Error(err)
     }
