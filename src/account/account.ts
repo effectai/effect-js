@@ -180,17 +180,16 @@ export class Account extends BaseContract {
 
   /**
    * Transfer between vaccounts
-   * @param toAccount vaccount to transfer from
-   * @param toAccountId vaccount to transfer to
+   * @param toAccount vaccount to transfer to
    * @param amountEfx amount of tokens, example: '10.0000'
    * @returns transaction result
    */
-  vtransfer = async (toAccount: string, toAccountId: number, amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  vtransfer = async (toAccount: string, amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature;
 
     await this.updatevAccountRows()
-    const balanceTo: object = await this.getVAccountByName(toAccount)
-    const balanceIndexTo: number = balanceTo[0].id
+    const toVAccount: object = await this.getVAccountByName(toAccount)
+    const toVAccountId: number = toVAccount[0].id
     const amount = convertToAsset(amountEfx)
     const fromAccount = this.effectAccount.accountName;
     const fromAccountId = this.effectAccount.vAccountRows[0].id
@@ -201,7 +200,7 @@ export class Account extends BaseContract {
       serialbuff.push(1)
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
-      serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
+      serialbuff.pushArray(Numeric.decimalToBinary(8, toVAccountId.toString()))
       serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
       serialbuff.pushName(this.config.efx_token_account)
 
@@ -218,7 +217,7 @@ export class Account extends BaseContract {
         }],
         data: {
           from_id: fromAccountId,
-          to_id: balanceIndexTo,
+          to_id: toVAccountId,
           quantity: {
             quantity: amount + ' ' + this.config.efx_symbol,
             contract: this.config.efx_token_account
