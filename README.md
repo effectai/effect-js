@@ -113,10 +113,25 @@ From your project folder, you should be able to import the compiled code from `e
 
 # 🧪 Testing
 The testing framework used for this project is [Jest](https://jestjs.io/docs/api). It is possible to run the tests with the following command. The tests are available in the `test` directory. 
-The default configuration is to use the `kylin` environment. If you want to use a different nodeos environment, you can specify the environment in the 
+Remember to copy the `.env.test.example` file to `.env.test` and fill in the values for your environment.
+
+Run the tests in the `test` directory with the `kylin` environment, for now it is configured to only run unit tests. 
 ```bash
 npm run test
 ```
+
+For more fine grained control of the test execution, you can use the following command.
+```bash
+# Run all tests and watch
+npm run test:watch
+
+# Run e2e tests
+npm run test:e2e
+
+# Run unit tests
+npm run test:unit
+```
+
 
 
 # 🗞 Publishing
