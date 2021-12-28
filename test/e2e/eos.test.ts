@@ -5,9 +5,24 @@
 import { EffectClient, createAccount, createWallet } from "../../dist/lib/src/index.js"
 import { EffectAccount } from "../../dist/lib/src/types/effectAccount.js"; 
 import { readFile } from "fs/promises";
+import dotenv from 'dotenv';
 import path from "path";
 import Web3 from "web3";
+import { JsSignatureProvider } from "eosjs/dist/eosjs-jssig";
+import { eosWalletAuth } from './../../src/types/eosWalletAuth';
 
+const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')}); 
+if (configuration.error) {
+    console.log(configuration.error)
+    console.log("Please create a .env file in the root directory of your project, with the following keys:EOS_PRIVATE_KEY, EOS_PUBLIC_KEY, EOS_ACCOUNT_NAME, EOS_ACCOUNT_PERMISSION")
+} 
+
+const signatureProvider = new JsSignatureProvider([process.env.EOS_PRIVATE_KEY]);
+const eosaccount: eosWalletAuth = {
+    accountName: process.env.EOS_ACCOUNT_NAME,
+    permission: process.env.EOS_ACCOUNT_PERMISSION,
+    publicKey: process.env.EOS_PUBLIC_KEY
+}
 
 describe('End to End testing of non connected client.', () => {
     let client: EffectClient;
@@ -39,9 +54,7 @@ describe('💮 EffectClient Web3 Connected Account Test Suite. 💖', () => {
     beforeAll(async () => {
         // Instantiate client and connect with burner account
         client = new EffectClient('kylin');
-        burnerAccount = createAccount();
-        burnerWallet = createWallet(burnerAccount);
-        await client.connectAccount(burnerWallet);
+        await client.connectAccount(signatureProvider, eosaccount); 
     })
     
     it('Should create a campaign when connected.', async () => {
