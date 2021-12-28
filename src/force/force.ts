@@ -857,9 +857,10 @@ export class Force extends BaseContract {
 
   /**
    * Receive tokens from completed tasks.
+   * @param paymentId
    * @returns 
    */
-     payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+     payout = async (paymentId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
       try {
         let sig: Signature
         const accountId = this.effectAccount.vAccountRows[0].id
@@ -880,7 +881,7 @@ export class Force extends BaseContract {
             permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
-            account_id: accountId,
+            payment_id: paymentId,
             sig: isBscAddress(user) ? sig.toString() : null
           }
         }
