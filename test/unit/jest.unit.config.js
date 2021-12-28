@@ -1,10 +1,3 @@
-/**
- * Main Jest configuration file
- * This configuration only includes unit tests. 
- * For other tests such as e2e and intergration tests see the test/ folder and 
- * their respective configuration files.
- */
-
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   name: "Effect-JS",
