@@ -12,6 +12,9 @@
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
+    "test:unit": "jest --config=test/unit/jest.unit.config.js",
+    "test:e2e": "jest --config=test/e2e/jest.e2e.config.js",
+    "test:integration": "jest --config=test/e2e/jest.integration.config.js",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
     "webpack:dev": "webpack --mode development -c webpack.config.js",
@@ -19,8 +22,6 @@
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
-    "build:amd": "tsc --module amd",
-    "build:system": "tsc --module system",
     "watch": "tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
