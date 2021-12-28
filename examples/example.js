@@ -40,7 +40,7 @@ const main = async () => {
         // campaign object, reward
         const makeCampaign = await sdk.force.makeCampaign(campaignToIpfs, '11')
         console.log('makeCampaign', makeCampaign)
-        await sdk.force.waitTransaction(makeCampaign.transaction_id)
+        await sdk.force.waitTransaction(makeCampaign)
         
         // Get last created campaign by connected user
         const campaign = await sdk.force.getMyLastCampaign()

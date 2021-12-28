@@ -176,22 +176,71 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Get task submissions of batch
-   * @param batchId
+   * Get reservations of connected user
    * @returns
    */
-  getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<Task>> => {
+  getMyReservations = async (): Promise<Array<Task>> => {
+    try {
+      const submissions = await this.getReservations()
+
+      const reservations = []
+      submissions.rows.forEach(sub => {
+        if (this.effectAccount.vAccountRows[0].id === parseInt(sub.account_id)) {
+          if (!sub.data) {
+            reservations.push(sub)
+          }
+        }
+      });
+
+      return reservations;
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * Get submissions of batch
+   * @param batchId 
+   * @param category , can be all, submissions or reservations
+   * @returns 
+   */
+  getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
 
     const batchSubmissions = []
     submissions.rows.forEach(sub => {
-      if (batchId === parseInt(sub.batch_id) && sub.data) {
-        batchSubmissions.push(sub)
+      if (batchId === parseInt(sub.batch_id)) {
+        if (category === 'all') {
+          batchSubmissions.push(sub)
+        } else if (category === 'reservations' && !sub.data ) {
+          batchSubmissions.push(sub)
+        } else if (category === 'submissions' && sub.data) {
+          batchSubmissions.push(sub)
+        }
       }
     });
 
     return batchSubmissions;
-  }
+  } 
+
+  /**
+   * OLD
+   * Get task submissions of batch
+   * @param batchId
+   * @returns
+   */
+     getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<Task>> => {
+      const submissions = await this.getReservations()
+  
+      const batchSubmissions = []
+      submissions.rows.forEach(sub => {
+        if (batchId === parseInt(sub.batch_id) && sub.data) {
+          batchSubmissions.push(sub)
+        }
+      });
+  
+      return batchSubmissions;
+    }
 
   /**
    * Get individual task result
@@ -242,7 +291,7 @@ export class Force extends BaseContract {
    * @param limit - max number of rows to return
    * @returns - Batch Table Rows Result
    */
-  getBatches = async (nextKey, limit = 20): Promise<GetTableRowsResult> => {
+  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = true): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -253,13 +302,20 @@ export class Force extends BaseContract {
     if (nextKey) {
       config.lower_bound = nextKey
     }
-    const data = await this.api.rpc.get_table_rows(config)
+    const batches = await this.api.rpc.get_table_rows(config)
 
-    data.rows.forEach(batch => {
+    batches.rows.forEach(batch => {
       batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
     });
 
-    return data;
+    if (processBatch) {
+      // Get Batch Reservations
+      for (let i = 0; i < batches.rows.length; i++) {
+        batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
+      }
+    }
+
+    return batches;
   }
 
   /**
@@ -377,7 +433,7 @@ export class Force extends BaseContract {
    * @param dataArray task data
    * @returns root of merkle tree
    */
-  getMerkleRoot = (campaignId: number, batchId: number, dataArray: object[]) : string => {
+  getMerkleTree = (campaignId: number, batchId: number, dataArray: object[]) : any => {
     const sha256 = x => Buffer.from(ecc.sha256(x), 'hex')
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
@@ -385,7 +441,7 @@ export class Force extends BaseContract {
     const leaves = dataArray.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
 
-    return tree.getRoot().toString('hex')
+    return { root: tree.getRoot().toString('hex'), tree, leaves: tree.getHexLeaves() }
   }
 
   /**
@@ -395,7 +451,7 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, content, repetitions: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createBatch = async (campaignId: number, content, repetitions: number): Promise<any> => {
     try {
       let sig: Signature
       let batchId: number = 0
@@ -409,7 +465,7 @@ export class Force extends BaseContract {
         content.tasks[i].link_id = uuidv4();
       }
       const hash = await this.uploadCampaign(content)
-      const merkleRoot = this.getMerkleRoot(campaignId, batchId, content.tasks)
+      const {root, leaves} = this.getMerkleTree(campaignId, batchId, content.tasks)
       const campaignOwner = this.effectAccount.accountName
 
       if (isBscAddress(campaignOwner)) {
@@ -419,7 +475,7 @@ export class Force extends BaseContract {
         serialbuff.pushUint32(campaignId)
         serialbuff.push(0)
         serialbuff.pushString(hash)
-        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(merkleRoot), 32)
+        serialbuff.pushUint8ArrayChecked(Serialize.hexToUint8Array(root), 32)
 
         sig = await this.generateSignature(serialbuff)
       }
@@ -463,7 +519,7 @@ export class Force extends BaseContract {
           id: batchId,
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
-          task_merkle_root: merkleRoot,
+          task_merkle_root: root,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
@@ -493,8 +549,13 @@ export class Force extends BaseContract {
           sig: null
         },
       }]
+      const transaction = await this.sendTransaction(campaignOwner, actions);
+      return {
+        transaction,
+        id: batchId,
+        leaves
 
-      return await this.sendTransaction(campaignOwner, actions);
+      }
     } catch (err) {
       throw new Error(err)
     }

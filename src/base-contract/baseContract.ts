@@ -14,6 +14,7 @@ import { HistoryNotSupportedError } from '../types/error';
 import wait from 'wait';
 import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
+import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
@@ -207,38 +208,37 @@ export class BaseContract {
    * @param irreversible 
    * @returns 
    */
-  waitTransaction = async function (tx: string, irreversible?: boolean): Promise<Transaction> {
-    let transaction
-    try {
+  waitTransaction = async function (txResult: TransactResult, irreversible?: boolean): Promise<boolean> {
+    let foundTransaction = false;
+    for (let blockNum = +txResult.processed.block_num; blockNum < +txResult.processed.block_num + 30; blockNum++) {
+      let result;
       await retry(async (bail) => {
-        console.log('Waiting for transaction...')
-        transaction = await this.api.rpc.history_get_transaction(tx).then((transaction) => {
-          if (!transaction || irreversible && !transaction.irreversible || !transaction.block_num || transaction.trx.receipt.status !== 'executed') {
-            throw new Error('Transaction not ready yet')
+        result = await this.api.rpc.get_block(blockNum)
+        .catch((err) => {
+          console.log(err.json)
+          if (err.json.error && err.json.error.name === 'unknown_block_exception') {
+            throw new Error(err)
           }
-        }).catch((err) => {
-          // bail if status code is 404. bail if there's another error which is not 'not found'. 
-          // retry on 'not found'
-          if (err.json.code === 404) {
-            bail(new HistoryNotSupportedError("This node doesn't support history of transactions"))
-            return
-          } else if(err.json.error !== 'not found') {
-            bail(new Error(err))
-            return
-          }
-          throw new Error(err.json.error)
+          bail(new Error(err))        
         })
       }, {
-          retries: 10
+        retries: 5
       })
-    } catch (err) {
-      if (err instanceof HistoryNotSupportedError) {
-        console.error(err)
-        // if history is not supported, force to wait 3 seconds to give the transaction time to complete
-        await wait(3000);
+      console.log(result)
+      result.transactions.forEach(transaction => {
+        if (transaction.trx.id === txResult.transaction_id) {
+          foundTransaction = true;
+        }
+      });
+      if (foundTransaction) {
+        break
       }
     }
-    return transaction
+
+    if (!foundTransaction) {
+      throw new Error('Transaction not found within 30 blocks')
+    }
+    return true;
   }
   
   /*
