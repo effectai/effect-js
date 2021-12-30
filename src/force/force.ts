@@ -860,20 +860,39 @@ export class Force extends BaseContract {
    * @param paymentId
    * @returns 
    */
-     payout = async (paymentId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-      try {
-        let sig: Signature
-        const accountId = this.effectAccount.vAccountRows[0].id
-        const user = this.effectAccount.accountName
-        
-        if (isBscAddress(user)) {
-          const serialbuff = new Serialize.SerialBuffer()
-          serialbuff.push(13)
-          serialbuff.pushUint32(accountId)
-  
-          sig = await this.generateSignature(serialbuff)
+  payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const accountId = this.effectAccount.vAccountRows[0].id
+      const user = this.effectAccount.accountName
+      // three days
+      const validationPeriod = 259200
+
+      const data = await this.getPendingBalance(accountId)
+      let pendingIds = []
+      if (data) {
+        for (const row of data.rows) {
+          // payout is only possible after x amount of days have passed since the last_submission_time
+          if (((new Date(row.last_submission_time).getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
+            pendingIds.push(row.id)
+          }
         }
-        const action = {
+      } else {
+        throw new Error('No pending payouts found');
+      }
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(13)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      let actions = []
+      for (let i = 0; i < pendingIds.length; i++) {
+        const paymentId = pendingIds[i];
+        actions.push({
           account: this.config.force_contract,
           name: 'payout',
           authorization: [{
@@ -884,12 +903,13 @@ export class Force extends BaseContract {
             payment_id: paymentId,
             sig: isBscAddress(user) ? sig.toString() : null
           }
-        }
-        return await this.sendTransaction(user, action);
-      } catch (error) {
-        throw new Error(error);
+        })
       }
+      return await this.sendTransaction(user, actions);
+    } catch (error) {
+      throw new Error(error);
     }
+  }
   /**
    * Get task index from merkle leaf
    * @param leafHash 
