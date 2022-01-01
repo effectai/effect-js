@@ -863,23 +863,12 @@ export class Force extends BaseContract {
   payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let sig: Signature
+      let actions = []
       const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
       // three days
       const validationPeriod = 259200
-
-      const data = await this.getPendingBalance(accountId)
-      let pendingIds = []
-      if (data) {
-        for (const row of data.rows) {
-          // payout is only possible after x amount of days have passed since the last_submission_time
-          if (((new Date(row.last_submission_time).getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
-            pendingIds.push(row.id)
-          }
-        }
-      } else {
-        throw new Error('No pending payouts found');
-      }
+      const payments = await this.getPendingBalance(accountId)
 
       if (isBscAddress(user)) {
         const serialbuff = new Serialize.SerialBuffer()
@@ -889,21 +878,26 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      let actions = []
-      for (let i = 0; i < pendingIds.length; i++) {
-        const paymentId = pendingIds[i];
-        actions.push({
-          account: this.config.force_contract,
-          name: 'payout',
-          authorization: [{
-            actor: isBscAddress(user) ? this.config.eos_relayer : user,
-            permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-          }],
-          data: {
-            payment_id: paymentId,
-            sig: isBscAddress(user) ? sig.toString() : null
+      if (payments) {
+        for (const payment of payments.rows) {
+          // payout is only possible after x amount of days have passed since the last_submission_time
+          if (((new Date(payment.last_submission_time).getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
+            actions.push({
+              account: this.config.force_contract,
+              name: 'payout',
+              authorization: [{
+                actor: isBscAddress(user) ? this.config.eos_relayer : user,
+                permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+              }],
+              data: {
+                payment_id: payment.id,
+                sig: isBscAddress(user) ? sig.toString() : null
+              }
+            })
           }
-        })
+        }
+      } else {
+        throw new Error('No pending payouts found');
       }
       return await this.sendTransaction(user, actions);
     } catch (error) {
