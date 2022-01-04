@@ -881,7 +881,7 @@ export class Force extends BaseContract {
       if (payments) {
         for (const payment of payments.rows) {
           // payout is only possible after x amount of days have passed since the last_submission_time
-          if (((new Date(payment.last_submission_time).getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
+          if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
             actions.push({
               account: this.config.force_contract,
               name: 'payout',
