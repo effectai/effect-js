@@ -291,7 +291,7 @@ export class Force extends BaseContract {
    * @param limit - max number of rows to return
    * @returns - Batch Table Rows Result
    */
-  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = true): Promise<GetTableRowsResult> => {
+  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = false): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -311,7 +311,7 @@ export class Force extends BaseContract {
     if (processBatch) {
       // Get Batch Reservations
       for (let i = 0; i < batches.rows.length; i++) {
-        batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
+        // batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
       }
     }
 
