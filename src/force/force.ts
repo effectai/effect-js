@@ -601,6 +601,94 @@ export class Force extends BaseContract {
   }
 
   /**
+   * pause batch which contains active tasks
+   * @param id batch ID
+   * @param campaignId campaign ID
+   * @returns transaction
+   */
+  pauseBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+      let vaccount = ['name', owner]
+      const batchPK = getCompositeKey(id, campaignId)
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(16)
+        serialbuff.pushNumberAsUint64(batchPK)
+        vaccount = ['address', owner]
+        sig = await this.generateSignature(serialbuff)
+      }
+      const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
+      
+      if (reservations.length) {
+        const action = {
+          account: this.config.force_contract,
+          name: 'closebatch',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            batch_id: batchPK,
+            owner: vaccount,
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+        return await this.sendTransaction(owner, action)
+      }
+      else {
+        throw 'No active tasks found for batch.'
+      }
+    } catch (err) {
+      throw new Error(err)
+    }     
+  }
+
+
+  resumeBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+      let vaccount = ['name', owner]
+      const batchPK = getCompositeKey(id, campaignId)
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(17)
+        serialbuff.pushNumberAsUint64(batchPK)
+        vaccount = ['address', owner]
+        sig = await this.generateSignature(serialbuff)
+      }
+      const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
+      
+      if (reservations.length) {
+        const action = {
+          account: this.config.force_contract,
+          name: 'reopenbatch',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            batch_id: batchPK,
+            owner: vaccount,
+            num_tasks: reservations.length,
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+        return await this.sendTransaction(owner, action)
+      }
+      else {
+        throw 'No active tasks found for batch.'
+      }
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
    * creates a force Campaign.
    * @param hash campaign data on IPFS
    * @param quantity the amount of tokens rewarded
