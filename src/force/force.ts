@@ -306,6 +306,15 @@ export class Force extends BaseContract {
 
     batches.rows.forEach(batch => {
       batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
+      if (batch.tasks_done >= 0 && batch.num_tasks > 0 && batch.tasks_done < batch.num_tasks) {
+        batch.status = 'Active'
+      }
+      else if (batch.tasks_done >= 0 && batch.num_tasks === 0) {
+        batch.status = 'Paused'
+      }
+      else if (batch.num_tasks === batch.tasks_done) {
+        batch.status = 'Completed'
+      }
     });
 
     if (processBatch) {
