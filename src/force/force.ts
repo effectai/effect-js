@@ -175,6 +175,22 @@ export class Force extends BaseContract {
     return data;
   }
 
+  getSubmissions = async (nextKey, limit:number = 20): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
+      table: 'submission',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+    const submissions = await this.api.rpc.get_table_rows(config)
+
+    return submissions;
+  }
+
   /**
    * Get reservations of connected user
    * @returns
