@@ -8,10 +8,7 @@ import { utils } from 'ethers';
 import { EffectAccount } from '../types/effectAccount';
 import BN from 'bn.js';
 import retry from 'async-retry'
-import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { isBscAddress } from '../utils/bscAddress'
-import { HistoryNotSupportedError } from '../types/error';
-import wait from 'wait';
 import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
@@ -84,24 +81,29 @@ export class BaseContract {
    */
   getVAccountByName = async (account: string): Promise<Array<vAccountRow>> => {
     try {
-      let accString: string;
+      let lowerBound: string;
+      let upperBound: string;
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
-        accString = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
+        lowerBound = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "f");
       } else {
-        accString = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
+        lowerBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "f");
       }
-      return (await this.api.rpc.get_table_rows({
+      
+      const result = (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,
         index_position: 2,
         key_type: "sha256",
-        lower_bound: accString,
-        upper_bound: accString,
+        lower_bound: lowerBound,
+        upper_bound: lowerBound,
         table: 'account',
         json: true,
-      })).rows;
+      })).rows
 
+      return [result[result.length - 1]]
     } catch (err) {
       throw new Error(err)
     }
