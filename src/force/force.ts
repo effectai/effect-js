@@ -615,13 +615,14 @@ export class Force extends BaseContract {
    * @param campaignId campaign ID
    * @returns transaction
    */
-  pauseBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  pauseBatch = async (batch: Batch) => {
     try {
       let sig: Signature
       const owner = this.effectAccount.accountName
       let vaccount = ['name', owner]
-      const batchPK = getCompositeKey(id, campaignId)
-
+      const batchPK = getCompositeKey(batch.id, batch.campaign_id)
+      console.log(batch)
+      console.log(batch.id, batch.campaign_id, batchPK)
       if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(16)
@@ -630,7 +631,7 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
       const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
-      
+      console.log(reservations)
       if (reservations.length) {
         const action = {
           account: this.config.force_contract,
@@ -656,12 +657,12 @@ export class Force extends BaseContract {
   }
 
 
-  resumeBatch = async (id: number, campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  resumeBatch = async (batch: Batch) => {
     try {
       let sig: Signature
       const owner = this.effectAccount.accountName
       let vaccount = ['name', owner]
-      const batchPK = getCompositeKey(id, campaignId)
+      const batchPK = getCompositeKey(batch.id, batch.campaign_id)
 
       if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
@@ -670,9 +671,9 @@ export class Force extends BaseContract {
         vaccount = ['address', owner]
         sig = await this.generateSignature(serialbuff)
       }
-      const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
-      
-      if (reservations.length) {
+      const content = await this.getIpfsContent(batch.content.field_1)
+
+      if (content.tasks.length > 0) {
         const action = {
           account: this.config.force_contract,
           name: 'reopenbatch',
@@ -683,7 +684,7 @@ export class Force extends BaseContract {
           data: {
             batch_id: batchPK,
             owner: vaccount,
-            num_tasks: reservations.length,
+            num_tasks: content.tasks.length,
             sig: isBscAddress(owner) ? sig.toString() : null
           }
         }
