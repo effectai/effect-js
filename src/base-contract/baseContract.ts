@@ -91,14 +91,14 @@ export class BaseContract {
         lowerBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
         upperBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "f");
       }
-      
+
       const result = (await this.api.rpc.get_table_rows({
         code: this.config.account_contract,
         scope: this.config.account_contract,
         index_position: 2,
         key_type: "sha256",
         lower_bound: lowerBound,
-        upper_bound: lowerBound,
+        upper_bound: upperBound,
         table: 'account',
         json: true,
       })).rows
