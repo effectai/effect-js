@@ -103,7 +103,7 @@ export class BaseContract {
         json: true,
       })).rows
 
-      return [result[result.length - 1]]
+      return (result.length > 0 ? [result[result.length - 1]] : [])
     } catch (err) {
       throw new Error(err)
     }
