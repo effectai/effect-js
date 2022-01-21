@@ -964,8 +964,6 @@ export class Force extends BaseContract {
       let actions = []
       const accountId = this.effectAccount.vAccountRows[0].id
       const user = this.effectAccount.accountName
-      // three days
-      const validationPeriod = 259200
       const payments = await this.getPendingBalance(accountId)
 
       if (isBscAddress(user)) {
@@ -979,7 +977,7 @@ export class Force extends BaseContract {
       if (payments) {
         for (const payment of payments.rows) {
           // payout is only possible after x amount of days have passed since the last_submission_time
-          if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + validationPeriod) < ((Date.now() / 1000))) {
+          if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payout_delay_sec) < ((Date.now() / 1000))) {
             actions.push({
               account: this.config.force_contract,
               name: 'payout',
