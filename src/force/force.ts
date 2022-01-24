@@ -417,11 +417,23 @@ export class Force extends BaseContract {
     }
   }
 
+  /**
+   * Combined joinCampaign and reserve task actions in one transaction to improve user experience in Effect Force.
+   * @param campaignId
+   * @param batchId
+   * @param taskIndex
+   * @param tasks
+   * @returns
+   */
   joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     const actions: Array<Object> = []
+    try {
     actions.push(await this.joinCampaign(campaignId, false))
-    actions.push(this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
+    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
     return await this.sendTransaction(this.effectAccount.accountName, actions);
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 
   /**
