@@ -536,6 +536,7 @@ export class Force extends BaseContract {
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
           task_merkle_root: root,
+          repetitions: repetitions,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
