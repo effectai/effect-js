@@ -828,10 +828,10 @@ export class Force extends BaseContract {
   }
 
   /**
-   * release expired task and then claim it.
+   * release and reclaim expired task.
    * @param taskId 
    */
-  releaseExpiredTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  claimExpiredTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     try {
       let releaseSig: Signature, reclaimSig: Signature 
 
