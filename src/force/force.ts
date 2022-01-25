@@ -379,7 +379,7 @@ export class Force extends BaseContract {
    * @param campaignId
    * @returns transaction result
    */
-  joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  joinCampaign = async (campaignId: number, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
     try {
       let sig: Signature
       const owner = this.effectAccount.accountName
@@ -406,8 +406,31 @@ export class Force extends BaseContract {
           sig: isBscAddress(owner) ? sig.toString() : null
         }
       }
+      if (sendTransaction) {
+        return await this.sendTransaction(owner, action);
+      } else {
+        return action
+      }
 
-      return await this.sendTransaction(owner, action);
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * Combined joinCampaign and reserve task actions in one transaction to improve user experience in Effect Force.
+   * @param campaignId
+   * @param batchId
+   * @param taskIndex
+   * @param tasks
+   * @returns
+   */
+  joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const actions: Array<Object> = []
+    try {
+    actions.push(await this.joinCampaign(campaignId, false))
+    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
+    return await this.sendTransaction(this.effectAccount.accountName, actions);
     } catch (err) {
       throw new Error(err)
     }
@@ -772,7 +795,7 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
     try {
       let sig: Signature
 
@@ -803,7 +826,7 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      const action = [{
+      const action = {
         account: this.config.force_contract,
         name: 'reservetask',
         authorization: [{
@@ -820,8 +843,13 @@ export class Force extends BaseContract {
           payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: isBscAddress(user) ? sig.toString() : null
         }
-      }]
-      return await this.sendTransaction(user, action);
+      }
+
+      if (sendTransaction) {
+        return await this.sendTransaction(user, action);
+      } else {
+        return action
+      }
     } catch (error) {
       throw new Error(error);
     }
