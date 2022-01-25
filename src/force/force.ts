@@ -856,6 +856,65 @@ export class Force extends BaseContract {
   }
 
   /**
+   * release and reclaim expired task.
+   * @param taskId 
+   */
+  claimExpiredTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let releaseSig: Signature, reclaimSig: Signature 
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const releaseBuff = new Serialize.SerialBuffer()
+        releaseBuff.push(14)
+        releaseBuff.pushNumberAsUint64(taskId)
+        releaseBuff.pushUint32(accountId)
+
+        const reclaimBuff = new Serialize.SerialBuffer()
+        reclaimBuff.push(15)
+        reclaimBuff.pushNumberAsUint64(taskId)
+        reclaimBuff.pushUint32(accountId)
+        
+        releaseSig = await this.generateSignature(releaseBuff)
+        reclaimSig = await this.generateSignature(reclaimBuff)
+      }
+
+      const actions = [{
+        account: this.config.force_contract,
+        name: 'releasetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? releaseSig.toString() : null
+        }
+      },{
+        account: this.config.force_contract,
+        name: 'reclaimtask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? reclaimSig.toString() : null
+        }
+      }]
+      return await this.sendTransaction(user, actions);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
    * Release a task reservation.
    * @param taskId 
    * @returns 

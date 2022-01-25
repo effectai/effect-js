@@ -13,7 +13,7 @@ import Web3 from 'web3';
 // TODO is there a more elegant way of building these multiple configuration objects? DRY?
 export const defaultConfiguration = (environment: string = 'testnet', config: any = {}): EffectClientConfig => {
     if (environment === 'mainnet' || environment === 'main') {
-        // TODO add proper configuration values here.
+        // TODO add proper configuration values for mainnet.
         return {
             network: config.network ?? "mainnet",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
@@ -33,7 +33,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             eos_relayer: config.eos_relayer ?? "pixeos1gswap",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
             eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001",
-            force_vaccount_id: config.force_vaccount_id
+            force_vaccount_id: config.force_vaccount_id,
+            payout_delay_sec: config.payout_delay_sec ?? 3600,
+            release_task_delay_sec: config.release_task_delay_sec ?? 1800
         }
     } else if (environment === 'testnet' || environment === 'kylin' || environment === 'test') {
         return {
@@ -55,7 +57,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
             eos_relayer: config.eos_relayer ?? "kylinrelayer",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app"
+            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app",
+            payout_delay_sec: config.payout_delay_sec ?? 3600,
+            release_task_delay_sec: config.release_task_delay_sec ?? 1800
+
         }
     } else if (environment === 'jungle' || environment === 'jungle3') {
         return {
@@ -77,7 +82,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
             eos_relayer: config.eos_relayer ?? "efxrelayer11",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app"
+            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app",
+            payout_delay_sec: config.payout_delay_sec ?? 3600,
+            release_task_delay_sec: config.release_task_delay_sec ?? 1800
         }
     } else if (environment === 'local') {
         return {
@@ -99,7 +106,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
             eos_relayer: config.eos_relayer ?? "effect.relay",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001" // TODO deploy the local relayer service.
+            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001", // TODO deploy the local relayer service.
+            payout_delay_sec: config.payout_delay_sec ?? 1,
+            release_task_delay_sec: config.release_task_delay_sec ?? 1
         }
     } else {
         console.log('no default config is being used, make sure you specified all config')
