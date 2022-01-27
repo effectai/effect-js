@@ -175,6 +175,22 @@ export class Force extends BaseContract {
     return data;
   }
 
+  getSubmissions = async (nextKey, limit:number = 20): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.force_contract,
+      scope: this.config.force_contract,
+      table: 'submission',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+    const submissions = await this.api.rpc.get_table_rows(config)
+
+    return submissions;
+  }
+
   /**
    * Get reservations of connected user
    * @returns
@@ -291,7 +307,7 @@ export class Force extends BaseContract {
    * @param limit - max number of rows to return
    * @returns - Batch Table Rows Result
    */
-  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = true): Promise<GetTableRowsResult> => {
+  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = false): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.force_contract,
       scope: this.config.force_contract,
@@ -311,7 +327,7 @@ export class Force extends BaseContract {
     if (processBatch) {
       // Get Batch Reservations
       for (let i = 0; i < batches.rows.length; i++) {
-        batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
+        // batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
       }
     }
 
@@ -363,7 +379,7 @@ export class Force extends BaseContract {
    * @param campaignId
    * @returns transaction result
    */
-  joinCampaign = async (campaignId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  joinCampaign = async (campaignId: number, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
     try {
       let sig: Signature
       const owner = this.effectAccount.accountName
@@ -390,8 +406,31 @@ export class Force extends BaseContract {
           sig: isBscAddress(owner) ? sig.toString() : null
         }
       }
+      if (sendTransaction) {
+        return await this.sendTransaction(owner, action);
+      } else {
+        return action
+      }
 
-      return await this.sendTransaction(owner, action);
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * Combined joinCampaign and reserve task actions in one transaction to improve user experience in Effect Force.
+   * @param campaignId
+   * @param batchId
+   * @param taskIndex
+   * @param tasks
+   * @returns
+   */
+  joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const actions: Array<Object> = []
+    try {
+    actions.push(await this.joinCampaign(campaignId, false))
+    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
+    return await this.sendTransaction(this.effectAccount.accountName, actions);
     } catch (err) {
       throw new Error(err)
     }
@@ -520,6 +559,7 @@ export class Force extends BaseContract {
           campaign_id: campaignId,
           content: { field_0: 0, field_1: hash },
           task_merkle_root: root,
+          repetitions: repetitions,
           payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
           sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
@@ -756,7 +796,7 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
     try {
       let sig: Signature
 
@@ -787,7 +827,7 @@ export class Force extends BaseContract {
         sig = await this.generateSignature(serialbuff)
       }
 
-      const action = [{
+      const action = {
         account: this.config.force_contract,
         name: 'reservetask',
         authorization: [{
@@ -800,6 +840,152 @@ export class Force extends BaseContract {
           data: CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(tasks[taskIndex]))),
           campaign_id: campaignId,
           batch_id: batchId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }
+
+      if (sendTransaction) {
+        return await this.sendTransaction(user, action);
+      } else {
+        return action
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * release and reclaim expired task.
+   * @param taskId 
+   */
+  claimExpiredTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let releaseSig: Signature, reclaimSig: Signature 
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const releaseBuff = new Serialize.SerialBuffer()
+        releaseBuff.push(14)
+        releaseBuff.pushNumberAsUint64(taskId)
+        releaseBuff.pushUint32(accountId)
+
+        const reclaimBuff = new Serialize.SerialBuffer()
+        reclaimBuff.push(15)
+        reclaimBuff.pushNumberAsUint64(taskId)
+        reclaimBuff.pushUint32(accountId)
+        
+        releaseSig = await this.generateSignature(releaseBuff)
+        reclaimSig = await this.generateSignature(reclaimBuff)
+      }
+
+      const actions = [{
+        account: this.config.force_contract,
+        name: 'releasetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? releaseSig.toString() : null
+        }
+      },{
+        account: this.config.force_contract,
+        name: 'reclaimtask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? reclaimSig.toString() : null
+        }
+      }]
+      return await this.sendTransaction(user, actions);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Release a task reservation.
+   * @param taskId 
+   * @returns 
+   */
+  releaseTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(14)
+        serialbuff.pushNumberAsUint64(taskId)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = [{
+        account: this.config.force_contract,
+        name: 'releasetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eos_relayer : user,
+          sig: isBscAddress(user) ? sig.toString() : null
+        }
+      }]
+      return await this.sendTransaction(user, action);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Reclaim a released task reservation.
+   * @param taskId 
+   * @returns 
+   */
+   reclaimTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+
+      const user = this.effectAccount.accountName
+      const accountId = this.effectAccount.vAccountRows[0].id
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(15)
+        serialbuff.pushNumberAsUint64(taskId)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      const action = [{
+        account: this.config.force_contract,
+        name: 'reclaimtask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eos_relayer : user,
+          permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
           account_id: accountId,
           payer: isBscAddress(user) ? this.config.eos_relayer : user,
           sig: isBscAddress(user) ? sig.toString() : null
@@ -850,6 +1036,54 @@ export class Force extends BaseContract {
         }
       }
       return await this.sendTransaction(user, action);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Receive tokens from completed tasks.
+   * @param paymentId
+   * @returns 
+   */
+  payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    try {
+      let sig: Signature
+      let actions = []
+      const accountId = this.effectAccount.vAccountRows[0].id
+      const user = this.effectAccount.accountName
+      const payments = await this.getPendingBalance(accountId)
+
+      if (isBscAddress(user)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(13)
+        serialbuff.pushUint32(accountId)
+
+        sig = await this.generateSignature(serialbuff)
+      }
+
+      if (payments) {
+        for (const payment of payments.rows) {
+          // payout is only possible after x amount of days have passed since the last_submission_time
+          if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payout_delay_sec) < ((Date.now() / 1000))) {
+            actions.push({
+              account: this.config.force_contract,
+              name: 'payout',
+              authorization: [{
+                actor: isBscAddress(user) ? this.config.eos_relayer : user,
+                permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+              }],
+              data: {
+                payment_id: payment.id,
+                sig: isBscAddress(user) ? sig.toString() : null
+              }
+            })
+          }
+        }
+      } else {
+        throw new Error('No pending payouts found');
+      }
+      return await this.sendTransaction(user, actions);
     } catch (error) {
       throw new Error(error);
     }
