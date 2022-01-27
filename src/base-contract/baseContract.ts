@@ -54,7 +54,6 @@ export class BaseContract {
 
   isAccountConnected = target => next => (...args) => {
     if (!this.effectAccount) {
-      console.error(`🖐🏽🖐🏽🖐🏽\nBaseContract::this.effectAccount\n${this.effectAccount}`)
       throw 'No account connected.'
     }
     return next(...args)
@@ -226,7 +225,7 @@ export class BaseContract {
       }, {
         retries: 5
       })
-      console.log(result)
+      // console.log(result)
       result.transactions.forEach(transaction => {
         if (transaction.trx.id === txResult.transaction_id) {
           foundTransaction = true;

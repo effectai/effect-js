@@ -117,6 +117,15 @@ export interface EffectClientConfig {
   /**
    * The Vaccount ID of the Force EOS account
    */
-  force_vaccount_id
+  force_vaccount_id: number
 
+  /**
+   * The period before a payment can be paid out, measured in seconds.
+   */
+  payout_delay_sec: number
+
+  /**
+   * The period before a reserved task can be automatically released, measured in seconds.
+   */
+  release_task_delay_sec: number
 }
