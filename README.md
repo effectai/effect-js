@@ -99,7 +99,7 @@ Install dependencies and dev-dependencies
 ```bash
 npm install
 ```
-It is now possible to start compiling the typescript files to the module spec of your choice, for now, the following module spec's are supported: [ESM, CommonJS, UMD]
+It is now possible to start compiling the typescript files to the module spec of your choice, for now, the following module specs are supported: [ESM, CommonJS, UMD]
 ```bash
 npm run build:cjs # commonjs
 npm run build:esm # esm
@@ -110,6 +110,29 @@ Link it. Now it is possible to use `npm link` in order to link the compiled type
 npm link /path/to/effect-js/
 ```
 From your project folder, you should be able to import the compiled code from `effect-js`. Depending on your environment, use `import` or `require` as needed.
+
+# 🧪 Testing
+The testing framework used for this project is [Jest](https://jestjs.io/docs/api). It is possible to run the tests with the following command. The tests are available in the `test` directory. 
+Remember to copy the `.env.test.example` file to `.env.test` and fill in the values for your environment.
+
+Run the tests in the `test` directory with the `kylin` environment, for now it is configured to only run unit tests. 
+```bash
+npm run test
+```
+
+For more fine grained control of the test execution, you can use the following command.
+```bash
+# Run all tests and watch
+npm run test:watch
+
+# Run e2e tests
+npm run test:e2e
+
+# Run unit tests
+npm run test:unit
+```
+
+
 
 # 🗞 Publishing
 Run the following command to build the source, increment the version, and publish the `dist` transpiled code and types to the npm repository, assuming you have the correct credentials.

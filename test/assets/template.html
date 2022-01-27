@@ -1,0 +1,41 @@
+<section class="section">
+    <div class="container has-text-centered">
+        <div id="tweet">
+            <h1 class="title">Tweet Sentiment</h1>
+        </div>
+
+        <div class="question question-sentiment">
+            <h2 class="subtitle">What is the <b>sentiment of this post</b>?</h2>
+            <div class="field">
+                <input class="is-checkradio" id="negative" value="negative" type="radio" name="sentiment">
+                <label for="negative">Negative</label>
+                <input class="is-checkradio" id="neutral" value="neutral" type="radio" name="sentiment">
+                <label for="neutral">Neutral</label>
+                <input class="is-checkradio" id="positive" value="positive" type="radio" name="sentiment">
+                <label for="positive">Positive</label>
+            </div>
+        </div>
+
+        <button type="submit" class="button is-primary is-large mt-6">Submit</button>
+    </div>
+</section>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-checkradio@2.1.2/dist/css/bulma-checkradio.min.css">
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<script>
+window.addEventListener('load', function() {
+  // Logic here to retrieve content of the tweet and other relevant properties.
+// Tweet is added to div with the id container.
+twttr.widgets.createTweet('${tweet_id}', document.getElementById('tweet', {theme: 'dark'})).then(() => {forceResize()})
+
+})
+
+</script>
+<style>
+.twitter-tweet {
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
