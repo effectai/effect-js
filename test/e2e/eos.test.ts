@@ -2,8 +2,8 @@
  * End to End (E2E) tests for web3.js
  */
 
-import { EffectClient, createAccount, createWallet } from "../../dist/lib/src/index.js"
-import { EffectAccount } from "../../dist/lib/src/types/effectAccount.js"; 
+import { EffectClient, createAccount, createWallet } from "../../dist/lib/index.js"
+import { EffectAccount } from "../../dist/lib/types/effectAccount.js"; 
 import { readFile } from "fs/promises";
 import dotenv from 'dotenv';
 import path from "path";
