@@ -11,6 +11,7 @@ import { readFile } from 'fs/promises';
 
 // Make sure to create .env.test in test folder
 const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')});
+// const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')});
 
 if (configuration.error) {
     console.log(configuration.error)

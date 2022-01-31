@@ -43,5 +43,5 @@ jobs:
           directory: 'test/'
           file_name: '.env.test'
       - run: npm run build
-      - run: ls -lah test && ls -lah
+      - run: ls -lah test && cat test/.env.test
       - run: npm run test
