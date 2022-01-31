@@ -42,4 +42,5 @@ jobs:
           envkey_EOS_ACCOUNT_PERMISSION: ${{ secrets.TEST_ACCOUNTNAME_PIXEOS }}
           directory: test
           file_name: .env.test
+      - run: npm run build
       - run: npm run test
