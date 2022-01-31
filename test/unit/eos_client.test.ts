@@ -3,7 +3,7 @@
  */
 
 import { eosWalletAuth } from './../../src/types/eosWalletAuth';
-import { EffectClient, createAccount, createWallet } from "../../dist/lib/src/index.js"
+import { EffectClient, createAccount, createWallet } from "../../dist/lib/index.js"
 import { JsSignatureProvider } from "eosjs/dist/eosjs-jssig";
 import dotenv from "dotenv";
 import path from 'path';

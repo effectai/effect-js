@@ -3,7 +3,7 @@
  */
 
 import Web3 from "web3"
-import { EffectClient, createAccount, createWallet } from "../../dist/lib/src/index.js"
+import { EffectClient, createAccount, createWallet } from "../../dist/lib/index.js"
 
 describe('🌹 EffectClient Web3 Not Connected Test Suite 💔' , () => {
     
