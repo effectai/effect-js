@@ -109,3 +109,4 @@ dist
 # Typedoc
 docs/
 notes/
+.vscode/settings.json

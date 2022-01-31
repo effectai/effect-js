@@ -32,14 +32,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           
-      # - name: test
-      #   uses: SpicyPizza/create-envfile@v1.2
-      #   with: 
-      #     envkey_DEBUG: false
-      #     envkey_EOS_PRIVATE_KEY: ${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }}
-      #     envkey_EOS_PUBLIC_KEY: ${{ secrets.TEST_PUBLICKEY_PIXEOS }}
-      #     envkey_EOS_ACCOUNT_NAME: ${{ secrets.TEST_PERMISSION_PIXEOS }}
-      #     envkey_EOS_ACCOUNT_PERMISSION: ${{ sectrets.TEST_ACCOUNTNAME_PIXEOS }}
-      #     directory: test
-      #     file_name: .env.test
-      # - run: npm run test
+      - name: test
+        uses: SpicyPizza/create-envfile@v1.2
+        with: 
+          envkey_DEBUG: false
+          envkey_EOS_PRIVATE_KEY: ${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }}
+          envkey_EOS_PUBLIC_KEY: ${{ secrets.TEST_PUBLICKEY_PIXEOS }}
+          envkey_EOS_ACCOUNT_NAME: ${{ secrets.TEST_PERMISSION_PIXEOS }}
+          envkey_EOS_ACCOUNT_PERMISSION: ${{ secrets.TEST_ACCOUNTNAME_PIXEOS }}
+          directory: test
+          file_name: .env.test
+      - run: npm run test
