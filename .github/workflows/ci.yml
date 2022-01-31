@@ -32,7 +32,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           
-      - name: test
+      - name: Create Env file
         uses: SpicyPizza/create-envfile@v1.2
         with: 
           envkey_DEBUG: false
@@ -42,6 +42,8 @@ jobs:
           envkey_EOS_ACCOUNT_PERMISSION: ${{ secrets.TEST_ACCOUNTNAME_PIXEOS }}
           directory: test
           file_name: .env.test
+
+      - name: test
       - run: npm run build
       - run: ls test && ls
       - run: npm run test
