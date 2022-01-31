@@ -3,7 +3,7 @@ name: Deploy on gh-pages
 on:
   push:
     branches:
-      - main
+      - test
 
 jobs:
   deploy:
