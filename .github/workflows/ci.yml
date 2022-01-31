@@ -40,10 +40,8 @@ jobs:
           envkey_EOS_PUBLIC_KEY: ${{ secrets.TEST_PUBLICKEY_PIXEOS }}
           envkey_EOS_ACCOUNT_NAME: ${{ secrets.TEST_PERMISSION_PIXEOS }}
           envkey_EOS_ACCOUNT_PERMISSION: ${{ secrets.TEST_ACCOUNTNAME_PIXEOS }}
-          directory: test
-          file_name: .env.test
-
-      - name: test
+          directory: 'test/'
+          file_name: '.env.test'
       - run: npm run build
       - run: ls test && ls
       - run: npm run test
