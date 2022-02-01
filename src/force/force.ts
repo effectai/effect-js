@@ -428,9 +428,12 @@ export class Force extends BaseContract {
   joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     const actions: Array<Object> = []
     try {
-    actions.push(await this.joinCampaign(campaignId, false))
-    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
-    return await this.sendTransaction(this.effectAccount.accountName, actions);
+      actions.push(await this.joinCampaign(campaignId, false))
+      // hmm
+      setTimeout(async () => {
+        actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
+      }, 100)
+      return await this.sendTransaction(this.effectAccount.accountName, actions);
     } catch (err) {
       throw new Error(err)
     }
@@ -822,7 +825,6 @@ export class Force extends BaseContract {
         serialbuff.pushUint8ArrayChecked(hex2bytes(CryptoJS.enc.Hex.stringify(leaves[taskIndex])), 32)
         serialbuff.pushUint32(campaignId)
         serialbuff.pushUint32(batchId)
-
         sig = await this.generateSignature(serialbuff)
       }
 
