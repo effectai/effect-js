@@ -14,7 +14,11 @@ import { eosWalletAuth } from './../../src/types/eosWalletAuth';
 const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')}); 
 if (configuration.error) {
     console.log(configuration.error)
-    console.log("Please create a .env file in the root directory of your project, with the following keys:EOS_PRIVATE_KEY, EOS_PUBLIC_KEY, EOS_ACCOUNT_NAME, EOS_ACCOUNT_PERMISSION")
+    console.log(`
+    Please create a .env file in the test directory of this project,
+    or create environment variables:
+    with the following keys:EOS_PRIVATE_KEY, EOS_PUBLIC_KEY, EOS_ACCOUNT_NAME, EOS_ACCOUNT_PERMISSION
+    `)
 } 
 
 const signatureProvider = new JsSignatureProvider([process.env.EOS_PRIVATE_KEY]);
