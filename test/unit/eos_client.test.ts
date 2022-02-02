@@ -10,7 +10,12 @@ import path from 'path';
 import { readFile } from 'fs/promises';
 
 // Make sure to create .env.test in test folder
-const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')});
+let configuration
+try {
+    dotenv.config({path: path.join(__dirname, '../.env.test')});
+} catch (error) {
+    console.log('.env.test not found, using other environment variables')
+}
 // const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')});
 
 if (configuration.error) {
