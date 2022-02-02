@@ -47,7 +47,7 @@ describe('🌹 EffectClient Web3 Not Connected Test Suite 💔' , () => {
         // Connect burner account
         const burnerAccountConnected = await client.connectAccount(burnerWallet);
         expect(burnerAccountConnected).toBeTruthy();
-    })
+    }, 30e3)
 
     it('Should make sure that the provided string is a valid BSC address', () => {
         const randomBscAddress = '0x1234567890123456789012345678901234567890';
