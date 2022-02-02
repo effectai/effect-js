@@ -13,15 +13,13 @@ import { readFile } from 'fs/promises';
 let configuration
 try {
     dotenv.config({path: path.join(__dirname, '../.env.test')});
+    if (configuration.error) {
+        console.log(configuration.error)
+        console.log("Please create a .env file in the root directory of your project, with the following keys:EOS_PRIVATE_KEY, EOS_PUBLIC_KEY, EOS_ACCOUNT_NAME, EOS_ACCOUNT_PERMISSION")
+    }     
 } catch (error) {
     console.log('.env.test not found, using other environment variables')
 }
-// const configuration = dotenv.config({path: path.join(__dirname, '../.env.test')});
-
-if (configuration.error) {
-    console.log(configuration.error)
-    console.log("Please create a .env file in the root directory of your project, with the following keys:EOS_PRIVATE_KEY, EOS_PUBLIC_KEY, EOS_ACCOUNT_NAME, EOS_ACCOUNT_PERMISSION")
-} 
 
 describe('🌻 EffectClient EOS-Signature Provider Test Suite.', () => {
 
