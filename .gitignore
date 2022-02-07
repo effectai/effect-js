@@ -110,3 +110,4 @@ dist
 docs/
 notes/
 .vscode/settings.json
+test/.env.test.bak
