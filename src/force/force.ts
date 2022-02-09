@@ -661,14 +661,12 @@ export class Force extends BaseContract {
     try {
       let sig: Signature
       const owner = this.effectAccount.accountName
-      let vaccount = ['name', owner]
       const batchPK = getCompositeKey(batch.id, batch.campaign_id)
 
       if (isBscAddress(owner)) {
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(17)
         serialbuff.pushNumberAsUint64(batchPK)
-        vaccount = ['address', owner]
         sig = await this.generateSignature(serialbuff)
       }
       const content = await this.getIpfsContent(batch.content.field_1)
@@ -676,14 +674,13 @@ export class Force extends BaseContract {
       if (content.tasks.length > 0) {
         const action = {
           account: this.config.force_contract,
-          name: 'reopenbatch',
+          name: 'publishbatch',
           authorization: [{
             actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
             permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
           }],
           data: {
             batch_id: batchPK,
-            owner: vaccount,
             num_tasks: content.tasks.length,
             sig: isBscAddress(owner) ? sig.toString() : null
           }
