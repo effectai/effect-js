@@ -16,6 +16,7 @@ import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 
 /**
@@ -222,7 +223,6 @@ export class Force extends BaseContract {
    */
   getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
-
     const batchSubmissions = []
     submissions.rows.forEach(sub => {
       if (batchId === parseInt(sub.batch_id)) {
@@ -429,10 +429,9 @@ export class Force extends BaseContract {
     const actions: Array<Object> = []
     try {
       actions.push(await this.joinCampaign(campaignId, false))
-      // hmm
-      setTimeout(async () => {
-        actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
-      }, 100)
+      // sleep needed to make sure the next metamask popup opens
+      await sleep(500)
+      actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
       return await this.sendTransaction(this.effectAccount.accountName, actions);
     } catch (err) {
       throw new Error(err)
