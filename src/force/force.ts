@@ -16,6 +16,7 @@ import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 
 /**
@@ -222,7 +223,6 @@ export class Force extends BaseContract {
    */
   getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
-
     const batchSubmissions = []
     submissions.rows.forEach(sub => {
       if (batchId === parseInt(sub.batch_id)) {
@@ -428,9 +428,11 @@ export class Force extends BaseContract {
   joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     const actions: Array<Object> = []
     try {
-    actions.push(await this.joinCampaign(campaignId, false))
-    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
-    return await this.sendTransaction(this.effectAccount.accountName, actions);
+      actions.push(await this.joinCampaign(campaignId, false))
+      // sleep needed to make sure the next metamask popup opens
+      await sleep(500)
+      actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
+      return await this.sendTransaction(this.effectAccount.accountName, actions);
     } catch (err) {
       throw new Error(err)
     }
@@ -823,7 +825,6 @@ export class Force extends BaseContract {
         serialbuff.pushUint8ArrayChecked(hex2bytes(CryptoJS.enc.Hex.stringify(leaves[taskIndex])), 32)
         serialbuff.pushUint32(campaignId)
         serialbuff.pushUint32(batchId)
-
         sig = await this.generateSignature(serialbuff)
       }
 
