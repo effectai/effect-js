@@ -12,3 +12,9 @@ export function getCompositeKey(accountId: number, campaignId: number): number {
   buf.pushUint32(campaignId)
   return parseInt(Numeric.binaryToDecimal(buf.getUint8Array(8)))
 }
+
+// TODO: function not working, fix
+export function splitCompositeKey(compositeKey: number): Array<Number> {
+  const buf = new Serialize.SerialBuffer({array: new Uint8Array(compositeKey)})
+  return [buf.getUint32(), buf.getUint32()]
+}
