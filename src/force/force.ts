@@ -1067,20 +1067,18 @@ export class Force extends BaseContract {
         for (const payment of payments.rows) {
           // payout is only possible after x amount of days have passed since the last_submission_time
           if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payout_delay_sec) < ((Date.now() / 1000))) {
-            if(parseFloat(payment.pending.quantity.slice(0, -4)) > 0) {
-              actions.push({
-                account: this.config.force_contract,
-                name: 'payout',
-                authorization: [{
-                  actor: isBscAddress(user) ? this.config.eos_relayer : user,
-                  permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
-                }],
-                data: {
-                  payment_id: payment.id,
-                  sig: isBscAddress(user) ? sig.toString() : null
-                }
-              })
-            }
+            actions.push({
+              account: this.config.force_contract,
+              name: 'payout',
+              authorization: [{
+                actor: isBscAddress(user) ? this.config.eos_relayer : user,
+                permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+              }],
+              data: {
+                payment_id: payment.id,
+                sig: isBscAddress(user) ? sig.toString() : null
+              }
+            })
           }
         }
       } else {
