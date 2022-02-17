@@ -547,11 +547,21 @@ export class Force extends BaseContract {
 
       let batchPk = getCompositeKey(batchId, campaignId)
 
+      let pubSig: Signature;
+      if (isBscAddress(fromAccount)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(17)
+        serialbuff.pushNumberAsUint64(batchPk)
+
+        pubSig = await this.generateSignature(serialbuff)
+      }
+
       const authorization = [{
         actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
         permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
       }]
 
+      console.log("batch composite key", batchPk)
       const actions = [{
         account: this.config.force_contract,
         name: 'mkbatch',
@@ -588,7 +598,7 @@ export class Force extends BaseContract {
           account_id: this.effectAccount.vAccountRows[0].id,
           batch_id: batchPk,
           num_tasks: content.tasks.length,
-          sig: null
+          sig: isBscAddress(fromAccount) ? pubSig.toString() : null,
         },
       }]
       const transaction = await this.sendTransaction(campaignOwner, actions);
