@@ -291,7 +291,7 @@ export class Force extends BaseContract {
           return taskResultFound(sub)
         }
       }
-      console.log(`Task ${leafHash} not found yet...`)
+      // console.log(`Task ${leafHash} not found yet...`)
       throw new Error(`Task ${leafHash} not found yet...`)
     }, {
         retries: Math.round(maxTimeout / interval),
