@@ -35,7 +35,7 @@ jobs:
       - run: npm run build
       - run: EOS_PRIVATE_KEY=${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }} EOS_ACCOUNT_NAME=${{ secrets.TEST_ACCOUNTNAME_PIXEOS }} EOS_ACCOUNT_PERMISSION=${{ secrets.TEST_PERMISSION_PIXEOS }} EOS_PUBLIC_KEY=${{ secrets.TEST_PUBLICKEY_PIXEOS }} npm run test
           
-      - name: Publish to NPM
+      # - name: Publish to NPM
       - run: npm run publish:next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
