@@ -33,7 +33,7 @@ jobs:
           publish_dir: ./docs
 
       # Tell Github who we are
-      - run: git config --global user.email "laurens@effect.ai"
+      - run: git config --global user.email "dev@effect.ai"
       - run: git config --global user.name "Effect Network"
 
       # - name: Publish to NPM
