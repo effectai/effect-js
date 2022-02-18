@@ -31,12 +31,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
-          
-      - run: npm run build
-      - run: EOS_PRIVATE_KEY=${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }} EOS_ACCOUNT_NAME=${{ secrets.TEST_ACCOUNTNAME_PIXEOS }} EOS_ACCOUNT_PERMISSION=${{ secrets.TEST_PERMISSION_PIXEOS }} EOS_PUBLIC_KEY=${{ secrets.TEST_PUBLICKEY_PIXEOS }} npm run test
-          
+
+      # Tell Github who we are
+      - run: git config --global user.email "laurens@effect.ai"
+      - run: git config --global user.name "Effect Network"
+
       # - name: Publish to NPM
       - run: npm run publish:next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-        
+
+      # - run: npm run build
+      - run: EOS_PRIVATE_KEY=${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }} EOS_ACCOUNT_NAME=${{ secrets.TEST_ACCOUNTNAME_PIXEOS }} EOS_ACCOUNT_PERMISSION=${{ secrets.TEST_PERMISSION_PIXEOS }} EOS_PUBLIC_KEY=${{ secrets.TEST_PUBLICKEY_PIXEOS }} npm run test
+          
