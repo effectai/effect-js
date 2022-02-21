@@ -322,6 +322,15 @@ export class Force extends BaseContract {
 
     batches.rows.forEach(batch => {
       batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
+      if (batch.tasks_done >= 0 && batch.num_tasks > 0 && batch.tasks_done < batch.num_tasks) {
+        batch.status = 'Active'
+      }
+      else if (batch.tasks_done >= 0 && batch.num_tasks === 0) {
+        batch.status = 'Paused'
+      }
+      else if (batch.num_tasks === batch.tasks_done) {
+        batch.status = 'Completed'
+      }
     });
 
     if (processBatch) {
@@ -647,6 +656,92 @@ export class Force extends BaseContract {
       }
 
       return await this.sendTransaction(owner, action)
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  /**
+   * pause batch which contains active tasks
+   * @param id batch ID
+   * @param campaignId campaign ID
+   * @returns transaction
+   */
+  pauseBatch = async (batch: Batch) => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+      let vaccount = ['name', owner]
+      const batchPK = getCompositeKey(batch.id, batch.campaign_id)
+      console.log(batch)
+      console.log(batch.id, batch.campaign_id, batchPK)
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(16)
+        serialbuff.pushNumberAsUint64(batchPK)
+        vaccount = ['address', owner]
+        sig = await this.generateSignature(serialbuff)
+      }
+      const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
+      console.log(reservations)
+      if (reservations.length) {
+        const action = {
+          account: this.config.force_contract,
+          name: 'closebatch',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            batch_id: batchPK,
+            owner: vaccount,
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+        return await this.sendTransaction(owner, action)
+      }
+      else {
+        throw 'No active tasks found for batch.'
+      }
+    } catch (err) {
+      throw new Error(err)
+    }     
+  }
+
+
+  resumeBatch = async (batch: Batch) => {
+    try {
+      let sig: Signature
+      const owner = this.effectAccount.accountName
+      const batchPK = getCompositeKey(batch.id, batch.campaign_id)
+
+      if (isBscAddress(owner)) {
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(17)
+        serialbuff.pushNumberAsUint64(batchPK)
+        sig = await this.generateSignature(serialbuff)
+      }
+      const content = await this.getIpfsContent(batch.content.field_1)
+
+      if (content.tasks.length > 0) {
+        const action = {
+          account: this.config.force_contract,
+          name: 'publishbatch',
+          authorization: [{
+            actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
+            permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          }],
+          data: {
+            batch_id: batchPK,
+            num_tasks: content.tasks.length,
+            sig: isBscAddress(owner) ? sig.toString() : null
+          }
+        }
+        return await this.sendTransaction(owner, action)
+      }
+      else {
+        throw 'No active tasks found for batch.'
+      }
     } catch (err) {
       throw new Error(err)
     }

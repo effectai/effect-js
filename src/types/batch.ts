@@ -1,6 +1,6 @@
 export interface Batch {
   id: number;
-  campaignId: number;
+  campaign_id: number;
   content: {
     field_0: number;
     field_1: string;
