@@ -17,7 +17,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
         return {
             network: config.network ?? "mainnet",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
-            host: config.host ?? 'https://eos.greymass.com',
+            host: config.host ?? 'https://eos.greymass.com:443',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
             secure: config.secure ?? false,
@@ -33,7 +33,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             eos_relayer: config.eos_relayer ?? "efxtxrelayer",
             eos_relayer_permission: config.eos_relayer_permission ?? "active",
             eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-mainnet-qyy9z.ondigitalocean.app",
-            force_vaccount_id: config.force_vaccount_id,
+            force_vaccount_id: config.force_vaccount_id ?? 0,
             payout_delay_sec: config.payout_delay_sec ?? 3600,
             release_task_delay_sec: config.release_task_delay_sec ?? 1800
         }
@@ -66,7 +66,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
         return {
             network: config.network ?? "jungle",
             signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KiS67ujRiD8JSocMDd8JgqurPs5tpPjiezKtM6Jb3z8oTWULWd']),
-            host: config.host ?? 'https://jungle3.greymass.com',
+            host: config.host ?? 'https://jungle3.greymass.com:443',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
             secure: config.secure ?? false,
