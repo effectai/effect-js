@@ -211,7 +211,7 @@ export class BaseContract {
    */
   waitTransaction = async function (txResult: TransactResult, irreversible?: boolean): Promise<boolean> {
     let foundTransaction = false;
-    for (let blockNum = +txResult.processed.block_num; blockNum < +txResult.processed.block_num + 30; blockNum++) {
+    for (let blockNum = +txResult.processed.block_num; blockNum < +txResult.processed.block_num + 60; blockNum++) {
       let result;
       await retry(async (bail) => {
         result = await this.api.rpc.get_block(blockNum)
@@ -237,7 +237,7 @@ export class BaseContract {
     }
 
     if (!foundTransaction) {
-      throw new Error('Transaction not found within 30 blocks')
+      throw new Error('Transaction not found within 60 blocks')
     }
     return true;
   }
