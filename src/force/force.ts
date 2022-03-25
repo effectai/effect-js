@@ -1127,7 +1127,25 @@ export class Force extends BaseContract {
    * @param tasks 
    * @returns 
    */
-  getTaskIndexFromLeaf = async function (campaignId: number, batchId:number, leafHash: string, tasks: Array<Task>): Promise<number> {
+  getTaskIndexFromLeaf = async function (campaignId: number, batchId:number, leafHash: string, tasks: Array<Task>, leaves?: Array<String>): Promise<number> {
+    let taskIndex: number;
+    const treeLeaves = leaves ? leaves : await this.getTreeLeaves(campaignId, batchId, tasks)
+    for (let i = 0; i < treeLeaves.length; i++) {
+      if (treeLeaves[i].substring(2) === leafHash) {
+        taskIndex = i
+      }
+    }
+    return taskIndex
+  }
+
+  /**
+   * Get the tree leaves
+   * @param campaignId
+   * @param batchId
+   * @param tasks
+   * @returns
+   */
+  getTreeLeaves = async function (campaignId: number, batchId:number, tasks: Array<Task>): Promise<Array<String>> {
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
@@ -1135,13 +1153,7 @@ export class Force extends BaseContract {
     const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
     const treeLeaves = tree.getHexLeaves()
-    let taskIndex: number;
 
-    for (let i = 0; i < treeLeaves.length; i++) {
-      if (treeLeaves[i].substring(2) === leafHash) {
-        taskIndex = i
-      }
-    }
-    return taskIndex
+    return treeLeaves
   }
 }
