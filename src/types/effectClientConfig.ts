@@ -1,5 +1,9 @@
-import { JsSignatureProvider } from "eosjs/dist/eosjs-jssig";
-import { SignatureProvider } from "eosjs/dist/eosjs-api-interfaces";
+import {
+  JsSignatureProvider
+} from "eosjs/dist/eosjs-jssig";
+import {
+  SignatureProvider
+} from "eosjs/dist/eosjs-api-interfaces";
 import Web3 from "web3";
 
 /**
@@ -8,124 +12,161 @@ import Web3 from "web3";
  */
 export interface EffectClientConfig {
 
-   /**
-    * The network to connect to.
-    * @default mainnet or kylin
-    */
-   network: string
+  /**
+   * The network to connect to.
+   * @default mainnet or kylin
+   */
+  network ? : string
 
-   /**
-    * EOS Signature Provider
-    */
-   signatureProvider?: JsSignatureProvider | SignatureProvider 
+  /**
+   * EOS Signature Provider
+   */
+  signatureProvider ? : JsSignatureProvider | SignatureProvider
 
-   /**
-    * The host where the json-rpc will connect to.
-    * @default "localhost", "eos.greymass.com", "api.kylin.alohaeos.com"
-    */
-   host: string
+  /**
+   * Web3 instance for BSC
+   */
+  web3 ? : Web3
 
-   /**
-    * Web3 instance for BSC
-    */
-   web3?: Web3
+  /**
+   * Network Integer ID for BSC 
+   * Mainnet: 56, Testnet: 97
+   */
+  bscNetworkId ? : number
 
-   /**
-    * The Effect API Key to interact with Effect-Network api service.
-    * TODO: Update this url when this service is created.
-    * You can obtain and manage your keys at: https://api.effect.network
-    */
-   apiKey?: string
+  /**
+   * Network Hex ID for BSC
+   * Mainnet: 0x38, Testnet: 0x61
+   */
+  bscHexId ? : string
 
-   /**
-    * Protocol to use for the connection.
-    */
-   secure?: boolean
+  /**
+   * BSC Chain Name
+   * Binance Smart Chain Network or Binance Smart Chain Testnet
+   */
+  bscChainName ? : string
 
-   /**
-    * Specifies the need for authentication of the call.
-    * If the call is made to a public endpoint this can be set to false.
-    */
-   authentication?: boolean
+  /**
+   * BSC Network Type
+   * @default Mainnet or Testnet
+   */
+  bscNetworkType ? : string
 
-   /**
-    * Authentication url
-    * @default https://auth.effect.network
-    */
-   authUrl?: string
+  /**
+   * BSC Token Name
+   * @default "Binance Coin"
+   */
+  bscTokenName ? : string
 
-   /**
-    * IPFS
-    * @default https://ipfs.effect.ai
-    */
-   ipfs_node: string
+  /**
+   * BSC Token Symbol
+   * @default BNB
+   */
+  bscTokenSymbol ? : string
 
+  /**
+   * BSC Rpc Url
+   * @default https://bsc-dataseed.binance.org/
+   */
+  bscRpcUrl ? : string
 
-   /**
-    * Force Contract
-    * @default '', forceonkyli2
-    */
-   force_contract: string
+  /**
+   * BSC Explorer Url
+   * @default https://bscscan.com 
+   * https://testnet.bscscan.com/
+   */
+  bscExplorerUrl ? : string
 
-   /**
-    * Account Contract
-    * @default "acckylin1111"
-    */
-   account_contract: string
+  /**
+   * Bsc EFX Token Contract
+   * @default '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0'
+   */
+  bscEfxTokenContract ? : string
 
-   /**
-    * EFX Token account
-    * @default "tokenonkylin"
-    */
-   efx_token_account: string
+  /**
+   * EOS Explorer Url
+   * @default https://bloks.io
+   */
+  eosExplorerUrl ? : string
 
-   /**
-    * EFX Token Symbol
-    * 'EFX', 'UTL'
-    */
-   efx_symbol: string
+  /**
+   * EOS Node Url
+   * Specify the protocol prefix and port postfix
+   * @default https://greymass.com:443
+   * http://localhost:8888
+   */
+  eosNodeUrl ? : string
 
-   /**
-    * EFX Token Precision
-    * 4
-    */
-   efx_precision: number
+  /**
+   * IPFS
+   * @default https://ipfs.effect.ai
+   */
+  ipfsNode ? : string
 
-   /**
-    * Extended Symbol
-    * @default '4, EFX', '4,UTL'
-    */
-   efx_extended_symbol: string
+  /**
+   * Force Contract
+   * @default '', forceonkyli2
+   */
+  forceContract ? : string
 
-   /**
-    * Eos Relayer
-    */
-   eos_relayer: string
+  /**
+   * Account Contract
+   * @default "acckylin1111"
+   */
+  accountContract ? : string
 
-   /**
-    * Relayer Permission
-    * @default "active"
-    */
-   eos_relayer_permission: string
+  /**
+   * EFX Token account
+   * @default "tokenonkylin"
+   */
+  efxTokenAccount ? : string
 
-   /**
-    * Relayer url
-    */
-   eos_relayer_url: string
+  /**
+   * EFX Token Symbol
+   * 'EFX', 'UTL'
+   */
+  efxSymbol ? : string
 
+  /**
+   * EFX Token Precision
+   * 4
+   */
+  efxPrecision ? : number
+
+  /**
+   * Extended Symbol
+   * @default '4, EFX', '4,UTL'
+   */
+  efxExtendedSymbol ? : string
+
+  /**
+   * Eos Relayer
+   */
+  eosRelayer ? : string
+
+  /**
+   * Relayer Permission
+   * @default "active"
+   */
+  eosRelayerPermission ? : string
+
+  /**
+   * Relayer url
+   */
+  eosRelayerUrl ? : string
 
   /**
    * The Vaccount ID of the Force EOS account
    */
-  force_vaccount_id: number
+  forceVaccountId ? : number
 
   /**
    * The period before a payment can be paid out, measured in seconds.
    */
-  payout_delay_sec: number
+  payoutDelaySec ? : number
 
   /**
    * The period before a reserved task can be automatically released, measured in seconds.
    */
-  release_task_delay_sec: number
+  releaseTaskDelaySec ? : number
 }

@@ -7,109 +7,117 @@ import Web3 from 'web3';
  * @param config? Configuration object. Pass configuraiton object in order to set any of the following properties:
  * { network, signatureProvider, relayerKey, host, web3, apiKey, secure, authentication, authUrl, ipfs_node, force_contract,
  * account_contract, efx_token_account, efx_symbol, efx_precision, efx_extended_symbol, eos_relayer, eos_relayer_permission }
- * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet', apiKey: 'abc123', ipfs_node: 'https://ifps.effect.ai'})
+ * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet, bscRpcUrl: 'wss://bsc-ws-node.nariox.org:443', ipfs_node: 'https://ifps.effect.ai'})
  */
 
-export const defaultConfiguration = (environment: string = 'jungle', config: any = {}): EffectClientConfig => {
-    if (environment === 'mainnet' || environment === 'main') {
+// TODO - The user should pass a config object, but it is not nessecary to specify all the properties, some of them should be optional. 
+// Should a new interface be created to pass a user defined config object?
+export const defaultConfiguration = (environment: string = 'jungle', config?: EffectClientConfig): EffectClientConfig => {
+    
+    if (environment === 'mainnet' || environment === 'main' || environment === 'app') {
+        
         return {
-            network: config.network ?? "mainnet",
-            signatureProvider: config.signatureProvider ?? null,
-            host: config.host ?? 'https://eos.greymass.com:443',
-            web3: config.web3 ?? new Web3, 
-            apiKey: config.apiKey ?? '',
-            secure: config.secure ?? false,
-            authentication: config.authentication ?? false,
-            authUrl: config.authUrl ?? '',
-            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
-            force_contract: config.force_contract ?? "force.efx",
-            account_contract: config.account_contract ?? 'vaccount.efx',
-            efx_token_account: config.efx_token_account ?? "effecttokens",
-            efx_symbol: config.efx_symbol ?? "EFX",
-            efx_precision: config.efx_precision ?? 4,
-            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
-            eos_relayer: config.eos_relayer ?? "efxtxrelayer",
-            eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-mainnet-qyy9z.ondigitalocean.app",
-            force_vaccount_id: config.force_vaccount_id ?? 0,
-            payout_delay_sec: config.payout_delay_sec ?? 3600,
-            release_task_delay_sec: config.release_task_delay_sec ?? 1800
+            network:                config.network                ?? "mainnet",
+            signatureProvider:      config.signatureProvider      ?? null,
+            web3:                   config.web3                   ?? new Web3('https://bsc-dataseed.binance.org'), 
+            ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
+            forceContract:          config.forceContract          ?? "force.efx",
+            accountContract:        config.accountContract        ?? 'vaccount.efx',
+            efxTokenAccount:        config.efxTokenAccount        ?? "effecttokens",
+            efxSymbol:              config.efxSymbol              ?? "EFX",
+            efxPrecision:           config.efxPrecision           ?? 4,
+            efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
+            eosRelayer:             config.eosRelayer             ?? "efxtxrelayer",
+            eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
+            eosRelayerUrl:          config.eosRelayerUrl          ?? "https://vaccount-relayer-service-mainnet-qyy9z.ondigitalocean.app",
+            forceVaccountId:        config.forceVaccountId        ?? 0,
+            payoutDelaySec:         config.payoutDelaySec         ?? 3600,
+            releaseTaskDelaySec:    config.releaseTaskDelaySec    ?? 1800,
+            bscNetworkId:           config.bscNetworkId           ?? 56,
+            bscHexId:               config.bscHexId               ?? '0x38',
+            bscChainName:           config.bscChainName           ?? 'Binance Smart Chain',
+            bscNetworkType:         config.bscNetworkType         ?? 'Mainnet',
+            bscTokenName:           config.bscTokenName           ?? 'Binance Coin',
+            bscTokenSymbol:         config.bscTokenSymbol         ?? 'BNB',
+            bscRpcUrl:              config.bscRpcUrl              ?? 'https://bsc-dataseed.binance.org',
+            bscExplorerUrl:         config.bscExplorerUrl         ?? 'https://bscscan.com',
+            bscEfxTokenContract:    config.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
+            eosExplorerUrl:         config.eosExplorerUrl         ?? 'https://bloks.io',
+            eosNodeUrl:             config.eosNodeUrl             ?? 'https://greymass.com:443'
         }
-    } else if (environment === 'testnet' || environment === 'kylin' || environment === 'test') {
-        return {
 
-            network: config.network ?? "kylin",
-            signatureProvider: config.signatureProvider ?? null,
-            host: config.host ?? 'https://api.kylin.alohaeos.com',
-            web3: config.web3 ?? new Web3, 
-            apiKey: config.apiKey ?? '',
-            secure: config.secure ?? false,
-            authentication: config.authentication ?? false,
-            authUrl: config.authUrl ?? '',
-            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
-            force_contract: config.force_contract ?? "forceonkyli2",
-            force_vaccount_id: config.force_vaccount_id ?? 163,
-            account_contract: config.account_contract ?? 'acckylin1111',
-            efx_token_account: config.efx_token_account ?? "tokenonkylin",
-            efx_symbol: config.efx_symbol ?? "UTL",
-            efx_precision: config.efx_precision ?? 4,
-            efx_extended_symbol: config.efx_extended_symbol ?? '4,UTL',
-            eos_relayer: config.eos_relayer ?? "kylinrelayer",
-            eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-bsrkv.ondigitalocean.app",
-            payout_delay_sec: config.payout_delay_sec ?? 3600,
-            release_task_delay_sec: config.release_task_delay_sec ?? 1800
-
-        }
-    } else if (environment === 'jungle' || environment === 'jungle3') {
+    } else if (environment === 'jungle' || environment === 'jungle3' || environment === 'testnet') {
+        
         return {
-            network: config.network ?? "jungle",
-            signatureProvider: config.signatureProvider ?? null,
-            host: config.host ?? 'https://jungle3.greymass.com:443',
-            web3: config.web3 ?? new Web3, 
-            apiKey: config.apiKey ?? '',
-            secure: config.secure ?? false,
-            authentication: config.authentication ?? false,
-            authUrl: config.authUrl ?? '',
-            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
-            force_contract: config.force_contract ?? "efxforce1111",
-            force_vaccount_id: config.force_vaccount_id ?? 66,
-            account_contract: config.account_contract ?? 'efxaccount11',
-            efx_token_account: config.efx_token_account ?? "efxtoken1112",
-            efx_symbol: config.efx_symbol ?? "EFX",
-            efx_precision: config.efx_precision ?? 4,
-            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
-            eos_relayer: config.eos_relayer ?? "efxrelayer11",
-            eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app",
-            payout_delay_sec: config.payout_delay_sec ?? 3600,
-            release_task_delay_sec: config.release_task_delay_sec ?? 1800
+            network:                config.network                ?? "jungle",
+            signatureProvider:      config.signatureProvider      ?? null,
+            web3:                   config.web3                   ?? new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'), 
+            ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
+            forceContract:          config.forceContract          ?? "efxforce1111",
+            forceVaccountId:        config.forceVaccountId        ?? 66,
+            accountContract:        config.accountContract        ?? 'efxaccount11',
+            efxTokenAccount:        config.efxTokenAccount        ?? "efxtoken1112",
+            efxSymbol:              config.efxSymbol              ?? "EFX",
+            efxPrecision:           config.efxPrecision           ?? 4,
+            efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
+            eosRelayer:             config.eosRelayer             ?? "efxrelayer11",
+            eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
+            eosRelayerUrl:          config.eosRelayerUrl          ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app",
+            payoutDelaySec:         config.payoutDelaySec         ?? 3600,
+            releaseTaskDelaySec:    config.releaseTaskDelaySec    ?? 1800,
+            bscNetworkId:           config.bscNetworkId           ?? 97,
+            bscHexId:               config.bscHexId               ?? '0x61',
+            bscChainName:           config.bscChainName           ?? 'Binance Smart Chain',
+            bscNetworkType:         config.bscNetworkType         ?? 'Testnet',
+            bscTokenName:           config.bscTokenName           ?? 'Binance Coin',
+            bscTokenSymbol:         config.bscTokenSymbol         ?? 'BNB',
+            bscRpcUrl:              config.bscRpcUrl              ?? 'https://data-seed-prebsc-1-s1.binance.org:8545',
+            bscExplorerUrl:         config.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
+            bscEfxTokenContract:    config.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
+            eosExplorerUrl:         config.eosExplorerUrl         ?? 'https://jungle3.bloks.io',
+            eosNodeUrl:             config.eosNodeUrl             ?? 'https://jungle3.greymass.com:443'            
         }
+
     } else if (environment === 'local') {
+        
+        /**
+         * INFO When spinning up the local node, the first account created should be the force_account.
+         * INFO deploy the local relayer service.
+         * TODO Add deployment of local efx token on bsc.
+         */
         return {
-            network: config.network ?? "local",
-            signatureProvider: config.signatureProvider ?? null,
-            host: config.host ?? 'http://localhost:8888',
-            web3: config.web3 ?? new Web3,
-            apiKey: config.apiKey ?? '',
-            secure: config.secure ?? false,
-            authentication: config.authentication ?? false,
-            authUrl: config.authUrl ?? '',
-            ipfs_node: config.ipfs_node ?? 'https://ipfs.effect.ai',
-            force_contract: config.force_contract ?? "effect.force",
-            force_vaccount_id: config.force_vaccount_id ?? 0, // TODO When spinning up the local node, the first account created should be the force_account.
-            account_contract: config.account_contract ?? 'effect.accnt',
-            efx_token_account: config.efx_token_account ?? "effect.token",
-            efx_symbol: config.efx_symbol ?? "EFX",
-            efx_precision: config.efx_precision ?? 4,
-            efx_extended_symbol: config.efx_extended_symbol ?? '4,EFX',
-            eos_relayer: config.eos_relayer ?? "effect.relay",
-            eos_relayer_permission: config.eos_relayer_permission ?? "active",
-            eos_relayer_url: config.eos_relayer_url ?? "http://localhost:3001", // TODO deploy the local relayer service.
-            payout_delay_sec: config.payout_delay_sec ?? 1,
-            release_task_delay_sec: config.release_task_delay_sec ?? 1
+            network:                config.network                ?? "local",
+            signatureProvider:      config.signatureProvider      ?? null,
+            web3:                   config.web3                   ?? new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'),
+            ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
+            forceContract:          config.forceContract          ?? "effect.force",
+            forceVaccountId:        config.forceVaccountId        ?? 0, 
+            accountContract:        config.accountContract        ?? 'effect.accnt',
+            efxTokenAccount:        config.efxTokenAccount        ?? "effect.token",
+            efxSymbol:              config.efxSymbol              ?? "EFX",
+            efxPrecision:           config.efxPrecision           ?? 4,
+            efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
+            eosRelayer:             config.eosRelayer             ?? "effect.relay",
+            eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
+            eosRelayerUrl:          config.eosRelayerUrl          ?? "http://localhost:3001", 
+            payoutDelaySec:         config.payoutDelaySec         ?? 1,
+            releaseTaskDelaySec:    config.releaseTaskDelaySec    ?? 1,
+            bscNetworkId:           config.bscNetworkId           ?? 97,
+            bscHexId:               config.bscHexId               ?? '0x61',
+            bscChainName:           config.bscChainName           ?? 'Binance Smart Chain',
+            bscNetworkType:         config.bscNetworkType         ?? 'Testnet',
+            bscTokenName:           config.bscTokenName           ?? 'Binance Coin',
+            bscTokenSymbol:         config.bscTokenSymbol         ?? 'BNB',
+            bscRpcUrl:              config.bscRpcUrl              ?? 'https://data-seed-prebsc-1-s1.binance.org:8545',
+            bscExplorerUrl:         config.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
+            bscEfxTokenContract:    config.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
+            eosExplorerUrl:         config.eosExplorerUrl         ?? 'https://local.bloks.io',
+            eosNodeUrl:             config.eosNodeUrl             ?? 'http://localhost:8888'            
         }
+
     } else {
         throw new Error('no default config is being used, make sure you specified configuration object for the environment you are using.')
     }
 }
+
+
