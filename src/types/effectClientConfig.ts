@@ -17,7 +17,7 @@ export interface EffectClientConfig {
    /**
     * EOS Signature Provider
     */
-   signatureProvider: JsSignatureProvider | SignatureProvider
+   signatureProvider?: JsSignatureProvider | SignatureProvider 
 
    /**
     * The host where the json-rpc will connect to.

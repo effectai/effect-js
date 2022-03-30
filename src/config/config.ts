@@ -1,3 +1,4 @@
+import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { EffectClientConfig } from './../types/effectClientConfig';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import Web3 from 'web3';
@@ -16,7 +17,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
         // TODO add proper configuration values for mainnet.
         return {
             network: config.network ?? "mainnet",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr']),
+            signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://eos.greymass.com:443',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
@@ -39,8 +40,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
         }
     } else if (environment === 'testnet' || environment === 'kylin' || environment === 'test') {
         return {
+
             network: config.network ?? "kylin",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KKjmMyCfdvmw1bhGJ8gsUDGmaW1Dph3B9WVjYvyiQNMGJuvPG2']),
+            signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://api.kylin.alohaeos.com',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
@@ -65,7 +67,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
     } else if (environment === 'jungle' || environment === 'jungle3') {
         return {
             network: config.network ?? "jungle",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KiS67ujRiD8JSocMDd8JgqurPs5tpPjiezKtM6Jb3z8oTWULWd']),
+            signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://jungle3.greymass.com:443',
             web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
             apiKey: config.apiKey ?? '',
@@ -89,7 +91,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
     } else if (environment === 'local') {
         return {
             network: config.network ?? "local",
-            signatureProvider: config.signatureProvider ?? new JsSignatureProvider(['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3']),
+            signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'http://localhost:8888',
             web3: config.web3 ?? new Web3,
             apiKey: config.apiKey ?? '',
