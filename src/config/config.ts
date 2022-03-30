@@ -1,6 +1,4 @@
-import { SignatureProvider } from 'eosjs/dist/eosjs-api-interfaces';
 import { EffectClientConfig } from './../types/effectClientConfig';
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import Web3 from 'web3';
 
 /**
@@ -11,15 +9,14 @@ import Web3 from 'web3';
  * account_contract, efx_token_account, efx_symbol, efx_precision, efx_extended_symbol, eos_relayer, eos_relayer_permission }
  * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet', apiKey: 'abc123', ipfs_node: 'https://ifps.effect.ai'})
  */
-// TODO is there a more elegant way of building these multiple configuration objects? DRY?
-export const defaultConfiguration = (environment: string = 'testnet', config: any = {}): EffectClientConfig => {
+
+export const defaultConfiguration = (environment: string = 'jungle', config: any = {}): EffectClientConfig => {
     if (environment === 'mainnet' || environment === 'main') {
-        // TODO add proper configuration values for mainnet.
         return {
             network: config.network ?? "mainnet",
             signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://eos.greymass.com:443',
-            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            web3: config.web3 ?? new Web3, 
             apiKey: config.apiKey ?? '',
             secure: config.secure ?? false,
             authentication: config.authentication ?? false,
@@ -44,7 +41,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             network: config.network ?? "kylin",
             signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://api.kylin.alohaeos.com',
-            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            web3: config.web3 ?? new Web3, 
             apiKey: config.apiKey ?? '',
             secure: config.secure ?? false,
             authentication: config.authentication ?? false,
@@ -69,7 +66,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             network: config.network ?? "jungle",
             signatureProvider: config.signatureProvider ?? null,
             host: config.host ?? 'https://jungle3.greymass.com:443',
-            web3: config.web3 ?? new Web3, // TODO double check this, I think it should be something else.
+            web3: config.web3 ?? new Web3, 
             apiKey: config.apiKey ?? '',
             secure: config.secure ?? false,
             authentication: config.authentication ?? false,
@@ -113,7 +110,6 @@ export const defaultConfiguration = (environment: string = 'testnet', config: an
             release_task_delay_sec: config.release_task_delay_sec ?? 1
         }
     } else {
-        console.log('no default config is being used, make sure you specified all config')
-        return config;
+        throw new Error('no default config is being used, make sure you specified configuration object for the environment you are using.')
     }
 }
