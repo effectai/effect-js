@@ -5,9 +5,9 @@ import Web3 from 'web3';
  * Build default configuration object to be passed to client instantiation.
  * @param environment Parameter to define which configuratoin object will be used, defaults ot testnet
  * @param config? Configuration object. Pass configuraiton object in order to set any of the following properties:
- * { network, signatureProvider, relayerKey, host, web3, apiKey, secure, authentication, authUrl, ipfs_node, force_contract,
- * account_contract, efx_token_account, efx_symbol, efx_precision, efx_extended_symbol, eos_relayer, eos_relayer_permission }
- * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet, bscRpcUrl: 'wss://bsc-ws-node.nariox.org:443', ipfs_node: 'https://ifps.effect.ai'})
+ * { network, signatureProvider, relayerKey, eosNodeUrl, web3, apiKey, secure, authentication, authUrl, ipfsNode, forceContract,
+ * accountContract, efxTokenAccount, efxSymbol, efx_precision, efxExtendedSymbol, eosRelayerAccount, eosRelayerPermission }
+ * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet, bscRpcUrl: 'wss://bsc-ws-node.nariox.org:443', ipfsNode: 'https://ifps.effect.ai'})
  */
 
 // TODO - The user should pass a config object, but it is not nessecary to specify all the properties, some of them should be optional. 
@@ -27,7 +27,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
             efxSymbol:              config.efxSymbol              ?? "EFX",
             efxPrecision:           config.efxPrecision           ?? 4,
             efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
-            eosRelayer:             config.eosRelayer             ?? "efxtxrelayer",
+            eosRelayerAccount:      config.eosRelayerAccount      ?? "efxtxrelayer",
             eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
             eosRelayerUrl:          config.eosRelayerUrl          ?? "https://vaccount-relayer-service-mainnet-qyy9z.ondigitalocean.app",
             forceVaccountId:        config.forceVaccountId        ?? 0,
@@ -60,7 +60,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
             efxSymbol:              config.efxSymbol              ?? "EFX",
             efxPrecision:           config.efxPrecision           ?? 4,
             efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
-            eosRelayer:             config.eosRelayer             ?? "efxrelayer11",
+            eosRelayerAccount:      config.eosRelayerAccount      ?? "efxrelayer11",
             eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
             eosRelayerUrl:          config.eosRelayerUrl          ?? "https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app",
             payoutDelaySec:         config.payoutDelaySec         ?? 3600,
@@ -97,7 +97,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
             efxSymbol:              config.efxSymbol              ?? "EFX",
             efxPrecision:           config.efxPrecision           ?? 4,
             efxExtendedSymbol:      config.efxExtendedSymbol      ?? '4,EFX',
-            eosRelayer:             config.eosRelayer             ?? "effect.relay",
+            eosRelayerAccount:      config.eosRelayerAccount      ?? "effect.relay",
             eosRelayerPermission:   config.eosRelayerPermission   ?? "active",
             eosRelayerUrl:          config.eosRelayerUrl          ?? "http://localhost:3001", 
             payoutDelaySec:         config.payoutDelaySec         ?? 1,

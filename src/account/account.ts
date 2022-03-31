@@ -39,8 +39,8 @@ export class Account extends BaseContract {
   getVAccountById = async (id: number): Promise<Array<vAccountRow>> => {
     try {
       return (await this.api.rpc.get_table_rows({
-        code: this.config.account_contract,
-        scope: this.config.account_contract,
+        code: this.config.accountContract,
+        scope: this.config.accountContract,
         index_position: 1,
         key_type: "sha256",
         lower_bound: id,
@@ -70,16 +70,16 @@ export class Account extends BaseContract {
       }
 
       const action = {
-        account: this.config.account_contract,
+        account: this.config.accountContract,
         name: 'open',
         authorization: [{
-          actor: type == 'address' ? this.config.eos_relayer : account,
-          permission: isBscAddress(account) ? this.config.eos_relayer_permission : permission
+          actor: type == 'address' ? this.config.eosRelayerAccount : account,
+          permission: isBscAddress(account) ? this.config.eosRelayerPermission : permission
         }],
         data: {
           acc: [type, type == 'address' ? address : account],
-          symbol: { contract: this.config.efx_token_account, sym: this.config.efx_extended_symbol },
-          payer: type == 'address' ? this.config.eos_relayer : account,
+          symbol: { contract: this.config.efxTokenAccount, sym: this.config.efxExtendedSymbol },
+          payer: type == 'address' ? this.config.eosRelayerAccount : account,
         }
       }
       return this.sendTransaction(account, action);
@@ -102,16 +102,16 @@ export class Account extends BaseContract {
       await this.updatevAccountRows()
       return await this.api.transact({
         actions: [{
-          account: this.config.efx_token_account,
+          account: this.config.efxTokenAccount,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
-            permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
+            permission: isBscAddress(fromAccount) ? this.config.eosRelayerPermission : this.effectAccount.permission
           }],
           data: {
             from: fromAccount,
-            to: this.config.account_contract,
-            quantity: amount + ' ' + this.config.efx_symbol,
+            to: this.config.accountContract,
+            quantity: amount + ' ' + this.config.efxSymbol,
             memo: accountId,
           },
         }]
@@ -146,26 +146,26 @@ export class Account extends BaseContract {
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
       serialbuff.pushName(toAccount)
-      serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
-      serialbuff.pushName(this.config.efx_token_account)
+      serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
+      serialbuff.pushName(this.config.efxTokenAccount)
 
       sig = await this.generateSignature(serialbuff)
     }
     // TODO: BSC -> BSC transactie met memo via pnetwork
     try {
       const action = {
-        account: this.config.account_contract,
+        account: this.config.accountContract,
         name: 'withdraw',
         authorization: [{
-          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          actor: isBscAddress(fromAccount) ? this.config.eosRelayerAccount : fromAccount,
+          permission: isBscAddress(fromAccount) ? this.config.eosRelayerPermission : this.effectAccount.permission
         }],
         data: {
           from_id: accountId,
           to_account: toAccount,
           quantity: {
-            quantity: amount + ' ' + this.config.efx_symbol,
-            contract: this.config.efx_token_account
+            quantity: amount + ' ' + this.config.efxSymbol,
+            contract: this.config.efxTokenAccount
           },
           memo: memo,
           sig: isBscAddress(fromAccount) ? sig.toString() : null,
@@ -199,26 +199,26 @@ export class Account extends BaseContract {
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
       serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
-      serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
-      serialbuff.pushName(this.config.efx_token_account)
+      serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
+      serialbuff.pushName(this.config.efxTokenAccount)
 
       sig = await this.generateSignature(serialbuff)
     }
 
     try {
       const action = {
-        account: this.config.account_contract,
+        account: this.config.accountContract,
         name: 'vtransfer',
         authorization: [{
-          actor: isBscAddress(fromAccount) ? this.config.eos_relayer : fromAccount,
-          permission: isBscAddress(fromAccount) ? this.config.eos_relayer_permission : this.effectAccount.permission,
+          actor: isBscAddress(fromAccount) ? this.config.eosRelayerAccount : fromAccount,
+          permission: isBscAddress(fromAccount) ? this.config.eosRelayerPermission : this.effectAccount.permission,
         }],
         data: {
           from_id: fromAccountId,
           to_id: toAccountId,
           quantity: {
-            quantity: amount + ' ' + this.config.efx_symbol,
-            contract: this.config.efx_token_account
+            quantity: amount + ' ' + this.config.efxSymbol,
+            contract: this.config.efxTokenAccount
           },
           memo: "",
           sig: isBscAddress(fromAccount) ? sig.toString() : null,

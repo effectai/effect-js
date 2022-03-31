@@ -17,7 +17,7 @@ describe('🌹 EffectClient Web3 Not Connected Test Suite 💔' , () => {
     it('Should return correct configuration for Client.', async () => {
         expect(client).toBeTruthy();
         expect(client.config.network).toBe('kylin');
-        expect(client.config.host).toBe('https://api.kylin.alohaeos.com')
+        expect(client.config.eosNodeUrl).toBe('https://api.kylin.alohaeos.com')
     })
 
     it('Should throw an: "No account connected" error when client is not connected.', async () => {

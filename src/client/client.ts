@@ -22,9 +22,9 @@ export class EffectClient {
 
     constructor(environment: string = 'testnet', configuration?: EffectClientConfig) {
         this.config = defaultConfiguration(environment, configuration)
-        const { signatureProvider, host } = this.config
+        const { signatureProvider, eosNodeUrl } = this.config
 
-        this.rpc = new JsonRpc(host, { fetch })
+        this.rpc = new JsonRpc(eosNodeUrl, { fetch })
         this.api = new Api({ rpc: this.rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
 
         this.account = new Account(this.api, this.config)

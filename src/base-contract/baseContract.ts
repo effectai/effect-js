@@ -84,16 +84,16 @@ export class BaseContract {
       let upperBound: string;
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
-        lowerBound = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "0");
-        upperBound = (nameToHex(this.config.efx_token_account) + "00" + address).padEnd(64, "f");
+        lowerBound = (nameToHex(this.config.efxTokenAccount) + "00" + address).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efxTokenAccount) + "00" + address).padEnd(64, "f");
       } else {
-        lowerBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "0");
-        upperBound = (nameToHex(this.config.efx_token_account) + "01" + nameToHex(account)).padEnd(64, "f");
+        lowerBound = (nameToHex(this.config.efxTokenAccount) + "01" + nameToHex(account)).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efxTokenAccount) + "01" + nameToHex(account)).padEnd(64, "f");
       }
 
       const result = (await this.api.rpc.get_table_rows({
-        code: this.config.account_contract,
-        scope: this.config.account_contract,
+        code: this.config.accountContract,
+        scope: this.config.accountContract,
         index_position: 2,
         key_type: "sha256",
         lower_bound: lowerBound,
@@ -184,7 +184,7 @@ export class BaseContract {
    * @returns content of the ipfs hash in your preferred format
    */
   getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-    const data = await this.fetch(`${this.config.ipfs_node}/ipfs/${hash}`)
+    const data = await this.fetch(`${this.config.ipfsNode}/ipfs/${hash}`)
     switch (format.toLowerCase()) {
       case 'formdata':
       case 'form':
@@ -251,7 +251,7 @@ export class BaseContract {
     let actions = [].concat(action)
     if (isBscAddress(owner)) {
       // post to relayer
-      return await this.fetch(this.config.eos_relayer_url + '/transaction', {
+      return await this.fetch(this.config.eosRelayerUrl + '/transaction', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

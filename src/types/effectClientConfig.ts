@@ -142,7 +142,7 @@ export interface EffectClientConfig {
   /**
    * Eos Relayer
    */
-  eosRelayer ? : string
+  eosRelayerAccount ? : string
 
   /**
    * Relayer Permission
@@ -152,6 +152,7 @@ export interface EffectClientConfig {
 
   /**
    * Relayer url
+   * @default ""
    */
   eosRelayerUrl ? : string
 

@@ -38,8 +38,8 @@ export class Force extends BaseContract {
   getPendingBalance = async (accountId?: number): Promise<GetTableRowsResult> => {
     const id = this.effectAccount ? this.effectAccount.vAccountRows[0].id : accountId
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'payment',
       index_position: 3,
       key_type: 'i64',
@@ -59,8 +59,8 @@ export class Force extends BaseContract {
    */
   getCampaigns = async (nextKey, limit = 20, processCampaign: boolean = true): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'campaign',
       limit: limit,
       lower_bound: undefined
@@ -88,8 +88,8 @@ export class Force extends BaseContract {
    */
   getCampaign = async (id: number, processCampaign: boolean = true): Promise<Campaign> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'campaign',
       key_type: 'i64',
       lower_bound: id,
@@ -111,8 +111,8 @@ export class Force extends BaseContract {
    */
   getMyLastCampaign = async (processCampaign: boolean = true): Promise<Campaign> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'campaign',
       key_type: 'i64',
       limit: 20,
@@ -162,8 +162,8 @@ export class Force extends BaseContract {
    */
   getReservations = async (): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       limit: -1,
       table: 'submission',
     }
@@ -174,8 +174,8 @@ export class Force extends BaseContract {
 
   getSubmissions = async (nextKey, limit:number = 20): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'submission',
       limit: limit,
       lower_bound: undefined
@@ -301,8 +301,8 @@ export class Force extends BaseContract {
    */
   getBatches = async (nextKey, limit:number = 20, processBatch:boolean = false): Promise<GetTableRowsResult> => {
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'batch',
       limit: limit,
       lower_bound: undefined
@@ -364,8 +364,8 @@ export class Force extends BaseContract {
     const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
 
     const config = {
-      code: this.config.force_contract,
-      scope: this.config.force_contract,
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
       table: 'campaignjoin',
       key_type: 'i64',
       lower_bound: key,
@@ -393,16 +393,16 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'joincampaign',
       authorization: [{
-        actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-        permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         account_id: this.effectAccount.vAccountRows[0].id,
         campaign_id: campaignId,
-        payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
@@ -449,7 +449,7 @@ export class Force extends BaseContract {
           method: 'POST',
           body: formData
         }
-        const response = await this.fetch(`${this.config.ipfs_node}/api/v0/add?pin=true`, requestOptions)
+        const response = await this.fetch(`${this.config.ipfsNode}/api/v0/add?pin=true`, requestOptions)
         const campaign = await response.json()
         return campaign.Hash as string
       }
@@ -521,7 +521,7 @@ export class Force extends BaseContract {
     await this.updatevAccountRows()
     const amount = convertToAsset(batchPrice.toString())
     const fromAccount = this.effectAccount.accountName
-    const toAccountId = this.config.force_vaccount_id
+    const toAccountId = this.config.forceVaccountId
     const fromAccountId = this.effectAccount.vAccountRows[0].id
     const nonce = this.effectAccount.vAccountRows[0].nonce
     if (isBscAddress(fromAccount)) {
@@ -530,8 +530,8 @@ export class Force extends BaseContract {
       serialbuff.pushUint32(nonce)
       serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
       serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
-      serialbuff.pushAsset(amount + ' ' + this.config.efx_symbol)
-      serialbuff.pushName(this.config.efx_token_account)
+      serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
+      serialbuff.pushName(this.config.efxTokenAccount)
 
       vaccSig = await this.generateSignature(serialbuff)
     }
@@ -548,13 +548,13 @@ export class Force extends BaseContract {
     }
 
     const authorization = [{
-      actor: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
-      permission: isBscAddress(campaignOwner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+      actor: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
+      permission: isBscAddress(campaignOwner) ? this.config.eosRelayerPermission : this.effectAccount.permission
     }]
 
     console.log("batch composite key", batchPk)
     const actions = [{
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'mkbatch',
       authorization,
       data: {
@@ -563,26 +563,26 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         task_merkle_root: root,
         repetitions: repetitions,
-        payer: isBscAddress(campaignOwner) ? this.config.eos_relayer : campaignOwner,
+        payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
         sig: isBscAddress(campaignOwner) ? sig.toString() : null
       },
     }, {
-      account: this.config.account_contract,
+      account: this.config.accountContract,
       name: 'vtransfer',
       authorization,
       data: {
         from_id: fromAccountId,
         to_id: toAccountId,
         quantity: {
-          quantity: amount + ' ' + this.config.efx_symbol,
-          contract: this.config.efx_token_account,
+          quantity: amount + ' ' + this.config.efxSymbol,
+          contract: this.config.efxTokenAccount,
         },
         sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
         fee: null,
         memo: batchPk
       },
     }, {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'publishbatch',
       authorization,
       data: {
@@ -620,11 +620,11 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'rmbatch',
       authorization: [{
-        actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-        permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         id: id,
@@ -660,11 +660,11 @@ export class Force extends BaseContract {
     console.log(reservations)
     if (reservations.length) {
       const action = {
-        account: this.config.force_contract,
+        account: this.config.forceContract,
         name: 'closebatch',
         authorization: [{
-          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
         }],
         data: {
           batch_id: batchPK,
@@ -695,11 +695,11 @@ export class Force extends BaseContract {
 
     if (content.tasks.length > 0) {
       const action = {
-        account: this.config.force_contract,
+        account: this.config.forceContract,
         name: 'publishbatch',
         authorization: [{
-          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
         }],
         data: {
           batch_id: batchPK,
@@ -734,20 +734,20 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'mkcampaign',
       authorization: [{
-        actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-        permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         owner: [isBscAddress(owner) ? 'address' : 'name', owner],
         content: { field_0: 0, field_1: hash },
         reward: {
-          quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
-          contract: this.config.efx_token_account
+          quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
+          contract: this.config.efxTokenAccount
         },
-        payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
@@ -777,21 +777,21 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'editcampaign',
       authorization: [{
-        actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-        permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         campaign_id: campaignId,
         owner: [isBscAddress(owner) ? 'address' : 'name', owner],
         content: { field_0: 0, field_1: hash },
         reward: {
-          quantity: convertToAsset(quantity) + ' ' + this.config.efx_symbol,
-          contract: this.config.efx_token_account
+          quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
+          contract: this.config.efxTokenAccount
         },
-        payer: isBscAddress(owner) ? this.config.eos_relayer : owner,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
@@ -817,11 +817,11 @@ export class Force extends BaseContract {
       }
 
       const action = {
-        account: this.config.force_contract,
+        account: this.config.forceContract,
         name: 'rmcampaign',
         authorization: [{
-          actor: isBscAddress(owner) ? this.config.eos_relayer : owner,
-          permission: isBscAddress(owner) ? this.config.eos_relayer_permission : this.effectAccount.permission
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
         }],
         data: {
           campaign_id: campaignId,
@@ -884,11 +884,11 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'reservetask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         proof: hexproof,
@@ -897,7 +897,7 @@ export class Force extends BaseContract {
         campaign_id: campaignId,
         batch_id: batchId,
         account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? sig.toString() : null
       }
     }
@@ -935,29 +935,29 @@ export class Force extends BaseContract {
     }
 
     const actions = [{
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'releasetask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         task_id: taskId,
         account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? releaseSig.toString() : null
       }
     },{
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'reclaimtask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         task_id: taskId,
         account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? reclaimSig.toString() : null
       }
     }]
@@ -985,16 +985,16 @@ export class Force extends BaseContract {
     }
 
     const action = [{
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'releasetask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         task_id: taskId,
         account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? sig.toString() : null
       }
     }]
@@ -1022,16 +1022,16 @@ export class Force extends BaseContract {
     }
 
     const action = [{
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'reclaimtask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         task_id: taskId,
         account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? sig.toString() : null
       }
     }]
@@ -1060,18 +1060,18 @@ export class Force extends BaseContract {
     }
 
     const action = {
-      account: this.config.force_contract,
+      account: this.config.forceContract,
       name: 'submittask',
       authorization: [{
-        actor: isBscAddress(user) ? this.config.eos_relayer : user,
-        permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
         task_id: submissionId,
         data: data,
         account_id: accountId,
         batch_id: batchId,
-        payer: isBscAddress(user) ? this.config.eos_relayer : user,
+        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? sig.toString() : null
       }
     }
@@ -1101,13 +1101,13 @@ export class Force extends BaseContract {
     if (payments) {
       for (const payment of payments.rows) {
         // payout is only possible after x amount of days have passed since the last_submission_time
-        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payout_delay_sec) < ((Date.now() / 1000))) {
+        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payoutDelaySec) < ((Date.now() / 1000))) {
           actions.push({
-            account: this.config.force_contract,
+            account: this.config.forceContract,
             name: 'payout',
             authorization: [{
-              actor: isBscAddress(user) ? this.config.eos_relayer : user,
-              permission: isBscAddress(user) ? this.config.eos_relayer_permission : this.effectAccount.permission
+              actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+              permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
             }],
             data: {
               payment_id: payment.id,
