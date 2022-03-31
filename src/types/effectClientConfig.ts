@@ -107,13 +107,19 @@ export interface EffectClientConfig {
    * Eos Host Name
    * @default greymass.com
    */
-  eosHostName ? : string
+  eosNodeHostName ? : string
 
   /**
    * Eos Port
    * @default 443
    */
-  eosPort ? : number
+  eosNodePort ? : number
+
+  /**
+   * Eos Chain Id
+   * @default 2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840
+   */
+  eosChainId ? : string
 
   /**
    * IPFS

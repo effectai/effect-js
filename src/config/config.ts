@@ -45,8 +45,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
             eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
-            eosPort:                config?.eosPort                ?? 443,
-            eosHostName:            config?.eosHostName            ?? 'greymass.com'
+            eosNodePort:            config?.eosNodePort            ?? 443,
+            eosNodeHostName:        config?.eosNodeHostName        ?? 'greymass.com',
+            eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
 
         }
 
@@ -81,8 +82,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://jungle3.bloks.io',
             eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
-            eosPort:                config?.eosPort                ?? 443,
-            eosHostName:            config?.eosHostName            ?? 'jungle3.greymass.com'
+            eosNodePort:            config?.eosNodePort            ?? 443,
+            eosNodeHostName:        config?.eosNodeHostName        ?? 'jungle3.greymass.com',
+            eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840'
 
         }
 
@@ -122,13 +124,14 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://local.bloks.io',
             eosNodeUrl:             config?.eosNodeUrl             ?? 'http://localhost:8888',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'http',
-            eosPort:                config?.eosPort                ?? 8888,
-            eosHostName:            config?.eosHostName            ?? 'localhost'
+            eosNodePort:            config?.eosNodePort            ?? 8888,
+            eosNodeHostName:        config?.eosNodeHostName        ?? 'localhost',
+            eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f'
 
         }
 
     } else {
-        throw new Error('no default config is being used, make sure you specified configuration object for the environment you are using.')
+        throw new Error('no default config is being used, make sure you specified configuration object for the environment you are using when creating a client effectSDK.EffectClient("main"). ')
     }
 }
 
