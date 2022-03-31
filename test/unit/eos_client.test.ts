@@ -27,7 +27,7 @@ describe('🌻 EffectClient EOS-Signature Provider Test Suite.', () => {
 
     beforeAll(async () => {
         // Instantiate client
-        client = new EffectClient('kylin');
+        client = new EffectClient('jungle');
     })    
     
     it('Should return correct configuration for Client.', async () => {

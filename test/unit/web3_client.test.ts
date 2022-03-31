@@ -11,13 +11,13 @@ describe('🌹 EffectClient Web3 Not Connected Test Suite 💔' , () => {
 
     beforeAll(async () => {
         // Instantiate client
-        client = new EffectClient('kylin');
+        client = new EffectClient('jungle');
     })
 
     it('Should return correct configuration for Client.', async () => {
-        expect(client).toBeTruthy();
-        expect(client.config.network).toBe('kylin');
-        expect(client.config.eosNodeUrl).toBe('https://api.kylin.alohaeos.com')
+        expect(client.config).toBeTruthy();
+        expect(client.config.network).toBe('testnet');
+        expect(client.config.eosNodeUrl).toBe('https://jungle3.greymass.com:443')
     })
 
     it('Should throw an: "No account connected" error when client is not connected.', async () => {
