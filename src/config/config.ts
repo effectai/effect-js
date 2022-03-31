@@ -6,7 +6,7 @@ import Web3 from 'web3';
  * @param environment Parameter to define which configuratoin object will be used, defaults ot testnet
  * @param config? Configuration object. Pass configuraiton object in order to set any of the following properties:
  * { network, signatureProvider, relayerKey, eosNodeUrl, web3, apiKey, secure, authentication, authUrl, ipfsNode, forceContract,
- * accountContract, efxTokenAccount, efxSymbol, efx_precision, efxExtendedSymbol, eosRelayerAccount, eosRelayerPermission }
+ * accountContract, efxTokenContract, efxSymbol, efx_precision, efxExtendedSymbol, eosRelayerAccount, eoelayerPermission }
  * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet, bscRpcUrl: 'wss://bsc-ws-node.nariox.org:443', ipfsNode: 'https://ifps.effect.ai'})
  */
 
@@ -23,7 +23,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'force.efx',
             accountContract:        config?.accountContract        ?? 'vaccount.efx',
-            efxTokenAccount:        config?.efxTokenAccount        ?? 'effecttokens',
+            efxTokenContract:        config?.efxTokenContract      ?? 'effecttokens',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -39,6 +39,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscNetworkType:         config?.bscNetworkType         ?? 'Mainnet',
             bscTokenName:           config?.bscTokenName           ?? 'Binance Coin',
             bscTokenSymbol:         config?.bscTokenSymbol         ?? 'BNB',
+            bscTokenDecimals:       config?.bscTokenDecimals       ?? 18,
             bscRpcUrl:              config?.bscRpcUrl              ?? 'https://bsc-dataseed.binance.org',
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
@@ -61,7 +62,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             forceContract:          config?.forceContract          ?? 'efxforce1111',
             forceVaccountId:        config?.forceVaccountId        ?? 66,
             accountContract:        config?.accountContract        ?? 'efxaccount11',
-            efxTokenAccount:        config?.efxTokenAccount        ?? 'efxtoken1112',
+            efxTokenContract:        config?.efxTokenContract      ?? 'efxtoken1112',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -76,6 +77,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscNetworkType:         config?.bscNetworkType         ?? 'Testnet',
             bscTokenName:           config?.bscTokenName           ?? 'Binance Coin',
             bscTokenSymbol:         config?.bscTokenSymbol         ?? 'BNB',
+            bscTokenDecimals:       config?.bscTokenDecimals       ?? 18,
             bscRpcUrl:              config?.bscRpcUrl              ?? 'https://data-seed-prebsc-1-s1.binance.org:8545',
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
@@ -103,7 +105,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             forceContract:          config?.forceContract          ?? 'effect.force',
             forceVaccountId:        config?.forceVaccountId        ?? 0, 
             accountContract:        config?.accountContract        ?? 'effect.accnt',
-            efxTokenAccount:        config?.efxTokenAccount        ?? 'effect.token',
+            efxTokenContract:        config?.efxTokenContract      ?? 'effect.token',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -118,6 +120,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscNetworkType:         config?.bscNetworkType         ?? 'Testnet',
             bscTokenName:           config?.bscTokenName           ?? 'Binance Coin',
             bscTokenSymbol:         config?.bscTokenSymbol         ?? 'BNB',
+            bscTokenDecimals:       config?.bscTokenDecimals       ?? 18,
             bscRpcUrl:              config?.bscRpcUrl              ?? 'https://data-seed-prebsc-1-s1.binance.org:8545',
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',

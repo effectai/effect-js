@@ -65,6 +65,12 @@ export interface EffectClientConfig {
   bscTokenSymbol ? : string
 
   /**
+   * BSCK Token Decimals
+   * @default 18
+   */
+  bscTokenDecimals ? : number
+
+  /**
    * BSC Rpc Url
    * @default https://bsc-dataseed.binance.org/
    */
@@ -92,7 +98,9 @@ export interface EffectClientConfig {
   /**
    * EOS Node Url
    * Specify the protocol prefix and port postfix
-   * @default https://greymass.com:443
+   * @default 
+   * https://greymass.com:443
+   * https://jungle3.greymass.com/443
    * http://localhost:8888
    */
   eosNodeUrl ? : string
@@ -143,7 +151,7 @@ export interface EffectClientConfig {
    * EFX Token account
    * @default "tokenonkylin"
    */
-  efxTokenAccount ? : string
+  efxTokenContract ? : string
 
   /**
    * EFX Token Symbol
