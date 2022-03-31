@@ -98,6 +98,24 @@ export interface EffectClientConfig {
   eosNodeUrl ? : string
 
   /**
+   * Eos Node Protocol
+   * @default https
+   */
+  eosNodeProtocol ? : string
+
+  /**
+   * Eos Host Name
+   * @default greymass.com
+   */
+  eosHostName ? : string
+
+  /**
+   * Eos Port
+   * @default 443
+   */
+  eosPort ? : number
+
+  /**
    * IPFS
    * @default https://ipfs.effect.ai
    */

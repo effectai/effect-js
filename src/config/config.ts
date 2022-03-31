@@ -43,7 +43,11 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443'
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443',
+            eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
+            eosPort:                config?.eosPort                ?? 443,
+            eosHostName:            config?.eosHostName            ?? 'greymass.com'
+
         }
 
     } else if (environment === 'jungle' || environment === 'jungle3' || environment === 'testnet') {
@@ -75,7 +79,11 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://jungle3.bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443'            
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443',
+            eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
+            eosPort:                config?.eosPort                ?? 443,
+            eosHostName:            config?.eosHostName            ?? 'jungle3.greymass.com'
+
         }
 
     } else if (environment === 'local') {
@@ -112,7 +120,11 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://local.bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'http://localhost:8888'            
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'http://localhost:8888',
+            eosNodeProtocol:        config?.eosNodeProtocol        ?? 'http',
+            eosPort:                config?.eosPort                ?? 8888,
+            eosHostName:            config?.eosHostName            ?? 'localhost'
+
         }
 
     } else {
