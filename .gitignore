@@ -111,3 +111,4 @@ docs/
 notes/
 .vscode/settings.json
 test/.env.test.bak
+.vscode/launch.json

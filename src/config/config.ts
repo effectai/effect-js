@@ -19,7 +19,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
         return {
             network:                config.network                ?? "mainnet",
             signatureProvider:      config.signatureProvider      ?? null,
-            web3:                   config.web3                   ?? new Web3('https://bsc-dataseed.binance.org'), 
+            web3:                   config.web3                   ?? new Web3(config.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'), 
             ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config.forceContract          ?? "force.efx",
             accountContract:        config.accountContract        ?? 'vaccount.efx',
@@ -51,7 +51,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
         return {
             network:                config.network                ?? "jungle",
             signatureProvider:      config.signatureProvider      ?? null,
-            web3:                   config.web3                   ?? new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'), 
+            web3:                   config.web3                   ?? new Web3(config.bscRpcUrl ?? 'https://data-seed-prebsc-1-s1.binance.org:8545'), 
             ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config.forceContract          ?? "efxforce1111",
             forceVaccountId:        config.forceVaccountId        ?? 66,
@@ -88,7 +88,7 @@ export const defaultConfiguration = (environment: string = 'jungle', config?: Ef
         return {
             network:                config.network                ?? "local",
             signatureProvider:      config.signatureProvider      ?? null,
-            web3:                   config.web3                   ?? new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'),
+            web3:                   config.web3                   ?? new Web3(config.bscRpcUrl ?? 'https://data-seed-prebsc-1-s1.binance.org:8545'),
             ipfsNode:               config.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config.forceContract          ?? "effect.force",
             forceVaccountId:        config.forceVaccountId        ?? 0, 
