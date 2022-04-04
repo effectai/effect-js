@@ -23,7 +23,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'force.efx',
             accountContract:        config?.accountContract        ?? 'vaccount.efx',
-            efxTokenContract:        config?.efxTokenContract      ?? 'effecttokens',
+            efxTokenContract:       config?.efxTokenContract       ?? 'effecttokens',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -47,7 +47,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHostName:        config?.eosNodeHostName        ?? 'greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'greymass.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
 
         }
@@ -62,7 +62,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             forceContract:          config?.forceContract          ?? 'efxforce1111',
             forceVaccountId:        config?.forceVaccountId        ?? 66,
             accountContract:        config?.accountContract        ?? 'efxaccount11',
-            efxTokenContract:        config?.efxTokenContract      ?? 'efxtoken1112',
+            efxTokenContract:       config?.efxTokenContract       ?? 'efxtoken1112',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -85,7 +85,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHostName:        config?.eosNodeHostName        ?? 'jungle3.greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.greymass.com',
             eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840'
 
         }
@@ -105,7 +105,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             forceContract:          config?.forceContract          ?? 'effect.force',
             forceVaccountId:        config?.forceVaccountId        ?? 0, 
             accountContract:        config?.accountContract        ?? 'effect.accnt',
-            efxTokenContract:        config?.efxTokenContract      ?? 'effect.token',
+            efxTokenContract:       config?.efxTokenContract       ?? 'effect.token',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
@@ -128,7 +128,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeUrl:             config?.eosNodeUrl             ?? 'http://localhost:8888',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'http',
             eosNodePort:            config?.eosNodePort            ?? 8888,
-            eosNodeHostName:        config?.eosNodeHostName        ?? 'localhost',
+            eosNodeHost:            config?.eosNodeHost            ?? 'localhost',
             eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f'
 
         }
