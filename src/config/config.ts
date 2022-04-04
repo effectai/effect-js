@@ -44,10 +44,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://eos.greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'eos.greymass.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
 
         }
