@@ -78,7 +78,7 @@ export class Account extends BaseContract {
         }],
         data: {
           acc: [type, type == 'address' ? address : account],
-          symbol: { contract: this.config.efxTokenAccount, sym: this.config.efxExtendedSymbol },
+          symbol: { contract: this.config.efxTokenContract, sym: this.config.efxExtendedSymbol },
           payer: type == 'address' ? this.config.eosRelayerAccount : account,
         }
       }
@@ -102,7 +102,7 @@ export class Account extends BaseContract {
       await this.updatevAccountRows()
       return await this.api.transact({
         actions: [{
-          account: this.config.efxTokenAccount,
+          account: this.config.efxTokenContract,
           name: 'transfer',
           authorization: [{
             actor: fromAccount,
@@ -147,7 +147,7 @@ export class Account extends BaseContract {
       serialbuff.pushArray(Numeric.decimalToBinary(8, accountId.toString()))
       serialbuff.pushName(toAccount)
       serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
-      serialbuff.pushName(this.config.efxTokenAccount)
+      serialbuff.pushName(this.config.efxTokenContract)
 
       sig = await this.generateSignature(serialbuff)
     }
@@ -165,7 +165,7 @@ export class Account extends BaseContract {
           to_account: toAccount,
           quantity: {
             quantity: amount + ' ' + this.config.efxSymbol,
-            contract: this.config.efxTokenAccount
+            contract: this.config.efxTokenContract
           },
           memo: memo,
           sig: isBscAddress(fromAccount) ? sig.toString() : null,
@@ -200,7 +200,7 @@ export class Account extends BaseContract {
       serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
       serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
       serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
-      serialbuff.pushName(this.config.efxTokenAccount)
+      serialbuff.pushName(this.config.efxTokenContract)
 
       sig = await this.generateSignature(serialbuff)
     }
@@ -218,7 +218,7 @@ export class Account extends BaseContract {
           to_id: toAccountId,
           quantity: {
             quantity: amount + ' ' + this.config.efxSymbol,
-            contract: this.config.efxTokenAccount
+            contract: this.config.efxTokenContract
           },
           memo: "",
           sig: isBscAddress(fromAccount) ? sig.toString() : null,

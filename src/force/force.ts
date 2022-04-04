@@ -531,7 +531,7 @@ export class Force extends BaseContract {
       serialbuff.pushArray(Numeric.decimalToBinary(8, fromAccountId.toString()))
       serialbuff.pushArray(Numeric.decimalToBinary(8, toAccountId.toString()))
       serialbuff.pushAsset(amount + ' ' + this.config.efxSymbol)
-      serialbuff.pushName(this.config.efxTokenAccount)
+      serialbuff.pushName(this.config.efxTokenContract)
 
       vaccSig = await this.generateSignature(serialbuff)
     }
@@ -575,7 +575,7 @@ export class Force extends BaseContract {
         to_id: toAccountId,
         quantity: {
           quantity: amount + ' ' + this.config.efxSymbol,
-          contract: this.config.efxTokenAccount,
+          contract: this.config.efxTokenContract,
         },
         sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
         fee: null,
@@ -745,7 +745,7 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         reward: {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
-          contract: this.config.efxTokenAccount
+          contract: this.config.efxTokenContract
         },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
@@ -789,7 +789,7 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         reward: {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
-          contract: this.config.efxTokenAccount
+          contract: this.config.efxTokenContract
         },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null

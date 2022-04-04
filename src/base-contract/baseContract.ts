@@ -84,11 +84,11 @@ export class BaseContract {
       let upperBound: string;
       if (isBscAddress(account)) {
         const address: string = account.length == 42 ? account.substring(2) : account;
-        lowerBound = (nameToHex(this.config.efxTokenAccount) + "00" + address).padEnd(64, "0");
-        upperBound = (nameToHex(this.config.efxTokenAccount) + "00" + address).padEnd(64, "f");
+        lowerBound = (nameToHex(this.config.efxTokenContract) + "00" + address).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efxTokenContract) + "00" + address).padEnd(64, "f");
       } else {
-        lowerBound = (nameToHex(this.config.efxTokenAccount) + "01" + nameToHex(account)).padEnd(64, "0");
-        upperBound = (nameToHex(this.config.efxTokenAccount) + "01" + nameToHex(account)).padEnd(64, "f");
+        lowerBound = (nameToHex(this.config.efxTokenContract) + "01" + nameToHex(account)).padEnd(64, "0");
+        upperBound = (nameToHex(this.config.efxTokenContract) + "01" + nameToHex(account)).padEnd(64, "f");
       }
 
       const result = (await this.api.rpc.get_table_rows({
