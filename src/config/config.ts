@@ -44,10 +44,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://eos.greymass.com:443',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://greymass.com:443',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'eos.greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'greymass.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
 
         }
@@ -57,7 +57,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
         return {
             network:                config?.network                ?? 'testnet',
             signatureProvider:      config?.signatureProvider      ?? null,
-            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://data-seed-prebsc-1-s1.binance.org:8545'), 
+            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'), 
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'efxforce1112',
             forceVaccountId:        config?.forceVaccountId        ?? 333,
@@ -100,7 +100,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
         return {
             network:                config?.network                ?? 'local',
             signatureProvider:      config?.signatureProvider      ?? null,
-            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://data-seed-prebsc-1-s1.binance.org:8545'),
+            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'effect.force',
             forceVaccountId:        config?.forceVaccountId        ?? 0, 
@@ -121,8 +121,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscTokenName:           config?.bscTokenName           ?? 'Binance Coin',
             bscTokenSymbol:         config?.bscTokenSymbol         ?? 'BNB',
             bscTokenDecimals:       config?.bscTokenDecimals       ?? 18,
-            bscRpcUrl:              config?.bscRpcUrl              ?? 'https://data-seed-prebsc-1-s1.binance.org:8545',
-            bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://testnet.bscscan.com',
+            bscRpcUrl:              config?.bscRpcUrl              ?? 'https://bsc-dataseed.binance.org',
+            bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://local.bloks.io',
             eosNodeUrl:             config?.eosNodeUrl             ?? 'http://localhost:8888',
