@@ -216,7 +216,7 @@ export class Force extends BaseContract {
   getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const submissions = await this.getReservations()
     const batchSubmissions = []
-    submissions.rows.forEach(sub => {
+    for await (const sub of submissions.rows) {
       if (batchId === parseInt(sub.batch_id)) {
         if (category === 'all') {
           batchSubmissions.push(sub)
@@ -226,7 +226,7 @@ export class Force extends BaseContract {
           batchSubmissions.push(sub)
         }
       }
-    });
+    }
 
     return batchSubmissions;
   } 
@@ -913,7 +913,7 @@ export class Force extends BaseContract {
    * release and reclaim expired task.
    * @param taskId 
    */
-  claimExpiredTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  claimExpiredTask = async (taskId: number, account_id?: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let releaseSig: Signature, reclaimSig: Signature 
 
     const user = this.effectAccount.accountName
@@ -934,20 +934,26 @@ export class Force extends BaseContract {
       reclaimSig = await this.generateSignature(reclaimBuff)
     }
 
-    const actions = [{
-      account: this.config.forceContract,
-      name: 'releasetask',
-      authorization: [{
-        actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
-        permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
-      }],
-      data: {
-        task_id: taskId,
-        account_id: accountId,
-        payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
-        sig: isBscAddress(user) ? releaseSig.toString() : null
-      }
-    },{
+    const actions = []
+    // if the task is not realeased yet, release it first
+    if (account_id) {
+      console.log('account id: ', account_id)
+      actions.push({
+        account: this.config.forceContract,
+        name: 'releasetask',
+        authorization: [{
+          actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+          permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
+        }],
+        data: {
+          task_id: taskId,
+          account_id: accountId,
+          payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+          sig: isBscAddress(user) ? releaseSig.toString() : null
+        }
+      })
+    }
+    actions.push({
       account: this.config.forceContract,
       name: 'reclaimtask',
       authorization: [{
@@ -960,7 +966,7 @@ export class Force extends BaseContract {
         payer: isBscAddress(user) ? this.config.eosRelayerAccount : user,
         sig: isBscAddress(user) ? reclaimSig.toString() : null
       }
-    }]
+    })
     return await this.sendTransaction(user, actions);
   }
 
