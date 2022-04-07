@@ -156,22 +156,6 @@ export class Force extends BaseContract {
     return campaign
   }
 
-  /**
-   * Get reservations
-   * @returns - Submission Table Rows Result
-   */
-  getReservations = async (): Promise<GetTableRowsResult> => {
-    const config = {
-      code: this.config.forceContract,
-      scope: this.config.forceContract,
-      limit: -1,
-      table: 'submission',
-    }
-    const data = await this.api.rpc.get_table_rows(config)
-
-    return data;
-  }
-
   getSubmissions = async (nextKey, limit:number = 20): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.forceContract,
@@ -186,25 +170,6 @@ export class Force extends BaseContract {
     const submissions = await this.api.rpc.get_table_rows(config)
 
     return submissions;
-  }
-
-  /**
-   * Get reservations of connected user
-   * @returns
-   */
-  getMyReservations = async (): Promise<Array<Task>> => {
-    const submissions = await this.getReservations()
-
-    const reservations = []
-    submissions.rows.forEach(sub => {
-      if (this.effectAccount.vAccountRows[0].id === parseInt(sub.account_id)) {
-        if (!sub.data) {
-          reservations.push(sub)
-        }
-      }
-    });
-
-    return reservations;
   }
 
   /**
@@ -240,25 +205,6 @@ export class Force extends BaseContract {
 
     return batchSubmissions;
   } 
-
-  /**
-   * OLD
-   * Get task submissions of batch
-   * @param batchId
-   * @returns
-   */
-     getTaskSubmissionsForBatch = async (batchId: number): Promise<Array<Task>> => {
-      const submissions = await this.getReservations()
-  
-      const batchSubmissions = []
-      submissions.rows.forEach(sub => {
-        if (batchId === parseInt(sub.batch_id) && sub.data) {
-          batchSubmissions.push(sub)
-        }
-      });
-  
-      return batchSubmissions;
-    }
 
   /**
    * Get individual task
@@ -324,7 +270,7 @@ export class Force extends BaseContract {
    * @param limit - max number of rows to return
    * @returns - Batch Table Rows Result
    */
-  getBatches = async (nextKey, limit:number = 20, processBatch:boolean = false): Promise<GetTableRowsResult> => {
+  getBatches = async (nextKey, limit:number = 20): Promise<GetTableRowsResult> => {
     const config = {
       code: this.config.forceContract,
       scope: this.config.forceContract,
@@ -351,13 +297,6 @@ export class Force extends BaseContract {
         batch.status = 'Not Published'
       }
     });
-
-    if (processBatch) {
-      // Get Batch Reservations
-      for (let i = 0; i < batches.rows.length; i++) {
-        // batches.rows[i].reservations = await this.getSubmissionsOfBatch(batches.rows[i].batch_id, 'reservations')
-      }
-    }
 
     return batches;
   }
@@ -871,6 +810,106 @@ export class Force extends BaseContract {
     const hash = await this.uploadCampaign(content)
     // create campaign
     return await this.createCampaign(hash, quantity)
+  }
+
+  reserveFreeTask = async (batch: Batch, tasks: Array<any>, submissions: Array<Task>): Promise<any> => {
+    let taskIndex
+    // First go through the submissions and get all the indexes of the tasks that are done
+    const indexes = []
+    const userIndexes = []
+    const treeLeaves = await this.getTreeLeaves(batch.campaign_id, batch.id, tasks)
+    for await (const sub of submissions) {
+      const index = await this.getTaskIndexFromLeaf(batch.campaign_id, batch.id, sub.leaf_hash, tasks, treeLeaves)
+      indexes.push(index)
+      if (sub.account_id === this.effectAccount.vAccountRows[0].id) {
+        userIndexes.push(index)
+      }
+    }
+
+    if (indexes.length > 0) {
+      // create object, which holds the count of the task indexes in the submissions
+      const indexesCount = {}
+      for (let i = 0; i < batch.num_tasks; i++) {
+        indexesCount[i] = 0
+      }
+      for (const num of indexes) {
+        indexesCount[num] = indexesCount[num] ? indexesCount[num] + 1 : 1
+      }
+      // grab the first available index, that the user hasn't done yet
+      const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < batch.repetitions && !userIndexes.includes(key))
+      taskIndex = availableIndex ? parseInt(availableIndex) : null
+    } else {
+      // no submissions yet in batch
+      taskIndex = 0
+    }
+
+    // if the taskIndex is empty, it means that there are no available tasks anymore
+    if (taskIndex === null) {
+      throw new Error('no available tasks')
+    }
+    console.log("make new reservation for task index", taskIndex)
+    return this.reserveTask(batch.id, taskIndex, batch.campaign_id, tasks)
+  }
+
+  reserveOrClaimTask = async (batch: Batch, tasks: Array<any>): Promise<Task> => {
+    const submissions = await this.getSubmissionsOfBatch(batch.batch_id)
+    const reservations = submissions.filter(s => !s.data || !s.data.length)
+    // get a reservation for the user
+    // could be an active reservation of the user, or an expired/released reservation in the batch
+    let reservation = null
+    const accountId = this.effectAccount.vAccountRows[0].id
+    for (const rv of reservations) {
+      if (rv.account_id !== null && parseInt((new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000).toString()) + parseInt(this.config.releaseTaskDelaySec.toFixed(0)) < parseInt((Date.now() / 1000).toFixed(0))) {
+        // found expired reservation
+        reservation = rv
+        reservation.isExpired = true
+        console.log('found expired reservation')
+      } else if (rv.account_id === null) {
+        // found a released reservation
+        console.log('found released reservation')
+
+        reservation = rv
+        reservation.isReleased = true
+      } else if (rv.account_id === accountId) {
+        console.log('found own reservation')
+
+        // found own reservation
+        reservation = rv
+        break // stop searching when we find own reservation
+      }
+    }
+    let tx
+    if (reservation) {
+      // There is a reservation available that is either from the user OR is expired/released
+      if (reservation.isExpired) {
+        // (re) claim expired task
+        tx = await this.claimExpiredTask(reservation.id, reservation.account_id)
+      } else if (reservation.isReleased) {
+        // (re) claim released task
+        tx = await this.reclaimTask(reservation.id)
+      }
+    } else {
+      console.log('make new reservation')
+
+      // User doesn't have reservation yet, so let's make one!
+      tx = await this.reserveFreeTask(batch, tasks, submissions)
+    }
+    if (tx) {
+      await this.waitTransaction(tx);
+      if (reservation) {
+        // reclaiming successfull! only thing that should be changed is account_id
+        reservation.account_id = accountId
+      } else {
+        // we didn't have a reservation before, so we made a new reservation. lets retrieve it
+        const submissions = await this.getSubmissionsOfBatch(batch.batch_id)
+        reservation = submissions.find(s => (!s.data || !s.data.length) && s.account_id === accountId)
+      }
+    }
+    if (!reservation) {
+      throw new Error('Could not find reservation')
+    }
+    reservation.task_index = await this.getTaskIndexFromLeaf(batch.campaign_id, batch.id, reservation.leaf_hash, tasks)
+    return reservation
   }
 
   /**

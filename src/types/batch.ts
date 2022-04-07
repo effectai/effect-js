@@ -1,6 +1,7 @@
 export interface Batch {
   id: number;
   campaign_id: number;
+  batch_id?: number;
   content: {
     field_0: number;
     field_1: string;
@@ -10,4 +11,5 @@ export interface Batch {
   repetitions: number;
   tasks_done: number;
   num_tasks: number;
+  tasks?: Array<any>;
 }

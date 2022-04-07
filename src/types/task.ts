@@ -6,4 +6,6 @@ export interface Task {
   batch_id: number;
   data: string;
   paid: number;
+  submitted_on?: string;
+  task_index?: number;
 }
