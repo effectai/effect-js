@@ -295,13 +295,10 @@ export class Force extends BaseContract {
    */
   pollTaskResult = async (leafHash: string, taskResultFound: Function, maxTimeout = 120000, interval = 10000): Promise<any> => {
     await retry(async () => {
-      const submissions = await this.getReservations()
-      for (let sub of submissions.rows) {
-        if (leafHash === sub.leaf_hash && sub.data) {
-          return taskResultFound(sub)
-        }
+      const result = await this.getTaskResult(leafHash)
+      if (result) {
+        return taskResultFound(result)
       }
-      // console.log(`Task ${leafHash} not found yet...`)
       throw new Error(`Task ${leafHash} not found yet...`)
     }, {
         retries: Math.round(maxTimeout / interval),
