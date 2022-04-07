@@ -251,21 +251,39 @@ export class Force extends BaseContract {
     }
 
   /**
+   * Get individual task
+   * @param leafHash - leafHash of task
+   * @returns Task
+   */
+  getTask = async (leafHash: string): Promise<Task> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      limit: 1,
+      table: 'submission',
+      index_position: 2,
+      key_type: 'sha256',
+      lower_bound: leafHash,
+      upper_bound: leafHash
+    }
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data[0];
+  }
+
+  /**
    * Get individual task result
    * @param leafHash - leafHash of task
    * @returns Task
    */
   getTaskResult = async (leafHash: string): Promise<Task> => {
-    const submissions = await this.getReservations()
+    const task = await this.getTask(leafHash)
+    let result: Task | PromiseLike<Task>
+    if (task && task.data) {
+      result = task
+    }
 
-    let task: Task | PromiseLike<Task>;
-    submissions.rows.forEach(sub => {
-      if (leafHash === sub.leaf_hash && sub.data) {
-        task = sub
-      }
-    });
-
-    return task;
+    return result;
   }
 
   /**
