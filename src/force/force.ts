@@ -214,7 +214,17 @@ export class Force extends BaseContract {
    * @returns 
    */
   getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
-    const submissions = await this.getReservations()
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'submission',
+      index_position: 3,
+      key_type: 'i64',
+      lower_bound: batchId,
+      upper_bound: batchId
+    }
+    const submissions = await this.api.rpc.get_table_rows(config)
+
     const batchSubmissions = []
     for await (const sub of submissions.rows) {
       if (batchId === parseInt(sub.batch_id)) {
@@ -329,14 +339,16 @@ export class Force extends BaseContract {
 
     batches.rows.forEach(batch => {
       batch.batch_id = getCompositeKey(batch.id, batch.campaign_id)
-      if (batch.tasks_done >= 0 && batch.num_tasks > 0 && batch.tasks_done < batch.num_tasks) {
+      if (batch.tasks_done >= 0 && batch.num_tasks > 0 && batch.tasks_done < (batch.num_tasks * batch.repetitions)) {
         batch.status = 'Active'
       }
-      else if (batch.tasks_done >= 0 && batch.num_tasks === 0) {
+      else if (batch.tasks_done > 0 && batch.num_tasks === 0) {
         batch.status = 'Paused'
       }
       else if (batch.num_tasks === batch.tasks_done) {
         batch.status = 'Completed'
+      } else {
+        batch.status = 'Not Published'
       }
     });
 
