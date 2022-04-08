@@ -186,7 +186,8 @@ export class Force extends BaseContract {
       index_position: 3,
       key_type: 'i64',
       lower_bound: batchId,
-      upper_bound: batchId
+      upper_bound: batchId,
+      limit: 300
     }
     const submissions = await this.api.rpc.get_table_rows(config)
 
