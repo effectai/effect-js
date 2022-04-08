@@ -12,7 +12,7 @@ export function isBscAddress(address: string): boolean {
  * @param eosAccount 
  * @returns 
  */
-export function validEosAccount (eosAccount: string): boolean {
+export function isEosAccount (eosAccount: string): boolean {
   const validEosChars = 'abcdefghijklmnopqrstuvwxyz12345' // Allowed characters for EOS eosAccount name
   const maxEosLength = 12
   const validChars = eosAccount.split('').every((char) => validEosChars.split('').includes(char))
