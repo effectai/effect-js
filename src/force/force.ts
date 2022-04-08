@@ -187,7 +187,7 @@ export class Force extends BaseContract {
       key_type: 'i64',
       lower_bound: batchId,
       upper_bound: batchId,
-      limit: 300
+      limit: this.config.batchSizeLimit
     }
     const submissions = await this.api.rpc.get_table_rows(config)
 
@@ -454,6 +454,10 @@ export class Force extends BaseContract {
   createBatch = async (campaignId: number, content, repetitions: number): Promise<any> => {
     let sig: Signature
     let batchId: number = 0
+
+    if ((content.tasks.length * repetitions) > this.config.batchSizeLimit) {
+      throw new Error(`Batch size exceeds limit of ${this.config.batchSizeLimit} (including repetitions)`)
+    }
 
     const batches = await this.getCampaignBatches(campaignId);
     if (batches.length) {

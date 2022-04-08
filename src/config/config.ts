@@ -48,7 +48,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
             eosNodeHost:            config?.eosNodeHost            ?? 'eos.greymass.com',
-            eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+            eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+            batchSizeLimit:         300
 
         }
 
@@ -86,8 +87,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
             eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.greymass.com',
-            eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840'
-
+            eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
+            batchSizeLimit:         300
         }
 
     } else if (environment === 'local') {
@@ -129,8 +130,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'http',
             eosNodePort:            config?.eosNodePort            ?? 8888,
             eosNodeHost:            config?.eosNodeHost            ?? 'localhost',
-            eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f'
-
+            eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f',
+            batchSizeLimit:         300
         }
 
     } else {

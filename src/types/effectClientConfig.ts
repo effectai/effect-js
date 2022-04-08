@@ -202,4 +202,9 @@ export interface EffectClientConfig {
    * The period before a reserved task can be automatically released, measured in seconds.
    */
   releaseTaskDelaySec ? : number
+
+  /**
+   * Max size of a batch
+   */
+  batchSizeLimit ? : number
 }
