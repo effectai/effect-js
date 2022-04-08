@@ -836,7 +836,7 @@ export class Force extends BaseContract {
         indexesCount[num] = indexesCount[num] ? indexesCount[num] + 1 : 1
       }
       // grab the first available index, that the user hasn't done yet
-      const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < batch.repetitions && !userIndexes.includes(key))
+      const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < batch.repetitions && !this.didWorkerDoTask(userIndexes, key))
       taskIndex = availableIndex ? parseInt(availableIndex) : null
     } else {
       // no submissions yet in batch
@@ -849,6 +849,11 @@ export class Force extends BaseContract {
     }
     console.log("make new reservation for task index", taskIndex)
     return this.reserveTask(batch.id, taskIndex, batch.campaign_id, tasks)
+  }
+
+  didWorkerDoTask = (userIndexes, key): Boolean => {
+    const item = userIndexes.find(i => parseInt(i) === parseInt(key))
+    return item !== null && item !== undefined
   }
 
   reserveOrClaimTask = async (batch: Batch, tasks: Array<any>): Promise<Task> => {
