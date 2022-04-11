@@ -100,44 +100,48 @@ function forceOnload() {
   document.getElementById('FORCE_FORM').addEventListener("submit", function(event) {
     event.preventDefault();
     let values = {};
-    const inputs = event.target.elements;
-    for (let index = 0; index < inputs.length; ++index) {
-      if (!inputs[index].name.startsWith('FORCE_')) {
-        let value;
-        const field = inputs[index];
-        const key = field.name || field.id;
-        if (!key) continue;
-        switch (field.type) {
-          case 'checkbox':
-            if (!field.checked) continue;
-            value = field.value;
-            break;
-          case 'submit':
-            // submit not yet supported
-            continue;
-          case 'file':
-            delete(inputs[index])
-            break;
-          case 'radio':
-            if (!field.checked) continue;
-            value = field.value;
-            break;
-          case 'select-multiple':
-            value = Array.from(inputs[index].options).filter(opt => opt.selected).map(opt => opt.value);
-            break;
-          default:
-            value = inputs[index].value;
-        }
-        if (key in values) {
-          if (Array.isArray(values[key])) {
-            // We already have an array with values, push new value to array
-            values[key].push(value);
-          } else {
-            // multiple values same key, create array
-            values[key] = [values[key], value];
+    if (typeof forceInput === "function") {
+      values = forceInput();
+    } else {
+      const inputs = event.target.elements;
+      for (let index = 0; index < inputs.length; ++index) {
+        if (!inputs[index].name.startsWith('FORCE_')) {
+          let value;
+          const field = inputs[index];
+          const key = field.name || field.id;
+          if (!key) continue;
+          switch (field.type) {
+            case 'checkbox':
+              if (!field.checked) continue;
+              value = field.value;
+              break;
+            case 'submit':
+              // submit not yet supported
+              continue;
+            case 'file':
+              delete(inputs[index])
+              break;
+            case 'radio':
+              if (!field.checked) continue;
+              value = field.value;
+              break;
+            case 'select-multiple':
+              value = Array.from(inputs[index].options).filter(opt => opt.selected).map(opt => opt.value);
+              break;
+            default:
+              value = inputs[index].value;
           }
-        } else {
-          values[key] = value;
+          if (key in values) {
+            if (Array.isArray(values[key])) {
+              // We already have an array with values, push new value to array
+              values[key].push(value);
+            } else {
+              // multiple values same key, create array
+              values[key] = [values[key], value];
+            }
+          } else {
+            values[key] = value;
+          }
         }
       }
     }
