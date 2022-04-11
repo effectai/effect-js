@@ -232,6 +232,8 @@ export class BaseContract {
         }
       });
       if (foundTransaction) {
+        // Sometimes the node hasn't processed the transactions in the block yet, wait a bit to give him some time
+        await new Promise(r => setTimeout(r, 500));
         break
       }
     }
