@@ -189,10 +189,14 @@ export class Force extends BaseContract {
       upper_bound: batchId,
       limit: this.config.batchSizeLimit
     }
-    const submissions = await this.api.rpc.get_table_rows(config)
+    const data = await this.api.rpc.get_table_rows(config)
+    if (data.more) {
+      // TODO: this should not happen, limit is too high
+      throw new Error('could not retrieve all submissions for batch')
+    }
 
     const batchSubmissions = []
-    for await (const sub of submissions.rows) {
+    for await (const sub of data.rows) {
       if (batchId === parseInt(sub.batch_id)) {
         if (category === 'all') {
           batchSubmissions.push(sub)
