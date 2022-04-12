@@ -174,9 +174,9 @@ export class Force extends BaseContract {
 
   /**
    * Get submissions of batch
-   * @param batchId 
+   * @param batchId
    * @param category , can be all, submissions or reservations
-   * @returns 
+   * @returns
    */
   getSubmissionsOfBatch = async (batchId: number, category = 'all'): Promise<Array<Task>> => {
     const config = {
@@ -209,7 +209,7 @@ export class Force extends BaseContract {
     }
 
     return batchSubmissions;
-  } 
+  }
 
   /**
    * Get individual task
@@ -315,7 +315,7 @@ export class Force extends BaseContract {
     const batches = await this.getBatches('', -1)
 
     const campaignBatches = []
-    
+
     batches.rows.forEach(batch => {
       if (campaignId === parseInt(batch.campaign_id)) {
         campaignBatches.push(batch)
@@ -651,7 +651,7 @@ export class Force extends BaseContract {
     }
     else {
       throw new Error('No active tasks found for batch.')
-    } 
+    }
   }
 
 
@@ -722,6 +722,7 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
+        qualis: [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -766,6 +767,7 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
+        qualis: [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -810,9 +812,9 @@ export class Force extends BaseContract {
 
   /**
    * Makes a campaign (uploadCampaign & createCampaign combined)
-   * @param content 
-   * @param quantity 
-   * @returns 
+   * @param content
+   * @param quantity
+   * @returns
    */
   makeCampaign = async (content: object, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // upload to ipfs
@@ -928,11 +930,11 @@ export class Force extends BaseContract {
 
   /**
    * reserve a task in a batch
-   * @param batchId 
-   * @param taskIndex 
-   * @param campaignId 
-   * @param tasks 
-   * @returns 
+   * @param batchId
+   * @param taskIndex
+   * @param campaignId
+   * @param tasks
+   * @returns
    */
   reserveTask = async (batchId: number, taskIndex: number, campaignId: number, tasks: Array<any>, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
     let sig: Signature
@@ -991,10 +993,10 @@ export class Force extends BaseContract {
 
   /**
    * release and reclaim expired task.
-   * @param taskId 
+   * @param taskId
    */
   claimExpiredTask = async (taskId: number, account_id?: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    let releaseSig: Signature, reclaimSig: Signature 
+    let releaseSig: Signature, reclaimSig: Signature
 
     const user = this.effectAccount.accountName
     const accountId = this.effectAccount.vAccountRows[0].id
@@ -1009,7 +1011,7 @@ export class Force extends BaseContract {
       reclaimBuff.push(15)
       reclaimBuff.pushNumberAsUint64(taskId)
       reclaimBuff.pushUint32(accountId)
-      
+
       releaseSig = await this.generateSignature(releaseBuff)
       reclaimSig = await this.generateSignature(reclaimBuff)
     }
@@ -1052,8 +1054,8 @@ export class Force extends BaseContract {
 
   /**
    * Release a task reservation.
-   * @param taskId 
-   * @returns 
+   * @param taskId
+   * @returns
    */
   releaseTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
@@ -1089,8 +1091,8 @@ export class Force extends BaseContract {
 
   /**
    * Reclaim a released task reservation.
-   * @param taskId 
-   * @returns 
+   * @param taskId
+   * @returns
    */
   reclaimTask = async (taskId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
@@ -1126,11 +1128,11 @@ export class Force extends BaseContract {
 
   /**
    * Submits a Task in a Batch
-   * @param batchId 
-   * @param submissionId 
-   * @param data 
-   * @param accountId 
-   * @returns 
+   * @param batchId
+   * @param submissionId
+   * @param data
+   * @param accountId
+   * @returns
    */
   submitTask = async (batchId: number, submissionId: number, data: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
@@ -1167,7 +1169,7 @@ export class Force extends BaseContract {
   /**
    * Receive tokens from completed tasks.
    * @param paymentId
-   * @returns 
+   * @returns
    */
   payout = async (): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
@@ -1209,9 +1211,9 @@ export class Force extends BaseContract {
   }
   /**
    * Get task index from merkle leaf
-   * @param leafHash 
-   * @param tasks 
-   * @returns 
+   * @param leafHash
+   * @param tasks
+   * @returns
    */
   getTaskIndexFromLeaf = async function (campaignId: number, batchId:number, leafHash: string, tasks: Array<Task>, leaves?: Array<String>): Promise<number> {
     let taskIndex: number;
