@@ -207,4 +207,13 @@ export interface EffectClientConfig {
    * Max size of a batch
    */
   batchSizeLimit ? : number
+
+  /**
+   * Estimated Time to Complete on Task in Seconds
+   * 1 Task per EFX per estimated time to complete
+   * If default is 60 seconds, then 1 Task per 1 EFX per 60 seconds => 1 EFX per Minute
+   * @default 60
+   * 
+   */
+  taskEstimatedTime ? : number
 }
