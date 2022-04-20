@@ -17,9 +17,8 @@ import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
 import { Qualification } from '../types/qualifications';
-import { Content } from '../types/content';
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -1253,12 +1252,7 @@ export class Force extends BaseContract {
    */
   createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::mkquali(content content, uint32_t account_id, eosio::name payer, vaccount::sig sig) {
-    const qualification = {
-      name, 
-      description,
-      type,
-      image
-    }
+    const qualification = { name, description, type, image }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
