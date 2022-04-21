@@ -210,9 +210,9 @@ export interface EffectClientConfig {
 
   /**
    * Estimated Time to Complete on Task in Seconds
-   * 1 Task per EFX per estimated time to complete
-   * If default is 60 seconds, then 1 Task per 1 EFX per 60 seconds => 1 EFX per Minute
-   * @default 60
+   * 1 Task per Dollar per estimated time to complete
+   * Will default to 1.5 Doller per hour (median income per hour worldwide)
+   * @default 1.5
    * 
    */
   taskEstimatedTime ? : number

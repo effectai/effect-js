@@ -16,6 +16,8 @@ import { Signature } from 'eosjs/dist/Signature';
 import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
+import { Qualification } from '../types/qualifications';
+import { Content } from '../types/content';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 
@@ -476,6 +478,7 @@ export class Force extends BaseContract {
     const campaignOwner = this.effectAccount.accountName
 
     if (isBscAddress(campaignOwner)) {
+      // mkbatch_params params = {8, id, campaign_id, content, task_merkle_root};
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(8)
       serialbuff.pushUint32(batchId)
@@ -1244,4 +1247,142 @@ export class Force extends BaseContract {
 
     return treeLeaves
   }
+
+  /**
+   * Create a Qualification andassign it to a campaign
+   */
+  createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    // void force::mkquali(content content, uint32_t account_id, eosio::name payer, vaccount::sig sig) {
+    const qualification = {
+      name, 
+      description,
+      type,
+      image
+    }
+
+    let sig: Signature
+    const owner = this.effectAccount.accountName
+    const accountId = this.effectAccount.vAccountRows[0].id
+
+    try {
+      const hash = await this.uploadCampaign(qualification)
+      console.log('Upload succesful, hash: ', hash)
+  
+  
+      if (isBscAddress(owner)) {
+        // mkquali_params params = {18, account_id, content};
+        // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))    
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(18)
+        serialbuff.pushUint32(accountId)
+        serialbuff.push(0)
+        serialbuff.pushString(hash)
+  
+        sig = await this.generateSignature(serialbuff)
+        console.log('Signature generated', sig)
+      }
+  
+      const action = {
+        account: this.config.forceContract,
+        name: 'mkquali',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+        }],
+        data: {
+          content: { field_0: 0, field_1:  hash },
+          account_id: accountId,
+          payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      }
+
+      console.log('action: ', action)
+  
+      const txReceipt = await this.sendTransaction(owner, action)
+      console.log('txReceipt: ', txReceipt)
+      return txReceipt
+     
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  /**
+   * Assign a qualification to a campaign
+   */
+  assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
+    let sig: Signature
+    const owner = this.effectAccount.accountName
+    const accountId = this.effectAccount.vAccountRows[0].id
+
+    if (isBscAddress(owner)) {
+      //  rmbatch_params params = {19, quali_id, user_id};
+      // (.push 19) (.pushUint32 id) (.pushUint32 user-id))))
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(19)
+      serialbuff.pushUint32(qualificationId)
+      serialbuff.pushUint32(accountId)
+
+      sig = await this.generateSignature(serialbuff)
+    }
+
+    const actions = {
+      account: this.config.forceContract,
+      name: 'assignquali',
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        quali_id: qualificationId,
+        user_id: accountId,
+        content: { field_0: 0, field_1: hash },
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+    return await this.sendTransaction(owner, actions)
+  }
+
+   /**
+   * Get Qualification
+   * @param id - id of campaign
+   * @param processCampaign - get campaign content from ipfs
+   * @returns Qualification
+   */
+    getQualification = async (id: number): Promise<Qualification> => {
+      const config = {
+        code: this.config.forceContract,
+        scope: this.config.forceContract,
+        table: 'quali',
+        key_type: 'i64',
+        lower_bound: id,
+        upper_bound: id,
+      }
+  
+      return (await this.api.rpc.get_table_rows(config)).rows[0]
+    }
+
+    /**
+     * Get User Qualifications
+     * @param id - id of the user
+     * @returns Array<Qualification>
+     */
+    getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+      const config = {
+        code: this.config.forceContract,
+        scope: this.config.forceContract,
+        table: 'userquali',
+        key_type: 'i64',
+        lower_bound: id,
+        upper_bound: id,
+      }
+      // TODO implement filter on rows
+      return (await this.api.rpc.get_table_rows(config)).rows[0]
+    }
+
+
 }
+
