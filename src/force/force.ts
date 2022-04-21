@@ -1251,7 +1251,6 @@ export class Force extends BaseContract {
    * Create a Qualification andassign it to a campaign
    */
   createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    // void force::mkquali(content content, uint32_t account_id, eosio::name payer, vaccount::sig sig) {
     const qualification = { name, description, type, image }
 
     let sig: Signature
@@ -1262,10 +1261,7 @@ export class Force extends BaseContract {
       const hash = await this.uploadCampaign(qualification)
       console.log('Upload succesful, hash: ', hash)
   
-  
       if (isBscAddress(owner)) {
-        // mkquali_params params = {18, account_id, content};
-        // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))    
         const serialbuff = new Serialize.SerialBuffer()
         serialbuff.push(18)
         serialbuff.pushUint32(accountId)
