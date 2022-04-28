@@ -1,12 +1,9 @@
 export interface Qualification {
     id: number;
-    name: string;
-    description: string;
-    image: string;
-    type: QualificationType;
-}
-
-enum QualificationType {
-    INCLUSIVE = 0,
-    EXCLUSIVE = 1
+    account_id: number;
+    info?: object
+    content: {
+        field_0: number;
+        field_1: string;
+    };
 }

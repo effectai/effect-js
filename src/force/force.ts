@@ -1352,37 +1352,95 @@ export class Force extends BaseContract {
    * @param processCampaign - get campaign content from ipfs
    * @returns Qualification
    */
-    getQualification = async (id: number): Promise<Qualification> => {
-      const config = {
-        code: this.config.forceContract,
-        scope: this.config.forceContract,
-        table: 'quali',
-        key_type: 'i64',
-        lower_bound: id,
-        upper_bound: id,
-      }
-  
-      return (await this.api.rpc.get_table_rows(config)).rows[0]
+  getQualification = async (id: number, processQualification: boolean = true): Promise<Qualification> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'quali',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
     }
+
+    let qualification = (await this.api.rpc.get_table_rows(config)).rows[0]
+
+    if (processQualification) {
+      // Get Quali Info.
+      for (let i = 0; i < qualification.rows.length; i++) {
+        qualification = await this.processQualification(qualification)
+      }
+    }
+
+    return qualification
+  }
 
     /**
      * Get User Qualifications
      * @param id - id of the user
      * @returns Array<Qualification>
      */
-    getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
-      const config = {
-        code: this.config.forceContract,
-        scope: this.config.forceContract,
-        table: 'userquali',
-        key_type: 'i64',
-        lower_bound: id,
-        upper_bound: id,
-      }
-      // TODO implement filter on rows
-      return (await this.api.rpc.get_table_rows(config)).rows[0]
+  getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'userquali',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
+    }
+    // TODO implement filter on rows
+    return (await this.api.rpc.get_table_rows(config)).rows[0]
+  }
+
+  /**
+   * Get Force Qualifications
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @param processCampaign - get qualification content from ipfs
+   * @returns - Qualification Table Rows Result
+  */
+  getQualifications = async (nextKey, limit = 20, processQualifications: boolean = true): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'quali',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
     }
 
+    const qualifications = await this.api.rpc.get_table_rows(config)
 
+    if (processQualifications) {
+      // Get Quali Info.
+      for (let i = 0; i < qualifications.rows.length; i++) {
+        qualifications.rows[i] = await this.processQualification(qualifications.rows[i])
+      }
+    }
+
+    return qualifications;
+  }
+
+  /**
+   * processQualification
+   * @param qualification
+   * @returns
+   */
+  processQualification = async (qualification: Qualification): Promise<Qualification> => {
+    try {
+      // field_0 represents the content type where:
+      // 0: IPFS
+      if (qualification.content.field_0 === 0 && qualification.content.field_1 !== '') {
+        // field_1 represents the IPFS hash
+        qualification.info = await this.getIpfsContent(qualification.content.field_1)
+      }
+    } catch (e) {
+      qualification.info = null
+      console.error('processCampaign', e)
+    }
+    return qualification
+  }
 }
 
