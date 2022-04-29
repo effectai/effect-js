@@ -698,7 +698,7 @@ export class Force extends BaseContract {
    * @param quantity the amount of tokens rewarded
    * @returns transaction result
    */
-  createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createCampaign = async (hash: string, quantity: string, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
@@ -725,12 +725,12 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
-        qualis: [],
+        qualis: qualis ? qualis : [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
-
+    
     return await this.sendTransaction(owner, action)
   }
 
@@ -741,7 +741,7 @@ export class Force extends BaseContract {
    * @param quantity the amount of tokens rewarded
    * @returns transaction result
    */
-  editCampaign = async (campaignId: number, hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  editCampaign = async (campaignId: number, hash: string, quantity: string, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
@@ -770,7 +770,7 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
-        qualis: [],
+        qualis: qualis ? qualis : [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
