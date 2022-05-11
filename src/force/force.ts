@@ -925,7 +925,13 @@ export class Force extends BaseContract {
       }
     }
     if (!reservation) {
-      throw new Error('Could not find reservation')
+      // Try it one more time before throwing an error
+      await sleep(1000)
+      const submissions = await this.getSubmissionsOfBatch(batch.batch_id)
+      reservation = submissions.find(s => (!s.data || !s.data.length) && s.account_id === accountId)
+      if (!reservation) {
+        throw new Error('Could not find reservation')
+      }
     }
     reservation.task_index = await this.getTaskIndexFromLeaf(batch.campaign_id, batch.id, reservation.leaf_hash, tasks)
     return reservation
