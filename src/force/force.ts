@@ -1432,7 +1432,7 @@ export class Force extends BaseContract {
   /**
    * processQualification
    * @param qualification
-   * @returns
+   * @returns Promise<Qualification> - Qualification with content
    */
   processQualification = async (qualification: Qualification): Promise<Qualification> => {
     try {
