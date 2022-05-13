@@ -530,7 +530,7 @@ export class Force extends BaseContract {
       permission: isBscAddress(campaignOwner) ? this.config.eosRelayerPermission : this.effectAccount.permission
     }]
 
-    console.log("batch composite key", batchPk)
+    // console.log("batch composite key", batchPk)
     const actions = [{
       account: this.config.forceContract,
       name: 'mkbatch',
@@ -625,8 +625,8 @@ export class Force extends BaseContract {
     const owner = this.effectAccount.accountName
     let vaccount = ['name', owner]
     const batchPK = getCompositeKey(batch.id, batch.campaign_id)
-    console.log(batch)
-    console.log(batch.id, batch.campaign_id, batchPK)
+    // console.log(batch)
+    // console.log(batch.id, batch.campaign_id, batchPK)
     if (isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(16)
@@ -635,7 +635,7 @@ export class Force extends BaseContract {
       sig = await this.generateSignature(serialbuff)
     }
     const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
-    console.log(reservations)
+    // console.log(reservations)
     if (reservations.length) {
       const action = {
         account: this.config.forceContract,
@@ -861,7 +861,7 @@ export class Force extends BaseContract {
     if (taskIndex === null) {
       throw new Error('no available tasks')
     }
-    console.log("make new reservation for task index", taskIndex)
+    // console.log("make new reservation for task index", taskIndex)
     return this.reserveTask(batch.id, taskIndex, batch.campaign_id, tasks)
   }
 
@@ -882,15 +882,15 @@ export class Force extends BaseContract {
         // found expired reservation
         reservation = rv
         reservation.isExpired = true
-        console.log('found expired reservation')
+        // console.log('found expired reservation')
       } else if (rv.account_id === null) {
         // found a released reservation
-        console.log('found released reservation')
+        // console.log('found released reservation')
 
         reservation = rv
         reservation.isReleased = true
       } else if (rv.account_id === accountId) {
-        console.log('found own reservation')
+        // console.log('found own reservation')
 
         // found own reservation
         reservation = rv
@@ -908,7 +908,7 @@ export class Force extends BaseContract {
         tx = await this.reclaimTask(reservation.id)
       }
     } else {
-      console.log('make new reservation')
+      // console.log('make new reservation')
 
       // User doesn't have reservation yet, so let's make one!
       tx = await this.reserveFreeTask(batch, tasks, submissions)
@@ -1028,7 +1028,7 @@ export class Force extends BaseContract {
     const actions = []
     // if the task is not realeased yet, release it first
     if (account_id) {
-      console.log('account id: ', account_id)
+      // console.log('account id: ', account_id)
       actions.push({
         account: this.config.forceContract,
         name: 'releasetask',
@@ -1272,7 +1272,7 @@ export class Force extends BaseContract {
 
     try {
       const hash = await this.uploadCampaign(qualification)
-      console.log('Upload succesful, hash: ', hash)
+      // console.log('Upload succesful, hash: ', hash)
   
   
       if (isBscAddress(owner)) {
@@ -1285,7 +1285,7 @@ export class Force extends BaseContract {
         serialbuff.pushString(hash)
   
         sig = await this.generateSignature(serialbuff)
-        console.log('Signature generated', sig)
+        // console.log('Signature generated', sig)
       }
   
       const action = {
@@ -1303,10 +1303,10 @@ export class Force extends BaseContract {
         }
       }
 
-      console.log('action: ', action)
+      // console.log('action: ', action)
   
       const txReceipt = await this.sendTransaction(owner, action)
-      console.log('txReceipt: ', txReceipt)
+      // console.log('txReceipt: ', txReceipt)
       return txReceipt
      
     } catch (error) {
