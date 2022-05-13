@@ -204,7 +204,8 @@ export interface EffectClientConfig {
   releaseTaskDelaySec ? : number
 
   /**
-   * Max size of a batch
+   * Max size of a batch, amount of tasks x amount of reps
+   * @default 300
    */
   batchSizeLimit ? : number
 
@@ -213,7 +214,6 @@ export interface EffectClientConfig {
    * 1 Task per Dollar per estimated time to complete
    * Will default to 1.5 Doller per hour (median income per hour worldwide)
    * @default 1.5
-   * 
    */
   taskEstimatedTime ? : number
 }
