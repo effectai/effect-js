@@ -1351,7 +1351,7 @@ export class Force extends BaseContract {
     }
 
     return qualifications;
-  }x
+  }
 
   /**
    * processQualification
