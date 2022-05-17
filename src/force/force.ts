@@ -328,82 +328,6 @@ export class Force extends BaseContract {
   }
 
   /**
-   * get campaign join table
-   * @param accountId
-   * @param campaignId
-   * @returns
-   */
-  getCampaignJoins = async (campaignId: number): Promise<GetTableRowsResult> => {
-    const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
-
-    const config = {
-      code: this.config.forceContract,
-      scope: this.config.forceContract,
-      table: 'campaignjoin',
-      key_type: 'i64',
-      lower_bound: key,
-      upper_bound: key,
-    }
-
-    return await this.api.rpc.get_table_rows(config)
-  }
-
-  /**
-   * Join a force Campaign.
-   * @param campaignId
-   * @returns transaction result
-   */
-  joinCampaign = async (campaignId: number, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
-    let sig: Signature
-    const owner = this.effectAccount.accountName
-
-    if (isBscAddress(owner)) {
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(7)
-      serialbuff.pushUint32(campaignId)
-
-      sig = await this.generateSignature(serialbuff)
-    }
-
-    const action = {
-      account: this.config.forceContract,
-      name: 'joincampaign',
-      authorization: [{
-        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-      }],
-      data: {
-        account_id: this.effectAccount.vAccountRows[0].id,
-        campaign_id: campaignId,
-        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        sig: isBscAddress(owner) ? sig.toString() : null
-      }
-    }
-    if (sendTransaction) {
-      return await this.sendTransaction(owner, action);
-    } else {
-      return action
-    }
-  }
-
-  /**
-   * Combined joinCampaign and reserve task actions in one transaction to improve user experience in Effect Force.
-   * @param campaignId
-   * @param batchId
-   * @param taskIndex
-   * @param tasks
-   * @returns
-   */
-  joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const actions: Array<Object> = []
-    actions.push(await this.joinCampaign(campaignId, false))
-    // sleep needed to make sure the next metamask popup opens
-    await sleep(500)
-    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
-    return await this.sendTransaction(this.effectAccount.accountName, actions);
-  }
-
-  /**
    * Upload campaign data to ipfs
    * @param campaignIpfs
    * @returns
@@ -1421,7 +1345,7 @@ export class Force extends BaseContract {
     }
 
     return qualifications;
-  }
+  }x
 
   /**
    * processQualification
