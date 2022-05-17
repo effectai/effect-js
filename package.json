@@ -1,6 +1,6 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.1.66",
+  "version": "0.1.71",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "browser": "dist/lib/index.js",
