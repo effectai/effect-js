@@ -11,12 +11,16 @@ export function convertToAsset(amount: string): string {
     // this.config.efx_precision
     const precision = 4
     const part = amount.toString().split('.')
-
+    console.debug('part', part)
     if (part.length === 1) {
-      return `${part[0]}.${'0'.repeat(precision)}`
+      const res = `${part[0]}.${'0'.repeat(precision)}`
+      console.debug('ifres', res)
+      return res
     } else {
-      const pad = precision - part[1].length
-      return `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+      const pad = precision - (part[1].length > 4 ? 4 : part[1].length )
+      const res = `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+      console.debug('elseres', res)
+      return res
     }
   } catch (error) {
     throw Error(error)
