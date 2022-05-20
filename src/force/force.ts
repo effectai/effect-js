@@ -1241,7 +1241,7 @@ export class Force extends BaseContract {
   /**
    * Assign a qualification to a campaign
    */
-  assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
@@ -1372,5 +1372,49 @@ export class Force extends BaseContract {
     }
     return qualification
   }
+
+  /**
+   * Get Assigned User Qualifications
+   * @param userId - id of the user
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @param processCampaign - get campaign content from ipfs
+   * @returns - Qualification Table Rows Result
+   */
+  getAssignedUserQualifications = async (accountId: number, nextKey, limit = 20, processQualifications: boolean = true): Promise<GetTableRowsResult> => {
+    
+    const id = this.effectAccount ? this.effectAccount.vAccountRows[0].id : accountId
+
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'userquali',
+      index_position: 0,
+      key_type: 'i64',
+      lower_bound: 
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+
+    const qualifications = await this.api.rpc.get_table_rows(config)
+
+    if (processQualifications) {
+      // Get Quali Info.
+      for (let i = 0; i < qualifications.rows.length; i++) {
+        qualifications.rows[i] = await this.processQualification(qualifications.rows[i])
+      }
+    }
+
+    return qualifications;
+  }
+
 }
 
+code: this.config.forceContract,
+scope: this.config.forceContract,
+table: 'payment',
+index_position: 3,
+key_type: 'i64',
+lower_bound: id,
+upper_bound: id
