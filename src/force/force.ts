@@ -1268,7 +1268,6 @@ export class Force extends BaseContract {
       data: {
         quali_id: qualificationId,
         user_id: accountId,
-        content: { field_0: 0, field_1: hash },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -1373,48 +1372,4 @@ export class Force extends BaseContract {
     return qualification
   }
 
-  /**
-   * Get Assigned User Qualifications
-   * @param userId - id of the user
-   * @param nextKey - key to start searching from
-   * @param limit - max number of rows to return
-   * @param processCampaign - get campaign content from ipfs
-   * @returns - Qualification Table Rows Result
-   */
-  getAssignedUserQualifications = async (accountId: number, nextKey, limit = 20, processQualifications: boolean = true): Promise<GetTableRowsResult> => {
-    
-    const id = this.effectAccount ? this.effectAccount.vAccountRows[0].id : accountId
-
-    const config = {
-      code: this.config.forceContract,
-      scope: this.config.forceContract,
-      table: 'userquali',
-      index_position: 0,
-      key_type: 'i64',
-      lower_bound: 
-    }
-    if (nextKey) {
-      config.lower_bound = nextKey
-    }
-
-    const qualifications = await this.api.rpc.get_table_rows(config)
-
-    if (processQualifications) {
-      // Get Quali Info.
-      for (let i = 0; i < qualifications.rows.length; i++) {
-        qualifications.rows[i] = await this.processQualification(qualifications.rows[i])
-      }
-    }
-
-    return qualifications;
-  }
-
 }
-
-code: this.config.forceContract,
-scope: this.config.forceContract,
-table: 'payment',
-index_position: 3,
-key_type: 'i64',
-lower_bound: id,
-upper_bound: id
