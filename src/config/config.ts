@@ -45,10 +45,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://api.eoseoul.io',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://api.eostitan.com',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'api.eoseoul.io',
+            eosNodeHost:            config?.eosNodeHost            ?? 'api.eostitan.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5

@@ -1,14 +1,9 @@
 <p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
 
 
-# 🔥 effect-js 
+# 🔥 @effectai/effect-js 
 
 Javascript SDK for integration with [https://effect.network](https://effect.network)  
-
-
-# Hackathon
-Join the hackathon and get your first effect-js project running!
-[Join at DevPost](https://effect-network-hackathon.devpost.com/)
 
 # Boilerplate Demo
 A demo of the browser boilerplate can be found at the following link:
