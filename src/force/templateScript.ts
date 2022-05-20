@@ -97,11 +97,11 @@ function forceResize() {
 function forceOnload() {
   forceResize();
 
-  document.getElementById('FORCE_FORM').addEventListener("submit", function(event) {
+  document.getElementById('FORCE_FORM').addEventListener("submit", async function(event) {
     event.preventDefault();
     let values = {};
     if (typeof forceInput === "function") {
-      values = forceInput();
+      values = await forceInput(event);
     } else {
       const inputs = event.target.elements;
       for (let index = 0; index < inputs.length; ++index) {
