@@ -465,6 +465,7 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         task_merkle_root: root,
         repetitions: repetitions,
+        qualis: null,
         payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
         sig: isBscAddress(campaignOwner) ? sig.toString() : null
       },
@@ -654,7 +655,7 @@ export class Force extends BaseContract {
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
-    
+
     return await this.sendTransaction(owner, action)
   }
 
