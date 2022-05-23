@@ -17,10 +17,12 @@ export function convertToAsset(amount: string): string {
       console.debug('ifres', res)
       return res
     } else {
-      const pad = precision - (part[1].length > 4 ? 4 : part[1].length )
-      const res = `${part[0]}.${part[1]}${'0'.repeat(pad)}`
-      console.debug('elseres', res)
-      return res
+      // Use to fixed .toFixed
+      if (part[1].length <= precision) {
+        const pad = precision 
+        const res = `${part[0]}.${part[1]}${'0'.repeat(pad)}`
+        console.debug('elseres', res)
+        return res
     }
   } catch (error) {
     throw Error(error)
