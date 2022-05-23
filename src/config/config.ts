@@ -85,10 +85,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://jungle3.bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.cryptolions.io/',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.cryptolions.io',
             eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5
