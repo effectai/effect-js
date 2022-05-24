@@ -465,6 +465,7 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         task_merkle_root: root,
         repetitions: repetitions,
+        qualis: null,
         payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
         sig: isBscAddress(campaignOwner) ? sig.toString() : null
       },
@@ -654,7 +655,7 @@ export class Force extends BaseContract {
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
-    
+
     return await this.sendTransaction(owner, action)
   }
 
@@ -1231,7 +1232,7 @@ export class Force extends BaseContract {
   /**
    * Assign a qualification to a campaign
    */
-  assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
@@ -1258,7 +1259,6 @@ export class Force extends BaseContract {
       data: {
         quali_id: qualificationId,
         user_id: accountId,
-        content: { field_0: 0, field_1: hash },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -1362,5 +1362,5 @@ export class Force extends BaseContract {
     }
     return qualification
   }
-}
 
+}

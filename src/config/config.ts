@@ -1,4 +1,5 @@
 import { EffectClientConfig } from './../types/effectClientConfig';
+
 import Web3 from 'web3';
 
 /**
@@ -10,16 +11,16 @@ import Web3 from 'web3';
  * @example defaultConfiguration(environment = 'mainnet', config = {network: 'mainnet, bscRpcUrl: 'wss://bsc-ws-node.nariox.org:443', ipfsNode: 'https://ifps.effect.ai'})
  */
 
-// TODO - The user should pass a config object, but it is not nessecary to specify all the properties, some of them should be optional. 
+// TODO - The user should pass a config object, but it is not nessecary to specify all the properties, some of them should be optional.
 // Should a new interface be created to pass a user defined config object?
 export const defaultConfiguration = (environment: string = 'testnet', config?: EffectClientConfig): EffectClientConfig => {
-    
+
     if (environment === 'mainnet' || environment === 'main' || environment === 'app') {
-        
+
         return {
             network:                config?.network                ?? 'mainnet',
             signatureProvider:      config?.signatureProvider      ?? null,
-            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'), 
+            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'force.efx',
             accountContract:        config?.accountContract        ?? 'vaccount.efx',
@@ -44,10 +45,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://eos.greymass.com:443',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://api.eostitan.com',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'eos.greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'api.eostitan.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5
@@ -84,10 +85,10 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
             eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://jungle3.bloks.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.greymass.com:443',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle3.cryptolions.io/',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.greymass.com',
+            eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.cryptolions.io',
             eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5
