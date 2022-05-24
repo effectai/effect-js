@@ -327,82 +327,6 @@ export class Force extends BaseContract {
   }
 
   /**
-   * get campaign join table
-   * @param accountId
-   * @param campaignId
-   * @returns
-   */
-  getCampaignJoins = async (campaignId: number): Promise<GetTableRowsResult> => {
-    const key = getCompositeKey(this.effectAccount.vAccountRows[0].id, campaignId)
-
-    const config = {
-      code: this.config.forceContract,
-      scope: this.config.forceContract,
-      table: 'campaignjoin',
-      key_type: 'i64',
-      lower_bound: key,
-      upper_bound: key,
-    }
-
-    return await this.api.rpc.get_table_rows(config)
-  }
-
-  /**
-   * Join a force Campaign.
-   * @param campaignId
-   * @returns transaction result
-   */
-  joinCampaign = async (campaignId: number, sendTransaction = true): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs | Object> => {
-    let sig: Signature
-    const owner = this.effectAccount.accountName
-
-    if (isBscAddress(owner)) {
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(7)
-      serialbuff.pushUint32(campaignId)
-
-      sig = await this.generateSignature(serialbuff)
-    }
-
-    const action = {
-      account: this.config.forceContract,
-      name: 'joincampaign',
-      authorization: [{
-        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-      }],
-      data: {
-        account_id: this.effectAccount.vAccountRows[0].id,
-        campaign_id: campaignId,
-        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        sig: isBscAddress(owner) ? sig.toString() : null
-      }
-    }
-    if (sendTransaction) {
-      return await this.sendTransaction(owner, action);
-    } else {
-      return action
-    }
-  }
-
-  /**
-   * Combined joinCampaign and reserve task actions in one transaction to improve user experience in Effect Force.
-   * @param campaignId
-   * @param batchId
-   * @param taskIndex
-   * @param tasks
-   * @returns
-   */
-  joinCampaignAndReserveTask = async (campaignId: number, batchId: number, taskIndex: number, tasks: Array<any>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const actions: Array<Object> = []
-    actions.push(await this.joinCampaign(campaignId, false))
-    // sleep needed to make sure the next metamask popup opens
-    await sleep(500)
-    actions.push(await this.reserveTask(batchId, taskIndex, campaignId, tasks, false))
-    return await this.sendTransaction(this.effectAccount.accountName, actions);
-  }
-
-  /**
    * Upload campaign data to ipfs
    * @param campaignIpfs
    * @returns
@@ -529,7 +453,7 @@ export class Force extends BaseContract {
       permission: isBscAddress(campaignOwner) ? this.config.eosRelayerPermission : this.effectAccount.permission
     }]
 
-    console.log("batch composite key", batchPk)
+    // console.log("batch composite key", batchPk)
     const actions = [{
       account: this.config.forceContract,
       name: 'mkbatch',
@@ -540,6 +464,7 @@ export class Force extends BaseContract {
         content: { field_0: 0, field_1: hash },
         task_merkle_root: root,
         repetitions: repetitions,
+        qualis: null,
         payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
         sig: isBscAddress(campaignOwner) ? sig.toString() : null
       },
@@ -624,8 +549,8 @@ export class Force extends BaseContract {
     const owner = this.effectAccount.accountName
     let vaccount = ['name', owner]
     const batchPK = getCompositeKey(batch.id, batch.campaign_id)
-    console.log(batch)
-    console.log(batch.id, batch.campaign_id, batchPK)
+    // console.log(batch)
+    // console.log(batch.id, batch.campaign_id, batchPK)
     if (isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(16)
@@ -634,7 +559,7 @@ export class Force extends BaseContract {
       sig = await this.generateSignature(serialbuff)
     }
     const reservations = await this.getSubmissionsOfBatch(batchPK, 'reservations')
-    console.log(reservations)
+    // console.log(reservations)
     if (reservations.length) {
       const action = {
         account: this.config.forceContract,
@@ -697,7 +622,7 @@ export class Force extends BaseContract {
    * @param quantity the amount of tokens rewarded
    * @returns transaction result
    */
-  createCampaign = async (hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createCampaign = async (hash: string, quantity: string, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
@@ -724,7 +649,7 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
-        qualis: [],
+        qualis: qualis ? qualis : [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -740,7 +665,7 @@ export class Force extends BaseContract {
    * @param quantity the amount of tokens rewarded
    * @returns transaction result
    */
-  editCampaign = async (campaignId: number, hash: string, quantity: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  editCampaign = async (campaignId: number, hash: string, quantity: string, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
@@ -769,7 +694,7 @@ export class Force extends BaseContract {
           quantity: convertToAsset(quantity) + ' ' + this.config.efxSymbol,
           contract: this.config.efxTokenContract
         },
-        qualis: [],
+        qualis: qualis ? qualis : [],
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -860,7 +785,7 @@ export class Force extends BaseContract {
     if (taskIndex === null) {
       throw new Error('no available tasks')
     }
-    console.log("make new reservation for task index", taskIndex)
+    // console.log("make new reservation for task index", taskIndex)
     return this.reserveTask(batch.id, taskIndex, batch.campaign_id, tasks)
   }
 
@@ -881,15 +806,15 @@ export class Force extends BaseContract {
         // found expired reservation
         reservation = rv
         reservation.isExpired = true
-        console.log('found expired reservation')
+        // console.log('found expired reservation')
       } else if (rv.account_id === null) {
         // found a released reservation
-        console.log('found released reservation')
+        // console.log('found released reservation')
 
         reservation = rv
         reservation.isReleased = true
       } else if (rv.account_id === accountId) {
-        console.log('found own reservation')
+        // console.log('found own reservation')
 
         // found own reservation
         reservation = rv
@@ -907,7 +832,7 @@ export class Force extends BaseContract {
         tx = await this.reclaimTask(reservation.id)
       }
     } else {
-      console.log('make new reservation')
+      // console.log('make new reservation')
 
       // User doesn't have reservation yet, so let's make one!
       tx = await this.reserveFreeTask(batch, tasks, submissions)
@@ -924,7 +849,13 @@ export class Force extends BaseContract {
       }
     }
     if (!reservation) {
-      throw new Error('Could not find reservation')
+      // Try it one more time before throwing an error
+      await sleep(1000)
+      const submissions = await this.getSubmissionsOfBatch(batch.batch_id)
+      reservation = submissions.find(s => (!s.data || !s.data.length) && s.account_id === accountId)
+      if (!reservation) {
+        throw new Error('Could not find reservation')
+      }
     }
     reservation.task_index = await this.getTaskIndexFromLeaf(batch.campaign_id, batch.id, reservation.leaf_hash, tasks)
     return reservation
@@ -1021,7 +952,7 @@ export class Force extends BaseContract {
     const actions = []
     // if the task is not realeased yet, release it first
     if (account_id) {
-      console.log('account id: ', account_id)
+      // console.log('account id: ', account_id)
       actions.push({
         account: this.config.forceContract,
         name: 'releasetask',
@@ -1256,52 +1187,45 @@ export class Force extends BaseContract {
     let sig: Signature
     const owner = this.effectAccount.accountName
     const accountId = this.effectAccount.vAccountRows[0].id
+    const hash = await this.uploadCampaign(qualification)
+    // console.log('Upload succesful, hash: ', hash)
 
-    try {
-      const hash = await this.uploadCampaign(qualification)
-      console.log('Upload succesful, hash: ', hash)
-  
-      if (isBscAddress(owner)) {
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(18)
-        serialbuff.pushUint32(accountId)
-        serialbuff.push(0)
-        serialbuff.pushString(hash)
-  
-        sig = await this.generateSignature(serialbuff)
-        console.log('Signature generated', sig)
-      }
-  
-      const action = {
-        account: this.config.forceContract,
-        name: 'mkquali',
-        authorization: [{
-          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-        }],
-        data: {
-          content: { field_0: 0, field_1:  hash },
-          account_id: accountId,
-          payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-          sig: isBscAddress(owner) ? sig.toString() : null
-        }
-      }
 
-      console.log('action: ', action)
-  
-      const txReceipt = await this.sendTransaction(owner, action)
-      console.log('txReceipt: ', txReceipt)
-      return txReceipt
-     
-    } catch (error) {
-      console.error(error)
+    if (isBscAddress(owner)) {
+      // mkquali_params params = {18, account_id, content};
+      // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(18)
+      serialbuff.pushUint32(accountId)
+      serialbuff.push(0)
+      serialbuff.pushString(hash)
+
+      sig = await this.generateSignature(serialbuff)
+      // console.log('Signature generated', sig)
     }
+
+    const action = {
+      account: this.config.forceContract,
+      name: 'mkquali',
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        content: { field_0: 0, field_1:  hash },
+        account_id: accountId,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+    
+    return await this.sendTransaction(owner, action)
   }
 
   /**
    * Assign a qualification to a campaign
    */
-  assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
@@ -1328,7 +1252,6 @@ export class Force extends BaseContract {
       data: {
         quali_id: qualificationId,
         user_id: accountId,
-        content: { field_0: 0, field_1: hash },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -1342,37 +1265,95 @@ export class Force extends BaseContract {
    * @param processCampaign - get campaign content from ipfs
    * @returns Qualification
    */
-    getQualification = async (id: number): Promise<Qualification> => {
-      const config = {
-        code: this.config.forceContract,
-        scope: this.config.forceContract,
-        table: 'quali',
-        key_type: 'i64',
-        lower_bound: id,
-        upper_bound: id,
-      }
-  
-      return (await this.api.rpc.get_table_rows(config)).rows[0]
+  getQualification = async (id: number, processQualification: boolean = true): Promise<Qualification> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'quali',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
     }
+
+    let qualification = (await this.api.rpc.get_table_rows(config)).rows[0]
+
+    if (processQualification) {
+      // Get Quali Info.
+      for (let i = 0; i < qualification.rows.length; i++) {
+        qualification = await this.processQualification(qualification)
+      }
+    }
+
+    return qualification
+  }
 
     /**
      * Get User Qualifications
      * @param id - id of the user
      * @returns Array<Qualification>
      */
-    getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
-      const config = {
-        code: this.config.forceContract,
-        scope: this.config.forceContract,
-        table: 'userquali',
-        key_type: 'i64',
-        lower_bound: id,
-        upper_bound: id,
-      }
-      // TODO implement filter on rows
-      return (await this.api.rpc.get_table_rows(config)).rows[0]
+  getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'userquali',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
+    }
+    // TODO implement filter on rows
+    return (await this.api.rpc.get_table_rows(config)).rows[0]
+  }
+
+  /**
+   * Get Force Qualifications
+   * @param nextKey - key to start searching from
+   * @param limit - max number of rows to return
+   * @param processCampaign - get qualification content from ipfs
+   * @returns - Qualification Table Rows Result
+  */
+  getQualifications = async (nextKey, limit = 20, processQualifications: boolean = true): Promise<GetTableRowsResult> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'quali',
+      limit: limit,
+      lower_bound: undefined
+    }
+    if (nextKey) {
+      config.lower_bound = nextKey
     }
 
+    const qualifications = await this.api.rpc.get_table_rows(config)
+
+    if (processQualifications) {
+      // Get Quali Info.
+      for (let i = 0; i < qualifications.rows.length; i++) {
+        qualifications.rows[i] = await this.processQualification(qualifications.rows[i])
+      }
+    }
+
+    return qualifications;
+  }
+
+  /**
+   * processQualification
+   * @param qualification
+   * @returns Promise<Qualification> - Qualification with content
+   */
+  processQualification = async (qualification: Qualification): Promise<Qualification> => {
+    try {
+      // field_0 represents the content type where:
+      // 0: IPFS
+      if (qualification.content.field_0 === 0 && qualification.content.field_1 !== '') {
+        // field_1 represents the IPFS hash
+        qualification.info = await this.getIpfsContent(qualification.content.field_1)
+      }
+    } catch (e) {
+      qualification.info = null
+      console.error('processCampaign', e)
+    }
+    return qualification
+  }
 
 }
-
