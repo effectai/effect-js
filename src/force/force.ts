@@ -1223,13 +1223,16 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Assign a qualification to a campaign
+   * Assign a qualification to a user.
+   * @param qualificationId
+   * @param user
+   * @returns Transacation  
    */
-  assignQualification = async (qualificationId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
-    const accountId = this.effectAccount.vAccountRows[0].id
+    // const accountId = this.effectAccount.vAccountRows[0].id
 
     if (isBscAddress(owner)) {
       //  rmbatch_params params = {19, quali_id, user_id};
