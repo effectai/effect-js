@@ -1292,20 +1292,35 @@ export class Force extends BaseContract {
 
     /**
      * Get User Qualifications
-     * @param id - id of the user
+     * @param id - id xof the user
      * @returns Array<Qualification>
      */
-  getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+    getAssignedQualifications = async (userId: number, nextKey, limit = 20): Promise<any[]> => {
+    // const userIdHex = userId.toString(16) // potential hex implementation.
+        
     const config = {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
-      key_type: 'i64',
-      lower_bound: id,
-      upper_bound: id,
+      key_type: 'i64', // Does this make sense? Where did I get this type?
+      lower_bound: undefined,
+      // Potential hex implementation
+      // index_position: 4,
+      // upper_bound: userId,
+      // lower_bound: `0x${userIdHex}0000`,
+      // upper_bound: `0x${userIdHex}FFFF`,
     }
-    // TODO implement filter on rows
-    return (await this.api.rpc.get_table_rows(config)).rows[0]
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+
+    const userQualifications = (await this.api.rpc.get_table_rows(config)).rows
+
+    if (userQualifications.length === 0) {
+      return []
+    } 
+
+    return userQualifications.filter(x => x.account_id === userId)
   }
 
   /**

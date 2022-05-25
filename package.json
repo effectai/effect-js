@@ -22,7 +22,7 @@
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
-    "watch": "tsc --watch",
+    "watch": "npm run prebuild && tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
     "docs:watch": "typedoc --watch",
