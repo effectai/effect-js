@@ -17,9 +17,8 @@ import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
 import { Qualification } from '../types/qualifications';
-import { Content } from '../types/content';
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -1183,13 +1182,7 @@ export class Force extends BaseContract {
    * Create a Qualification andassign it to a campaign
    */
   createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    // void force::mkquali(content content, uint32_t account_id, eosio::name payer, vaccount::sig sig) {
-    const qualification = {
-      name, 
-      description,
-      type,
-      image
-    }
+    const qualification = { name, description, type, image }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
@@ -1230,13 +1223,16 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Assign a qualification to a campaign
+   * Assign a qualification to a user.
+   * @param qualificationId
+   * @param user
+   * @returns Transacation  
    */
-  assignQualification = async (qualificationId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
-    const accountId = this.effectAccount.vAccountRows[0].id
+    // const accountId = this.effectAccount.vAccountRows[0].id
 
     if (isBscAddress(owner)) {
       //  rmbatch_params params = {19, quali_id, user_id};
@@ -1296,20 +1292,35 @@ export class Force extends BaseContract {
 
     /**
      * Get User Qualifications
-     * @param id - id of the user
+     * @param id - id xof the user
      * @returns Array<Qualification>
      */
-  getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+    getAssignedQualifications = async (userId: number, nextKey, limit = 20): Promise<any[]> => {
+    // const userIdHex = userId.toString(16) // potential hex implementation.
+        
     const config = {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
-      key_type: 'i64',
-      lower_bound: id,
-      upper_bound: id,
+      key_type: 'i64', // Does this make sense? Where did I get this type?
+      lower_bound: undefined,
+      // Potential hex implementation
+      // index_position: 4,
+      // upper_bound: userId,
+      // lower_bound: `0x${userIdHex}0000`,
+      // upper_bound: `0x${userIdHex}FFFF`,
     }
-    // TODO implement filter on rows
-    return (await this.api.rpc.get_table_rows(config)).rows[0]
+    if (nextKey) {
+      config.lower_bound = nextKey
+    }
+
+    const userQualifications = (await this.api.rpc.get_table_rows(config)).rows
+
+    if (userQualifications.length === 0) {
+      return []
+    } 
+
+    return userQualifications.filter(x => x.account_id === userId)
   }
 
   /**
