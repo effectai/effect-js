@@ -17,6 +17,7 @@ import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
 import { Qualification } from '../types/qualifications';
+import { exit } from 'process';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -1279,48 +1280,42 @@ export class Force extends BaseContract {
     }
 
     let qualification = (await this.api.rpc.get_table_rows(config)).rows[0]
-
     if (processQualification) {
       // Get Quali Info.
-      for (let i = 0; i < qualification.rows.length; i++) {
-        qualification = await this.processQualification(qualification)
-      }
+      qualification = await this.processQualification(qualification)
     }
 
     return qualification
   }
 
-    /**
-     * Get User Qualifications
-     * @param id - id xof the user
-     * @returns Array<Qualification>
-     */
-    getAssignedQualifications = async (userId: number, nextKey, limit = 20): Promise<any[]> => {
-    // const userIdHex = userId.toString(16) // potential hex implementation.
-        
+  /**
+   * Get User Qualifications
+   * @param id - id xof the user
+   * @returns Array<Qualification>
+   */
+  getAssignedQualifications = async (userId: number): Promise<any[]> => {
+    const userIdHex = userId.toString(16) // potential hex implementation.
+    const hex32 = ("00000000" + userIdHex).slice(-8)
+    const lower = hex32.padEnd(16, '0')
+    const upper = hex32.padEnd(16, 'F')
+
     const config = {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
-      key_type: 'i64', // Does this make sense? Where did I get this type?
-      lower_bound: undefined,
-      // Potential hex implementation
-      // index_position: 4,
-      // upper_bound: userId,
-      // lower_bound: `0x${userIdHex}0000`,
-      // upper_bound: `0x${userIdHex}FFFF`,
-    }
-    if (nextKey) {
-      config.lower_bound = nextKey
+      lower_bound: parseInt(lower, 16),
+      upper_bound: parseInt(upper, 16),
     }
 
-    const userQualifications = (await this.api.rpc.get_table_rows(config)).rows
+    const qualifications = await this.api.rpc.get_table_rows(config)
 
-    if (userQualifications.length === 0) {
-      return []
-    } 
+    const userQualis = []
+    for (let i = 0; i < qualifications.rows.length; i++) {
+      const quali = await this.getQualification(qualifications.rows[i].quali_id)
+      userQualis.push(quali)
+    }
 
-    return userQualifications.filter(x => x.account_id === userId)
+    return userQualis;
   }
 
   /**
