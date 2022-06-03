@@ -17,9 +17,9 @@ import { Campaign } from '../types/campaign';
 import { Batch } from '../types/batch';
 import retry from 'async-retry'
 import { Qualification } from '../types/qualifications';
-import { Content } from '../types/content';
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+import { exit } from 'process';
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * The Force class is responsible for interacting with the campaigns, templates, batches and tasks on the platform.
@@ -1183,70 +1183,57 @@ export class Force extends BaseContract {
    * Create a Qualification andassign it to a campaign
    */
   createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    // void force::mkquali(content content, uint32_t account_id, eosio::name payer, vaccount::sig sig) {
-    const qualification = {
-      name, 
-      description,
-      type,
-      image
-    }
+    const qualification = { name, description, type, image }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
     const accountId = this.effectAccount.vAccountRows[0].id
+    const hash = await this.uploadCampaign(qualification)
+    // console.log('Upload succesful, hash: ', hash)
 
-    try {
-      const hash = await this.uploadCampaign(qualification)
-      // console.log('Upload succesful, hash: ', hash)
-  
-  
-      if (isBscAddress(owner)) {
-        // mkquali_params params = {18, account_id, content};
-        // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))    
-        const serialbuff = new Serialize.SerialBuffer()
-        serialbuff.push(18)
-        serialbuff.pushUint32(accountId)
-        serialbuff.push(0)
-        serialbuff.pushString(hash)
-  
-        sig = await this.generateSignature(serialbuff)
-        // console.log('Signature generated', sig)
-      }
-  
-      const action = {
-        account: this.config.forceContract,
-        name: 'mkquali',
-        authorization: [{
-          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-        }],
-        data: {
-          content: { field_0: 0, field_1:  hash },
-          account_id: accountId,
-          payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-          sig: isBscAddress(owner) ? sig.toString() : null
-        }
-      }
 
-      // console.log('action: ', action)
-  
-      const txReceipt = await this.sendTransaction(owner, action)
-      // console.log('txReceipt: ', txReceipt)
-      return txReceipt
-     
-    } catch (error) {
-      console.error(error)
+    if (isBscAddress(owner)) {
+      // mkquali_params params = {18, account_id, content};
+      // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(18)
+      serialbuff.pushUint32(accountId)
+      serialbuff.push(0)
+      serialbuff.pushString(hash)
+
+      sig = await this.generateSignature(serialbuff)
+      // console.log('Signature generated', sig)
     }
+
+    const action = {
+      account: this.config.forceContract,
+      name: 'mkquali',
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        content: { field_0: 0, field_1:  hash },
+        account_id: accountId,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+    
+    return await this.sendTransaction(owner, action)
   }
 
   /**
-   * Assign a qualification to a campaign
+   * Assign a qualification to a user.
+   * @param qualificationId
+   * @param user
+   * @returns Transacation  
    */
-  assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (qualificationId: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
     let sig: Signature
     const owner = this.effectAccount.accountName
-    const accountId = this.effectAccount.vAccountRows[0].id
+    // const accountId = this.effectAccount.vAccountRows[0].id
 
     if (isBscAddress(owner)) {
       //  rmbatch_params params = {19, quali_id, user_id};
@@ -1269,7 +1256,6 @@ export class Force extends BaseContract {
       data: {
         quali_id: qualificationId,
         user_id: accountId,
-        content: { field_0: 0, field_1: hash },
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
       }
@@ -1294,33 +1280,42 @@ export class Force extends BaseContract {
     }
 
     let qualification = (await this.api.rpc.get_table_rows(config)).rows[0]
-
     if (processQualification) {
       // Get Quali Info.
-      for (let i = 0; i < qualification.rows.length; i++) {
-        qualification = await this.processQualification(qualification)
-      }
+      qualification = await this.processQualification(qualification)
     }
 
     return qualification
   }
 
-    /**
-     * Get User Qualifications
-     * @param id - id of the user
-     * @returns Array<Qualification>
-     */
-  getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+  /**
+   * Get User Qualifications
+   * @param id - id xof the user
+   * @returns Array<Qualification>
+   */
+  getAssignedQualifications = async (userId: number): Promise<any[]> => {
+    const userIdHex = userId.toString(16) // potential hex implementation.
+    const hex32 = ("00000000" + userIdHex).slice(-8)
+    const lower = hex32.padEnd(16, '0')
+    const upper = hex32.padEnd(16, 'F')
+
     const config = {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
-      key_type: 'i64',
-      lower_bound: id,
-      upper_bound: id,
+      lower_bound: parseInt(lower, 16),
+      upper_bound: parseInt(upper, 16),
     }
-    // TODO implement filter on rows
-    return (await this.api.rpc.get_table_rows(config)).rows[0]
+
+    const qualifications = await this.api.rpc.get_table_rows(config)
+
+    const userQualis = []
+    for (let i = 0; i < qualifications.rows.length; i++) {
+      const quali = await this.getQualification(qualifications.rows[i].quali_id)
+      userQualis.push(quali)
+    }
+
+    return userQualis;
   }
 
   /**
@@ -1373,5 +1368,5 @@ export class Force extends BaseContract {
     }
     return qualification
   }
-}
 
+}

@@ -1,6 +1,6 @@
 {
   "name": "@effectai/effect-js",
-  "version": "0.2.5",
+  "version": "0.2.11",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
   "main": "dist/lib/index.js",
   "browser": "dist/lib/index.js",
@@ -22,7 +22,7 @@
     "build:cjs": "tsc --module commonjs",
     "build:es": "tsc --module es2020",
     "build:umd": "tsc --module umd",
-    "watch": "tsc --watch",
+    "watch": "npm run prebuild && tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
     "docs:watch": "typedoc --watch",
