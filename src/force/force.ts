@@ -1204,7 +1204,7 @@ export class Force extends BaseContract {
    * Create a Qualification andassign it to a campaign
    */
   createQualification = async (name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const qualification = { name, description, type, image }
+    const qualification = { name, description, type, image, ishidden }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
