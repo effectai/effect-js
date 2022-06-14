@@ -1229,37 +1229,48 @@ export class Force extends BaseContract {
    * @param user
    * @returns Transacation  
    */
-  assignQualification = async (qualificationId: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
+  assignQualification = async (ids: Array<number> | number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let qualificationIds = []
+    if (!Array.isArray(ids)) {
+      qualificationIds.push(ids)
+    } else {
+      qualificationIds = [...ids]
+    }
+
     let sig: Signature
     const owner = this.effectAccount.accountName
-    // const accountId = this.effectAccount.vAccountRows[0].id
+    const actions = []
 
-    if (isBscAddress(owner)) {
-      //  rmbatch_params params = {19, quali_id, user_id};
-      // (.push 19) (.pushUint32 id) (.pushUint32 user-id))))
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(19)
-      serialbuff.pushUint32(qualificationId)
-      serialbuff.pushUint32(accountId)
+    for (let i = 0; i < qualificationIds.length; i++) {
+      const qid = qualificationIds[i];
 
-      sig = await this.generateSignature(serialbuff)
-    }
+      if (isBscAddress(owner)) {
+        //  rmbatch_params params = {19, quali_id, user_id};
+        // (.push 19) (.pushUint32 id) (.pushUint32 user-id))))
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(19)
+        serialbuff.pushUint32(qid)
+        serialbuff.pushUint32(accountId)
 
-    const actions = {
-      account: this.config.forceContract,
-      name: 'assignquali',
-      authorization: [{
-        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-      }],
-      data: {
-        quali_id: qualificationId,
-        user_id: accountId,
-        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        sig: isBscAddress(owner) ? sig.toString() : null
+        sig = await this.generateSignature(serialbuff)
       }
+
+      actions.push({
+        account: this.config.forceContract,
+        name: 'assignquali',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+        }],
+        data: {
+          quali_id: qid,
+          user_id: accountId,
+          payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      })
     }
+
     return await this.sendTransaction(owner, actions)
   }
 
