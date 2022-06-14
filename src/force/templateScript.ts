@@ -145,6 +145,9 @@ function forceOnload() {
         }
       }
     }
+    if (typeof forceBeforeSubmit === "function") {
+      values = await forceBeforeSubmit(values, event);
+    }
     parent.postMessage({'task': 'submit', 'values': values}, '*');
     return false;
   });
