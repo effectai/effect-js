@@ -4,16 +4,19 @@ export class Template {
     public html: string;
     public placeholders: object;
     public options: object;
+    public info: object;
     private rendered: string;
-    constructor(html, placeholders = {}, options = {}) {
+    constructor(html, placeholders = {}, options = {}, info = {}) {
         this.html = html;
         this.placeholders = placeholders;
         this.options = options;
+        this.info = info;
     }
     public render(): string {
         this.replacePlaceholders()
         this.injectHTML(templateScript)
         this.injectJSVar('FORCE_OPTIONS',this.options);
+        this.injectJSVar('FORCE_INFO',this.info);
         this.injectJSVar('FORCE_PLACEHOLDERS',this.placeholders);
         this.wrapForm()
         return this.rendered;
