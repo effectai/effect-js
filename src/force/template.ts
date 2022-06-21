@@ -14,10 +14,10 @@ export class Template {
     }
     public render(): string {
         this.replacePlaceholders()
-        this.injectHTML(templateScript)
         this.injectJSVar('FORCE_OPTIONS',this.options);
         this.injectJSVar('FORCE_INFO',this.info);
         this.injectJSVar('FORCE_PLACEHOLDERS',this.placeholders);
+        this.injectHTML(templateScript)
         this.wrapForm()
         return this.rendered;
     }
