@@ -214,6 +214,27 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Does this make sense? So it might makes sense to iterate through the array in reverse order. 
+   * Get Last submission 
+   * @returns Task
+   */
+     getLatestSubmissions = async (): Promise<GetTableRowsResult> => {
+      const config = {
+        code: this.config.forceContract,
+        scope: this.config.forceContract,
+        table: 'submission',
+        key_type: 'i64',
+        limit: 20,
+        reverse: true
+      }
+  
+      const task = await this.api.rpc.get_table_rows(config)
+    
+      return task
+    }
+  
+
+  /**
    * Get individual task
    * @param leafHash - leafHash of task
    * @returns Task
@@ -1182,8 +1203,8 @@ export class Force extends BaseContract {
   /**
    * Create a Qualification andassign it to a campaign
    */
-  createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const qualification = { name, description, type, image }
+  createQualification = async (name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const qualification = { name, description, type, image, ishidden }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
@@ -1229,37 +1250,48 @@ export class Force extends BaseContract {
    * @param user
    * @returns Transacation  
    */
-  assignQualification = async (qualificationId: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    // void force::assignquali(uint32_t quali_id, uint32_t user_id, eosio::name payer, vaccount::sig sig) {
+  assignQualification = async (ids: Array<number> | number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let qualificationIds = []
+    if (!Array.isArray(ids)) {
+      qualificationIds.push(ids)
+    } else {
+      qualificationIds = [...ids]
+    }
+
     let sig: Signature
     const owner = this.effectAccount.accountName
-    // const accountId = this.effectAccount.vAccountRows[0].id
+    const actions = []
 
-    if (isBscAddress(owner)) {
-      //  rmbatch_params params = {19, quali_id, user_id};
-      // (.push 19) (.pushUint32 id) (.pushUint32 user-id))))
-      const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(19)
-      serialbuff.pushUint32(qualificationId)
-      serialbuff.pushUint32(accountId)
+    for (let i = 0; i < qualificationIds.length; i++) {
+      const qid = qualificationIds[i];
 
-      sig = await this.generateSignature(serialbuff)
-    }
+      if (isBscAddress(owner)) {
+        //  rmbatch_params params = {19, quali_id, user_id};
+        // (.push 19) (.pushUint32 id) (.pushUint32 user-id))))
+        const serialbuff = new Serialize.SerialBuffer()
+        serialbuff.push(19)
+        serialbuff.pushUint32(qid)
+        serialbuff.pushUint32(accountId)
 
-    const actions = {
-      account: this.config.forceContract,
-      name: 'assignquali',
-      authorization: [{
-        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
-      }],
-      data: {
-        quali_id: qualificationId,
-        user_id: accountId,
-        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
-        sig: isBscAddress(owner) ? sig.toString() : null
+        sig = await this.generateSignature(serialbuff)
       }
+
+      actions.push({
+        account: this.config.forceContract,
+        name: 'assignquali',
+        authorization: [{
+          actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+        }],
+        data: {
+          quali_id: qid,
+          user_id: accountId,
+          payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+          sig: isBscAddress(owner) ? sig.toString() : null
+        }
+      })
     }
+
     return await this.sendTransaction(owner, actions)
   }
 
