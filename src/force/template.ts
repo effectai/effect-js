@@ -60,7 +60,7 @@ export class Template {
     }
     private injectJSVar(name: string, value: any) {
         const html = `<script>window.${name} = ${JSON.stringify(value)};</script>`;
-        this.injectHTML(html)
+        this.injectHTML(html, true)
     }
 
     private injectJSFile(url: string, prepend: boolean = false) {
