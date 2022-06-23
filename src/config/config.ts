@@ -51,7 +51,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeHost:            config?.eosNodeHost            ?? 'api.eostitan.com',
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             batchSizeLimit:         300,
-            taskEstimatedTime:      1.5
+            taskEstimatedTime:      1.5,
+            qualifierAccountId:     config?.qualifierAccountId     ?? 127
 
         }
 
@@ -91,7 +92,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeHost:            config?.eosNodeHost            ?? 'jungle3.cryptolions.io',
             eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
             batchSizeLimit:         300,
-            taskEstimatedTime:      1.5
+            taskEstimatedTime:      1.5,
+            qualifierAccountId:     config?.qualifierAccountId     ?? 389
         }
 
     } else if (environment === 'local') {
@@ -135,7 +137,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosNodeHost:            config?.eosNodeHost            ?? 'localhost',
             eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f',
             batchSizeLimit:         300,
-            taskEstimatedTime:      1.5
+            taskEstimatedTime:      1.5,
+            qualifierAccountId:     config?.qualifierAccountId     ?? 389
         }
 
     } else {
