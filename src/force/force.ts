@@ -214,6 +214,27 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Does this make sense? So it might makes sense to iterate through the array in reverse order. 
+   * Get Last submission 
+   * @returns Task
+   */
+     getLatestSubmissions = async (): Promise<GetTableRowsResult> => {
+      const config = {
+        code: this.config.forceContract,
+        scope: this.config.forceContract,
+        table: 'submission',
+        key_type: 'i64',
+        limit: 20,
+        reverse: true
+      }
+  
+      const task = await this.api.rpc.get_table_rows(config)
+    
+      return task
+    }
+  
+
+  /**
    * Get individual task
    * @param leafHash - leafHash of task
    * @returns Task
@@ -1182,8 +1203,8 @@ export class Force extends BaseContract {
   /**
    * Create a Qualification andassign it to a campaign
    */
-  createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const qualification = { name, description, type, image }
+  createQualification = async (name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const qualification = { name, description, type, image, ishidden }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
