@@ -1,0 +1,902 @@
+[
+  {
+    "id": 78,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmXEf3Tpv131tdhR45688R2zoRVdFJDcodNVC2g6dvsrNW"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Image classification",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 79,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmQ19GWf9ALCCabLChDhigrCVLCSzuwnw6zhLjn3M85Uqw"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Basic English Proficiency",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 80,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmYwNSo8TAPKCXFVg1gPupFd3EoAz2PGSc333RWV2RUXDZ"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "English (US) Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 81,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmPfMfncD8cGnnLfMfxyUsxpmSMbWXsdqhFYFq9neRxAn1"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Chinese (Simplified) Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 82,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmeKp5sSAo8vXLaMw93gCbw3LmPR1gjzoBUoBHifVHoXmc"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Indonesian Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 83,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmaHu8mgK8eBV9DfjtMvofG3DnuKAowZfhRZTpiwb8cLAD"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Arabic Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 84,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmbFyS1fvTTP5yygDkJxkpL6LMyr7DUxGjfGqbfEk9S2Fs"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Spanish Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 85,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmWEzSAarCJQ7o4YPEnPu3X6oCCaXiFJvpra2noLQQamS9"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Portuguese (Brazilian) Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 86,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmRkgWo3FnXeyoUfuj42zhnFpGmSxTZqA2Lfow4sLD1WLb"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Italian Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 87,
+    "content": {
+      "field_0": 0,
+      "field_1": "Qma7ZtzT8bDLuh7M9y3Le4Lsc72YjoFjzjcuHNJ9CvpJq8"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "German Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 88,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmW1ZLZ2CQMapeaVKHTTPDJ8y5Wd1CzENFRdc2bgpfMYxo"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "French Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 89,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmXqf1CwX3oti6tN3CGj8Gy777XrUEMowEhP7bjYHdch7f"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Polish Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 90,
+    "content": {
+      "field_0": 0,
+      "field_1": "Qma9VqsjQcwjiMmcNiKRM6SEoFLfh4Dr2RMQjJkkWJYt8R"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Dutch Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 91,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmSJqngv1tdEujmJidoaQDaYtRH7LYkQHirKjxFqW1DuKk"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Georgian Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 92,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmRmNhAkAnPJB7urAfXwSjfrKGjLzQyAJbqi1ySThjMBrB"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Russian Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 93,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmezQqAXfgjxTbxvFqAjYrCXfRLxbh8uyD8ZMCXvRs1ahF"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Turkish Translation/Proofreading",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 94,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmaQW5A61p7W5LMeDSMKKwttXASa5Tp3iPsoTsJnuFzdjD"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ES Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 95,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmcqE1JJoRtXWR7THJoq9tFUhf4MScpbJDvbkN1MCsTSuM"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ZH Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 96,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmdL2mJczEk1BvpdoYDQMhMdcs3HWYoBTwrWxpMurBayMm"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "PT Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 97,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmQwrbGYAzqHpyQuPSgcjkQovEDnoqNxAM9Fud1SXvU4ix"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "RU Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 98,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmbFGUTCVgK9cZWrrFTEchuQhKShuNoQJLtDMtmQaZAf7r"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ES Translation Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 99,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmTFdJiAiaKWdR9Sf7wiRW5wk7gCcH51TPiWKTLZVjkFq1"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ZH Translaiton Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 100,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmTEouL5Y4ECrzA5iweM4HWxni1yZWq4ZBWZd9txz7fbf3"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "RU Translation Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 101,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmXk39DHQdcfKyPr2trRhy7pwYmREVhQKKnPn4RRF1mqLg"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "PT Translation Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 102,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmQnzxtyVUb43iL5HDwoqisAu8er5bqUuvbyXjZCWHNjtW"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "NL Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 103,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmTt8r4dxdoCxshEkyJ94tvbtFqacwKJpjEw8f7MkY7mLA"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ID Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 104,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmckFdNuZr2eMsNC77qBtYMvQEkCm6YdCQyuuc4KoPr2ew"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "PL Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 105,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmbSTnVc6pmruq95tiC9ct4u6KdQAzMzCQboEUrFdTJphM"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "FR Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 106,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmR1rCzuog1Gm9mcMvxBufNJXovzftKNEkWARJREUnHvwT"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "IT Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 107,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmZgs4cUkxW66YVkjZQ34fsS4XjpCLaxJjFfjbsPoVXYrM"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "AR Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 108,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmXxec8TUsLWtZ7fVjUc9S9AQiqS4oyotSvGPyBUQyx4tR"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Translation Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 109,
+    "content": {
+      "field_0": 0,
+      "field_1": "Qme9gqUoWChLH5P298oppvQaZg9Rs9DeKwW4G9CqMrd2sk"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Subtitle Master Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 110,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmYw5UJAtFQz75QNnEKNGWg7fTcESsNsgpYjNTnEWRNmZZ"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "DE Translation Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 111,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmNtyAiFME1nvXuDnxwWjFZKDsN5uaoi3W9LsPo5XCG3fv"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Closed Caption Test (Open Book)",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 112,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmZmBZnxh2agdtzw6upkeA6c3GED2jHsWe9jQheSfSt5qh"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Effect FORCE Captioner",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 113,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmTgLSvAMcnv54B1faQyrJ5rLnW93VexpQVzcNiVjPQzPF"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "NL Translator Proofreader Blacklist ",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 114,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmeVMfqfHA7PaKTMh43kaoZVDoLkgUSFPChqdRWLgX6pec"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "DE Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 115,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmQUJFvtG4eE3KGLkvRU4DxzvpESm8MEAq55jz86cPzbTu"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ES Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 116,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmbiRpiqPxCCh1NJxSutjKyvWNJECnThiGtM7N25sDanxr"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "RU Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 117,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmRyffDJj8undpzKHPqA2oSZWLdPqFSxLXkyakAUgi9CDu"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "PT Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 118,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmdiFB99zE12o4SxaHjTqmtKSjwoXiNYbEumkqmftz5xvA"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "AR Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 119,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmPeCzao9iH8MLZiRgbK1oZUnVpjbLjeAmwdR8AqLnPjQJ"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ID Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 120,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmWFN3gXu218Z8aEsqxQDuKdvP7XBs3QxK5d9QTsATwixW"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "FR Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 121,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmetSpB3y6LVC4tK3GL3YupqMVPodjMvrEZYssUDRHSaT6"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "IT Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 122,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmSKBcj8Fwv7Bu6R6LFTss2BWpGUkNUsL2J9WRXTbguu7E"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ZH Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 123,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmPvNzJHiiddRfuPo4mHsFGyyJDeMPTWajyxibXDe8aYhy"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "PL Translator Proofreader Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 124,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmNXz7ggHVe53YP5FGvain8bi2KVPDqVUBRTGCpN91nbyq"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Validator Blacklist",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": true
+    }
+  },
+  {
+    "id": 125,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmT6LGveehs44H5KA8k6BGcKKMqEpoi519Cn9WJopi2xWB"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "KHMS Translator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 126,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmX3eJw8fs9QrHK9nYGUAs8r673wbe7TS8aDxWb1aHUgVS"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Block KH Tasks",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 127,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmaKWA7aQWG2V1Dktf7r4u8rG87roXHUYmXtJL8BNXqRKh"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "EN Native Captioner",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 128,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmbiWxCKgUCUvo3qkTVPuu6bXge6QkCgQa5mFSA5PmTzjq"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Kastaar",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 129,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmSvjX46CUUjyxh2Y3jjgtyC71ZSkjnhGKmGTjT833GxEf"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Troubadour",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 130,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmWfjxRqkbf3R67vLukwj1GZBWj2pdNtCmyGjbdaovpiuE"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Pirate Translator/Proofreader",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 131,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmR2GA6vbhqTVDKPxQEHGTzAf4hFSuqZJYM9QhQwxYyW8r"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Flemish Transcriber",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 132,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmX6PQc6Wy8Z5VQjqbepmhkr5wM1w7ioLDL1beFPdFLVH2"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Dutch Caption Creator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 133,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmUfRiLd6KG9Fn7jawV1p96i3DfXQLRyrKsQFk4JN617tW"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Special Sauce",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 134,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmT6LGveehs44H5KA8k6BGcKKMqEpoi519Cn9WJopi2xWB"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "KHMS Translator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 135,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmYwATumqqFQnNb9b1Zvc6dexrjDnqui4TaLLz7xTyUYDQ"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "Storm Trooper 2021",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 136,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmdNHt46S92BJnSVvKcF9iezKztNruMyB2pKNiTnfMAHGa"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ar-EG Translator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  },
+  {
+    "id": 137,
+    "content": {
+      "field_0": 0,
+      "field_1": "QmS6cr2RfMPkjitq5ixL9EajnCVsKXVZ6c4Ur1FwqBzf2B"
+    },
+    "account_id": 389,
+    "info": {
+      "name": "ar-EG Validator",
+      "description": "Official Effect Network Qualification.",
+      "type": null,
+      "image": "https://effect.network/img/logo/logo_icon.png",
+      "ishidden": false
+    }
+  }
+]
