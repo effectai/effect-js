@@ -216,4 +216,9 @@ export interface EffectClientConfig {
    * @default 1.5
    */
   taskEstimatedTime ? : number
+
+  /**
+   * vAccount ID of qualifier account
+   */
+  qualifierAccountId ? : number
 }
