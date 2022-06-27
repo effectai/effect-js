@@ -1245,6 +1245,50 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Edit Qualifications. 
+   * Only owner can edit their qualifications. 
+   */
+  editQualification = async (qualificationId: number, name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const qualification = { name, description, type, image, ishidden }
+
+    let sig: Signature
+    const owner = this.effectAccount.accountName
+    const accountId = this.effectAccount.vAccountRows[0].id
+    const hash = await this.uploadCampaign(qualification)
+    // console.log('Upload succesful, hash: ', hash)
+
+    if (isBscAddress(owner)) {
+      // mkquali_params params = {18, account_id, content};
+      // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(18)
+      serialbuff.pushUint32(accountId)
+      serialbuff.push(0)
+      serialbuff.pushString(hash)
+
+      sig = await this.generateSignature(serialbuff)
+      // console.log('Signature generated', sig)
+    }
+
+    const action = {
+      account: this.config.forceContract,
+      name: 'editquali', 
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        content: { field_0: 0, field_1:  hash },
+        account_id: accountId,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+
+    return await this.sendTransaction(owner, action)
+  }
+
+  /**
    * Assign a qualification to a user.
    * @param qualificationId
    * @param user
