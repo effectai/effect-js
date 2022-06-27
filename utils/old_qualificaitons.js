@@ -55,11 +55,11 @@ const old_qualis = [
     { 'name': 'ar-EG Validator', 'description': 'ar-EG Validator. User is proficient in checking others` work and validating for correctness.' },
 ]
 
-const other_qualis = [
+const example_qualis = [
     { 'name': 'Basic Papiamento Proficiency', 'description': 'Basic Papiamento Proficiency. User demonstrates command and use of Papiamento language in a conversational manner. ' },
 ]
     
-exports.old_qualis = {old_qualis, other_qualis};
+exports.old_qualis = {old_qualis, example_qualis};
 
 
 /**
