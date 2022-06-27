@@ -3,7 +3,7 @@ const fs = require('fs')
 const dotenv = require('dotenv')
 const { EffectClient, createAccount, createWallet } = require('../dist/lib')
 const { connectEosAccount, connectBscAccount } = require('./connect_efx_account.js')
-const { old_qualis, other_qualis } = require('./old_qualificaitons').old_qualis
+const { old_qualis, example_qualis } = require('./old_qualificaitons').old_qualis
 
 // Initialize Config
 dotenv.config({path: '.env'})
