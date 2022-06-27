@@ -2,8 +2,8 @@
 const fs = require('fs')
 const dotenv = require('dotenv')
 const { EffectClient, createAccount, createWallet } = require('../dist/lib')
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
-const old_qualis = require('./old_qualificaitons').old_qualis
+const { connectEosAccount, connectBscAccount } = require('./connect_efx_account.js')
+const { old_qualis, other_qualis } = require('./old_qualificaitons').old_qualis
 
 // Initialize Config
 dotenv.config({path: '.env'})
@@ -39,19 +39,44 @@ async function main () {
         // Get accountid
         const accountid = sdk.effectAccount.vAccountRows[0].id
 
-        // Loop through the old qualis and create them in the new system.
+        // Loop through the old qualis and create them in the new sy\stem.
         for (const qual of old_qualis) {
-            console.log(qual)
+            // console.log({
+            //     name: qual.name,
+            //     description: qual.description,
+            //     type: null, 
+            //     img_url: 'https://effect.network/img/logo/logo_icon.png',
+            //     is_hidden: false
+            // })
+
+            console.log('🔥 Creating qualification: ', qual.name)
+
+            // For approved qualifications
             await sdk.force.createQualification(
-                qual, 
-                "Official Effect Network Qualification.", 
+                qual.name, 
+                qual.description, 
                 null, 
                 'https://effect.network/img/logo/logo_icon.png',
-                qual.includes('Blacklist') ? true : false
+                false
             )
             .then(console.log)
             .catch(console.error)
+
+            // For rejected qualifications
+            await sdk.force.createQualification(
+                `${qual.name} - BlockList`,
+                qual.description,
+                null,
+                'https://effect.network/img/logo/logo_icon.png',
+                true
+            )
+            .then(console.log)
+            .catch(console.error)
+
         }
+
+        console.log('🔥 Done creating qualificaitons: ', old_qualis.length)
+        console.log('🔥 Retrieving newly created qualifications.')
 
         // Retrieve all the qualificaitons in order to get the ids.
         let next = true 
@@ -68,7 +93,7 @@ async function main () {
         console.log(`🔥 Found ${qualis.length} qualifications.`)
         const ids = qualis.filter(quali => quali.id === accountid)
         ids.forEach(console.log)
-        console.log(`🔥 Found ${ids.length} qualifications with id ${accountid}.`)
+        console.log(`🔥 Found ${ids.length} qualifications for account with id ${accountid}.`)
 
         // Save it to a file.
         fs.writeFileSync('qualis.json', JSON.stringify(ids, null, 2))
@@ -81,18 +106,3 @@ async function main () {
         console.error(e)
     }
 }
-
-
-
-/**
- * Miscellaneous functions 
- */
-// const res = await sdk.force.getUserQualifications().catch(console.error)
-// const res = await sdk.force.getCampaignBatches(4).catch(console.error)
-// const res = await sdk.force.deleteBatch(0, 14).catch(console.error)
-// const res = await sdk.force.getSubmissionsOfBatch(17179869185).catch(console.error)
-// const res = await sdk.force.deleteCampaign(13).catch(console.error)
-// const res = await sdk.force.getCampaign(13, true).catch(console.error)
-// const res = await sdk.force.getMyLastCampaign(false).catch(console.error)
-// const res = await sdk.force.getCampaignBatches(14).then(console.log).catch(console.error)
-// const res = await sdk.force.deleteBatch(0, 14).then(console.log).catch(console.error)
