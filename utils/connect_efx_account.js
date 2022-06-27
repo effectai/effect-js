@@ -1,3 +1,6 @@
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
+
+
 /**
  * Connect with an BSC account.
  * @param {} effectsdk 
