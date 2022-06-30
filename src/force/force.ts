@@ -1335,6 +1335,7 @@ export class Force extends BaseContract {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
+      limit: 100, // temp fix until pagination
       lower_bound: parseInt(lower, 16),
       upper_bound: parseInt(upper, 16),
     }
