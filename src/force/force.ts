@@ -1347,7 +1347,39 @@ export class Force extends BaseContract {
 
   /**
    * Remove a qualification from a user.
+   * serialbuffer size: 20
    */
+  unAssignQualification = async (ids: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let sig: Signature
+    const owner = this.effectAccount.accountName
+
+    if (isBscAddress(owner)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(20)
+      serialbuff.pushUint32(ids)
+      serialbuff.pushUint32(accountId)
+
+      sig = await this.generateSignature(serialbuff)
+    }
+
+    const action = {
+      account: this.config.forceContract,
+      name: 'unassignquali',
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        quali_id: ids,
+        user_id: accountId,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+    
+    return await this.sendTransaction(owner, action)
+  }
+
 
 
 
