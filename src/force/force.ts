@@ -1245,8 +1245,7 @@ export class Force extends BaseContract {
   }
 
   /**
-   * Edit Qualifications. 
-   * Only owner can edit their qualifications. 
+   * Edit a Qualification
    */
   editQualification = async (qualificationId: number, name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     const qualification = { name, description, type, image, ishidden }
@@ -1257,11 +1256,16 @@ export class Force extends BaseContract {
     const hash = await this.uploadCampaign(qualification)
     // console.log('Upload succesful, hash: ', hash)
 
+
+    // Check if caller of this function is the owner of the qualification
+    const qualiToEdit = await this.getQualification(qualificationId);
+    if (qualiToEdit.account_id !== accountId) {
+      throw new Error('Caller is not the owner of this qualification')
+    }
+
     if (isBscAddress(owner)) {
-      // mkquali_params params = {18, account_id, content};
-      // (.push 18)  (.pushUint32 acc-id) (.push 0) (.pushString content))))
       const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(18)
+      serialbuff.push(20)
       serialbuff.pushUint32(accountId)
       serialbuff.push(0)
       serialbuff.pushString(hash)
@@ -1272,12 +1276,13 @@ export class Force extends BaseContract {
 
     const action = {
       account: this.config.forceContract,
-      name: 'editquali', 
+      name: 'editquali',
       authorization: [{
         actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
+        quali_id: qualificationId,
         content: { field_0: 0, field_1:  hash },
         account_id: accountId,
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
@@ -1337,6 +1342,41 @@ export class Force extends BaseContract {
     }
 
     return await this.sendTransaction(owner, actions)
+  }
+
+  /**
+   * Remove a qualification from a user.
+   * serialbuffer size: 20
+   */
+  unAssignQualification = async (ids: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    let sig: Signature
+    const owner = this.effectAccount.accountName
+
+    if (isBscAddress(owner)) {
+      const serialbuff = new Serialize.SerialBuffer()
+      serialbuff.push(20)
+      serialbuff.pushUint32(ids)
+      serialbuff.pushUint32(accountId)
+
+      sig = await this.generateSignature(serialbuff)
+    }
+
+    const action = {
+      account: this.config.forceContract,
+      name: 'uassignquali',
+      authorization: [{
+        actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
+      }],
+      data: {
+        quali_id: ids,
+        user_id: accountId,
+        payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
+        sig: isBscAddress(owner) ? sig.toString() : null
+      }
+    }
+    
+    return await this.sendTransaction(owner, action)
   }
 
    /**
