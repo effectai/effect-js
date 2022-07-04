@@ -1365,7 +1365,7 @@ export class Force extends BaseContract {
 
     const action = {
       account: this.config.forceContract,
-      name: 'unassignquali',
+      name: 'uassignquali',
       authorization: [{
         actor: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission

@@ -6,7 +6,6 @@ const {connectEosAccount, connectBscAccount} = require('./connect_efx_account')
 
 // Initialize
 dotenv.config({path: '.env'})
-
 console.log(process.env.ACCOUNTNAME, process.env.PERMISSION, process.env.PRIVATE_KEY, process.env.BSC_KEY)
 
 const config = {
@@ -39,7 +38,6 @@ async function main () {
         /**
          * Miscellaneous functions 
          */
-        // const res = await sdk.force.getUserQualifications().catch(console.error)
         // const res = await sdk.force.getCampaignBatches(6).then(console.log).catch(console.error)
         // const res = await sdk.force.deleteBatch(0, 6).then(console.log).catch(console.error)
         // const res = await sdk.force.getSubmissionsOfBatch(17179869185).catch(console.error)
@@ -48,7 +46,23 @@ async function main () {
         // const res = await sdk.force.getMyLastCampaign(false).catch(console.error)
         // const res = await sdk.force.getCampaignBatches(14).then(console.log).catch(console.error)
         // const res = await sdk.force.deleteBatch(0, 14).then(console.log).catch(console.error)
-        await sdk.force.getQualification(1).then(console.log).catch(console.error)
+        
+        
+        /**
+         * Qualification methods
+         */
+        // const res = await sdk.force.getUserQualifications().catch(console.error)
+        // sdk.force.getAssignedQualifications(33).then(console.log).catch(console.error)
+        // sdk.force.editQualification(0,  'Name', 'Description', 0, 'https://www.lalala.com/hello.png', false)
+        // .then(console.log)
+        // .catch(console.error)
+        // sdk.force.getQualification(0).then(console.log).catch(console.error)
+        // await sdk.force.getQualification(1).then(console.log).catch(console.error)
+        
+        // sdk.force.assignQualification(0,  389).then(console.log).catch(console.error)
+        sdk.force.unAssignQualification(5, 127).then(console.log).catch(console.error)
+
+
         
     } catch (e) {
         console.error(e)
