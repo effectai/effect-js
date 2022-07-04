@@ -1283,6 +1283,7 @@ export class Force extends BaseContract {
         permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
+        quali_id: qualificationId,
         content: { field_0: 0, field_1:  hash },
         account_id: accountId,
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
