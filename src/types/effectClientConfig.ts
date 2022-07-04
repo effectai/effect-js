@@ -221,4 +221,33 @@ export interface EffectClientConfig {
    * vAccount ID of qualifier account
    */
   qualifierAccountId ? : number
+
+
+  /**
+   * EOS account of the qualifier account
+   * @default "efxqualifier"
+   */
+  eosQualifierContract ? : string
+
+  /**
+   * Validation url for the qualifier account
+   */
+  validationUrl ? : string
+
+  /**
+   * Embedded Fees for the Effect Force
+   * @default 0% (0.0)
+   */
+  embeddedForceFees ? : number
+
+  /**
+   * Effect Dao Contract
+   */
+  efxDaoContract ? : string
+
+  /**
+   * Effect Dao Vaccount ID
+   * @default N/A
+   */
+  efxDaoVaccountId ? : number
 }

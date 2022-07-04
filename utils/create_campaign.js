@@ -1,22 +1,22 @@
 const { EffectClient, createAccount, createWallet } = require('../dist/lib')
+const {connectBscAccount, connectEosAccount} = require('./connect_efx_account')
+
+// These need to be set in the environment.
+const configEnv = {
+    BSC_KEY: '', // BSC private key
+    ACCOUNTNAME: '', // EOS account name 
+    PERMISSION: '', // EOS permission
+    PRIVATE_KEY: '' // EOS privatekey
+}
 
 const main = async () => {
     try {
         console.log('Starting...')
-        const sdk = new EffectClient('kylin')
-
-        // Instantiating bsc account.
-        const account = createAccount(
-            // leave empty to generate new private key
-            '0x6f46d8d7c9684ed049c941758cb9186eb2b5758221a229e27861fe357edb770d'
-        )
-        // Generate web3 instance from account with private key.
-        // Could also be the web3 object with a MetaMask connection etc.
-        const web3 = createWallet(account)
+        const sdk = new EffectClient('testnet')
 
         // Connect web3 account to SDK
-        const effectAccount = await sdk.connectAccount(web3);
-
+        const effectAccount = await connectEosAccount(sdk, configEnv)
+        // const effectAccount = await connectBscAccount(sdk, configEnv)
         console.log('effectAccount', effectAccount)
 
         const campaignToIpfs = {

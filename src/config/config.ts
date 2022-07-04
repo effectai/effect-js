@@ -52,7 +52,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosChainId:             config?.eosChainId             ?? 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
-            qualifierAccountId:     config?.qualifierAccountId     ?? 127
+            qualifierAccountId:     config?.qualifierAccountId     ?? 127,
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxqualifier',
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-mainnet-t4o43.ondigitalocean.app/',
 
         }
 
@@ -65,7 +67,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'efxforce1112',
             forceVaccountId:        config?.forceVaccountId        ?? 333,
-            accountContract:        config?.accountContract        ?? 'efxaccount11',
+            accountContract:        config?.accountContract        ?? 'efxaccount11',;
             efxTokenContract:       config?.efxTokenContract       ?? 'efxtoken1112',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
@@ -93,7 +95,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosChainId:             config?.eosChainId             ?? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
-            qualifierAccountId:     config?.qualifierAccountId     ?? 389
+            qualifierAccountId:     config?.qualifierAccountId     ?? 389,
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
         }
 
     } else if (environment === 'local') {
@@ -138,7 +142,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosChainId:             config?.eosChainId             ?? '8a34ec7df1b8cd06ff4a8abbaa7cc50300823350cadc59ab296cb00d104d2b8f',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
-            qualifierAccountId:     config?.qualifierAccountId     ?? 389
+            qualifierAccountId:     config?.qualifierAccountId     ?? 389,
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',            
         }
 
     } else {
