@@ -1409,7 +1409,7 @@ export class Force extends BaseContract {
    * @param id - id xof the user
    * @returns Array<Qualification>
    */
-  getAssignedQualifications = async (userId: number): Promise<any[]> => {
+  getAssignedQualifications = async (nextKey, limit = 20, processQualification: boolean = true, userId: number): Promise<any[]> => {
     const userIdHex = userId.toString(16) // potential hex implementation.
     const hex32 = ("00000000" + userIdHex).slice(-8)
     const lower = hex32.padEnd(16, '0')
@@ -1419,19 +1419,24 @@ export class Force extends BaseContract {
       code: this.config.forceContract,
       scope: this.config.forceContract,
       table: 'userquali',
-      limit: 100, // temp fix until pagination
+      limit: limit,
       lower_bound: parseInt(lower, 16),
       upper_bound: parseInt(upper, 16),
     }
 
-    const qualifications = await this.api.rpc.get_table_rows(config)
-
-    const userQualis = []
-    for (let i = 0; i < qualifications.rows.length; i++) {
-      const quali = await this.getQualification(qualifications.rows[i].quali_id)
-      userQualis.push(quali)
+    if (nextKey) {
+      config.lower_bound = nextKey
     }
-
+    const qualifications = await this.api.rpc.get_table_rows(config)
+    let userQualis = []
+    if (processQualification) {
+      for (let i = 0; i < qualifications.rows.length; i++) {
+        const quali = await this.getQualification(qualifications.rows[i].quali_id)
+        userQualis.push(quali)
+      }
+    } else {
+      userQualis = qualifications.rows
+    }
     return userQualis;
   }
 
