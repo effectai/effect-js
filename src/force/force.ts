@@ -1265,7 +1265,7 @@ export class Force extends BaseContract {
 
     if (isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(20)
+      serialbuff.push(18)
       serialbuff.pushUint32(accountId)
       serialbuff.push(0)
       serialbuff.pushString(hash)
@@ -1348,14 +1348,15 @@ export class Force extends BaseContract {
    * Remove a qualification from a user.
    * serialbuffer size: 20
    */
-  unAssignQualification = async (ids: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  unAssignQualification = async (id: number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
     if (isBscAddress(owner)) {
+      //     (.push 20) (.pushUint32 id) (.pushUint32 user-id))))
       const serialbuff = new Serialize.SerialBuffer()
       serialbuff.push(20)
-      serialbuff.pushUint32(ids)
+      serialbuff.pushUint32(id)
       serialbuff.pushUint32(accountId)
 
       sig = await this.generateSignature(serialbuff)
@@ -1369,7 +1370,7 @@ export class Force extends BaseContract {
         permission: isBscAddress(owner) ? this.config.eosRelayerPermission : this.effectAccount.permission
       }],
       data: {
-        quali_id: ids,
+        quali_id: id,
         user_id: accountId,
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
