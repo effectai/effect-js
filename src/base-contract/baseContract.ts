@@ -12,9 +12,11 @@ import { isBscAddress } from '../utils/bscAddress'
 import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
+import LocalStorageCache from 'localstorage-cache';
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+const storageCache = new LocalStorageCache(3 * 1024, 'LRU'); //
 
 /**
  * > “Elinor agreed to it all, for she did not think he deserved the compliment of rational opposition.” ― Jane Austen
@@ -184,23 +186,33 @@ export class BaseContract {
    * @returns content of the ipfs hash in your preferred format
    */
   getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
-    const data = await this.fetch(`${this.config.ipfsNode}/ipfs/${hash}`)
-    switch (format.toLowerCase()) {
-      case 'formdata':
-      case 'form':
-        return data.text()
-      case 'buffer':
-      case 'arraybuffer':
-      case 'array':
-        return data.arrayBuffer()
-      case 'blob':
-        return data.blob()
-      case 'text':
-        return data.text()
-      case 'json':
-        return data.json()
+    if (hash && !hash.includes(' ')) {
+      if (!storageCache.getCache(hash)) {
+        const data = await this.fetch(`${this.config.ipfsNode}/ipfs/${hash}`)
+        switch (format.toLowerCase()) {
+          case 'formdata':
+          case 'form':
+            return data.text()
+          case 'buffer':
+          case 'arraybuffer':
+          case 'array':
+            return data.arrayBuffer()
+          case 'blob':
+            return data.blob()
+          case 'text':
+            return data.text()
+          case 'json':
+            const ipfsData = await data.json()
+            if (this.config.ipfsCache) {
+              storageCache.setCache(hash, ipfsData)
+            }
+            return ipfsData
+        }
+      } else {
+        return storageCache.getCache(hash)
+      }
     }
-    return data
+    return null
   }
 
   /**
