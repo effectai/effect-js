@@ -1265,7 +1265,7 @@ export class Force extends BaseContract {
 
     if (isBscAddress(owner)) {
       const serialbuff = new Serialize.SerialBuffer()
-      serialbuff.push(18)
+      serialbuff.push(20)
       serialbuff.pushUint32(accountId)
       serialbuff.push(0)
       serialbuff.pushString(hash)
@@ -1283,7 +1283,7 @@ export class Force extends BaseContract {
       }],
       data: {
         quali_id: qualificationId,
-        content: { field_0: 0, field_1:  hash },
+        content: { field_0: 0, field_1: hash },
         account_id: accountId,
         payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
         sig: isBscAddress(owner) ? sig.toString() : null
