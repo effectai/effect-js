@@ -250,4 +250,9 @@ export interface EffectClientConfig {
    * @default N/A
    */
   efxDaoVaccountId ? : number
+
+  /**
+   * Cache ipfs requests
+   */
+  ipfsCache ? : boolean
 }
