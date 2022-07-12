@@ -1492,4 +1492,9 @@ export class Force extends BaseContract {
     return qualification
   }
 
+  getBatchId = (batchId: number, campaignId: number): number => {
+    console.log('tryna get for this', batchId, campaignId)
+    return getCompositeKey(batchId, campaignId)
+  }
+
 }
