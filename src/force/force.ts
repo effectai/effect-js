@@ -402,7 +402,7 @@ export class Force extends BaseContract {
    * @param content
    * @returns transaction result
    */
-  createBatch = async (campaignId: number, content, repetitions: number): Promise<any> => {
+  createBatch = async (campaignId: number, content, repetitions: number, contract?: string): Promise<any> => {
     let sig: Signature
     let batchId: number = 0
 
@@ -475,9 +475,8 @@ export class Force extends BaseContract {
       permission: isBscAddress(campaignOwner) ? this.config.eosRelayerPermission : this.effectAccount.permission
     }]
 
-    // console.log("batch composite key", batchPk)
     const actions = [{
-      account: this.config.forceContract,
+      account: contract ? contract : this.config.forceContract,
       name: 'mkbatch',
       authorization,
       data: {
@@ -506,7 +505,7 @@ export class Force extends BaseContract {
         memo: batchPk
       },
     }, {
-      account: this.config.forceContract,
+      account: contract ? contract : this.config.forceContract,
       name: 'publishbatch',
       authorization,
       data: {
@@ -1495,5 +1494,4 @@ export class Force extends BaseContract {
   getBatchId = (batchId: number, campaignId: number): number => {
     return getCompositeKey(batchId, campaignId)
   }
-
 }
