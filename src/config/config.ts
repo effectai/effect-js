@@ -74,7 +74,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
             eosRelayerAccount:      config?.eosRelayerAccount      ?? 'efxrelayer11',
             eosRelayerPermission:   config?.eosRelayerPermission   ?? 'active',
-            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-rn7et.ondigitalocean.app',
+            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
             payoutDelaySec:         config?.payoutDelaySec         ?? 3600,
             releaseTaskDelaySec:    config?.releaseTaskDelaySec    ?? 1800,
             bscNetworkId:           config?.bscNetworkId           ?? 56,
