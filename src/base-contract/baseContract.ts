@@ -203,7 +203,7 @@ export class BaseContract {
             return data.text()
           case 'json':
             const ipfsData = await data.json()
-            if (this.config.ipfsCache) {
+            if (this.config.ipfsCache && (typeof window !== "undefined" && typeof window.document !== "undefined")) {
               storageCache.setCache(hash, ipfsData)
             }
             return ipfsData
