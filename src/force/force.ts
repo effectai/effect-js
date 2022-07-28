@@ -214,6 +214,26 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get Batch by ID
+   */
+  getBatchById = async (id: number): Promise<Batch> => {
+    const config = {
+      code: this.config.forceContract,
+      scope: this.config.forceContract,
+      table: 'batch',
+      key_type: 'i64',
+      lower_bound: id,
+      upper_bound: id,
+      limit: this.config.batchSizeLimit
+    }
+
+    const data = await this.api.rpc.get_table_rows(config)
+
+    return data.rows[0]
+  }
+
+  
+  /**
    * Does this make sense? So it might makes sense to iterate through the array in reverse order. 
    * Get Last submission 
    * @returns Task
