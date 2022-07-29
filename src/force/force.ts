@@ -319,7 +319,9 @@ export class Force extends BaseContract {
       else if (batch.tasks_done > 0 && batch.num_tasks === 0) {
         batch.status = 'Paused'
       }
-      else if (batch.num_tasks === batch.tasks_done) {
+      else if (batch.num_tasks === 0) {
+        batch.status = 'Not Published'
+      } else if ((batch.num_tasks * batch.repetitions) === batch.tasks_done) {
         batch.status = 'Completed'
       } else {
         batch.status = 'Not Published'
