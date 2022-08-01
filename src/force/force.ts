@@ -224,7 +224,7 @@ export class Force extends BaseContract {
       key_type: 'i64',
       lower_bound: id,
       upper_bound: id,
-      limit: this.config.batchSizeLimit
+      limit: 1
     }
 
     const data = await this.api.rpc.get_table_rows(config)
