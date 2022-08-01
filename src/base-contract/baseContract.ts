@@ -188,10 +188,8 @@ export class BaseContract {
     // Check has is valid and not empty
     if (hash && !hash.includes(' ')) {
       if (store.has(hash) && !refresh) { // if store has content and refresh is false then return from store.
-        console.debug('getIpfsContent: from store')
         return store.get(hash)
       } else { // else fetch from ipfs and store in store.
-        console.debug('getIpfsContent: from ipfs')
         const ipfsData = this.getIpfsData(hash, format)
         store.set(hash, ipfsData)
         return ipfsData
