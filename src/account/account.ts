@@ -117,7 +117,7 @@ export class Account extends BaseContract {
         }]
       }, {
         blocksBehind: 3,
-        expireSeconds: 30,
+        expireSeconds: this.config.eosTxExpire,
       });
     } catch (err) {
       throw new Error(err)
