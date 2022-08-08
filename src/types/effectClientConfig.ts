@@ -255,4 +255,10 @@ export interface EffectClientConfig {
    * Cache ipfs requests
    */
   ipfsCache ? : boolean
+
+  /**
+   * Eos transaction expire time in seconds
+   * The amount of time required by the user to sign the transaction.
+   */
+   eosTxExpire ? : number
 }

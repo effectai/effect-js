@@ -299,7 +299,7 @@ export class BaseContract {
         actions
       }, {
         blocksBehind: 3,
-        expireSeconds: 30,
+        expireSeconds: this.config.eosTxExpire,
       }).catch((err)=>{
         return Promise.reject(err)
       });
