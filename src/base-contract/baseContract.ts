@@ -185,11 +185,16 @@ export class BaseContract {
    * @returns content of the ipfs hash in your preferred format
    */
    getIpfsContent = async (hash: string, format: string = 'json', refresh: boolean = false): Promise<any> => {
+    
     // Check has is valid and not empty
     if (hash && !hash.includes(' ')) {
-      if (store.has(hash) && !refresh) { // if store has content and refresh is false then return from store.
+
+      // IF store has content is TRUE AND refresh is NOT TRUE AND config.ipfsCache is TRUE THEN return from store ELSE fetch from ipfs
+      if (store.has(hash) && !refresh && this.config.ipfsCache) { 
         return store.get(hash)
-      } else { // else fetch from ipfs and store in store.
+      } else { 
+        
+        // fetch from ipfs and store in store.
         const ipfsData = this.getIpfsData(hash, format)
         store.set(hash, ipfsData)
         return ipfsData
