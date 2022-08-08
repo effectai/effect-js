@@ -252,7 +252,13 @@ export interface EffectClientConfig {
   efxDaoVaccountId ? : number
 
   /**
-   * Cache ipfs requests
+   * Cache ipfs requests, enable or disable the ability to cache ipfs requests. 
    */
   ipfsCache ? : boolean
+
+  /**
+   * Eos transaction expire time in seconds
+   * The amount of time required by the user to sign the transaction.
+   */
+   eosTxExpire ? : number
 }

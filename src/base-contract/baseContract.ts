@@ -12,11 +12,10 @@ import { isBscAddress } from '../utils/bscAddress'
 import { nameToHex } from '../utils/hex'
 import { vAccountRow } from '../types/vAccountRow';
 import { TransactResult } from 'eosjs/dist/eosjs-api-interfaces';
-import LocalStorageCache from 'localstorage-cache';
+import store from "store2";
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-const storageCache = new LocalStorageCache(3 * 1024, 'LRU'); //
 
 /**
  * > “Elinor agreed to it all, for she did not think he deserved the compliment of rational opposition.” ― Jane Austen
@@ -185,34 +184,49 @@ export class BaseContract {
    * @param format - format of the content you are fetching.
    * @returns content of the ipfs hash in your preferred format
    */
-  getIpfsContent = async (hash: string, format: string = 'json'): Promise<any> => {
+   getIpfsContent = async (hash: string, format: string = 'json', refresh: boolean = false): Promise<any> => {
+    
+    // Check has is valid and not empty
     if (hash && !hash.includes(' ')) {
-      if (!storageCache.getCache(hash)) {
-        const data = await this.fetch(`${this.config.ipfsNode}/ipfs/${hash}`)
-        switch (format.toLowerCase()) {
-          case 'formdata':
-          case 'form':
-            return data.text()
-          case 'buffer':
-          case 'arraybuffer':
-          case 'array':
-            return data.arrayBuffer()
-          case 'blob':
-            return data.blob()
-          case 'text':
-            return data.text()
-          case 'json':
-            const ipfsData = await data.json()
-            if (this.config.ipfsCache && (typeof window !== "undefined" && typeof window.document !== "undefined")) {
-              storageCache.setCache(hash, ipfsData)
-            }
-            return ipfsData
-        }
-      } else {
-        return storageCache.getCache(hash)
+
+      // IF store has content is TRUE AND refresh is NOT TRUE AND config.ipfsCache is TRUE THEN return from store ELSE fetch from ipfs
+      if (store.has(hash) && !refresh && this.config.ipfsCache) { 
+        return store.get(hash)
+      } else { 
+        
+        // fetch from ipfs and store in store.
+        const ipfsData = this.getIpfsData(hash, format)
+        store.set(hash, ipfsData)
+        return ipfsData
       }
+    } else {
+      return null
     }
-    return null
+  }
+
+  /**
+   * Get IPFS Content in JSON, without caching, to be in getIpfsContent. 
+   * @param hash - hash of the IPFS content you want to fetch
+   * @param format - format of the content you are fetching.
+   * @returns content of the ipfs hash in your preferred format
+   */
+  getIpfsData = async (hash: string, format: string): Promise<any> => {
+    const data = await this.fetch(`${this.config.ipfsNode}/ipfs/${hash}`)
+    switch (format.toLowerCase()) {
+      case 'formdata':
+      case 'form':
+        return data.text()
+      case 'buffer':
+      case 'arraybuffer':
+      case 'array':
+        return data.arrayBuffer()
+      case 'blob':
+        return data.blob()
+      case 'text':
+        return data.text()
+      case 'json':
+        return await data.json()
+    }
   }
 
   /**
@@ -290,7 +304,7 @@ export class BaseContract {
         actions
       }, {
         blocksBehind: 3,
-        expireSeconds: 30,
+        expireSeconds: this.config.eosTxExpire,
       }).catch((err)=>{
         return Promise.reject(err)
       });
