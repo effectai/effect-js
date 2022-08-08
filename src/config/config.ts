@@ -56,7 +56,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosQualifierContract:   config?.eosQualifierContract   ?? 'efxqualifier',
             validationUrl:          config?.validationUrl          ?? 'https://validation-bot-mainnet-t4o43.ondigitalocean.app/',
             ipfsCache:              config?.ipfsCache              ?? true,
-            eosTxExpire:        120
+            eosTxExpire:            120
         }
 
     } else if (environment === 'jungle' || environment === 'jungle3' || environment === 'testnet') {
@@ -100,7 +100,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
             validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
             ipfsCache:              config?.ipfsCache              ?? true,
-            eosTxExpire:        120
+            eosTxExpire:            120
         }
 
     } else if (environment === 'local') {
@@ -149,7 +149,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
             validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
             ipfsCache:              config?.ipfsCache              ?? true,
-            eosTxExpire:        120
+            eosTxExpire:            120
         }
 
     } else {
