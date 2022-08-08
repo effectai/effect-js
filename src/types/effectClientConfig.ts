@@ -252,7 +252,7 @@ export interface EffectClientConfig {
   efxDaoVaccountId ? : number
 
   /**
-   * Cache ipfs requests
+   * Cache ipfs requests, enable or disable the ability to cache ipfs requests. 
    */
   ipfsCache ? : boolean
 }
