@@ -1268,15 +1268,14 @@ export class Force extends BaseContract {
   /**
    * Edit a Qualification
    */
-  editQualification = async (qualificationId: number, name: string, description: string, type: number, image?: string, ishidden?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-    const qualification = { name, description, type, image, ishidden }
+  editQualification = async (qualificationId: number, name: string, description: string, type: number, image?: string, ishidden?: string, campaignid?: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+    const qualification = { name, description, type, image, ishidden, campaignid }
 
     let sig: Signature
     const owner = this.effectAccount.accountName
     const accountId = this.effectAccount.vAccountRows[0].id
     const hash = await this.uploadCampaign(qualification)
     // console.log('Upload succesful, hash: ', hash)
-
 
     // Check if caller of this function is the owner of the qualification
     const qualiToEdit = await this.getQualification(qualificationId);
