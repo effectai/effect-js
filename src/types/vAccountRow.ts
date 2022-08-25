@@ -1,6 +1,9 @@
 export interface vAccountRow {
   address: Array<string>;
-  balance: Array<Object>;
+  balance: {
+    quantity: string;
+    contract:  string;
+  };
   id: number;
   nonce: number;
 }
