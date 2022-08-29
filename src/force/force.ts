@@ -537,6 +537,35 @@ export class Force extends BaseContract {
         sig: isBscAddress(fromAccount) ? pubSig.toString() : null,
       },
     }]
+
+    const accRow = this.effectAccount.vAccountRows[0]
+
+    // if it's an EOS account and it doesn't have enough vEFX for the batch
+    // add a deposit transaction to deposit the amount the user needs
+    console.log(batchPrice)
+    console.log(parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, '')))
+    if (!isBscAddress(campaignOwner)
+      && batchPrice > parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, ''))) {
+      console.log('niet genoeg!')
+      const efxLeft = (batchPrice - parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, '')) )
+      actions.unshift(
+        {
+          account: this.config.efxTokenContract,
+          name: 'transfer',
+          authorization: [{
+            actor: fromAccount,
+            permission: this.effectAccount.permission
+          }],
+          data: {
+            from: fromAccount,
+            to: this.config.accountContract,
+            // @ts-ignore
+            quantity: convertToAsset(efxLeft) + ' ' + this.config.efxSymbol,
+            memo: this.effectAccount.vAccountRows[0].id,
+          },
+        }
+      )
+    }
     const transaction = await this.sendTransaction(campaignOwner, actions);
     return {
       transaction,
