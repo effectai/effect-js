@@ -144,6 +144,7 @@ export class Force extends BaseContract {
    * @returns
    */
   processCampaign = async (campaign: Campaign): Promise<Campaign> => {
+    if (!campaign) { return null; }
     try {
       // field_0 represents the content type where:
       // 0: IPFS
@@ -542,11 +543,8 @@ export class Force extends BaseContract {
 
     // if it's an EOS account and it doesn't have enough vEFX for the batch
     // add a deposit transaction to deposit the amount the user needs
-    console.log(batchPrice)
-    console.log(parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, '')))
     if (!isBscAddress(campaignOwner)
       && batchPrice > parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, ''))) {
-      console.log('niet genoeg!')
       const efxLeft = (batchPrice - parseFloat(accRow.balance.quantity.replace(` ${this.config.efxSymbol}`, '')) )
       actions.unshift(
         {
@@ -1527,6 +1525,7 @@ export class Force extends BaseContract {
    * @returns Promise<Qualification> - Qualification with content
    */
   processQualification = async (qualification: Qualification): Promise<Qualification> => {
+    if (!qualification) { return null; }
     try {
       // field_0 represents the content type where:
       // 0: IPFS
