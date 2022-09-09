@@ -458,9 +458,12 @@ export class Force extends BaseContract {
       sig = await this.generateSignature(serialbuff)
     }
 
+    // TODO: get the fee_percentage from the force settings table
     const campaign = await this.getCampaign(campaignId)
     const [reward, symbol] = parseAsset(campaign.reward.quantity)
-    const batchPrice = reward * content.tasks.length * repetitions
+    const feePercentage = 0.1;
+    const batchPrice = (reward + reward * feePercentage) * content.tasks.length * repetitions
+
 
     // TODO: below code copied from vaccount module, can we just call that code?
     let vaccSig: Signature;
