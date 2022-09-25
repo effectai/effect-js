@@ -24,64 +24,9 @@ npm i @effectai/effect-js
 ```
 
 # 🏎 Quick start
-Simple example of how to use the library in order to create a wallet and publish a campaign on the platform. 
+Please take a look at the [Quick-Start-Guide](https://developer.effect.network/quickstart/) in order to understand how to install and use the library.
+You can also take a look at our [Medium-Article](https://medium.com/effect-ai/launch-your-dapp-on-effect-network-eece1ba221f6) to get a quick overview of how to use the library on the dApp side. In other words: on how to post tasks to an already defined template on Effect Force.
 
-```javascript
-//Require, import also available
-const effectsdk = require('@effectai/effect-js');
-const client = new effectsdk.EffectClient('testnet')
-
-// Instantiating bsc account.
-const account = effectsdk.createAccount(
-    // leave empty to generate new private key, or use existing private
-    'YourVeryPrivateKeyHere'
-)
-
-// Generate web3 instance from account with private key.
-// Could also be the web3 object with a MetaMask connection etc.
-const web3 = effectsdk.createWallet(account)
-
-const main = async () => {
-    // Connect web3 account to SDK
-  const effectAccount = await client.connectAccount(web3);
-
-  const newCampaign = {
-      title: 'Random Title',
-      description: 'Networked well-modulated instruction set',
-      instructions: `American whole magazine truth stop whose.`,
-      template: `<div>
-                <image src='` + '${image_url}' + `'></image>
-                <h2>What do you see in the picture above? 🐸</h2>
-                <input type='radio' name='radio-answer' id="original" label=''>Stars 🤩</input><br>
-                <input type='radio' name='radio-answer' id="original" label=''>Mechanical Turk 😏</input><br>
-                <input type='radio' name='radio-answer' id="original" label=''>Dog 🤐</input> <br>
-                <input type='radio' name='radio-answer' id="original" label=''>Cat 😵</input><br>
-                <hr>
-                <button type="submit">Submit</button> 
-              </div>
-              <script></script>
-              <style></style>`,      
-      image: 'https://ipfs.effect.ai/ipfs/bafkreiggnttdaxleeii6cdt23i4e24pfcvzyrndf5kzfbqgf3fxjryj5s4',
-      category: 'Image Labeling',
-      example_task: {'image_url': 'https://ipfs.effect.ai/ipfs/bafkreidrxwhqsxa22uyjamz7qq3lh7pv2eg3ykodju6n7cgprmjpal2oga'},
-      version: 1,
-      reward: 10
-  }
-
-  // Create campaign.
-  // campaign object, reward efx per task
-  const makeCampaign = await client.force.makeCampaign(newCampaign, '10')
-  console.log('makeCampaign', makeCampaign)
-
-  // Get Campaigns
-  // nextKey, limit
-  const campaigns = await client.force.getMyLastCampaign()
-  console.log('Campaigns', campaigns)
-}
-
-main()
-
-```
 
 # 🦋 Development
 The best way to get to know how this module works is by adding features while you can run it. So there are some examples provided to provide an idea of how to create a transaction with the Effect Network.
