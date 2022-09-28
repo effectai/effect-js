@@ -273,7 +273,7 @@ export class Force extends BaseContract {
     }
     const data = await this.api.rpc.get_table_rows(config)
 
-    return data[0];
+    return data.rows[0];
   }
 
   /**
