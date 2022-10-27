@@ -1345,11 +1345,13 @@ export class Force extends BaseContract {
 
   /**
    * Assign a qualification to a user.
-   * @param qualificationId
-   * @param user
-   * @returns Transacation  
+   * @param ids The qualification ID to assign, or an array of qualification IDs
+   * @param user To user vAccount ID to assign the qualification to
+   * @param value The value to assign for each userquli in the array
+   * @returns Transaction
    */
-  assignQualification = async (ids: Array<number> | number, accountId: number): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  assignQualification = async (ids: Array<number> | number, accountId: number, value: string = '')
+  : Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let qualificationIds = []
     if (!Array.isArray(ids)) {
       qualificationIds.push(ids)
@@ -1385,6 +1387,7 @@ export class Force extends BaseContract {
         data: {
           quali_id: qid,
           user_id: accountId,
+          value: value,
           payer: isBscAddress(owner) ? this.config.eosRelayerAccount : owner,
           sig: isBscAddress(owner) ? sig.toString() : null
         }
