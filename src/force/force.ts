@@ -695,7 +695,7 @@ export class Force extends BaseContract {
    * @param quantity the amount of tokens rewarded
    * @returns transaction result
    */
-  createCampaign = async (hash: string, quantity: string, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  createCampaign = async (hash: string, quantity: string | number, qualis?: Array<object>): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature
     const owner = this.effectAccount.accountName
 
