@@ -1225,13 +1225,10 @@ export class Force extends BaseContract {
     let taskIndex: number;
     const treeLeaves = leaves ? leaves : await this.getTreeLeaves(campaignId, batchId, tasks)
     for (let i = 0; i < treeLeaves.length; i++) {
-      if (treeLeaves[i].substring('2') === leafHash) {
+      if (treeLeaves[i].substring(2) === leafHash) {
         taskIndex = i
-      } else {
-        taskIndex = 0
       }
     }
-    console.log('effectjs::taskIndex', taskIndex)
     return taskIndex
   }
 
@@ -1246,7 +1243,6 @@ export class Force extends BaseContract {
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
     const sha256 = (x: string) => Buffer.from(ecc.sha256(x), 'hex')
-
 
     const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
     const tree = new MerkleTree(leaves, sha256)
