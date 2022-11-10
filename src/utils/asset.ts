@@ -4,7 +4,7 @@
  * @returns string
  * Inspiration from: https://github.com/EOSIO/eosjs/blob/3ef13f3743be9b358c02f47263995eae16201279/src/format.js
 */
-export function convertToAsset(amount: string): string {
+export function convertToAsset(amount: string | number): string {
   try {
 
     // this.config.efx_precision
