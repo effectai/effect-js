@@ -182,9 +182,10 @@ export class Account extends BaseContract {
    * Transfer between vaccounts
    * @param toAccountId vaccount to transfer to
    * @param amountEfx amount of tokens, example: '10.0000'
+   * @param memo optional memo
    * @returns transaction result
    */
-  vtransfer = async (toAccountId: number, amountEfx: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+  vtransfer = async (toAccountId: number, amountEfx: string, memo: string = ""): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
     let sig: Signature;
 
     await this.updatevAccountRows()
@@ -211,7 +212,7 @@ export class Account extends BaseContract {
         name: 'vtransfer',
         authorization: [{
           actor: isBscAddress(fromAccount) ? this.config.eosRelayerAccount : fromAccount,
-          permission: isBscAddress(fromAccount) ? this.config.eosRelayerPermission : this.effectAccount.permission,
+          permission: isBscAddress(fromAccount) ? this.config.eosRelayerPermission : this.effectAccount.permission
         }],
         data: {
           from_id: fromAccountId,
@@ -220,7 +221,7 @@ export class Account extends BaseContract {
             quantity: amount + ' ' + this.config.efxSymbol,
             contract: this.config.efxTokenContract
           },
-          memo: "",
+          memo: memo,
           sig: isBscAddress(fromAccount) ? sig.toString() : null,
           fee: null
         },
