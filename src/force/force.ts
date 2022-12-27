@@ -1486,6 +1486,7 @@ export class Force extends BaseContract {
     if (processQualification) {
       for (let i = 0; i < qualifications.rows.length; i++) {
         const quali = await this.getQualification(qualifications.rows[i].quali_id)
+        quali.value = qualifications.rows[i]?.value
         userQualis.push(quali)
       }
     } else {

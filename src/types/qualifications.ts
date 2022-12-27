@@ -1,6 +1,7 @@
 export interface Qualification {
     id: number;
     account_id: number;
+    value?: string;
     info?: {
         name: string;
         description: string;
