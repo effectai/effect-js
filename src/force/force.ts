@@ -419,6 +419,20 @@ export class Force extends BaseContract {
   }
 
   /**
+   * Get fee percentage price from eos
+   */
+    getFeePercentage = async (): Promise<number> => {
+      const fee = await this.api.rpc.get_table_rows({
+        code: this.config.forceContract,
+        scope: this.config.forceContract,
+        table: 'settings',
+        limit: 1
+      })
+  
+      return fee.rows[0].fee_percentage
+    }
+
+  /**
    * Creates a batch on a Campaign.
    * @param campaignId
    * @param batchId
@@ -461,7 +475,10 @@ export class Force extends BaseContract {
     // TODO: get the fee_percentage from the force settings table
     const campaign = await this.getCampaign(campaignId)
     const [reward, symbol] = parseAsset(campaign.reward.quantity)
-    const feePercentage = 0.1;
+    const feePercentage = await this.getFeePercentage()
+    if (Number.isNaN(feePercentage) || feePercentage === undefined) {
+      throw new Error('Fee percentage is not properly set.')
+    }
     const batchPrice = (reward + reward * feePercentage) * content.tasks.length * repetitions
 
 
