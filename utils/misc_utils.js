@@ -27,6 +27,26 @@ async function main () {
         // const effectAccount = await connectBscAccount(sdk)
         console.log('effectAccount', effectAccount)
 
+        sdk.force.getFeePercentage().then(console.log).catch(console.error)
+
+        // const accid = 9
+        // const vacc = await sdk.account.getVAccountById(accid).catch(console.error)
+        // console.log('vaccount', vacc)
+
+        // const pendingBalance = await sdk.force.getPendingBalance(accid).catch(console.error)
+        // console.log('pendingBalance', pendingBalance)
+
+        // const qualis = await sdk.force.getAssignedQualifications(null, 100, true, accid).catch(console.error)
+        // console.log('qualis', qualis[3])
+        
+        // const qual = await sdk.force.getQualification(0).catch(console.error)
+        // console.log('qual', qual)
+
+
+
+
+        // sdk.account.getVAccountById(273).then(console.log).catch(console.error)
+
         // const json = {
         //     name:"Force Alpha",
         //     description:"Original Effect Force user. \nThis Qualification asserts that you have used and worked witht the original Effect Force before we moved to the new Decentralized Effect Network Force.\nA token to remember our humble beginnings. \n",
@@ -60,7 +80,7 @@ async function main () {
         // await sdk.force.getQualification(1).then(console.log).catch(console.error)
         
         // sdk.force.assignQualification(0,  389).then(console.log).catch(console.error)
-        sdk.force.unAssignQualification(5, 127).then(console.log).catch(console.error)
+        // sdk.force.unAssignQualification(5, 127).then(console.log).catch(console.error)
 
 
         
