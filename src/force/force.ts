@@ -1507,7 +1507,7 @@ export class Force extends BaseContract {
         userQualis.push(quali)
       }
     } else {
-      userQualis = qualifications.rows
+      userQualis = [...qualifications.rows]
     }
     return userQualis;
   }
@@ -1541,6 +1541,18 @@ export class Force extends BaseContract {
     }
 
     return qualifications;
+  }
+
+  /**
+   * Get User Qualificaitons
+   * @param userId - id of the user
+   * @param qualificationId - id of the qualification
+   * @returns Qualification - Qualification without content, returns undefined if not found.
+   */
+  getUserQualification = async (userId: number, qualificationId: number): Promise<Qualification> => {
+    const qualis = await this.getAssignedQualifications(null, 100, false, userId)
+    const userQuali = qualis.find(quali => quali.quali_id === qualificationId)
+    return userQuali
   }
 
   /**
