@@ -1,0 +1,17 @@
+name: Add bounty to Bounty Board
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@RELEASE_VERSION
+        with:
+          project-url: https://github.com/orgs/effectai/projects/6 # bounty board project
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: bounty
