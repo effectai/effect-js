@@ -1,7 +1,7 @@
 name: Add bounty to Bounty Board
 
 on:
-  pull_request:
+  issues:
     types:
       - labeled
 
