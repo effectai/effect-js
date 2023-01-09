@@ -10,8 +10,10 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@RELEASE_VERSION
+      - uses: actions/add-to-project@v0.4.0
         with:
           project-url: https://github.com/orgs/effectai/projects/6 # bounty board project
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bounty
+
+
