@@ -972,12 +972,12 @@ export class Force extends BaseContract {
     const prefixle = CryptoJS.enc.Hex.stringify(CryptoJS.lib.WordArray.create([campaignId, batchId], 8))
     const prefixbe = CryptoJS.enc.Hex.parse(prefixle.match(/../g).reverse().join(''))
 
-    const leaves = tasks.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
+    const leaves = tasks?.map(x => SHA256(prefixbe.clone().concat(CryptoJS.enc.Utf8.parse(JSON.stringify(x)))))
 
     const tree = new MerkleTree(leaves, sha256)
     const proof = tree.getProof(leaves[taskIndex])
-    const hexproof = proof.map(x => buf2hex(x.data))
-    const pos = proof.map(x => (x.position === 'right') ? 1 : 0)
+    const hexproof = proof?.map(x => buf2hex(x.data))
+    const pos = proof?.map(x => (x.position === 'right') ? 1 : 0)
 
     if (isBscAddress(user)) {
       const serialbuff = new Serialize.SerialBuffer()
