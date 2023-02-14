@@ -73,8 +73,12 @@ export class EffectClient {
                 }
             } else {
                 eosSignatureProvider = provider;
-                this.effectAccount = { accountName: account.accountName, permission: account.permission, address: account.publicKey }
-                this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
+                if (!account || !account.accountName || !account.permission || !account.publicKey) {
+                    throw new Error('Please provide a valid EOS account, accountName, permission and publicKey')
+                } else {
+                    this.effectAccount = { accountName: account.accountName, permission: account.permission, address: account.publicKey }
+                    this.api = new Api({ rpc: this.rpc, signatureProvider: eosSignatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() })
+                }
             }
 
             await this.account.setSignatureProvider(this.effectAccount, this.api, web3 ? web3 : null)
