@@ -428,7 +428,7 @@ export class Force extends BaseContract {
         table: 'settings',
         limit: 1
       })
-  
+
       return fee.rows[0].fee_percentage
     }
 
@@ -456,6 +456,7 @@ export class Force extends BaseContract {
       content.tasks[i].link_id = uuidv4();
     }
     const hash = await this.uploadCampaign(content)
+
     const {root, leaves} = this.getMerkleTree(campaignId, batchId, content.tasks)
     const campaignOwner = this.effectAccount.accountName
 
@@ -472,7 +473,6 @@ export class Force extends BaseContract {
       sig = await this.generateSignature(serialbuff)
     }
 
-    // TODO: get the fee_percentage from the force settings table
     const campaign = await this.getCampaign(campaignId)
     const [reward, symbol] = parseAsset(campaign.reward.quantity)
     const feePercentage = await this.getFeePercentage()
@@ -480,6 +480,7 @@ export class Force extends BaseContract {
       throw new Error('Fee percentage is not properly set.')
     }
     const batchPrice = (reward + reward * feePercentage) * content.tasks.length * repetitions
+
 
 
     // TODO: below code copied from vaccount module, can we just call that code?
@@ -518,46 +519,50 @@ export class Force extends BaseContract {
       permission: isBscAddress(campaignOwner) ? this.config.eosRelayerPermission : this.effectAccount.permission
     }]
 
-    const actions = [{
-      account: contract ? contract : this.config.forceContract,
-      name: 'mkbatch',
-      authorization,
-      data: {
-        id: batchId,
-        campaign_id: campaignId,
-        content: { field_0: 0, field_1: hash },
-        task_merkle_root: root,
-        repetitions: repetitions,
-        qualis: null,
-        payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
-        sig: isBscAddress(campaignOwner) ? sig.toString() : null
-      },
-    }, {
-      account: this.config.accountContract,
-      name: 'vtransfer',
-      authorization,
-      data: {
-        from_id: fromAccountId,
-        to_id: toAccountId,
-        quantity: {
-          quantity: amount + ' ' + this.config.efxSymbol,
-          contract: this.config.efxTokenContract,
+    const actions = [
+        {
+        account: contract ? contract : this.config.forceContract,
+        name: 'mkbatch',
+        authorization,
+        data: {
+          id: batchId,
+          campaign_id: campaignId,
+          content: { field_0: 0, field_1: hash },
+          task_merkle_root: root,
+          repetitions: repetitions,
+          qualis: null,
+          payer: isBscAddress(campaignOwner) ? this.config.eosRelayerAccount : campaignOwner,
+          sig: isBscAddress(campaignOwner) ? sig.toString() : null
         },
-        sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
-        fee: null,
-        memo: batchPk
       },
-    }, {
-      account: contract ? contract : this.config.forceContract,
-      name: 'publishbatch',
-      authorization,
-      data: {
-        account_id: this.effectAccount.vAccountRows[0].id,
-        batch_id: batchPk,
-        num_tasks: content.tasks.length,
-        sig: isBscAddress(fromAccount) ? pubSig.toString() : null,
+      {
+        account: this.config.accountContract,
+        name: 'vtransfer',
+        authorization,
+        data: {
+          from_id: fromAccountId,
+          to_id: toAccountId,
+          quantity: {
+            quantity: amount + ' ' + this.config.efxSymbol,
+            contract: this.config.efxTokenContract,
+          },
+          sig: isBscAddress(fromAccount) ? vaccSig.toString() : null,
+          fee: null,
+          memo: batchPk
+        },
       },
-    }]
+      {
+        account: contract ? contract : this.config.forceContract,
+        name: 'publishbatch',
+        authorization,
+        data: {
+          account_id: this.effectAccount.vAccountRows[0].id,
+          batch_id: batchPk,
+          num_tasks: content.tasks.length,
+          sig: isBscAddress(fromAccount) ? pubSig.toString() : null,
+        },
+      }
+    ]
 
     const accRow = this.effectAccount.vAccountRows[0]
 
@@ -584,7 +589,8 @@ export class Force extends BaseContract {
         }
       )
     }
-    const transaction = await this.sendTransaction(campaignOwner, actions);
+
+    const transaction = await this.sendTransaction(campaignOwner, actions).catch(console.error)
     return {
       transaction,
       id: batchId,
@@ -1308,7 +1314,7 @@ export class Force extends BaseContract {
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
-    
+
     return await this.sendTransaction(owner, action)
   }
 
@@ -1446,7 +1452,7 @@ export class Force extends BaseContract {
         sig: isBscAddress(owner) ? sig.toString() : null
       }
     }
-    
+
     return await this.sendTransaction(owner, action)
   }
 
