@@ -233,10 +233,10 @@ export class Force extends BaseContract {
     return data.rows[0]
   }
 
-  
+
   /**
-   * Does this make sense? So it might makes sense to iterate through the array in reverse order. 
-   * Get Last submission 
+   * Does this make sense? So it might makes sense to iterate through the array in reverse order.
+   * Get Last submission
    * @returns Task
    */
      getLatestSubmissions = async (): Promise<GetTableRowsResult> => {
@@ -248,12 +248,12 @@ export class Force extends BaseContract {
         limit: 20,
         reverse: true
       }
-  
+
       const task = await this.api.rpc.get_table_rows(config)
-    
+
       return task
     }
-  
+
 
   /**
    * Get individual task
