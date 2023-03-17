@@ -59,8 +59,52 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosTxExpire:            120
         }
 
+    } else if (environment === 'jungle4') {
+
+        return {
+            network:                config?.network                ?? 'jungle4',
+            signatureProvider:      config?.signatureProvider      ?? null,
+            web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
+            ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
+            forceContract:          config?.forceContract          ?? 'efxforce1113',
+            forceVaccountId:        config?.forceVaccountId        ?? 333, //TODO
+            accountContract:        config?.accountContract        ?? 'efxaccount11',
+            efxTokenContract:       config?.efxTokenContract       ?? 'efxtoken1112',
+            efxSymbol:              config?.efxSymbol              ?? 'EFX',
+            efxPrecision:           config?.efxPrecision           ?? 4,
+            efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
+            eosRelayerAccount:      config?.eosRelayerAccount      ?? 'efxrelayer11',
+            eosRelayerPermission:   config?.eosRelayerPermission   ?? 'active',
+            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
+            payoutDelaySec:         config?.payoutDelaySec         ?? 3600,
+            releaseTaskDelaySec:    config?.releaseTaskDelaySec    ?? 1800,
+            bscNetworkId:           config?.bscNetworkId           ?? 56,
+            bscHexId:               config?.bscHexId               ?? '0x38',
+            bscChainName:           config?.bscChainName           ?? 'Binance Smart Chain',
+            bscNetworkType:         config?.bscNetworkType         ?? 'Mainnet',
+            bscTokenName:           config?.bscTokenName           ?? 'Binance Coin',
+            bscTokenSymbol:         config?.bscTokenSymbol         ?? 'BNB',
+            bscTokenDecimals:       config?.bscTokenDecimals       ?? 18,
+            bscRpcUrl:              config?.bscRpcUrl              ?? 'https://bsc-dataseed.binance.org',
+            bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
+            bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
+            eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://local.bloks.io/?nodeUrl=http%3A%2F%2Fjungle4.cryptolions.io&systemDomain=eosio&hyperionUrl=https%3A%2F%2Fjungle4history.cryptolions.io',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle4history.cryptolions.io',
+            eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
+            eosNodePort:            config?.eosNodePort            ?? 443,
+            eosNodeHost:            config?.eosNodeHost            ?? 'jungle4history.cryptolions.io',
+            eosChainId:             config?.eosChainId             ?? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
+            batchSizeLimit:         300,
+            taskEstimatedTime:      1.5,
+            qualifierAccountId:     config?.qualifierAccountId     ?? 389,
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
+            ipfsCache:              config?.ipfsCache              ?? true,
+            eosTxExpire:            120
+        }
+
     } else if (environment === 'jungle' || environment === 'jungle3' || environment === 'testnet') {
-        
+
         return {
             network:                config?.network                ?? 'testnet',
             signatureProvider:      config?.signatureProvider      ?? null,
@@ -104,7 +148,6 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
         }
 
     } else if (environment === 'local') {
-        
         /**
          * INFO When spinning up the local node, the first account created should be the force_account.
          * INFO deploy the local relayer service.
@@ -116,7 +159,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'effect.force',
-            forceVaccountId:        config?.forceVaccountId        ?? 0, 
+            forceVaccountId:        config?.forceVaccountId        ?? 0,
             accountContract:        config?.accountContract        ?? 'effect.accnt',
             efxTokenContract:       config?.efxTokenContract       ?? 'effect.token',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
@@ -124,7 +167,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
             eosRelayerAccount:      config?.eosRelayerAccount      ?? 'effect.relay',
             eosRelayerPermission:   config?.eosRelayerPermission   ?? 'active',
-            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'http://localhost:3001', 
+            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'http://localhost:3001',
             payoutDelaySec:         config?.payoutDelaySec         ?? 1,
             releaseTaskDelaySec:    config?.releaseTaskDelaySec    ?? 1,
             bscNetworkId:           config?.bscNetworkId           ?? 97,
@@ -156,5 +199,3 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
         throw new Error('no default config is being used, make sure you specified configuration object for the environment you are using when creating a client effectSDK.EffectClient("main"). ')
     }
 }
-
-
