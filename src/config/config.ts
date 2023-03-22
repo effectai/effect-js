@@ -67,15 +67,15 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
             forceContract:          config?.forceContract          ?? 'efxforce1113',
-            forceVaccountId:        config?.forceVaccountId        ?? 333, //TODO
+            forceVaccountId:        config?.forceVaccountId        ?? 333, // TODO Create force vAccount
             accountContract:        config?.accountContract        ?? 'efxaccount11',
             efxTokenContract:       config?.efxTokenContract       ?? 'efxtoken1112',
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
-            eosRelayerAccount:      config?.eosRelayerAccount      ?? 'efxrelayer11',
+            eosRelayerAccount:      config?.eosRelayerAccount      ?? 'efxrelayer11', // TODO needs to be deployed
             eosRelayerPermission:   config?.eosRelayerPermission   ?? 'active',
-            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
+            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app', // TODO update relayer
             payoutDelaySec:         config?.payoutDelaySec         ?? 3600,
             releaseTaskDelaySec:    config?.releaseTaskDelaySec    ?? 1800,
             bscNetworkId:           config?.bscNetworkId           ?? 56,
@@ -88,17 +88,17 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             bscRpcUrl:              config?.bscRpcUrl              ?? 'https://bsc-dataseed.binance.org',
             bscExplorerUrl:         config?.bscExplorerUrl         ?? 'https://bscscan.com',
             bscEfxTokenContract:    config?.bscEfxTokenContract    ?? '0xC51Ef828319b131B595b7ec4B28210eCf4d05aD0',
-            eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://local.bloks.io/?nodeUrl=http%3A%2F%2Fjungle4.cryptolions.io&systemDomain=eosio&hyperionUrl=https%3A%2F%2Fjungle4history.cryptolions.io',
-            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle4history.cryptolions.io',
+            eosExplorerUrl:         config?.eosExplorerUrl         ?? 'https://jungle4.eosq.eosnation.io/',
+            eosNodeUrl:             config?.eosNodeUrl             ?? 'https://jungle4.greymass.com/',
             eosNodeProtocol:        config?.eosNodeProtocol        ?? 'https',
             eosNodePort:            config?.eosNodePort            ?? 443,
-            eosNodeHost:            config?.eosNodeHost            ?? 'jungle4history.cryptolions.io',
+            eosNodeHost:            config?.eosNodeHost            ?? 'jungle4.greymass.com',
             eosChainId:             config?.eosChainId             ?? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
             qualifierAccountId:     config?.qualifierAccountId     ?? 389,
-            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot',
-            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot', // TODO needs to be deployed, but wait for the new quali system
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app', // TODO Does this need to be updated?
             ipfsCache:              config?.ipfsCache              ?? true,
             eosTxExpire:            120
         }
