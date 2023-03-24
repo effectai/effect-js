@@ -73,9 +73,9 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             efxSymbol:              config?.efxSymbol              ?? 'EFX',
             efxPrecision:           config?.efxPrecision           ?? 4,
             efxExtendedSymbol:      config?.efxExtendedSymbol      ?? '4,EFX',
-            eosRelayerAccount:      config?.eosRelayerAccount      ?? 'efxrelayer11', // TODO needs to be deployed
+            eosRelayerAccount:      config?.eosRelayerAccount      ?? 'effectrelayr',
             eosRelayerPermission:   config?.eosRelayerPermission   ?? 'active',
-            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app', // TODO update relayer
+            eosRelayerUrl:          config?.eosRelayerUrl          ?? 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
             payoutDelaySec:         config?.payoutDelaySec         ?? 3600,
             releaseTaskDelaySec:    config?.releaseTaskDelaySec    ?? 1800,
             bscNetworkId:           config?.bscNetworkId           ?? 56,
@@ -97,8 +97,8 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
             qualifierAccountId:     config?.qualifierAccountId     ?? 389,
-            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxdavid1bot', // TODO needs to be deployed, but wait for the new quali system
-            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app', // TODO Does this need to be updated?
+            eosQualifierContract:   config?.eosQualifierContract   ?? 'efxqualifier',
+            validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
             ipfsCache:              config?.ipfsCache              ?? true,
             eosTxExpire:            120
         }
