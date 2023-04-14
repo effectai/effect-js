@@ -190,12 +190,17 @@ export class Force extends BaseContract {
       key_type: 'i64',
       lower_bound: batchId,
       upper_bound: batchId,
-      limit: this.config.batchSizeLimit
+      limit: this.config.batchSizeLimit + 1
     }
-    const data = await this.api.rpc.get_table_rows(config)
+    let data = await this.api.rpc.get_table_rows(config)
+
+    
+    // TODO: this should not happen, limit is too high
     if (data.more) {
-      // TODO: this should not happen, limit is too high
-      throw new Error('could not retrieve all submissions for batch')
+      // throw new Error('could not retrieve all submissions for batch')
+      config.limit = 600
+      console.debug(`getSubmissionsOfBatch: could not retrieve all submissions for batch ${batchId}, trying with higher limit ${config.limit}}`)
+      data = await this.api.rpc.get_table_rows(config)
     }
 
     const batchSubmissions = []
