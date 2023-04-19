@@ -66,7 +66,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             signatureProvider:      config?.signatureProvider      ?? null,
             web3:                   config?.web3                   ?? new Web3(config?.bscRpcUrl ?? 'https://bsc-dataseed.binance.org'),
             ipfsNode:               config?.ipfsNode               ?? 'https://ipfs.effect.ai',
-            forceContract:          config?.forceContract          ?? 'efxforce1113',
+            forceContract:          config?.forceContract          ?? 'efxforce1112',
             forceVaccountId:        config?.forceVaccountId        ?? 333, // TODO Create force vAccount
             accountContract:        config?.accountContract        ?? 'efxaccount11',
             efxTokenContract:       config?.efxTokenContract       ?? 'efxtoken1112',
