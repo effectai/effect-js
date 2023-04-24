@@ -17,7 +17,7 @@ The SDK reference is available here: [SDK-Reference](https://effectai.github.io/
 
 # ✒️ Installation
 
-The official distribution for the package can is available at [npm](https://www.npmjs.com/package/effect-js).
+The official distribution for the package can is available at [npm](https://www.npmjs.com/package/@effectai/effect-js).
 
 ```bash
 npm i @effectai/effect-js
