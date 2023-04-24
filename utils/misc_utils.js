@@ -1,14 +1,15 @@
 // import dotenv from 'dotenv'
 const dotenv = require('dotenv')
 const { EffectClient, createAccount, createWallet } = require('../dist/lib')
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
-const {connectEosAccount, connectBscAccount} = require('./connect_efx_account')
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig') // development only
+const { connectEosAccount, connectBscAccount, openEosAccount } = require('./connect_efx_account')
 
 // Initialize
 dotenv.config({path: '.env'})
 console.log(process.env.ACCOUNTNAME, process.env.PERMISSION, process.env.PRIVATE_KEY, process.env.BSC_KEY)
 
 const config = {
+    NETWORK: process.env.NETWORK,
     ACCOUNTNAME: process.env.ACCOUNTNAME,
     PERMISSION: process.env.PERMISSION,
     PRIVATE_KEY: process.env.PRIVATE_KEY,
@@ -16,18 +17,37 @@ const config = {
 }
 
 // Run the Track!! 
-main()
+console.log('🔥 Connecting to account', config)
+setTimeout(async () => { await main() }, 5e3);
 
 async function main () {
     try {
 
-        const sdk = new EffectClient('mainnet')
+        const sdk = new EffectClient(config.NETWORK)
+        openEosAccount(sdk, config)
 
-        const effectAccount = await connectEosAccount(sdk, config)
-        // const effectAccount = await connectBscAccount(sdk)
-        console.log('effectAccount', effectAccount)
+        // const effectAccount = await connectEosAccount(sdk, config)
+        // // const effectAccount = await connectBscAccount(sdk)
+        // console.log('effectAccount', effectAccount)
 
-        sdk.force.getFeePercentage().then(console.log).catch(console.error)
+        // const quali_id = 37
+        // const accname = ''
+        // const vacc = (await sdk.account.getVAccountByName(accname).catch(console.error)).pop()
+        // console.log('vaccount', vacc)
+
+        // console.log('vacc.id', vacc.id, typeof vacc.id);
+
+
+        // console.time('getPendingBalance')
+        // const quali = await sdk.force.getUserQualification(vacc.id, quali_id).catch(console.error)
+        // console.log('quali', quali)
+        // console.timeEnd('getPendingBalance')
+
+        // sdk.force.getPendingBalance(vacc.id).then(console.log).catch(console.error)
+        // sdk.force.getAssignedQualifications(null, 10, false, vacc.id).then(console.log).catch(console.error)
+
+
+        // sdk.force.getFeePercentage().then(console.log).catch(console.error)
 
         // const accid = 9
         // const vacc = await sdk.account.getVAccountById(accid).catch(console.error)

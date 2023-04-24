@@ -1,6 +1,5 @@
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
 
-
 /**
  * Connect with an BSC account.
  * @param {} effectsdk 
@@ -42,7 +41,31 @@ async function connectEosAccount(effectsdk, configEnv) {
     }
 }
 
+/**
+ * Create an EOS account.
+ * @param {*} effectsdk
+ * @param {*} configEnv
+ * @returns
+ */
+async function openEosAccount(effectsdk, configEnv) {
+    try {
+        console.log("🔥 Creating account")
+        const provider = new JsSignatureProvider([configEnv.PRIVATE_KEY])
+        const eos_accnt = {
+            accountName: configEnv.ACCOUNTNAME,
+            permission: configEnv.PERMISSION,
+            privateKey: configEnv.PRIVATE_KEY
+        }
+        const effect_account = await effectsdk.account.openAccount(eos_accnt.accountName, eos_accnt.permission)
+        console.log(`🔥 Connected to account: ${effect_account.accountName}`)
+        return effect_account
+    } catch (error) {
+        console.error('🧯 Error connecting EOS account', error)
+    }
+}
+
 module.exports = {
     connectBscAccount,
-    connectEosAccount
+    connectEosAccount,
+    openEosAccount
 }
