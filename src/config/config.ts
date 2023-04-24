@@ -96,7 +96,7 @@ export const defaultConfiguration = (environment: string = 'testnet', config?: E
             eosChainId:             config?.eosChainId             ?? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
             batchSizeLimit:         300,
             taskEstimatedTime:      1.5,
-            qualifierAccountId:     config?.qualifierAccountId     ?? 389,
+            qualifierAccountId:     config?.qualifierAccountId     ?? 5,
             eosQualifierContract:   config?.eosQualifierContract   ?? 'efxqualifier',
             validationUrl:          config?.validationUrl          ?? 'https://validation-bot-jungle-mlolk.ondigitalocean.app',
             ipfsCache:              config?.ipfsCache              ?? true,
