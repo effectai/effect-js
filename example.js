@@ -1,5 +1,6 @@
 const efxSdk = require('./dist/index')
 
-const client = new efxSdk.Client()
+const effect = new efxSdk.Client()
 
-client.getCampaigns().then(console.log).catch(console.error)
+
+effect.tasks.getCampaigns().then(console.log).catch(console.error)
