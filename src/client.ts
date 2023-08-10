@@ -4,24 +4,24 @@ import { configPresets } from './config';
 import { APIClient, APIClientOptions, FetchProvider } from '@wharfkit/antelope'
 
 export class Client {
-    static __classname = 'Client'
+  static __classname = 'Client'
 
-    readonly apiClient: APIClient;
-    readonly config: ClientConfig;
+  readonly eos: APIClient;
+  readonly config: ClientConfig;
 
-    constructor (environment: string = 'jungle4') {
-        this.apiClient = new APIClient({
-            provider: new FetchProvider('https://jungle4.api.eosnation.io/')
-        });
-        this.config = configPresets[environment];
-    }
+  constructor (environment: string = 'jungle4') {
+    this.config = configPresets[environment];
+    this.eos = new APIClient({
+      provider: new FetchProvider(this.config.eosRpcUrl)
+    });
+  }
 
-    async getCampaigns (): Promise<Campaign[]> {
-        const response = await this.apiClient.v1.chain.get_table_rows({
-            code: 'efxforce1112',
-            table: 'campaign',
-            scope: 'efxforce1112',
-        })
-        return response.rows
-    }
+  async getCampaigns (): Promise<Campaign[]> {
+    const response = await this.eos.v1.chain.get_table_rows({
+      code: this.config.tasksContract,
+      table: 'campaign',
+      scope: this.config.tasksContract,
+    })
+    return response.rows
+  }
 }
