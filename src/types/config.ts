@@ -88,5 +88,5 @@ export interface ClientConfig {
    * Cache ipfs requests, enable or disable the ability to cache ipfs requests.
    * @default true
    */
-  ipfsCache: boolean
+  ipfsCache: boolean,
 }
