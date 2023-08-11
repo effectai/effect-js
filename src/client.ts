@@ -1,6 +1,8 @@
 import { ClientConfig } from './types/config';
 import { configPresets } from './config';
 import { TasksService } from './services/tasks';
+import { VAccountService } from './services/vaccount';
+
 import { APIClient, APIClientOptions, FetchProvider } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
@@ -21,6 +23,7 @@ export class Client {
     }
 
     tasks = new TasksService(this);
+    vaccount = new VAccountService(this);
 
     login (actor: string, permission: string, privateKey: string) {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
