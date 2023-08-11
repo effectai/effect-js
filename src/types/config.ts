@@ -18,6 +18,11 @@ export interface ClientConfig {
   eosRpcUrl: string
 
   /**
+   * ID of the EOS chain
+   */
+  eosChainId: string
+
+  /**
    * IPFS endopint
    * @default https://ipfs.effect.ai
    */
