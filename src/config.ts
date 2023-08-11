@@ -19,7 +19,7 @@ const configPresets: {[key: string]: ClientConfig} = {
     eosRelayerPermission: 'active',
     eosRelayerUrl: 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
     forceVaccountId: 0, // TODO
-    ipfsCache: true
+    ipfsCache: true,
   }
 };
 
