@@ -118,6 +118,7 @@
     "@wharfkit/antelope": "^0.7.3",
     "buffer": "^6.0.3",
     "elliptic": "^6.5.4",
+    "store2": "^2.14.2",
     "uuid": "^8.3.2"
   }
 }
