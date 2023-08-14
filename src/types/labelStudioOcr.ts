@@ -1,9 +1,4 @@
-interface Annotation {
-    id: number;
-    result: OCRResult[];
-}
-
-interface OCRResult {
+export interface OCRResult {
     original_width: number;
     original_height: number;
     image_rotation: number;
@@ -21,13 +16,18 @@ interface OCRResult {
     type: string;
 }
 
-interface Data {
+export interface Annotation {
+    id: number;
+    result: OCRResult[];
+}
+
+export interface Data {
     image: string;
     ipfs: string;
     submitted_on: string;
 }
 
-interface LabelStudioData {
+export interface LabelStudioData {
     id: string;
     annotations: Annotation[];
     data: Data;
