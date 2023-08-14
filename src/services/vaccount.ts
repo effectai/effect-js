@@ -1,6 +1,9 @@
 import { Client } from '../client';
 import {
+    ABIEncoder,
+    ABIDecoder,
     Variant,
+    Checksum256,
     Struct,
     UInt8,
     UInt64,
@@ -9,7 +12,8 @@ import {
     Checksum160Type,
     Asset,
     Name,
-    NameType
+    NameType,
+    Serializer,
 } from '@wharfkit/antelope';
 
 @Variant.type('vaddress', [Checksum160, Name])
@@ -20,7 +24,7 @@ class VAddress extends Variant {
 @Struct.type('extended_symbol')
 class ExtendedSymbol extends Struct {
     static abiName = 'extended_symbol'
-    static abiFields = [{name: 'sym', type: 'symbol'},{name: 'contract', type: 'name'}]
+    static abiFields = [{name: 'sym', type: 'symbol'}, {name: 'contract', type: 'name'}]
     constructor(sym: Asset.SymbolType, contract: NameType) {
         super({'sym': sym, 'contract': contract});
     }
@@ -63,5 +67,32 @@ export class VAccountService {
             },
         }
         return this.client.session.transact({ action: action });
+    }
+
+    /**
+     * Get all VAccount rows of the configured account and token contract
+     */
+    async getAll() {
+        const conf = this.client.config;
+        let enc = new ABIEncoder(32);
+        Name.from(conf.tokenContract).toABI(enc);
+        const vaddr = VAddress.from(this.client.session.actor);
+        enc.writeByte(vaddr.variantIdx);
+        vaddr.value.toABI(enc);
+
+        const key = enc.getBytes().hexString
+        let arr = new Uint8Array(32)
+        arr.set(enc.getData(), 0)
+        const keycs = Checksum256.from(arr);
+
+        return this.client.eos.v1.chain.get_table_rows({
+            code: conf.vaccountContract,
+            table: 'account',
+            scope: conf.vaccountContract,
+            upper_bound: keycs,
+            lower_bound: keycs,
+            index_position: 'secondary',
+            key_type: 'sha256',
+        });
     }
 };
