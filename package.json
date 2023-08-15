@@ -116,6 +116,8 @@
   },
   "dependencies": {
     "@wharfkit/antelope": "^0.7.3",
+    "@wharfkit/session": "^1.0.0",
+    "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
     "buffer": "^6.0.3",
     "elliptic": "^6.5.4",
     "store2": "^2.14.2",
