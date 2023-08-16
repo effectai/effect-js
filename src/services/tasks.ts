@@ -52,6 +52,30 @@ export class TasksService {
         return rows
     }
 
+
+
+    /**
+     * Fetch the task data
+     * Load the batch the task is in (get _task_.batch_id from the batch table)
+     * Get the batch IPFS hash from batch.content.value
+     * Load the IPFS object and confirm it is a JSON array. Get the _task_.task_idxth item from the array
+     * Render the campaign template with that task data
+     */
+    async getTask (campaignId: number, taskId: number): Promise<any> {}
+
+    /**
+      * Submit task
+      * Call submittask(camapign_id, task_idx, data, account_id, sig). Note to use _task_.task_idx for the task_idx parameter (not the ID).
+      *     sig (for BSC only): to avoid replay attacks, the signature is (mark)(campaign_id)(task_idx)(data). The mark value is 5.
+     */
+    async submitTask (campaignId: number, taskId: number, data: any): Promise<any> {}
+
+    /**
+     * Reserve next task
+     * The same process as above, but make sure to update last_task_done for BSC users
+     */
+    async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
+
     /**
      * 
      * @param id id of the campaign
@@ -74,8 +98,11 @@ export class TasksService {
     /**
      * TODO: add type for reservation
      * GetReservations
+     * Find active reservations
+     * To find all users reservation: filter the reservation table by account_id (index = 3)
+     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
      */
-    async getReservations (campaignId: number): Promise<any> {
+    async getActiveReservations (campaignId: number): Promise<any> {
         const response = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.tasksContract,
             table: 'reservation',
@@ -88,6 +115,13 @@ export class TasksService {
     }
 
     /**
+     * TODO: Retrieve all reservations.
+     */
+    async getAllReservations (): Promise<any> {}
+
+
+
+    /**
      * TODO: Add type for user
      * GetMyResercvations for account that is logged in.
      */
@@ -97,7 +131,7 @@ export class TasksService {
             table: 'reservation',
             scope: this.client.config.tasksContract,
             limit: -1,
-            index_position: 3,
+            index_position: 'tertiary',
         })
 
         // TODO check if this account_name is correct
@@ -108,7 +142,15 @@ export class TasksService {
     }
 
     /**
+     * TODO: Add type for reservation and test this.
      * Call reservetask(campaign_id, account_id, quali_assets, payer, sig)
+     * Reserve a task
+     * To work on a task in a campaign:
+     * Fetch the last task index the user did from the acctaskidx table. This can be directly fetched using the composite primary key: (uint64_t{account_id} << 32) | campaign_id;
+     * Call reservetask(campaign_id, account_id, quali_assets, payer, sig)
+     *     quali_assets: can be null, then the smart contract will search through all the assets of the user, which consumes more CPU
+     *     sig (for BSC users only): to avoid replay attacks, the signature is composed of (mark)(last_task_done)(campaign_id). The mark value is 6
+     * Wait for the transaction to process, find the reserved task by polling as described in find active reservations
      */
     async reserveTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {
         const response = await this.client.eos.v1.chain.get_table_rows({
