@@ -20,7 +20,7 @@ export class IpfsService {
      * @param {File} file - file to upload to IPFS
      * @returns {string} - hash of the file uploaded to IPFS
      */
-    uploadFormatNode = async (obj: object): Promise<string> => {
+    upload = async (obj: object): Promise<string> => {
         try {
             const stringified = JSON.stringify(obj)
             const formData = new formatNode.FormData()
