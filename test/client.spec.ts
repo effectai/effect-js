@@ -1,4 +1,5 @@
 import { Client } from '../src/client'
+import fetch from 'node-fetch'
 
 test('Client', async () => {
 
