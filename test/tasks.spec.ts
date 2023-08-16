@@ -1,5 +1,5 @@
 import { Client } from '../src/client'
-import fetch from 'node-fetch'
+const fetch = require('node-fetch')
 
 test('Client', async () => {
     const client = new Client('jungle4', { fetch })

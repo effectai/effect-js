@@ -1,12 +1,12 @@
 import { Client } from '../src/client'
-import fetch from 'node-fetch'
+const fetch = require('node-fetch')
 
 test('Client', async () => {
 
     // Instantiate the client, Test jungle first.
-    const client = new Client('jungle', { fetch })
-
+    const client = new Client('jungle4', { fetch })
     expect(client).toBeDefined()
+    expect(client).toBeInstanceOf(Client)
 
     // Make sure all the services are available.
     expect(client).toHaveProperty('config')

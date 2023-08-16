@@ -1,8 +1,9 @@
 import { IpfsContentFormat, IpfsService } from '../src/services/ipfs'
 import { Client } from '../src/client'
-import fetch from 'node-fetch'
+// import fetch from 'node-fetch'
+const fetch = require('node-fetch')
 
-const client = new Client('jungle', { fetch })
+const client = new Client('jungle4', { fetch })
 
 const hash = 'QmXKn3tGx6CoyaMVgR9L6df3Dtbocx2zvMoQxSNNU1oEnV'
 
