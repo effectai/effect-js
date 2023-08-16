@@ -1,14 +1,9 @@
-/**
- * Main Jest configuration file
- * This configuration only includes unit tests. 
- * For other tests such as e2e and intergration tests see the test/ folder and 
- * their respective configuration files.
- */
+// import {  } from 'ts-jest'
 
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+const config = {
   name: "Effect-JS",
   preset: 'ts-jest',
+  // preset: 'ts-jest/presets/default-esm', // other preset that might be usefulw
   testEnvironment: 'node',
   verbose: true,
 
@@ -28,3 +23,4 @@ module.exports = {
   ],
 };
 
+export default config;
