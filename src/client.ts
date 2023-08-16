@@ -16,12 +16,14 @@ export class Client {
     readonly eos!: APIClient;
     session!: Session;
 
+    /**
+     * 
+     * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
+     * @param {FetchProviderOptions} fetchConfig, Supply a custom fetch config to the EffectSDK fetch provider
+     */
     constructor (environment: string = 'jungle4', fetchConfig?: FetchProviderOptions) {
         this.config = configPresets[environment];
-        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-            // custom fetch or global fetch or window.fetch or error
-            fetch: fetchConfig?.fetch || fetch || window.fetch || (() => { throw new Error('No fetch implementation available') })
-        });
+        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, fetchConfig);
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
 
