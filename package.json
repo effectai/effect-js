@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "test:watch": "jest --coverage --watch",
+    "test:watch": "jest --watchAll",
+    "test:covwatch": "jest --coverage --watch",
     "test:unit": "jest --config=test/unit/jest.unit.config.js",
     "test:e2e": "jest --config=test/e2e/jest.e2e.config.js",
     "test:integration": "jest --config=test/e2e/jest.integration.config.js",
