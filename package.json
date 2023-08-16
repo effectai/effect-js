@@ -2,6 +2,7 @@
   "name": "@effectai/effect-js",
   "version": "0.3.39",
   "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+  "type": "module",
   "main": "dist/index.js",
   "browser": "dist/index.js",
   "module": "dist/index.js",
@@ -78,8 +79,9 @@
   },
   "homepage": "https://github.com/effectai/effect-js#readme",
   "devDependencies": {
+    "@jest/globals": "^29.6.2",
     "@types/dotenv": "^8.2.0",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.5.2",
     "@types/node": "^16.4.3",
     "@types/node-fetch": "^2.5.12",
     "@types/text-encoding": "^0.0.36",
@@ -120,6 +122,8 @@
     "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
     "buffer": "^6.0.3",
     "elliptic": "^6.5.4",
+    "formdata-node": "^5.0.1",
+    "formdata-polyfill": "^4.0.10",
     "node-fetch": "^2.6.12",
     "store2": "^2.14.2",
     "uuid": "^8.3.2"
