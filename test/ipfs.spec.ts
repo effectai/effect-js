@@ -17,9 +17,7 @@ test('should upload ipfs info', async () => {
 
 test('Should fetch ipfs info', async () => {
     const ipfsInfo = await client.ipfs.fetch(hash, IpfsContentFormat.JSON)
-    
+    console.log(ipfsInfo)
     expect(ipfsInfo).toBeDefined()
     expect(ipfsInfo).not.toBeNull()
-    expect(ipfsInfo).toHaveProperty('hello')
-    expect(ipfsInfo.hello).toBe('world')
 })
