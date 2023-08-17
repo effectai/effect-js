@@ -1,10 +1,10 @@
 import { Client } from '../src/client'
-const fetch = require('node-fetch')
+import { expect, test } from 'vitest'
 
 test('Client', async () => {
 
     // Instantiate the client, Test jungle first.
-    const client = new Client('jungle4', { fetch })
+    const client = new Client('jungle4')
     expect(client).toBeDefined()
     expect(client).toBeInstanceOf(Client)
 

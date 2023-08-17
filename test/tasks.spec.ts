@@ -1,8 +1,9 @@
 import { Client } from '../src/client'
-const fetch = require('node-fetch')
+
+import { expect, test } from 'vitest'
 
 test('Client', async () => {
-    const client = new Client('jungle4', { fetch })
+    const client = new Client('jungle4')
     expect(client).toBeInstanceOf(Client)
 
     const result = await client.tasks.getCampaigns()
