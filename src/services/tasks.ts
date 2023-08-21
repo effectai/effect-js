@@ -1,4 +1,4 @@
-import { Campaign } from '../types/campaign';
+import { Campaign, Reservation } from '../types/campaign';
 import { Client } from '../client';
 import { UInt128 } from '@wharfkit/antelope';
 
@@ -127,7 +127,6 @@ export class TasksService {
     async getCampaignReservations (campaignId: number, accountId): Promise<any> {}
 
 
-
     /**
      * TODO: Add type for user
      * GetMyResercvations for account that is logged in.
@@ -148,8 +147,7 @@ export class TasksService {
     // const [reservation] = accTaskIdxReservation.rows
     // return reservation
 
-    async getMyReservation (campaignId: number): Promise<any> {
-
+    async getMyReservation (campaignId: number): Promise<Reservation> {
         // Make sure user is logged in
         this.client.requireSession()
 
@@ -157,62 +155,55 @@ export class TasksService {
             code: this.client.config.tasksContract,
             table: 'reservation',
             scope: this.client.config.tasksContract,
-            limit: -1,
             index_position: 'tertiary',
         })
 
-        // TODO check if this account_name is correct
-        response.rows.find((row: any) => row.acccamp === this.client.session.actor)
+        console.log(response)
 
-        const [reservation] = response.rows
-        return reservation
+        const accReservation = response.rows.find((row: Reservation) => row.account_id === this.client.session.)
+        return accReservation
     }
 
     /**
-     * TODO: Add type for reservation and test this.
-     * Call reservetask(campaign_id, account_id, quali_assets, payer, sig)
-     * Reserve a task
-     * To work on a task in a campaign:
-     * Fetch the last task index the user did from the acctaskidx table. This can be directly fetched using the composite primary key: (uint64_t{account_id} << 32) | campaign_id;
-     * Call reservetask(campaign_id, account_id, quali_assets, payer, sig)
-     *     quali_assets: can be null, then the smart contract will search through all the assets of the user, which consumes more CPU
-     *     sig (for BSC users only): to avoid replay attacks, the signature is composed of (mark)(last_task_done)(campaign_id). The mark value is 6
-     * Wait for the transaction to process, find the reserved task by polling as described in find active reservations
+     * Reserve a task, will check if the user already has a reservation for this campaign and return it, if not will create a new reservation and return it.
+     * @param campaignId id of the campaign
+     * @param qualiAssets can be null, then the smart contract will search through all the assets of the user.
+     * @returns {Promise<Reservation>} Reservation
      */
-    async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<any> {
+    async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
+        try {
+            // Make sure user is logged in
+            this.client.requireSession()
 
-        // Make sure user is logged in
-        this.client.requireSession()
+            const myReservation = await this.getMyReservation(campaignId)
+            if (myReservation) {
+                return myReservation
+            } else {
+                const action = {
+                    account: this.client.config.tasksContract,
+                    name: 'reservetask',
+                    authorization: [{
+                        actor: this.client.session.actor,
+                        permission: this.client.session.permission,
+                    }],
+                    data: {
+                        campaign_id: campaignId,
+                        account_id: this.client.session.actor,
+                        quali_assets: qualiAssets,
+                        payer: this.client.session.actor,
+                        sig: null,
+                    },
+                }
+                await this.client.session.transact({ action })
 
-        const myReservation = this.getMyReservation(campaignId)
-        if (myReservation) {
-            return myReservation
-        } else {
-            const action = {
-                account: this.client.config.tasksContract,
-                name: 'reservetask',
-                authorization: [{
-                    actor: this.client.session.actor,
-                    permission: this.client.session.permission,
-                }],
-                data: {
-                    campaign_id: campaignId,
-                    account_id: this.client.session.actor,
-                    quali_assets: qualiAssets,
-                    payer: this.client.session.actor,
-                    sig: null,
-                },
+                // TODO: Sleep for a bit for now, use finality plugin later.
+                await new Promise(resolve => setTimeout(resolve, 3000))
+
+                return await this.getMyReservation(campaignId)
             }
-            const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
-                console.log('error', error)
-                throw new Error(error)
-            })
-            console.log('reserveTaskResponse', reserveTaskResponse)
-
-            // Sleep for a bit for now.
-            await new Promise(resolve => setTimeout(resolve, 3000))
-
-            return this.getMyReservation(campaignId)
+        } catch (error) {
+            console.log('error', error)
+            throw error
         }
     }
 }
