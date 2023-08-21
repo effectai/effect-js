@@ -121,11 +121,19 @@ export class TasksService {
      */
     async getAllReservations (): Promise<any> {}
 
+    /**
+     * Get Campaign Reservations
+     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
+     */
+    async getCampaignReservations (campaignId: number, accountId): Promise<any> {}
+
 
 
     /**
      * TODO: Add type for user
      * GetMyResercvations for account that is logged in.
+     * To find all users reservation: filter the reservation table by account_id (index = 3)
+     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
      */
     async getMyReservations (campaignId: number): Promise<any> {
         const response = await this.client.eos.v1.chain.get_table_rows({
