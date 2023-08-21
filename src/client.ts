@@ -46,9 +46,12 @@ export class Client {
         });
     }
 
-    requireSession () {
+    /**
+     * Require a session to be set (make sure user is logged in), otherwise throw an error.
+     */
+    requireSession (): void {
         if (!this.session) {
-            throw new Error('Session is required for this method');
+            throw new Error('Session is required for this method, please login.');
         }
     }
 }
