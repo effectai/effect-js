@@ -147,7 +147,10 @@ export class TasksService {
     // const [reservation] = accTaskIdxReservation.rows
     // return reservation
 
-    async getMyReservation (campaignId: number): Promise<Reservation> {
+    /**
+     * 
+     */
+    async getReservationCurrentUser (campaignId: number): Promise<Reservation> {
         // Make sure user is logged in
         this.client.requireSession()
 
@@ -158,9 +161,7 @@ export class TasksService {
             index_position: 'tertiary',
         })
 
-        console.log(response)
-
-        const accReservation = response.rows.find((row: Reservation) => row.account_id === this.client.session.)
+        const accReservation = response.rows.find((row: Reservation) => row.campaign_id === campaignId)
         return accReservation
     }
 
@@ -172,10 +173,9 @@ export class TasksService {
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
         try {
-            // Make sure user is logged in
             this.client.requireSession()
 
-            const myReservation = await this.getMyReservation(campaignId)
+            const myReservation = await this.getReservationCurrentUser(campaignId)
             if (myReservation) {
                 return myReservation
             } else {
@@ -199,7 +199,7 @@ export class TasksService {
                 // TODO: Sleep for a bit for now, use finality plugin later.
                 await new Promise(resolve => setTimeout(resolve, 3000))
 
-                return await this.getMyReservation(campaignId)
+                return await this.getReservationCurrentUser(campaignId)
             }
         } catch (error) {
             console.log('error', error)
