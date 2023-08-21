@@ -8,6 +8,8 @@ import { APIClient, APIClientOptions, FetchProvider, FetchProviderOptions } from
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 
+import { fetch } from '@web-std/fetch'
+
 export class Client {
     static __classname = 'Client'
 
@@ -21,9 +23,9 @@ export class Client {
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
      * @param {FetchProviderOptions} fetchConfig, Supply a custom fetch config to the EffectSDK fetch provider
      */
-    constructor (environment: string = 'jungle4', fetchConfig?: FetchProviderOptions) {
+    constructor (environment: string = 'jungle4') {
         this.config = configPresets[environment];
-        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, fetchConfig);
+        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, { fetch });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
 
@@ -42,5 +44,14 @@ export class Client {
             },
             walletPlugin,
         });
+    }
+
+    /**
+     * Require a session to be set (make sure user is logged in), otherwise throw an error.
+     */
+    requireSession (): void {
+        if (!this.session) {
+            throw new Error('Session is required for this method, please login.');
+        }
     }
 }

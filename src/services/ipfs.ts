@@ -1,7 +1,6 @@
-import { FormData,formDataToBlob } from 'formdata-polyfill/esm.min'
-import formatNode from 'formdata-node'
 import { Client } from "../client";
 import store from 'store2'
+import { Blob, FormData } from '@web-std/fetch'
 
 export enum IpfsContentFormat {
   FormData = 'formdata',
@@ -14,66 +13,36 @@ export enum IpfsContentFormat {
 export class IpfsService {
     constructor(private client: Client) {}
 
-    /**
-     * TODO: Test for using this module
-     * Upload a file to IPFS
-     * @param {File} file - file to upload to IPFS
-     * @returns {string} - hash of the file uploaded to IPFS
-     */
     upload = async (obj: object): Promise<string> => {
-        try {
-            const stringified = JSON.stringify(obj)
-            const formData = new formatNode.FormData()
-            const blob = new formatNode.Blob([stringified], { type: 'application/json' })
-            formData.append('file', blob)
+      try {
+        const stringified = JSON.stringify(obj)
+        const blob = new Blob([stringified], { type: 'application/json' })
+        const formData = new FormData()
+        const blobText = await blob.text()
+        formData.append('file', blob)
 
-            if (blob.size > 1024 * 1024 * 10) {
-                throw new Error('File too large, max file size is: 10MB')
-            } else {
-                const response = await this.client.fetchProvider
-                    .fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, {
-                        method: 'POST',
-                        body: formData
-                    })
-                const json = await response.json()
-                return json.hash as string
-            }
-        } catch (error) {
-            console.error(error)
-            throw new Error(error)
-        }
-    }
-
-    /**
-     * TODO: Test for using this module
-     * Upload a file to IPFS
-     * @param {File} file - file to upload to IPFS
-     * @returns {string} - hash of the file uploaded to IPFS
-     */
-        uploadPolyFill = async (obj: object): Promise<string> => {
-          try {
-              const stringified = JSON.stringify(obj)
-              const formData = new FormData()
-              formData.append('file', stringified)
-              const blob = formDataToBlob(formData)
-  
-              if (blob.size > 1024 * 1024 * 10) {
-                  throw new Error('File too large, max file size is: 10MB')
-              } else {
-                  const response = await this.client.fetchProvider
-                      .fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, {
-                          method: 'POST',
-                          body: formData
-                      })
-                  const json = await response.json()
-                  return json.hash as string
-              }
-          } catch (error) {
-              console.error(error)
-              throw new Error(error)
+        if (blob.size > 1024 * 1024 * 10) {
+          throw new Error('File too large, max file size is: 10MB')
+        } else {
+          const requestOptions: RequestInit = {
+            method: 'POST',
+            body: formData,
           }
+          const response = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, requestOptions)
+          if (!response.ok) {
+            const errorText = await response.text()
+            console.error(errorText)
+            throw new Error('Error uploading file to IPFS')
+          } else {
+            const json = await response.json()
+            return json.Hash as string
+          }
+        }
+      } catch (error) {
+        console.error(error)
+        throw new Error(error)
       }
-  
+    }
 
   /**
    * Get IPFS Content in JSON, without caching, to be in getIpfsContent. 
