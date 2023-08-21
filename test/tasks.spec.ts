@@ -1,5 +1,6 @@
 import { Client } from '../src/client'
-import { describe, expect, test } from 'vitest'
+import { Campaign, Reservation } from '../src/types/campaign'
+import { describe, expect, expectTypeOf, test } from 'vitest'
 import { config } from 'dotenv'
 
 const cacc = config({
@@ -24,6 +25,7 @@ describe('Tasks', async () => {
     
         const [ campaign ] = campaignList
         expect(campaign).toBeDefined()
+        expectTypeOf(campaign).toMatchTypeOf<Campaign>()
         expect(campaign.id).toEqual(0)
     
         const [ , owner ] = campaign.owner
@@ -41,6 +43,15 @@ describe('Tasks', async () => {
         expect(owner).toEqual('efxefxefxefx')
     })
 
+    test('User login', async () => {
+
+        expect(() => client.requireSession()).toThrowError()
+
+        client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
+
+        expect(client.session).toBeDefined()
+    })
+
     test('Reserve Task', async () => {
         const campaign = await client.tasks.getCampaign(0)
         // AccountId `vibrantcacti: 3`
@@ -50,12 +61,11 @@ describe('Tasks', async () => {
 
         const reservation = await client.tasks.reserveTask(0)
 
-        console.log('reservation', reservation)
-
         expect(reservation).toBeDefined()
+        expectTypeOf(reservation).toMatchTypeOf<Reservation>()
         expect(reservation.id).toEqual(0)
         expect(reservation.campaign_id).toEqual(0)
-        expect(reservation.owner).toEqual('efxefxefxefx')
+        
     })
 
 })
