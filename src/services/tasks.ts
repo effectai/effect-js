@@ -154,17 +154,51 @@ export class TasksService {
      *     sig (for BSC users only): to avoid replay attacks, the signature is composed of (mark)(last_task_done)(campaign_id). The mark value is 6
      * Wait for the transaction to process, find the reserved task by polling as described in find active reservations
      */
-    async reserveTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'account_id',
-            scope: this.client.config.tasksContract,
-            limit: -1,
-            index_position: 'tertiary',
-        })
+    async reserveTask (campaignId: number, accountId: number, qualiAssets?: string[], sig?: any): Promise<any> {
 
-        const [reservation] = response.rows
-        return reservation
+        if (!this.client.session) {
+            throw new Error('You must login before reserving a task.')
+        } else {
+            const action = {
+                account: this.client.config.tasksContract,
+                name: 'reservetask',
+                authorization: [{
+                    actor: this.client.session.actor,
+                    permission: this.client.session.permission,
+                }],
+                data: {
+                    campaign_id: campaignId,
+                    account_id: accountId,
+                    quali_assets: qualiAssets,
+                    payer: this.client.session.actor,
+                    sig: sig,
+                },
+            }
+            const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
+                console.log('error', error)
+                throw new Error(error)
+            })
+            console.log('reserveTaskResponse', reserveTaskResponse)
+
+            // TODO: poll for reservation
+            // reserveTaskResponse.transaction?.transaction_extensions.
+            // while (!this.client.eos.v1.chain.get_transaction_status(reserveTaskResponse))) {
+            //     await new Promise(resolve => setTimeout(resolve, 1000))
+            // }
+
+            const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'acctaskidx',
+                scope: this.client.config.tasksContract,
+                index_position: 'tertiary',
+                lower_bound: UInt128.from(accountId as unknown as string),
+                upper_bound: UInt128.from(accountId as unknown as string),
+            })
+
+            console.log('accTaskIdxReservation', accTaskIdxReservation)
+            const [reservation] = accTaskIdxReservation.rows
+            return reservation
+        }
     }
 
 };
