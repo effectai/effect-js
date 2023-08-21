@@ -134,7 +134,25 @@ export class TasksService {
      * To find all users reservation: filter the reservation table by account_id (index = 3)
      * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
      */
-    async getMyReservations (campaignId: number): Promise<any> {
+
+    // const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
+    //     code: this.client.config.tasksContract,
+    //     table: 'acctaskidx',
+    //     scope: this.client.config.tasksContract,
+    //     index_position: 'tertiary',
+    //     lower_bound: UInt128.from(this.client.vaccount.getAll()),
+    //     upper_bound: UInt128.from(this.client.vaccount.getAll()),
+    // })
+
+    // console.log('accTaskIdxReservation', accTaskIdxReservation)
+    // const [reservation] = accTaskIdxReservation.rows
+    // return reservation
+
+    async getMyReservation (campaignId: number): Promise<any> {
+
+        // Make sure user is logged in
+        this.client.requireSession()
+
         const response = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.tasksContract,
             table: 'reservation',
@@ -166,42 +184,35 @@ export class TasksService {
         // Make sure user is logged in
         this.client.requireSession()
 
-        const action = {
-            account: this.client.config.tasksContract,
-            name: 'reservetask',
-            authorization: [{
-                actor: this.client.session.actor,
-                permission: this.client.session.permission,
-            }],
-            data: {
-                campaign_id: campaignId,
-                account_id: this.client.session.actor,
-                quali_assets: qualiAssets,
-                payer: this.client.session.actor,
-                sig: null,
-            },
+        const myReservation = this.getMyReservation(campaignId)
+        if (myReservation) {
+            return myReservation
+        } else {
+            const action = {
+                account: this.client.config.tasksContract,
+                name: 'reservetask',
+                authorization: [{
+                    actor: this.client.session.actor,
+                    permission: this.client.session.permission,
+                }],
+                data: {
+                    campaign_id: campaignId,
+                    account_id: this.client.session.actor,
+                    quali_assets: qualiAssets,
+                    payer: this.client.session.actor,
+                    sig: null,
+                },
+            }
+            const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
+                console.log('error', error)
+                throw new Error(error)
+            })
+            console.log('reserveTaskResponse', reserveTaskResponse)
+
+            // Sleep for a bit for now.
+            await new Promise(resolve => setTimeout(resolve, 3000))
+
+            return this.getMyReservation(campaignId)
         }
-        const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
-            console.log('error', error)
-            throw new Error(error)
-        })
-        console.log('reserveTaskResponse', reserveTaskResponse)
-
-        // Sleep for a bit for now.
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'acctaskidx',
-            scope: this.client.config.tasksContract,
-            index_position: 'tertiary',
-            lower_bound: UInt128.from(this.client.vaccount.getAll()),
-            upper_bound: UInt128.from(this.client.vaccount.getAll()),
-        })
-
-        console.log('accTaskIdxReservation', accTaskIdxReservation)
-        const [reservation] = accTaskIdxReservation.rows
-        return reservation
     }
-
-};
+}
