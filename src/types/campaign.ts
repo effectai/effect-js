@@ -26,3 +26,12 @@ export interface Campaign {
     estimated_time: string,
   }
 }
+
+export interface Reservation {
+  id: number;
+  task_idx: number;
+  account_id: number;
+  batch_id: number;
+  reserved_on: string;
+  campaign_id: number;
+}
