@@ -1,7 +1,6 @@
 import { Campaign } from '../types/campaign';
 import { Client } from '../client';
 import { UInt128 } from '@wharfkit/antelope';
-import { TransactArgs } from '@wharfkit/session';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -46,8 +45,8 @@ export class TasksService {
 
             if (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
-                lowerBound = UInt128.from(lastRow.id + 1) as unknown as UInt128
-                upperBound = UInt128.from(lastRow.id + 21) as unknown as UInt128
+                lowerBound = UInt128.from(lastRow.id + 1)
+                upperBound = UInt128.from(lastRow.id + 21)
             } else {
                 more = false
             }
@@ -66,8 +65,8 @@ export class TasksService {
             code: this.client.config.tasksContract,
             table: 'campaign',
             scope: this.client.config.tasksContract,
-            lower_bound: UInt128.from(id as unknown as string),
-            upper_bound: UInt128.from(id as unknown as string),
+            lower_bound: UInt128.from(id),
+            upper_bound: UInt128.from(id),
             limit: 1,
         })
 
@@ -162,51 +161,47 @@ export class TasksService {
      *     sig (for BSC users only): to avoid replay attacks, the signature is composed of (mark)(last_task_done)(campaign_id). The mark value is 6
      * Wait for the transaction to process, find the reserved task by polling as described in find active reservations
      */
-    async reserveTask (campaignId: number, accountId: number, qualiAssets?: string[], sig?: any): Promise<any> {
+    async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<any> {
 
-        if (!this.client.session) {
-            throw new Error('You must login before reserving a task.')
-        } else {
-            const action = {
-                account: this.client.config.tasksContract,
-                name: 'reservetask',
-                authorization: [{
-                    actor: this.client.session.actor,
-                    permission: this.client.session.permission,
-                }],
-                data: {
-                    campaign_id: campaignId,
-                    account_id: accountId,
-                    quali_assets: qualiAssets,
-                    payer: this.client.session.actor,
-                    sig: sig,
-                },
-            }
-            const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
-                console.log('error', error)
-                throw new Error(error)
-            })
-            console.log('reserveTaskResponse', reserveTaskResponse)
+        // Make sure user is logged in
+        this.client.requireSession()
 
-            // TODO: poll for reservation
-            // reserveTaskResponse.transaction?.transaction_extensions.
-            // while (!this.client.eos.v1.chain.get_transaction_status(reserveTaskResponse))) {
-            //     await new Promise(resolve => setTimeout(resolve, 1000))
-            // }
-
-            const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
-                code: this.client.config.tasksContract,
-                table: 'acctaskidx',
-                scope: this.client.config.tasksContract,
-                index_position: 'tertiary',
-                lower_bound: UInt128.from(accountId as unknown as string),
-                upper_bound: UInt128.from(accountId as unknown as string),
-            })
-
-            console.log('accTaskIdxReservation', accTaskIdxReservation)
-            const [reservation] = accTaskIdxReservation.rows
-            return reservation
+        const action = {
+            account: this.client.config.tasksContract,
+            name: 'reservetask',
+            authorization: [{
+                actor: this.client.session.actor,
+                permission: this.client.session.permission,
+            }],
+            data: {
+                campaign_id: campaignId,
+                account_id: this.client.session.actor,
+                quali_assets: qualiAssets,
+                payer: this.client.session.actor,
+                sig: null,
+            },
         }
+        const reserveTaskResponse = await this.client.session.transact({ action }).catch((error) => {
+            console.log('error', error)
+            throw new Error(error)
+        })
+        console.log('reserveTaskResponse', reserveTaskResponse)
+
+        // Sleep for a bit for now.
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.tasksContract,
+            table: 'acctaskidx',
+            scope: this.client.config.tasksContract,
+            index_position: 'tertiary',
+            lower_bound: UInt128.from(this.client.vaccount.getAll()),
+            upper_bound: UInt128.from(this.client.vaccount.getAll()),
+        })
+
+        console.log('accTaskIdxReservation', accTaskIdxReservation)
+        const [reservation] = accTaskIdxReservation.rows
+        return reservation
     }
 
 };
