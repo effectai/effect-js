@@ -15,6 +15,7 @@ import {
     NameType,
     Serializer,
 } from '@wharfkit/antelope';
+import { VAccount } from '../types/user';
 
 @Variant.type('vaddress', [Checksum160, Name])
 class VAddress extends Variant {
@@ -70,9 +71,43 @@ export class VAccountService {
     }
 
     /**
+     * Get vAccount row of the configured account and token contract
+     * @returns {Promise<VAccount>}
+     */
+    async get (): Promise<VAccount> {
+        const { conf, keycs } = this.generateCheckSumForVAccount();
+        const response = await this.client.eos.v1.chain.get_table_rows({
+            code: conf.vaccountContract,
+            table: 'account',
+            scope: conf.vaccountContract,
+            upper_bound: keycs,
+            lower_bound: keycs,
+            index_position: 'secondary',
+            key_type: 'sha256',
+        });
+        return response.rows.find((row: VAccount) => row.balance.contract === conf.tokenContract);
+    }
+
+    /**
      * Get all VAccount rows of the configured account and token contract
      */
     async getAll() {
+        const { conf, keycs } = this.generateCheckSumForVAccount();
+        return await this.client.eos.v1.chain.get_table_rows({
+            code: conf.vaccountContract,
+            table: 'account',
+            scope: conf.vaccountContract,
+            upper_bound: keycs,
+            lower_bound: keycs,
+            index_position: 'secondary',
+            key_type: 'sha256',
+        });
+    }
+
+    /**
+     * Generate checkSum for vaccount
+     */
+    generateCheckSumForVAccount () {
         const conf = this.client.config;
         let enc = new ABIEncoder(32);
         Name.from(conf.tokenContract).toABI(enc);
@@ -85,14 +120,6 @@ export class VAccountService {
         arr.set(enc.getData(), 0)
         const keycs = Checksum256.from(arr);
 
-        return this.client.eos.v1.chain.get_table_rows({
-            code: conf.vaccountContract,
-            table: 'account',
-            scope: conf.vaccountContract,
-            upper_bound: keycs,
-            lower_bound: keycs,
-            index_position: 'secondary',
-            key_type: 'sha256',
-        });
+        return { conf, keycs }
     }
 };
