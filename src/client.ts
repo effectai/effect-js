@@ -45,4 +45,10 @@ export class Client {
             walletPlugin,
         });
     }
+
+    requireSession () {
+        if (!this.session) {
+            throw new Error('Session is required for this method');
+        }
+    }
 }
