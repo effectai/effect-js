@@ -1,6 +1,7 @@
 import { Client } from '../src/client'
-import { describe, expect, test, } from 'vitest'
+import { describe, expect, expectTypeOf, test, } from 'vitest'
 import { config } from 'dotenv'
+import { VAccount } from '../src/types/user'
 
 config({
     path: './test/.env',
@@ -22,4 +23,12 @@ describe('VAccount', async () => {
         expect(client.session).toBeDefined()
     })
 
+    test('Get VAccount', async () => {
+        const response = await client.vaccount.getAll()
+        const [ vaccount ] = response.rows
+        expect(vaccount).toBeDefined()
+        const [ , name ] = vaccount.address
+        expect(name).toEqual(process.env.VITE_EOSACC)
+        expectTypeOf(vaccount).toMatchTypeOf<VAccount>()
+    })
 })
