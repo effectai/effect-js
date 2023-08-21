@@ -1,6 +1,7 @@
 import { Campaign } from '../types/campaign';
 import { Client } from '../client';
 import { UInt128 } from '@wharfkit/antelope';
+import { TransactArgs } from '@wharfkit/session';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -19,9 +20,12 @@ export class TasksService {
         return response.rows
     }
 
+    // TODO: Figure out which method works better, this `getAllCampaigns` or the `getCampaigns` above.
+    // This needs to be tested when their are more campaigns on jungle.
+    // Not sure how well wharfkit handles setting the limit to -1.
     /**
      * Retrieve all campaigns published to Effect Network
-     * @returns Campaign[]
+     * @returns {Campaign[]} Promise<Campaign[]>
      */
     async getAllCampaigns (): Promise<Campaign[]> {
         const rows: Campaign[] = []
@@ -52,7 +56,24 @@ export class TasksService {
         return rows
     }
 
+    /**
+     * Retrieve campaign by id
+     * @param id id of the campaign
+     * @returns {Promise<Campaign>} Campaign
+     */
+    async getCampaign (id: number): Promise<Campaign> {
+        const response = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.tasksContract,
+            table: 'campaign',
+            scope: this.client.config.tasksContract,
+            lower_bound: UInt128.from(id as unknown as string),
+            upper_bound: UInt128.from(id as unknown as string),
+            limit: 1,
+        })
 
+        const [campaign] = response.rows
+        return campaign
+    }
 
     /**
      * Fetch the task data
@@ -72,28 +93,9 @@ export class TasksService {
 
     /**
      * Reserve next task
-     * The same process as above, but make sure to update last_task_done for BSC users
+     * The same process as above, ~~but make sure to update last_task_done for BSC users~~
      */
     async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
-
-    /**
-     * 
-     * @param id id of the campaign
-     * @returns Campaign
-     */
-    async getCampaign (id: number): Promise<Campaign> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'campaign',
-            scope: this.client.config.tasksContract,
-            lower_bound: UInt128.from(id as unknown as string),
-            upper_bound: UInt128.from(id as unknown as string),
-            limit: 1,
-        })
-
-        const [campaign] = response.rows
-        return campaign
-    }
 
     /**
      * TODO: add type for reservation
