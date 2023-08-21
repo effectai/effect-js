@@ -21,11 +21,6 @@ export class IpfsService {
         const blobText = await blob.text()
         formData.append('file', blob)
 
-        console.log('blob', blob)
-        console.log('blobText', blobText)
-        console.log('formData', formData)
-        
-
         if (blob.size > 1024 * 1024 * 10) {
           throw new Error('File too large, max file size is: 10MB')
         } else {
@@ -34,14 +29,12 @@ export class IpfsService {
             body: formData,
           }
           const response = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, requestOptions)
-          console.log('upload', response)
           if (!response.ok) {
             const errorText = await response.text()
             console.error(errorText)
             throw new Error('Error uploading file to IPFS')
           } else {
             const json = await response.json()
-            console.log('json', json)
             return json.Hash as string
           }
         }
