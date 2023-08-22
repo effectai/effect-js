@@ -1,10 +1,10 @@
-// Using es6 import
+// // Using es6 import
 // (async () => {
-//     const efxSdk = await import('@effectai/effect-js')
+//     const efxSdk = await import('../dist/index')
 //     console.log(efxSdk)
 // })()
 
 
 // Using require
-// const efxSdk = require('@effectai/effect-js')
-// console.log(efxSdk)
+const efxSdk = require('../dist/index')
+console.log(efxSdk)
