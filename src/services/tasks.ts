@@ -1,6 +1,6 @@
 import { Campaign, Reservation } from '../types/campaign';
 import { Client } from '../client';
-import { UInt128, UInt64 } from '@wharfkit/antelope';
+import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -135,20 +135,21 @@ export class TasksService {
         try {
             this.client.requireSession()
             const vaccount = await this.client.vaccount.get()
-            // convert to hex
-            const hexCampaignId = campaignId.toString(16)
-            const hexAccountId = vaccount.id.toString(16)
-            const compositeKey = UInt64.from(hexAccountId + hexCampaignId)
-            console.log('vaccount', vaccount)
+
+            // create a composite Uint64 key from two Uint32 keys
+            const a = new Uint8Array(8);
+            a.set(UInt32.from(campaignId).byteArray, 0);
+            a.set(UInt32.from(vaccount.id).byteArray, 4);
+            const bound = UInt64.from(a)
+
             const response = await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.tasksContract,
-                table: 'campaign',
-                // index_position: 'secondary',
+                table: 'reservation',
+                index_position: 'secondary',
                 scope: this.client.config.tasksContract,
-                upper_bound: compositeKey,
-                lower_bound: compositeKey,
+                upper_bound: bound,
+                lower_bound: bound,
             })
-            console.log('getReservation', response)
 
             const [ reservation ] = response.rows
             return reservation
