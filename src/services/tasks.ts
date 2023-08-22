@@ -21,7 +21,6 @@ export class TasksService {
 
     // TODO: Figure out which method works better, this `getAllCampaigns` or the `getCampaigns` above.
     // This needs to be tested when their are more campaigns on jungle.
-    // Not sure how well wharfkit handles setting the limit to -1.
     /**
      * Retrieve all campaigns published to Effect Network
      * @returns {Campaign[]} Promise<Campaign[]>
