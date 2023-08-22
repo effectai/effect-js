@@ -1,5 +1,4 @@
 import { Client } from "../client";
-import store from 'store2'
 import { Blob, FormData } from '@web-std/fetch'
 
 export enum IpfsContentFormat {
@@ -53,19 +52,7 @@ export class IpfsService {
   fetch = async (hash: string, ipfsContentForm: IpfsContentFormat): Promise<any> => {
     try {
       let data: { formData: () => any; arrayBuffer: () => any; blob: () => any; text: () => any; json: () => any; };
-
-      // Use store2 to cache the IPFS content, chekc config and if it is cached, return it
-      if (this.client.config.ipfsCache && store.has(hash)) {
-        data = store.get(hash)
-      } else {
-        // Fetch the IPFS content
-        data = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/ipfs/${hash}`)
-  
-        // Cache the IPFS content
-        if (this.client.config.ipfsCache) {
-          store.set(hash, data)
-        }
-      }
+      data = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/ipfs/${hash}`)
   
       // Return the IPFS content in the format you want
       switch (ipfsContentForm) {

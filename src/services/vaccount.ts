@@ -1,19 +1,13 @@
 import { Client } from '../client';
 import {
     ABIEncoder,
-    ABIDecoder,
     Variant,
     Checksum256,
     Struct,
-    UInt8,
-    UInt64,
-    UInt32,
     Checksum160,
-    Checksum160Type,
     Asset,
     Name,
     NameType,
-    Serializer,
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
 
@@ -62,7 +56,7 @@ export class VAccountService {
             name: "open",
             authorization: [this.client.session.permissionLevel],
             data: {
-                acc: VAddress.from(this.client.session.actor),
+                acc: VAddress.from(Name.from(this.client.session.actor.toString())),
                 symbol: new ExtendedSymbol('4,EFX', conf.tokenContract),
                 payer: this.client.session.actor,
             },
@@ -111,7 +105,7 @@ export class VAccountService {
         const conf = this.client.config;
         let enc = new ABIEncoder(32);
         Name.from(conf.tokenContract).toABI(enc);
-        const vaddr = VAddress.from(this.client.session.actor);
+        const vaddr = VAddress.from(Name.from(this.client.session.actor.toString()))
         enc.writeByte(vaddr.variantIdx);
         vaddr.value.toABI(enc);
 

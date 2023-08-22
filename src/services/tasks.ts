@@ -1,6 +1,6 @@
 import { Campaign, Reservation } from '../types/campaign';
 import { Client } from '../client';
-import { UInt128 } from '@wharfkit/antelope';
+import { UInt128, UInt64 } from '@wharfkit/antelope';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -97,25 +97,6 @@ export class TasksService {
     async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
 
     /**
-     * TODO: add type for reservation
-     * GetReservations
-     * Find active reservations
-     * To find all users reservation: filter the reservation table by account_id (index = 3)
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
-     */
-    async getActiveReservations (campaignId: number): Promise<any> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'reservation',
-            scope: this.client.config.tasksContract,
-            limit: -1
-        })
-
-        const [reservation] = response.rows
-        return reservation
-    }
-
-    /**
      * TODO: Retrieve all reservations.
      */
     async getAllReservations (): Promise<any> {}
@@ -143,26 +124,38 @@ export class TasksService {
     //     upper_bound: UInt128.from(this.client.vaccount.getAll()),
     // })
 
-    // console.log('accTaskIdxReservation', accTaskIdxReservation)
+
     // const [reservation] = accTaskIdxReservation.rows
     // return reservation
 
     /**
-     * 
+     * Get the reservation of the current user for a campaign
      */
-    async getReservationCurrentUser (campaignId: number): Promise<Reservation> {
-        // Make sure user is logged in
-        this.client.requireSession()
+    async getMyReservation (campaignId: number): Promise<Reservation> {
+        try {
+            this.client.requireSession()
+            const vaccount = await this.client.vaccount.get()
+            // convert to hex
+            const hexCampaignId = campaignId.toString(16)
+            const hexAccountId = vaccount.id.toString(16)
+            const compositeKey = UInt64.from(hexAccountId + hexCampaignId)
+            console.log('vaccount', vaccount)
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'campaign',
+                // index_position: 'secondary',
+                scope: this.client.config.tasksContract,
+                upper_bound: compositeKey,
+                lower_bound: compositeKey,
+            })
+            console.log('getReservation', response)
 
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'reservation',
-            scope: this.client.config.tasksContract,
-            index_position: 'tertiary',
-        })
-
-        const accReservation = response.rows.find((row: Reservation) => row.campaign_id === campaignId)
-        return accReservation
+            const [ reservation ] = response.rows
+            return reservation
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
     }
 
     /**
@@ -175,10 +168,11 @@ export class TasksService {
         try {
             this.client.requireSession()
 
-            const myReservation = await this.getReservationCurrentUser(campaignId)
+            const myReservation = await this.getMyReservation(campaignId)
             if (myReservation) {
                 return myReservation
             } else {
+                const vacc = await this.client.vaccount.get()
                 const action = {
                     account: this.client.config.tasksContract,
                     name: 'reservetask',
@@ -188,21 +182,19 @@ export class TasksService {
                     }],
                     data: {
                         campaign_id: campaignId,
-                        account_id: this.client.session.actor,
+                        account_id: vacc.id,
                         quali_assets: qualiAssets,
                         payer: this.client.session.actor,
                         sig: null,
                     },
                 }
                 await this.client.session.transact({ action })
-
                 // TODO: Sleep for a bit for now, use finality plugin later.
                 await new Promise(resolve => setTimeout(resolve, 3000))
 
-                return await this.getReservationCurrentUser(campaignId)
+                return await this.getMyReservation(campaignId)
             }
         } catch (error) {
-            console.log('error', error)
             throw error
         }
     }
