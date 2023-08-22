@@ -54,12 +54,11 @@ describe('Tasks', async () => {
 
     test('Reserve Task', async () => {
         const campaign = await client.tasks.getCampaign(0)
-        // AccountId `vibrantcacti: 3`
+        client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
 
-        console.log(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
-        const login = client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
-
-        const reservation = await client.tasks.reserveTask(0)
+        console.debug('Trying to reserve task test')
+        const reservation = await client.tasks.reserveTask(campaign.id)
+        console.log('reservation', reservation)
 
         expect(reservation).toBeDefined()
         expectTypeOf(reservation).toMatchTypeOf<Reservation>()
