@@ -107,27 +107,6 @@ export class TasksService {
      */
     async getCampaignReservations (campaignId: number, accountId): Promise<any> {}
 
-
-    /**
-     * TODO: Add type for user
-     * GetMyResercvations for account that is logged in.
-     * To find all users reservation: filter the reservation table by account_id (index = 3)
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
-     */
-
-    // const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
-    //     code: this.client.config.tasksContract,
-    //     table: 'acctaskidx',
-    //     scope: this.client.config.tasksContract,
-    //     index_position: 'tertiary',
-    //     lower_bound: UInt128.from(this.client.vaccount.getAll()),
-    //     upper_bound: UInt128.from(this.client.vaccount.getAll()),
-    // })
-
-
-    // const [reservation] = accTaskIdxReservation.rows
-    // return reservation
-
     /**
      * Get the reservation of the current user for a campaign
      */

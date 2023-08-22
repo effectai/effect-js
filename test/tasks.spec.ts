@@ -8,7 +8,7 @@ const cacc = config({
     debug: true
 })
 
-console.log('cacc', cacc)
+// console.log('cacc', cacc)
 
 describe('Tasks', async () => {
     const client = new Client('jungle4')
@@ -58,7 +58,6 @@ describe('Tasks', async () => {
 
         console.debug('Trying to reserve task test')
         const reservation = await client.tasks.reserveTask(campaign.id)
-        console.log('reservation', reservation)
 
         expect(reservation).toBeDefined()
         expectTypeOf(reservation).toMatchTypeOf<Reservation>()
