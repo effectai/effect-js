@@ -72,6 +72,11 @@ From your project folder, you should be able to import the compiled code from `e
 
 The testing framework used for this project is [ViTest](https://vitest.dev) and is configured to run the tests in the `test` directory.
 Remember to copy the `test/.env.test.example` file to `test/.env.test` and fill in the values for your environment.
+Currently, these variables are required:
+
+- VITE_EOSACC=yourEosAccountName
+- VITE_EOSPERM=yourEosAccountPermission
+- VITE_EOSPK=yourEosAccountPrivateKey
 
 ```bash
 cp test/.env.test.example test/.env.test
