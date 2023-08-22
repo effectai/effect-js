@@ -74,9 +74,9 @@ The testing framework used for this project is [ViTest](https://vitest.dev) and 
 Remember to copy the `test/.env.test.example` file to `test/.env.test` and fill in the values for your environment.
 Currently, these variables are required:
 
-- VITE_EOSACC=yourEosAccountName
-- VITE_EOSPERM=yourEosAccountPermission
-- VITE_EOSPK=yourEosAccountPrivateKey
+- `VITE_EOSACC=yourEosAccountName`
+- `VITE_EOSPERM=yourEosAccountPermission`
+- `VITE_EOSPK=yourEosAccountPrivateKey`
 
 ```bash
 cp test/.env.test.example test/.env.test
@@ -101,3 +101,12 @@ Running `publish:next` will publish a pre-release of the SDK to the npm reposito
 ```bash
 npm run publish:next
 ```
+
+## TODO
+
+- [x] Basic tests schrijven voor de functie die we nu hebben (check wharfkit/antelope tests als voorbeeldje)
+- [x] Reservation aanmaken (without qualifications)
+- [x] Reservations ophalen
+- [ ] AtomicAssets ophalen van de user
+- [ ] hiervoor wharfkit/anchor gebruiken (niet de atomicassets js package)
+- [ ] Reservering aanmaken (met qualifications)
