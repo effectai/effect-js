@@ -1,8 +1,33 @@
-<p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
-
 # 🔥 @effectai/effect-js
 
-Effect Network SDK for integration with [https://effect.network](https://effect.network)  
+<p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
+
+Effect Network SDK for integration with [https://effect.network](https://effect.network)
+
+## ✒️ Installation
+
+The official distribution for the package can is available at [npm](https://www.npmjs.com/package/@effectai/effect-js).
+Note that the module available under the `@effectai/effect-js` namespace is for ECMAScript modules, if you want to use the module in a CommonJS environment (require), you can use the `@effectai/effect-js@cjs` module.
+
+### ESM
+
+```bash
+npm i @effectai/effect-js
+```
+
+```js
+import { EffectSdk } from "@effectai/effect-js";
+```
+
+### CommonJS
+
+```bash
+npm i @effectai/effect-js@cjs
+```
+
+```js
+const { EffectSdk } = require("@effectai/effect-js");
+```
 
 ## Quickstart
 
@@ -10,20 +35,7 @@ Take a look at the quick start [guide](https://developer.effect.network/quicksta
 
 ## SDK-Reference
 
-The SDK reference is available here: [SDK-Reference](https://effectai.github.io/effect-js/)  
-
-## ✒️ Installation
-
-The official distribution for the package can is available at [npm](https://www.npmjs.com/package/@effectai/effect-js).
-
-```bash
-npm i @effectai/effect-js
-```
-
-## 🏎 Quick start
-
-Please take a look at the [Quick-Start-Guide](https://developer.effect.network/quickstart/) to understand how to install and use the library.
-You can also take a look at our [Medium-Article](https://medium.com/effect-ai/launch-your-dapp-on-effect-network-eece1ba221f6) to get a quick overview of how to use the library on the dApp side. In other words: on how to post tasks to an already defined template on Effect Force.
+The SDK reference is available here: [SDK-Reference](https://effectai.github.io/effect-js/)
 
 ## 🦋 Development
 
@@ -32,48 +44,46 @@ The best way to get to know how this module works is by adding features while yo
 Clone the project
 
 ```bash
-git clone git@github.com:dfuse-io/client-js.git
+git clone https://github.com/effectai/effect-js.git
 ```
 
 Install dependencies and dev-dependencies
 
 ```bash
-npm install
+npm ci
 ```
 
-It is now possible to start compiling the typescript files to the module spec of your choice, for now, the following module specs are supported: [ESM, CommonJS, UMD]
+It is now possible to start compiling the typescript files to the module spec of your choice, for now, the following module specs are supported: [ESM, CommonJS]
 
 ```bash
-npm run build:cjs ## commonjs
-npm run build:esm ## esm
-npm run build:umd ## umd
+npm run build # esmodules
+npm run build:cjs # commonjs
 ```
 
-Link it. Now it is possible to use `npm link` in order to link the compiled typescript code to your own project, from the directory of your project, run the following command.
+Link it. Now it is possible to use `npm link` to link the compiled typescript code to your project, from the directory of your project, run the following command.
 
 ```bash
 npm link /path/to/effect-js/
 ```
 
-From your project folder, you should be able to import the compiled code from `effect-js`. Depending on your environment, use `import` or `require` as needed.
+From your project folder, you should be able to import the compiled code from `effect-js`. Depending on your environment, use `import` or `require` as [described above](## ✒️ Installation).
 
 ## 🧪 Testing
 
-The testing framework used for this project is [Jest](https://jestjs.io/docs/api). It is possible to run the tests with the following command. The tests are available in the `test` directory.
-Remember to copy the `.env.test.example` file to `.env.test` and fill in the values for your environment.
+The testing framework used for this project is [ViTest](https://vitest.dev) and is configured to run the tests in the `test` directory.
+Remember to copy the `test/.env.test.example` file to `test/.env.test` and fill in the values for your environment.
+Currently, these variables are required:
 
-Run the tests in the `test` directory with the `kylin` environment, for now, it is configured to only run unit tests.
-For more fine-grained control of the test execution, you can use the following command.
+- `VITE_EOSACC=yourEosAccountName`
+- `VITE_EOSPERM=yourEosAccountPermission`
+- `VITE_EOSPK=yourEosAccountPrivateKey`
 
 ```bash
-## Run all tests and watch
+cp test/.env.test.example test/.env.test
+
+npm run test
+# OR
 npm run test:watch
-
-## Run e2e tests
-npm run test:e2e
-
-## Run unit tests
-npm run test:unit
 ```
 
 ## 🗞 Publishing
@@ -91,3 +101,12 @@ Running `publish:next` will publish a pre-release of the SDK to the npm reposito
 ```bash
 npm run publish:next
 ```
+
+## TODO
+
+- [x] Basic tests schrijven voor de functie die we nu hebben (check wharfkit/antelope tests als voorbeeldje)
+- [x] Reservation aanmaken (without qualifications)
+- [x] Reservations ophalen
+- [ ] AtomicAssets ophalen van de user
+- [ ] hiervoor wharfkit/anchor gebruiken (niet de atomicassets js package)
+- [ ] Reservering aanmaken (met qualifications)

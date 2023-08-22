@@ -1,6 +1,6 @@
 import { Campaign, Reservation } from '../types/campaign';
 import { Client } from '../client';
-import { UInt128, UInt64 } from '@wharfkit/antelope';
+import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -21,7 +21,6 @@ export class TasksService {
 
     // TODO: Figure out which method works better, this `getAllCampaigns` or the `getCampaigns` above.
     // This needs to be tested when their are more campaigns on jungle.
-    // Not sure how well wharfkit handles setting the limit to -1.
     /**
      * Retrieve all campaigns published to Effect Network
      * @returns {Campaign[]} Promise<Campaign[]>
@@ -97,36 +96,69 @@ export class TasksService {
     async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
 
     /**
-     * TODO: Retrieve all reservations.
+     * Retrieve all reservations
+     * @returns {Promise<Reservation[]>} Reservation[]
      */
-    async getAllReservations (): Promise<any> {}
+    async getAllReservations (): Promise<Reservation[]> {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'reservation',
+                scope: this.client.config.tasksContract,
+            })
+            
+            while(response.more) {
+                const lastRow = response.rows[response.rows.length - 1]
+                const lowerBound = UInt64.from(lastRow.id + 1)
+                const upperBound = UInt64.from(lastRow.id + 21)
+                const moreResponse = await this.client.eos.v1.chain.get_table_rows({
+                    code: this.client.config.tasksContract,
+                    table: 'reservation',
+                    scope: this.client.config.tasksContract,
+                    lower_bound: lowerBound,
+                    upper_bound: upperBound,
+                })
+                response.rows.push(...moreResponse.rows)
+                response.more = moreResponse.more
+            }
+
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
-     * Get Campaign Reservations
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
+     * Get Campaign Reservation for user
+     * @param campaignId id of the campaign
+     * @param accountId id of the account
+     * @returns {Promise<Reservation>} Reservation
      */
-    async getCampaignReservations (campaignId: number, accountId): Promise<any> {}
+    async getCampaignReservation (campaignId: number, accountId: number): Promise<Reservation> {
+        try {
+            // create a composite Uint64 key from two Uint32 keys
+            const a = new Uint8Array(8);
+            a.set(UInt32.from(campaignId).byteArray, 0);
+            a.set(UInt32.from(accountId).byteArray, 4);
+            const bound = UInt64.from(a)
 
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'reservation',
+                index_position: 'secondary',
+                scope: this.client.config.tasksContract,
+                upper_bound: bound,
+                lower_bound: bound,
+            })
 
-    /**
-     * TODO: Add type for user
-     * GetMyResercvations for account that is logged in.
-     * To find all users reservation: filter the reservation table by account_id (index = 3)
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
-     */
-
-    // const accTaskIdxReservation = await this.client.eos.v1.chain.get_table_rows({
-    //     code: this.client.config.tasksContract,
-    //     table: 'acctaskidx',
-    //     scope: this.client.config.tasksContract,
-    //     index_position: 'tertiary',
-    //     lower_bound: UInt128.from(this.client.vaccount.getAll()),
-    //     upper_bound: UInt128.from(this.client.vaccount.getAll()),
-    // })
-
-
-    // const [reservation] = accTaskIdxReservation.rows
-    // return reservation
+            const [ reservation ] = response.rows
+            return reservation
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Get the reservation of the current user for a campaign
@@ -135,20 +167,21 @@ export class TasksService {
         try {
             this.client.requireSession()
             const vaccount = await this.client.vaccount.get()
-            // convert to hex
-            const hexCampaignId = campaignId.toString(16)
-            const hexAccountId = vaccount.id.toString(16)
-            const compositeKey = UInt64.from(hexAccountId + hexCampaignId)
-            console.log('vaccount', vaccount)
+
+            // create a composite Uint64 key from two Uint32 keys
+            const a = new Uint8Array(8);
+            a.set(UInt32.from(campaignId).byteArray, 0);
+            a.set(UInt32.from(vaccount.id).byteArray, 4);
+            const bound = UInt64.from(a)
+
             const response = await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.tasksContract,
-                table: 'campaign',
-                // index_position: 'secondary',
+                table: 'reservation',
+                index_position: 'secondary',
                 scope: this.client.config.tasksContract,
-                upper_bound: compositeKey,
-                lower_bound: compositeKey,
+                upper_bound: bound,
+                lower_bound: bound,
             })
-            console.log('getReservation', response)
 
             const [ reservation ] = response.rows
             return reservation

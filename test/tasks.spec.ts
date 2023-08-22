@@ -4,11 +4,11 @@ import { describe, expect, expectTypeOf, test } from 'vitest'
 import { config } from 'dotenv'
 
 const cacc = config({
-    path: './test/.env',
+    path: './test/.env.test',
     debug: true
 })
 
-console.log('cacc', cacc)
+// console.log('cacc', cacc)
 
 describe('Tasks', async () => {
     const client = new Client('jungle4')
@@ -58,7 +58,6 @@ describe('Tasks', async () => {
 
         console.debug('Trying to reserve task test')
         const reservation = await client.tasks.reserveTask(campaign.id)
-        console.log('reservation', reservation)
 
         expect(reservation).toBeDefined()
         expectTypeOf(reservation).toMatchTypeOf<Reservation>()

@@ -4,7 +4,7 @@ import { config } from 'dotenv'
 import { VAccount } from '../src/types/user'
 
 config({
-    path: './test/.env',
+    path: './test/.env.test',
     debug: true
 })
 
