@@ -4,7 +4,7 @@ import { describe, expect, expectTypeOf, test } from 'vitest'
 import { config } from 'dotenv'
 
 const cacc = config({
-    path: './test/.env',
+    path: './test/.env.test',
     debug: true
 })
 
