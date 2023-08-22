@@ -102,10 +102,35 @@ export class TasksService {
     async getAllReservations (): Promise<any> {}
 
     /**
-     * Get Campaign Reservations
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
+     * Get Campaign Reservation for user
+     * @param campaignId id of the campaign
+     * @param accountId id of the account
+     * @returns {Promise<Reservation>} Reservation
      */
-    async getCampaignReservations (campaignId: number, accountId): Promise<any> {}
+    async getCampaignReservation (campaignId: number, accountId: number): Promise<Reservation> {
+        try {
+            // create a composite Uint64 key from two Uint32 keys
+            const a = new Uint8Array(8);
+            a.set(UInt32.from(campaignId).byteArray, 0);
+            a.set(UInt32.from(accountId).byteArray, 4);
+            const bound = UInt64.from(a)
+
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'reservation',
+                index_position: 'secondary',
+                scope: this.client.config.tasksContract,
+                upper_bound: bound,
+                lower_bound: bound,
+            })
+
+            const [ reservation ] = response.rows
+            return reservation
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Get the reservation of the current user for a campaign
