@@ -160,6 +160,7 @@ export class TasksService {
             if (myReservation) {
                 return myReservation
             } else {
+                const vacc = await this.client.vaccount.get()
                 const action = {
                     account: this.client.config.tasksContract,
                     name: 'reservetask',
@@ -169,13 +170,13 @@ export class TasksService {
                     }],
                     data: {
                         campaign_id: campaignId,
-                        account_id: this.client.session.actor,
+                        account_id: vacc.id,
                         quali_assets: qualiAssets,
                         payer: this.client.session.actor,
                         sig: null,
                     },
                 }
-                await this.client.session.transact({ action })
+                const transaction = await this.client.session.transact({ action })
 
                 // TODO: Sleep for a bit for now, use finality plugin later.
                 await new Promise(resolve => setTimeout(resolve, 3000))
