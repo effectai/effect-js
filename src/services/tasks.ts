@@ -97,25 +97,6 @@ export class TasksService {
     async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
 
     /**
-     * TODO: add type for reservation
-     * GetReservations
-     * Find active reservations
-     * To find all users reservation: filter the reservation table by account_id (index = 3)
-     * To find the user reservation in a campaign: filter on acccamp (index 1) with composite index (uint64_t{account_id.value()} << 32) | campaign_id
-     */
-    async getActiveReservations (campaignId: number): Promise<any> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'reservation',
-            scope: this.client.config.tasksContract,
-            limit: -1
-        })
-
-        const [reservation] = response.rows
-        return reservation
-    }
-
-    /**
      * TODO: Retrieve all reservations.
      */
     async getAllReservations (): Promise<any> {}
