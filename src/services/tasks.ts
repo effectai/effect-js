@@ -96,9 +96,38 @@ export class TasksService {
     async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
 
     /**
-     * TODO: Retrieve all reservations.
+     * Retrieve all reservations
+     * @returns {Promise<Reservation[]>} Reservation[]
      */
-    async getAllReservations (): Promise<any> {}
+    async getAllReservations (): Promise<Reservation[]> {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'reservation',
+                scope: this.client.config.tasksContract,
+            })
+            
+            while(response.more) {
+                const lastRow = response.rows[response.rows.length - 1]
+                const lowerBound = UInt64.from(lastRow.id + 1)
+                const upperBound = UInt64.from(lastRow.id + 21)
+                const moreResponse = await this.client.eos.v1.chain.get_table_rows({
+                    code: this.client.config.tasksContract,
+                    table: 'reservation',
+                    scope: this.client.config.tasksContract,
+                    lower_bound: lowerBound,
+                    upper_bound: upperBound,
+                })
+                response.rows.push(...moreResponse.rows)
+                response.more = moreResponse.more
+            }
+
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Get Campaign Reservation for user
