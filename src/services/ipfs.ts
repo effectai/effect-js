@@ -17,7 +17,6 @@ export class IpfsService {
         const stringified = JSON.stringify(obj)
         const blob = new Blob([stringified], { type: 'application/json' })
         const formData = new FormData()
-        const blobText = await blob.text()
         formData.append('file', blob)
 
         if (blob.size > 1024 * 1024 * 10) {
@@ -49,13 +48,13 @@ export class IpfsService {
    * @param {IpfsContentFormat} format - format of the content you are fetching, 
    * @returns content of the ipfs hash in your preferred format
    */
-  fetch = async (hash: string, ipfsContentForm: IpfsContentFormat): Promise<any> => {
+  fetch = async (hash: string, ipfsContentFormat: IpfsContentFormat): Promise<any> => {
     try {
       let data: { formData: () => any; arrayBuffer: () => any; blob: () => any; text: () => any; json: () => any; };
       data = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/ipfs/${hash}`)
   
       // Return the IPFS content in the format you want
-      switch (ipfsContentForm) {
+      switch (ipfsContentFormat) {
         case IpfsContentFormat.FormData:
           return data.formData()
         case IpfsContentFormat.ArrayBuffer:
