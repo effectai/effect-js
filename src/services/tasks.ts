@@ -99,7 +99,19 @@ export class TasksService {
      * Load the IPFS object and confirm it is a JSON array. Get the _task_.task_idxth item from the array
      * Render the campaign template with that task data
      */
-    async getTask (campaignId: number, taskId: number): Promise<any> {}
+    async getTaskData (reservation: Reservation): Promise<any[]> {
+        try {
+            const batch = await this.getBatch(reservation.batch_id)
+            const ipfsData = await this.client.ipfs.fetch(batch.content.field_1, IpfsContentFormat.JSON)
+            if (!Array.isArray(ipfsData)) {
+                throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
+            }
+            return ipfsData[reservation.task_idx]
+        } catch (error) {
+            console.error(error)
+            throw new Error(error.message)
+        }
+    }
 
     /**
       * Submit task
