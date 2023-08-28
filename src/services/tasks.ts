@@ -1,6 +1,7 @@
-import { Campaign, Reservation } from '../types/campaign';
+import { Reservation, Batch, Campaign } from './../types/campaign';
 import { Client } from '../client';
 import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
+import { IpfsContentFormat } from './ipfs';
 
 export class TasksService {
     constructor(private client: Client) {}
