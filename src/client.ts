@@ -9,6 +9,7 @@ import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 
 import { fetch } from '@web-std/fetch'
+import { efxTicker } from './types/user';
 
 export class Client {
     static __classname = 'Client'
@@ -44,6 +45,20 @@ export class Client {
             },
             walletPlugin,
         });
+    }
+
+    async efxValue (): Promise<efxTicker> {
+        try {
+            const efxPrice = await fetch('https://api.coingecko.com/api/v3/coins/effect-network/tickers')
+            const efxPriceJson = await efxPrice.json()
+            console.debug(efxPriceJson)
+            const [ ticker ] = efxPriceJson.tickers
+            console.debug('ticker', ticker.converted_last)
+            return ticker.converted_last
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error retrieving EFX Ticker Price from CoinGecko')
+        }
     }
 
     /**
