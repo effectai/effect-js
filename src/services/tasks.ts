@@ -231,4 +231,48 @@ export class TasksService {
             throw error
         }
     }
+
+    /**
+     * Retrieve Effect Network Qualification NFT for user.
+     * @param accountId id of the account
+     * @returns {Promise<Qualification>} Qualification NFT
+     */
+    async getQualifications(accountId: number): Promise<any[]> {
+
+        // We should look at the current implementation for how AtomicAssets implemented this.
+        // We can mock this by using atomic assets nfts on jungle
+
+        const response = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.atomicAssetsContract,
+            table: 'assets',
+            scope: this.client.config.atomicAssetsContract,
+            limit: 50,
+            upper_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
+            lower_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
+            index_position: 'secondary', // TODO: Which index do I need to have?
+            key_type: 'sha256', // TODO: Is this needed?
+        });
+
+        return response.rows
+    }
+
+    /**
+     * Retrieve Effect Network Qualification NFT Collection
+     * 
+     */
+    async getQualificationCollection (): Promise<any> {
+
+        const bounds: string = 'effect.network'
+
+        const response = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.atomicAssetsContract,
+            table: 'collections',
+            scope: this.client.config.atomicAssetsContract,
+            limit: 1,
+            upper_bound: UInt128.from(),
+            lower_bound: UInt128.from(),
+            index_position: 'primary',
+
+        })
+    }
 }
