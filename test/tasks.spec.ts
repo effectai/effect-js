@@ -43,6 +43,17 @@ describe('Tasks', async () => {
         expect(owner).toEqual('efxefxefxefx')
     })
 
+    test('Get Batch from Campaign', async () => {
+        const batch = await client.tasks.getBatch(0)
+        expect(batch).toBeDefined()
+        expect(batch.id).toEqual(0)
+        
+        const taskData = await client.tasks.getTaskData(batch.id)
+        expect(taskData).toBeDefined()
+        expect(taskData).toHaveLength(1)
+
+    })
+
     test('User login', async () => {
 
         expect(() => client.requireSession()).toThrowError()
@@ -56,7 +67,6 @@ describe('Tasks', async () => {
         const campaign = await client.tasks.getCampaign(0)
         client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
 
-        console.debug('Trying to reserve task test')
         const reservation = await client.tasks.reserveTask(campaign.id)
 
         expect(reservation).toBeDefined()
@@ -65,5 +75,6 @@ describe('Tasks', async () => {
         expect(reservation.campaign_id).toEqual(0)
         
     })
+
 
 })
