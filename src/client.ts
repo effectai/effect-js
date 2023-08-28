@@ -1,14 +1,12 @@
 import { ClientConfig } from './types/config';
 import { configPresets } from './config';
-import { IpfsService } from './services/ipfs';
+// import { IpfsService } from './services/ipfs';
 import { TasksService } from './services/tasks';
 import { VAccountService } from './services/vaccount';
 
 import { APIClient, APIClientOptions, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
-
-import { fetch } from '@web-std/fetch'
 
 export class Client {
     static __classname = 'Client'
@@ -19,7 +17,7 @@ export class Client {
     session!: Session;
 
     /**
-     * 
+     *
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
      * @param {FetchProviderOptions} fetchConfig, Supply a custom fetch config to the EffectSDK fetch provider
      */
@@ -30,7 +28,7 @@ export class Client {
     }
 
     tasks = new TasksService(this);
-    ipfs = new IpfsService(this);
+    // ipfs = new IpfsService(this);
     vaccount = new VAccountService(this);
 
     login (actor: string, permission: string, privateKey: string) {
