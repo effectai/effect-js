@@ -14,6 +14,7 @@ const configPresets: {[key: string]: ClientConfig} = {
         proposalsContract: 'efxproposals',
         vaccountContract: 'efxaccount11',
         daoContract: 'efxdao111112',
+        atomicAssetsContract: 'atomicassets',
         efxSymbol: 'EFX',
         efxPrecision: 4,
         eosRelayerAccount: 'effectrelayr',

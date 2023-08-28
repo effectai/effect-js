@@ -51,6 +51,11 @@ export interface ClientConfig {
    */
   daoContract: string
 
+  /**
+   * Atomic Assets Contract
+   */
+  atomicAssetsContract: string
+
   stakeContract: string,
   feepoolContract: string,
   proposalsContract: string,
