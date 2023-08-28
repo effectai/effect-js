@@ -105,8 +105,7 @@ export class VAccountService {
      * @param accountId ID of  the given acccount
      * @returns the payment rows of the given `accountId`
      */
-    getPendingBalance = async (accountId: number): Promise<any> => {
-
+    getPendingPayout = async (accountId: number): Promise<any> => {
         return await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.tasksContract,
                 scope: this.client.config.tasksContract,
@@ -117,6 +116,39 @@ export class VAccountService {
                 upper_bound: UInt128.from(accountId)
         })
     }
+
+  /**
+   * Receive tokens from completed tasks.
+   * @param paymentId
+   * @returns
+   */
+  payout = async (accountId: number): Promise<any> => {
+    const user = this.effectAccount.accountName
+    const payments = await this.getPendingPayout(accountId)
+
+    if (payments) {
+      for (const payment of payments.rows) {
+        // payout is only possible after x amount of days have passed since the last_submission_time
+        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payoutDelaySec) < ((Date.now() / 1000))) {
+          actions.push({
+            account: this.config.forceContract,
+            name: 'payout',
+            authorization: [{
+              actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+              permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
+            }],
+            data: {
+              payment_id: payment.id,
+              sig: isBscAddress(user) ? sig.toString() : null
+            }
+          })
+        }
+      }
+    } else {
+      throw new Error('No pending payouts found');
+    }
+    return await this.sendTransaction(user, actions);
+  }
 
     /**
      * Generate checkSum for vaccount
