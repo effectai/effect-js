@@ -7,3 +7,9 @@ export interface VAccount {
         contract: string;
     };
 }
+
+export interface efxTicker {
+    btc: number,
+    eth: number,
+    usd: number
+}
