@@ -56,3 +56,7 @@ export interface Batch {
     contract: string;
   };
 }
+
+export interface TaskData {
+  
+}
