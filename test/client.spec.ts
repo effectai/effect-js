@@ -1,3 +1,4 @@
+import { efxTicker } from './../src/types/user';
 import { Client } from '../src/client'
 import { expect, test } from 'vitest'
 
@@ -7,6 +8,18 @@ test('Client', async () => {
     const client = new Client('jungle4')
     expect(client).toBeDefined()
     expect(client).toBeInstanceOf(Client)
+
+    expect(client).toHaveProperty('login')
+    expect(client).toHaveProperty('efxValue')
+
+    const efxPrice = await client.efxValue()
+    expect(efxPrice).toBeDefined()
+    expect(efxPrice).toHaveProperty('btc')
+    expect(efxPrice).toHaveProperty('eth')
+    expect(efxPrice).toHaveProperty('usd')
+    expect(efxPrice.usd).toBeTypeOf('number')
+    expect(efxPrice.usd).toBeGreaterThan(0)
+
 
     // Make sure all the services are available.
     expect(client).toHaveProperty('config')
