@@ -122,33 +122,33 @@ export class VAccountService {
    * @param paymentId
    * @returns
    */
-  payout = async (accountId: number): Promise<any> => {
-    const user = this.effectAccount.accountName
-    const payments = await this.getPendingPayout(accountId)
+//   payout = async (accountId: number): Promise<any> => {
+//     const user = this.effectAccount.accountName
+//     const payments = await this.getPendingPayout(accountId)
 
-    if (payments) {
-      for (const payment of payments.rows) {
-        // payout is only possible after x amount of days have passed since the last_submission_time
-        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payoutDelaySec) < ((Date.now() / 1000))) {
-          actions.push({
-            account: this.config.forceContract,
-            name: 'payout',
-            authorization: [{
-              actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
-              permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
-            }],
-            data: {
-              payment_id: payment.id,
-              sig: isBscAddress(user) ? sig.toString() : null
-            }
-          })
-        }
-      }
-    } else {
-      throw new Error('No pending payouts found');
-    }
-    return await this.sendTransaction(user, actions);
-  }
+//     if (payments) {
+//       for (const payment of payments.rows) {
+//         // payout is only possible after x amount of days have passed since the last_submission_time
+//         if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payoutDelaySec) < ((Date.now() / 1000))) {
+//           actions.push({
+//             account: this.config.forceContract,
+//             name: 'payout',
+//             authorization: [{
+//               actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
+//               permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
+//             }],
+//             data: {
+//               payment_id: payment.id,
+//               sig: isBscAddress(user) ? sig.toString() : null
+//             }
+//           })
+//         }
+//       }
+//     } else {
+//       throw new Error('No pending payouts found');
+//     }
+//     return await this.sendTransaction(user, actions);
+//   }
 
     /**
      * Generate checkSum for vaccount
