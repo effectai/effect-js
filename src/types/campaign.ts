@@ -35,3 +35,24 @@ export interface Reservation {
   reserved_on: string;
   campaign_id: number;
 }
+
+export interface Batch {
+  id: number;
+  campaign_id: number;
+  content: {
+    field_0: number;
+    field_1: string;
+  };
+  balance: {
+    quantity: string;
+    contract: string;
+  };
+  repetitions: number;
+  tasks_done: number;
+  num_tasks: number;
+  start_task_idx: number;
+  reward: {
+    quantity: string;
+    contract: string;
+  };
+}
