@@ -74,6 +74,25 @@ export class TasksService {
     }
 
     /**
+     * Retrieve Batch by id
+     * @param id id of the batch
+     * @returns {Promise<Batch>} Batch
+     */
+    async getBatch (batchId: number): Promise<Batch> {
+        const response = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.tasksContract,
+            table: 'batch',
+            scope: this.client.config.tasksContract,
+            lower_bound: UInt128.from(batchId),
+            upper_bound: UInt128.from(batchId),
+            limit: 1,
+        })
+
+        const [batch] = response.rows
+        return batch
+    }
+
+    /**
      * Fetch the task data
      * Load the batch the task is in (get _task_.batch_id from the batch table)
      * Get the batch IPFS hash from batch.content.value
