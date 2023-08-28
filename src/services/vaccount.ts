@@ -8,6 +8,7 @@ import {
     Asset,
     Name,
     NameType,
+    UInt128,
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
 
@@ -96,6 +97,25 @@ export class VAccountService {
             index_position: 'secondary',
             key_type: 'sha256',
         });
+    }
+
+    /**
+     * TODO: Figure out return type
+     * get pending balance
+     * @param accountId ID of  the given acccount
+     * @returns the payment rows of the given `accountId`
+     */
+    getPendingBalance = async (accountId: number): Promise<any> => {
+
+        return await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                scope: this.client.config.tasksContract,
+                table: 'payment',
+                index_position: 'tertiary',
+                key_type: 'i64',
+                lower_bound: UInt128.from(accountId),
+                upper_bound: UInt128.from(accountId)
+        })
     }
 
     /**
