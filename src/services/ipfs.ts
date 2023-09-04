@@ -1,5 +1,5 @@
 import { Client } from "../client";
-import { Blob, FormData } from '@web-std/fetch'
+// import { Blob, FormData } from '@web-std/fetch'
 
 export enum IpfsContentFormat {
   FormData = 'formdata',
