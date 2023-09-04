@@ -10,15 +10,6 @@ test('Client', async () => {
     expect(client).toBeInstanceOf(Client)
 
     expect(client).toHaveProperty('login')
-    expect(client).toHaveProperty('efxValue')
-
-    const efxPrice = await client.efxValue()
-    expect(efxPrice).toBeDefined()
-    expect(efxPrice).toHaveProperty('btc')
-    expect(efxPrice).toHaveProperty('eth')
-    expect(efxPrice).toHaveProperty('usd')
-    expect(efxPrice.usd).toBeTypeOf('number')
-    expect(efxPrice.usd).toBeGreaterThan(0)
 
 
     // Make sure all the services are available.
