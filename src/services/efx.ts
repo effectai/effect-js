@@ -1,10 +1,16 @@
 import { DefiBoxPair } from './../types/user';
-import { UInt128 } from '@wharfkit/antelope';
+import { Asset, UInt128 } from '@wharfkit/antelope';
 import { Client } from '../client';
+import { TransactResult } from '@wharfkit/session';
 
 export enum DefiBoxPairEnum {
     EosEfx= 191,
     EosUsdt= 12,
+}
+
+export enum swapDirection {
+    EfxToUsdt = `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
+    UsdtToEfx = `${DefiBoxPairEnum.EosUsdt}-${DefiBoxPairEnum.EosEfx}`
 }
 
 export class TokenService {
@@ -39,6 +45,65 @@ export class TokenService {
         } catch (error) {
             console.error(error)
             throw new Error('Error retrieving EFX Ticker Price from DefiBox')
+        }
+    }
+
+    async swapOut (amount: number): Promise<TransactResult> {
+        try {
+            this.client.requireSession()
+            const efxPrice = await this.getEfxPrice()
+            const valueAmount = efxPrice * amount
+            return await this.client.session.transact({
+                "action": {
+                    "account": "effecttokens",
+                    "name": "transfer",
+                    "authorization": [
+                      {
+                        "actor": this.client.session.actor,
+                        "permission": this.client.session.permission
+                      }
+                    ],
+                    "data": {
+                      "from": this.client.session.actor,
+                      "to": "swap.defi",
+                      "quantity": Asset.from(amount, '4,EFX'),
+                      "memo": `swap,${valueAmount},${swapDirection.EfxToUsdt}`
+                    }
+                  }
+            })
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error swapping out of EFX')
+        }
+    }
+
+    async swapIn (amount: number): Promise<TransactResult> {
+        try {
+            this.client.requireSession()
+            const efxPrice = await this.getEfxPrice()
+            // TODO: make sure if this is correct, doesn't feel right.
+            const valueAmount = 1 / efxPrice * amount
+            return await this.client.session.transact({
+                "action": {
+                    "account": "tethertether",
+                    "name": "transfer",
+                    "authorization": [
+                      {
+                        "actor": this.client.session.actor,
+                        "permission": this.client.session.permission
+                      }
+                    ],
+                    "data": {
+                      "from": this.client.session.actor,
+                      "to": "swap.defi",
+                      "quantity": Asset.from(amount, '4,USDT'),
+                      "memo": `swap,${valueAmount},${swapDirection.UsdtToEfx}`
+                    }
+                  }
+            })
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error swapping out of EFX')
         }
     }
 
