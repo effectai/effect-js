@@ -1,3 +1,13 @@
+/**
+ * Vaccount Interface, Virtual Account for Effect Network
+ * @interface
+ * @property {number} id - Vaccount ID
+ * @property {number} nonce - Vaccount nonce
+ * @property {array} address - Vaccount address ['name', 'eosAccName']
+ * @property {string} balance - Vaccount balance
+ * @property {string} contract - Vaccount contract
+ * @property {string} quantity - Vaccount quantity
+ */
 export interface VAccount {
     id: number;
     nonce: number;
@@ -32,4 +42,4 @@ export interface DefiBoxPair {
     price0_cumulative_last: string;
     price1_cumulative_last: number;
     block_time_last: string;
-  }
+}
