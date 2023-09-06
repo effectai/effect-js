@@ -8,9 +8,10 @@ import {
     Asset,
     Name,
     NameType,
-    UInt128,
+    UInt128
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
+import { TransactResult } from '@wharfkit/session';
 
 @Variant.type('vaddress', [Checksum160, Name])
 class VAddress extends Variant {
@@ -106,7 +107,7 @@ export class VAccountService {
      * @returns the payment rows of the given `accountId`
      */
     getPendingPayout = async (accountId: number): Promise<any> => {
-        return await this.client.eos.v1.chain.get_table_rows({
+        const response = await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.tasksContract,
                 scope: this.client.config.tasksContract,
                 table: 'payment',
@@ -115,40 +116,46 @@ export class VAccountService {
                 lower_bound: UInt128.from(accountId),
                 upper_bound: UInt128.from(accountId)
         })
+        console.debug(response)
+        return response
     }
 
   /**
+   * TODO: Define tests for this method
    * Receive tokens from completed tasks.
    * @param paymentId
    * @returns
    */
-//   payout = async (accountId: number): Promise<any> => {
-//     const user = this.effectAccount.accountName
-//     const payments = await this.getPendingPayout(accountId)
+  payout = async (): Promise<TransactResult> => {
+    this.client.requireSession()
 
-//     if (payments) {
-//       for (const payment of payments.rows) {
-//         // payout is only possible after x amount of days have passed since the last_submission_time
-//         if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + this.config.payoutDelaySec) < ((Date.now() / 1000))) {
-//           actions.push({
-//             account: this.config.forceContract,
-//             name: 'payout',
-//             authorization: [{
-//               actor: isBscAddress(user) ? this.config.eosRelayerAccount : user,
-//               permission: isBscAddress(user) ? this.config.eosRelayerPermission : this.effectAccount.permission
-//             }],
-//             data: {
-//               payment_id: payment.id,
-//               sig: isBscAddress(user) ? sig.toString() : null
-//             }
-//           })
-//         }
-//       }
-//     } else {
-//       throw new Error('No pending payouts found');
-//     }
-//     return await this.sendTransaction(user, actions);
-//   }
+    const actions = <any>[];
+    const vacc = await this.get()
+    const settings = await this.client.tasks.getForceSettings()
+    const payments = await this.getPendingPayout(vacc.id)
+
+    if (payments) {
+      for (const payment of payments.rows) {
+        // payout is only possible after x amount of days have passed since the last_submission_time
+        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + settings.payout_delay_sec < ((Date.now() / 1000)))) {
+          actions.push({
+            account: this.client.config.tasksContract,
+            name: 'payout',
+            authorization: [{
+              actor: this.client.session.actor,
+              permission: this.client.session.permission
+            }],
+            data: {
+              payment_id: payment.id
+            }
+          })
+        }
+      }
+    } else {
+      throw new Error('No pending payouts found');
+    }
+    return await this.client.session.transact({ actions: actions });
+  }
 
     /**
      * Generate checkSum for vaccount
