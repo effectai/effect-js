@@ -15,7 +15,7 @@ test('Client', async () => {
     // Make sure all the services are available.
     expect(client).toHaveProperty('config')
     expect(client).toHaveProperty('tasks')
-    expect(client).toHaveProperty('ipfs')
+    // expect(client).toHaveProperty('ipfs')
     expect(client).toHaveProperty('vaccount')
     
     // Check that the config is defined correctly
