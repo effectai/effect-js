@@ -19,7 +19,7 @@ describe('VAccount', async () => {
     })
 
     test('Open VAccount', async () => {
-        await client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
+        client.login(process.env.VITE_EOSACC!, process.env.VITE_EOSPERM!, process.env.VITE_EOSPK!)
         expect(client.session).toBeDefined()
     })
 
