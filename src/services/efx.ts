@@ -27,7 +27,6 @@ export class TokenService {
                 upper_bound: UInt128.from(pairEnum.valueOf()),
             })
             const [ pair ] = pairResponse.rows
-            console.debug(pair)
             return pair
         } catch (error) {
             console.error(error)
@@ -40,7 +39,6 @@ export class TokenService {
             const eosEfxPair = await this.getDefiBoxPair(DefiBoxPairEnum.EosEfx)
             const eosUsdtPair = await this.getDefiBoxPair(DefiBoxPairEnum.EosUsdt)
             const efxUsdt = Number(eosEfxPair.price1_last) * Number(eosUsdtPair.price0_last)
-            console.debug('efxUsdt', efxUsdt)
             return efxUsdt
         } catch (error) {
             console.error(error)
@@ -81,7 +79,7 @@ export class TokenService {
         try {
             this.client.requireSession()
             const efxPrice = await this.getEfxPrice()
-            // TODO: make sure if this is correct, doesn't feel right.
+            // TODO: make sure if this is correct
             const valueAmount = 1 / efxPrice * amount
             return await this.client.session.transact({
                 "action": {
