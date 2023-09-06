@@ -25,7 +25,7 @@
     "watch": "npm run prebuild && tsc --watch",
     "prebuild": "rimraf docs dist",
     "docs": "typedoc",
-    "docs:watch": "typedoc --watch",
+    "docs:watch": "typedoc --watch --emit both",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
     "publish:public": "npm run prebuild && npm version patch && npm run build:cjs && npm run webpack && npm publish --access public",
@@ -96,13 +96,13 @@
     "stream-http": "^3.2.0",
     "ts-node-dev": "^2.0.0",
     "typedoc": "^0.24.8",
+    "typedoc-plugin-mermaid": "^1.10.0",
     "typescript": "^5.1.6",
     "vitest": "^0.34.2",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@web-std/fetch": "^4.1.2",
     "@wharfkit/antelope": "^0.8.0",
     "@wharfkit/session": "^1.0.0",
     "@wharfkit/wallet-plugin-privatekey": "^1.0.0"

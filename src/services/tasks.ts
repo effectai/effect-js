@@ -1,7 +1,6 @@
-import { Reservation, Batch, Campaign } from './../types/campaign';
+import { Reservation, Batch, Campaign, TasksSettings } from './../types/campaign';
 import { Client } from '../client';
 import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
-import { IpfsContentFormat } from './ipfs';
 
 export class TasksService {
     constructor(private client: Client) {}
@@ -100,19 +99,27 @@ export class TasksService {
      * Load the IPFS object and confirm it is a JSON array. Get the _task_.task_idxth item from the array
      * Render the campaign template with that task data
      */
-    async getTaskData (reservation: Reservation): Promise<any[]> {
-        try {
-            const batch = await this.getBatch(reservation.batch_id)
-            const ipfsData = await this.client.ipfs.fetch(batch.content.field_1, IpfsContentFormat.JSON)
-            if (!Array.isArray(ipfsData)) {
-                throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
-            }
-            return ipfsData[reservation.task_idx]
-        } catch (error) {
-            console.error(error)
-            throw new Error(error.message)
-        }
-    }
+    // async getTaskData (reservation: Reservation): Promise<any[]> {
+    //     try {
+    //         const batch = await this.getBatch(reservation.batch_id)
+    //         const ipfsData = await this.client.ipfs.fetch(batch.content.field_1, IpfsContentFormat.JSON)
+
+    //         // check if the ipfsData is an array
+    //         if (!Array.isArray(ipfsData)) {
+    //             throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
+    //         }
+
+    //         // Check if there is a task at the index
+    //         if (!ipfsData.hasOwnProperty(reservation.task_idx)) {
+    //             throw new Error(`Task data retrieved from IPFS does not have a task at index ${reservation.task_idx}. \n${ipfsData}`)
+    //         }
+
+    //         return ipfsData[reservation.task_idx]
+    //     } catch (error) {
+    //         console.error(error)
+    //         throw new Error(error.message)
+    //     }
+    // }
 
     /**
       * Submit task
@@ -138,7 +145,7 @@ export class TasksService {
                 table: 'reservation',
                 scope: this.client.config.tasksContract,
             })
-            
+
             while(response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 const lowerBound = UInt64.from(lastRow.id + 1)
@@ -183,6 +190,7 @@ export class TasksService {
                 upper_bound: bound,
                 lower_bound: bound,
             })
+            
 
             const [ reservation ] = response.rows
             return reservation
@@ -193,7 +201,9 @@ export class TasksService {
     }
 
     /**
-     * Get the reservation of the current user for a campaign
+     * Get the reservation of logged in user for a campaign.
+     * @param campaignId id of the campaign
+     * @returns {Promise<Reservation>} Reservation
      */
     async getMyReservation (campaignId: number): Promise<Reservation> {
         try {
@@ -228,6 +238,19 @@ export class TasksService {
      * @param campaignId id of the campaign
      * @param qualiAssets can be null, then the smart contract will search through all the assets of the user.
      * @returns {Promise<Reservation>} Reservation
+     *
+     * ```mermaid
+     * sequenceDiagram
+     *  participant User
+     *  participant Client
+     *  participant Smart Contract
+     *  User->>Client: Login
+     *  Client->>Smart Contract: reserveTask(campaignId, qualiAssets)
+     *  Smart Contract->>Smart Contract: Check if user already has a reservation for this campaign
+     *  Smart Contract->>Smart Contract: If not, create a new reservation
+     *  Smart Contract->>Client: Return reservation
+     *  Client->>User: Return reservation
+     * ```
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
         try {
@@ -238,22 +261,24 @@ export class TasksService {
                 return myReservation
             } else {
                 const vacc = await this.client.vaccount.get()
-                const action = {
-                    account: this.client.config.tasksContract,
-                    name: 'reservetask',
-                    authorization: [{
-                        actor: this.client.session.actor,
-                        permission: this.client.session.permission,
-                    }],
-                    data: {
-                        campaign_id: campaignId,
-                        account_id: vacc.id,
-                        quali_assets: qualiAssets,
-                        payer: this.client.session.actor,
-                        sig: null,
-                    },
-                }
-                await this.client.session.transact({ action })
+                await this.client.session.transact({
+                    action: {
+                        account: this.client.config.tasksContract,
+                        name: 'reservetask',
+                        authorization: [{
+                            actor: this.client.session.actor,
+                            permission: this.client.session.permission,
+                        }],
+                        data: {
+                            campaign_id: campaignId,
+                            account_id: vacc.id,
+                            quali_assets: qualiAssets,
+                            payer: this.client.session.actor,
+                            sig: null,
+                        },
+                    }
+                })
+
                 // TODO: Sleep for a bit for now, use finality plugin later.
                 await new Promise(resolve => setTimeout(resolve, 3000))
 
@@ -282,15 +307,16 @@ export class TasksService {
             upper_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
             lower_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
             index_position: 'secondary', // TODO: Which index do I need to have?
-            key_type: 'sha256', // TODO: Is this needed?
+            // key_type: 'sha256', // TODO: Is this needed? if this is set than the lowerbound needs to be of type Checksum
         });
 
         return response.rows
     }
 
     /**
+     * TODO: Figure out the interface for a Qualification NFT Asset
      * Retrieve Effect Network Qualification NFT Collection
-     * 
+     *
      */
     async getQualificationCollection (): Promise<any> {
 
@@ -301,10 +327,30 @@ export class TasksService {
             table: 'collections',
             scope: this.client.config.atomicAssetsContract,
             limit: 1,
-            upper_bound: UInt128.from(),
-            lower_bound: UInt128.from(),
+            upper_bound: UInt128.from(1),
+            lower_bound: UInt128.from(1),
             index_position: 'primary',
 
         })
     }
+
+    /**
+     * Get payout delay
+     * @returns the payout delay in seconds
+     * @throws error if the payout delay is not available
+     */
+        getForceSettings = async (): Promise<TasksSettings> => {
+            try {
+                const response = await this.client.eos.v1.chain.get_table_rows({
+                    code: this.client.config.tasksContract,
+                    scope: this.client.config.tasksContract,
+                    table: 'settings',
+                })
+                const [config] = response.rows
+                return config
+            } catch (error) {
+                console.error(error)
+                throw new Error('Error retrieving Force settings')
+            }
+        }
 }

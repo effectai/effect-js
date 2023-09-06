@@ -1,15 +1,13 @@
 import { ClientConfig } from './types/config';
 import { configPresets } from './config';
-import { IpfsService } from './services/ipfs';
+// import { IpfsService } from './services/ipfs';
 import { TasksService } from './services/tasks';
 import { VAccountService } from './services/vaccount';
+import { TokenService } from './services/efx';
 
-import { APIClient, APIClientOptions, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
+import { APIClient, FetchProvider } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
-
-import { fetch } from '@web-std/fetch'
-import { efxTicker } from './types/user';
 
 export class Client {
     static __classname = 'Client'
@@ -20,7 +18,7 @@ export class Client {
     session!: Session;
 
     /**
-     * 
+     *
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
      * @param {FetchProviderOptions} fetchConfig, Supply a custom fetch config to the EffectSDK fetch provider
      */
@@ -31,8 +29,9 @@ export class Client {
     }
 
     tasks = new TasksService(this);
-    ipfs = new IpfsService(this);
+    // ipfs = new IpfsService(this);
     vaccount = new VAccountService(this);
+    efx = new TokenService(this);
 
     login (actor: string, permission: string, privateKey: string) {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
@@ -45,20 +44,6 @@ export class Client {
             },
             walletPlugin,
         });
-    }
-
-    async efxValue (): Promise<efxTicker> {
-        try {
-            const efxPrice = await fetch('https://api.coingecko.com/api/v3/coins/effect-network/tickers')
-            const efxPriceJson = await efxPrice.json()
-            console.debug(efxPriceJson)
-            const [ ticker ] = efxPriceJson.tickers
-            console.debug('ticker', ticker.converted_last)
-            return ticker.converted_last
-        } catch (error) {
-            console.error(error)
-            throw new Error('Error retrieving EFX Ticker Price from CoinGecko')
-        }
     }
 
     /**
