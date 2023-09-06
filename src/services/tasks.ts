@@ -335,4 +335,24 @@ export class TasksService {
 
         })
     }
+
+    /**
+     * Get payout delay
+     * @returns the payout delay in seconds
+     * @throws error if the payout delay is not available
+     */
+        getForceSettings = async (): Promise<TasksSettings> => {
+            try {
+                const response = await this.client.eos.v1.chain.get_table_rows({
+                    code: this.client.config.tasksContract,
+                    scope: this.client.config.tasksContract,
+                    table: 'settings',
+                })
+                const [config] = response.rows
+                return config
+            } catch (error) {
+                console.error(error)
+                throw new Error('Error retrieving Force settings')
+            }
+        }
 }
