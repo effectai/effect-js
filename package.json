@@ -12,7 +12,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:covwatch": "vitest --coverage --watch",
+    "test:cov": "vitest --coverage",
     "test:unit": "vitest --config=test/unit/vitest.unit.config.js",
     "test:e2e": "vitest --config=test/e2e/vitest.e2e.config.js",
     "test:integration": "vitest --config=test/e2e/vitest.integration.config.js",
