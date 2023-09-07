@@ -1,4 +1,4 @@
-// import { IpfsContentFormat, IpfsService } from '../src/services/ipfs'
+import { IpfsContentFormat } from '../src/services/ipfs'
 import { Client } from '../src/client'
 import { expect, test } from 'vitest'
 
@@ -22,15 +22,15 @@ test('Should check that client is defined', async () => {
 //     expect(uploadWebHash).toBe(helloWorldHash)
 // })
 
-// test('Should fetch ipfs info correctly', async () => {
+test('Should fetch ipfs info correctly', async () => {
 
-//     const hash = 'QmXKn3tGx6CoyaMVgR9L6df3Dtbocx2zvMoQxSNNU1oEnV'
-//     const imageurl = 'https://ipfs.effect.ai/ipfs/QmVuSBpoSEUdHmB2owcbAQnModzfcbEme6w6nCkJDDJcy4'
-//     const ipfsInfo = await client.ipfs.fetch(hash, IpfsContentFormat.JSON)
+    const hash = 'QmXKn3tGx6CoyaMVgR9L6df3Dtbocx2zvMoQxSNNU1oEnV'
+    const imageurl = 'https://ipfs.effect.ai/ipfs/QmVuSBpoSEUdHmB2owcbAQnModzfcbEme6w6nCkJDDJcy4'
+    const ipfsInfo = await client.ipfs.fetch(hash, IpfsContentFormat.JSON)
 
-//     expect(ipfsInfo).toBeDefined()
-//     expect(ipfsInfo).not.toBeNull()
-//     expect(typeof ipfsInfo).toBe('object')
-//     expect(ipfsInfo?.data?.image).toBe(imageurl)
+    expect(ipfsInfo).toBeDefined()
+    expect(ipfsInfo).not.toBeNull()
+    expect(typeof ipfsInfo).toBe('object')
+    expect(ipfsInfo?.data?.image).toBe(imageurl)
 
-// })
+})

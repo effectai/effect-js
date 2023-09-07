@@ -1,6 +1,6 @@
 import { ClientConfig } from './types/config';
 import { configPresets } from './config';
-// import { IpfsService } from './services/ipfs';
+import { IpfsService } from './services/ipfs';
 import { TasksService } from './services/tasks';
 import { VAccountService } from './services/vaccount';
 import { TokenService } from './services/efx';
@@ -24,12 +24,14 @@ export class Client {
      */
     constructor (environment: string = 'jungle4') {
         this.config = configPresets[environment];
-        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, { fetch });
+        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, { 
+            fetch : fetch || window.fetch
+         });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
 
     tasks = new TasksService(this);
-    // ipfs = new IpfsService(this);
+    ipfs = new IpfsService(this);
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
 

@@ -99,27 +99,27 @@ export class TasksService {
      * Load the IPFS object and confirm it is a JSON array. Get the _task_.task_idxth item from the array
      * Render the campaign template with that task data
      */
-    // async getTaskData (reservation: Reservation): Promise<any[]> {
-    //     try {
-    //         const batch = await this.getBatch(reservation.batch_id)
-    //         const ipfsData = await this.client.ipfs.fetch(batch.content.field_1, IpfsContentFormat.JSON)
+    async getTaskData (reservation: Reservation): Promise<any[]> {
+        try {
+            const batch = await this.getBatch(reservation.batch_id)
+            const ipfsData = await this.client.ipfs.fetch(batch.content.field_1)
 
-    //         // check if the ipfsData is an array
-    //         if (!Array.isArray(ipfsData)) {
-    //             throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
-    //         }
+            // check if the ipfsData is an array
+            if (!Array.isArray(ipfsData)) {
+                throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
+            }
 
-    //         // Check if there is a task at the index
-    //         if (!ipfsData.hasOwnProperty(reservation.task_idx)) {
-    //             throw new Error(`Task data retrieved from IPFS does not have a task at index ${reservation.task_idx}. \n${ipfsData}`)
-    //         }
+            // Check if there is a task at the index
+            if (!ipfsData.hasOwnProperty(reservation.task_idx)) {
+                throw new Error(`Task data retrieved from IPFS does not have a task at index ${reservation.task_idx}. \n${ipfsData}`)
+            }
 
-    //         return ipfsData[reservation.task_idx]
-    //     } catch (error) {
-    //         console.error(error)
-    //         throw new Error(error.message)
-    //     }
-    // }
+            return ipfsData[reservation.task_idx]
+        } catch (error) {
+            console.error(error)
+            throw new Error(error.message)
+        }
+    }
 
     /**
       * Submit task
