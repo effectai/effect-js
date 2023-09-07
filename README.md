@@ -6,8 +6,9 @@ Effect Network SDK for integration with [https://effect.network](https://effect.
 
 ## ✒️ Installation
 
-The official distribution for the package can is available at [npm](https://www.npmjs.com/package/@effectai/effect-js).
+The official distribution for the package is available at [npm](https://www.npmjs.com/package/@effectai/effect-js).
 Note that the module available under the `@effectai/effect-js` namespace is for ECMAScript modules, if you want to use the module in a CommonJS environment (require), you can use the `@effectai/effect-js@cjs` module.
+Note, that if you are using NodeJS, the minimum version required is `v18`.
 
 ### ESM
 
