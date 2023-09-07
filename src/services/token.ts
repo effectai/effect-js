@@ -1,11 +1,11 @@
-import { DefiBoxPair } from '../types/user';
-import { Asset, UInt128 } from '@wharfkit/antelope';
-import { Client } from '../client';
-import { TransactResult } from '@wharfkit/session';
+import { type DefiBoxPair } from '../types/user'
+import { Asset, UInt128 } from '@wharfkit/antelope'
+import { type Client } from '../client'
+import { type TransactResult } from '@wharfkit/session'
 
 export enum DefiBoxPairEnum {
-    EosEfx= 191,
-    EosUsdt= 12,
+    EosEfx = 191,
+    EosUsdt = 12,
 }
 
 export enum swapDirection {
@@ -14,10 +14,10 @@ export enum swapDirection {
 }
 
 export class TokenService {
-    constructor(private client: Client) {}
+    constructor (private readonly client: Client) {}
 
     /**
-     * Returns a DefiBox pair, 
+     * Returns a DefiBox pair,
      * @param pairEnum DefiBoxPairEnum
      * @returns DefiBoxPair
      */
@@ -29,9 +29,9 @@ export class TokenService {
                 table: 'pairs',
                 limit: 1,
                 lower_bound: UInt128.from(pairEnum.valueOf()),
-                upper_bound: UInt128.from(pairEnum.valueOf()),
+                upper_bound: UInt128.from(pairEnum.valueOf())
             })
-            const [ pair ] = pairResponse.rows
+            const [pair] = pairResponse.rows
             return pair
         } catch (error) {
             console.error(error)
@@ -66,22 +66,22 @@ export class TokenService {
             const efxPrice = await this.getEfxPrice()
             const valueAmount = efxPrice * amount
             return await this.client.session.transact({
-                "action": {
-                    "account": "effecttokens",
-                    "name": "transfer",
-                    "authorization": [
-                      {
-                        "actor": this.client.session.actor,
-                        "permission": this.client.session.permission
-                      }
+                action: {
+                    account: 'effecttokens',
+                    name: 'transfer',
+                    authorization: [
+                        {
+                            actor: this.client.session.actor,
+                            permission: this.client.session.permission
+                        }
                     ],
-                    "data": {
-                      "from": this.client.session.actor,
-                      "to": "swap.defi",
-                      "quantity": Asset.from(amount, '4,EFX'),
-                      "memo": `swap,${valueAmount},${swapDirection.EfxToUsdt}`
+                    data: {
+                        from: this.client.session.actor,
+                        to: 'swap.defi',
+                        quantity: Asset.from(amount, '4,EFX'),
+                        memo: `swap,${valueAmount},${swapDirection.EfxToUsdt}`
                     }
-                  }
+                }
             })
         } catch (error) {
             console.error(error)
@@ -100,27 +100,26 @@ export class TokenService {
             const efxPrice = await this.getEfxPrice()
             const valueAmount = 1 / efxPrice * amount
             return await this.client.session.transact({
-                "action": {
-                    "account": "tethertether",
-                    "name": "transfer",
-                    "authorization": [
-                      {
-                        "actor": this.client.session.actor,
-                        "permission": this.client.session.permission
-                      }
+                action: {
+                    account: 'tethertether',
+                    name: 'transfer',
+                    authorization: [
+                        {
+                            actor: this.client.session.actor,
+                            permission: this.client.session.permission
+                        }
                     ],
-                    "data": {
-                      "from": this.client.session.actor,
-                      "to": "swap.defi",
-                      "quantity": Asset.from(amount, '4,USDT'),
-                      "memo": `swap,${valueAmount},${swapDirection.UsdtToEfx}`
+                    data: {
+                        from: this.client.session.actor,
+                        to: 'swap.defi',
+                        quantity: Asset.from(amount, '4,USDT'),
+                        memo: `swap,${valueAmount},${swapDirection.UsdtToEfx}`
                     }
-                  }
+                }
             })
         } catch (error) {
             console.error(error)
             throw new Error('Error swapping out of EFX')
         }
     }
-
 }

@@ -1,4 +1,3 @@
-import { efxTicker } from './../src/types/user';
 import { Client } from '../src/client'
 import { expect, test } from 'vitest'
 

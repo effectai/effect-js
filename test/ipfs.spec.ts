@@ -1,4 +1,3 @@
-import { IpfsContentFormat } from '../src/services/ipfs'
 import { Client } from '../src/client'
 import { expect, test } from 'vitest'
 

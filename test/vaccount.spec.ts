@@ -25,7 +25,7 @@ describe('VAccount', async () => {
 
     test('Get VAccount', async () => {
         const response = await client.vaccount.getAll()
-        const [ vaccount ] = response.rows
+        const [ vaccount ] = response
         expect(vaccount).toBeDefined()
         const [ , name ] = vaccount.address
         expect(name).toEqual(process.env.VITE_EOSACC)

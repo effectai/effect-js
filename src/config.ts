@@ -1,7 +1,7 @@
-import { ClientConfig } from './types/config';
+import { type ClientConfig } from './types/config'
 
-const configPresets: {[key: string]: ClientConfig} = {
-    'jungle4': {
+const configPresets: Record<string, ClientConfig> = {
+    jungle4: {
         network: 'jungle4',
         eosExplorerUrl: '',
         eosRpcUrl: 'https://jungle4.greymass.com/',
@@ -23,7 +23,7 @@ const configPresets: {[key: string]: ClientConfig} = {
         forceVaccountId: 0, // TODO
         ipfsCache: true
     },
-    'eos': {
+    eos: {
         network: 'eos',
         eosExplorerUrl: '',
         eosRpcUrl: 'https://eos.greymass.com/',
@@ -45,6 +45,6 @@ const configPresets: {[key: string]: ClientConfig} = {
         forceVaccountId: 0, // TODO
         ipfsCache: true
     }
-};
+}
 
-export { configPresets };
+export { configPresets }

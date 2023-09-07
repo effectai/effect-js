@@ -1,9 +1,9 @@
-import { Reservation, Batch, Campaign, TasksSettings } from './../types/campaign';
-import { Client } from '../client';
-import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
+import { type Reservation, type Batch, type Campaign, type TasksSettings } from './../types/campaign'
+import { type Client } from '../client'
+import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope'
 
 export class TasksService {
-    constructor(private client: Client) {}
+    constructor (private readonly client: Client) {}
 
     // TODO: Keep this one?
     /**
@@ -14,7 +14,7 @@ export class TasksService {
         const response = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.tasksContract,
             table: 'campaign',
-            scope: this.client.config.tasksContract,
+            scope: this.client.config.tasksContract
         })
         return response.rows
     }
@@ -37,7 +37,7 @@ export class TasksService {
                 table: 'campaign',
                 scope: this.client.config.tasksContract,
                 lower_bound: lowerBound,
-                upper_bound: upperBound,
+                upper_bound: upperBound
             })
 
             rows.push(...response.rows)
@@ -66,7 +66,7 @@ export class TasksService {
             scope: this.client.config.tasksContract,
             lower_bound: UInt128.from(id),
             upper_bound: UInt128.from(id),
-            limit: 1,
+            limit: 1
         })
 
         const [campaign] = response.rows
@@ -85,7 +85,7 @@ export class TasksService {
             scope: this.client.config.tasksContract,
             lower_bound: UInt128.from(batchId),
             upper_bound: UInt128.from(batchId),
-            limit: 1,
+            limit: 1
         })
 
         const [batch] = response.rows
@@ -143,10 +143,10 @@ export class TasksService {
             const response = await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.tasksContract,
                 table: 'reservation',
-                scope: this.client.config.tasksContract,
+                scope: this.client.config.tasksContract
             })
 
-            while(response.more) {
+            while (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 const lowerBound = UInt64.from(lastRow.id + 1)
                 const upperBound = UInt64.from(lastRow.id + 21)
@@ -155,7 +155,7 @@ export class TasksService {
                     table: 'reservation',
                     scope: this.client.config.tasksContract,
                     lower_bound: lowerBound,
-                    upper_bound: upperBound,
+                    upper_bound: upperBound
                 })
                 response.rows.push(...moreResponse.rows)
                 response.more = moreResponse.more
@@ -177,9 +177,9 @@ export class TasksService {
     async getCampaignReservation (campaignId: number, accountId: number): Promise<Reservation> {
         try {
             // create a composite Uint64 key from two Uint32 keys
-            const a = new Uint8Array(8);
-            a.set(UInt32.from(campaignId).byteArray, 0);
-            a.set(UInt32.from(accountId).byteArray, 4);
+            const a = new Uint8Array(8)
+            a.set(UInt32.from(campaignId).byteArray, 0)
+            a.set(UInt32.from(accountId).byteArray, 4)
             const bound = UInt64.from(a)
 
             const response = await this.client.eos.v1.chain.get_table_rows({
@@ -188,11 +188,10 @@ export class TasksService {
                 index_position: 'secondary',
                 scope: this.client.config.tasksContract,
                 upper_bound: bound,
-                lower_bound: bound,
+                lower_bound: bound
             })
-            
 
-            const [ reservation ] = response.rows
+            const [reservation] = response.rows
             return reservation
         } catch (error) {
             console.error(error)
@@ -211,9 +210,9 @@ export class TasksService {
             const vaccount = await this.client.vaccount.get()
 
             // create a composite Uint64 key from two Uint32 keys
-            const a = new Uint8Array(8);
-            a.set(UInt32.from(campaignId).byteArray, 0);
-            a.set(UInt32.from(vaccount.id).byteArray, 4);
+            const a = new Uint8Array(8)
+            a.set(UInt32.from(campaignId).byteArray, 0)
+            a.set(UInt32.from(vaccount.id).byteArray, 4)
             const bound = UInt64.from(a)
 
             const response = await this.client.eos.v1.chain.get_table_rows({
@@ -222,10 +221,10 @@ export class TasksService {
                 index_position: 'secondary',
                 scope: this.client.config.tasksContract,
                 upper_bound: bound,
-                lower_bound: bound,
+                lower_bound: bound
             })
 
-            const [ reservation ] = response.rows
+            const [reservation] = response.rows
             return reservation
         } catch (error) {
             console.error(error)
@@ -253,39 +252,35 @@ export class TasksService {
      * ```
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
-        try {
-            this.client.requireSession()
+        this.client.requireSession()
 
-            const myReservation = await this.getMyReservation(campaignId)
-            if (myReservation) {
-                return myReservation
-            } else {
-                const vacc = await this.client.vaccount.get()
-                await this.client.session.transact({
-                    action: {
-                        account: this.client.config.tasksContract,
-                        name: 'reservetask',
-                        authorization: [{
-                            actor: this.client.session.actor,
-                            permission: this.client.session.permission,
-                        }],
-                        data: {
-                            campaign_id: campaignId,
-                            account_id: vacc.id,
-                            quali_assets: qualiAssets,
-                            payer: this.client.session.actor,
-                            sig: null,
-                        },
+        const myReservation = await this.getMyReservation(campaignId)
+        if (myReservation !== undefined) {
+            return myReservation
+        } else {
+            const vacc = await this.client.vaccount.get()
+            await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'reservetask',
+                    authorization: [{
+                        actor: this.client.session.actor,
+                        permission: this.client.session.permission
+                    }],
+                    data: {
+                        campaign_id: campaignId,
+                        account_id: vacc.id,
+                        quali_assets: qualiAssets,
+                        payer: this.client.session.actor,
+                        sig: null
                     }
-                })
+                }
+            })
 
-                // TODO: Sleep for a bit for now, use finality plugin later.
-                await new Promise(resolve => setTimeout(resolve, 3000))
+            // TODO: Sleep for a bit for now, use finality plugin later.
+            await new Promise(resolve => setTimeout(resolve, 3000))
 
-                return await this.getMyReservation(campaignId)
-            }
-        } catch (error) {
-            throw error
+            return await this.getMyReservation(campaignId)
         }
     }
 
@@ -294,8 +289,7 @@ export class TasksService {
      * @param accountId id of the account
      * @returns {Promise<Qualification>} Qualification NFT
      */
-    async getQualifications(accountId: number): Promise<any[]> {
-
+    async getQualifications (accountId: number): Promise<any[]> {
         // We should look at the current implementation for how AtomicAssets implemented this.
         // We can mock this by using atomic assets nfts on jungle
 
@@ -306,9 +300,9 @@ export class TasksService {
             limit: 50,
             upper_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
             lower_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
-            index_position: 'secondary', // TODO: Which index do I need to have?
+            index_position: 'secondary' // TODO: Which index do I need to have?
             // key_type: 'sha256', // TODO: Is this needed? if this is set than the lowerbound needs to be of type Checksum
-        });
+        })
 
         return response.rows
     }
@@ -319,7 +313,6 @@ export class TasksService {
      *
      */
     async getQualificationCollection (): Promise<any> {
-
         const bounds: string = 'effect.network'
 
         const response = await this.client.eos.v1.chain.get_table_rows({
@@ -329,7 +322,7 @@ export class TasksService {
             limit: 1,
             upper_bound: UInt128.from(1),
             lower_bound: UInt128.from(1),
-            index_position: 'primary',
+            index_position: 'primary'
 
         })
     }
@@ -339,18 +332,18 @@ export class TasksService {
      * @returns the payout delay in seconds
      * @throws error if the payout delay is not available
      */
-        getForceSettings = async (): Promise<TasksSettings> => {
-            try {
-                const response = await this.client.eos.v1.chain.get_table_rows({
-                    code: this.client.config.tasksContract,
-                    scope: this.client.config.tasksContract,
-                    table: 'settings',
-                })
-                const [config] = response.rows
-                return config
-            } catch (error) {
-                console.error(error)
-                throw new Error('Error retrieving Force settings')
-            }
+    getForceSettings = async (): Promise<TasksSettings> => {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                scope: this.client.config.tasksContract,
+                table: 'settings'
+            })
+            const [config] = response.rows
+            return config
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error retrieving Force settings')
         }
+    }
 }
