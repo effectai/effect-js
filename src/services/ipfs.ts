@@ -13,31 +13,39 @@ export class IpfsService {
 
     upload = async (obj: object): Promise<any> => {
       try {
-        // const stringified = JSON.stringify(obj)
-        // const blob = new Blob([stringified], { type: 'application/json' })
-        // const formData = new FormData()
-        // const blobText = await blob.text()
-        // formData.append('file', blob)
+        const stringified = JSON.stringify(obj)
 
-        // if (blob.size > 1024 * 1024 * 10) {
-        //   throw new Error('File too large, max file size is: 10MB')
-        // } else {
-        //   const requestOptions: RequestInit = {
-        //     method: 'POST',
-        //     body: formData,
-        //   }
-        //   const response = await this.client.fetchProvider.fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, requestOptions)
-        //   if (!response.ok) {
-        //     const errorText = await response.text()
-        //     console.error(errorText)
-        //     throw new Error('Error uploading file to IPFS')
-        //   } else {
-        //     const json = await response.json()
-        //     return json.Hash as string
-        //   }
-        // }
+        let blob: any;
+        if (Blob || window.Blob) {
+          blob = new Blob([stringified], { type: 'application/json' })
+        } else {
+          const Blob = (await import('node:buffer')).Blob
+          blob = new Blob([stringified], { type: 'application/json' })
+        }
 
-        return null
+        const formData = new FormData()
+        formData.append('file', blob)
+
+        if (blob.size > 1024 * 1024 * 10) {
+          throw new Error('File too large, max file size is: 10MB')
+        } else {
+          const requestOptions: RequestInit = {
+            method: 'POST',
+            body: formData,
+          }
+
+          const response = await this.client.fetchProvider
+              .fetch(`${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`, requestOptions)
+
+          if (!response.ok) {
+            const errorText = await response.text()
+            console.error(errorText)
+            throw new Error('Error uploading file to IPFS')
+          } else {
+            const json = await response.json()
+            return json.Hash as string
+          }
+        }
       } catch (error) {
         console.error(error)
         throw new Error(error)
