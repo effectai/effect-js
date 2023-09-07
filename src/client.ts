@@ -3,7 +3,7 @@ import { configPresets } from './config';
 import { IpfsService } from './services/ipfs';
 import { TasksService } from './services/tasks';
 import { VAccountService } from './services/vaccount';
-import { TokenService } from './services/efx';
+import { TokenService } from './services/token';
 
 import { APIClient, FetchProvider } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
@@ -18,9 +18,8 @@ export class Client {
     session!: Session;
 
     /**
-     *
+     * Create a new Effect Network Client instance
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
-     * @param {FetchProviderOptions} fetchConfig, Supply a custom fetch config to the EffectSDK fetch provider
      */
     constructor (environment: string = 'jungle4') {
         this.config = configPresets[environment];
