@@ -56,6 +56,7 @@ export class TokenService {
     }
 
     /**
+     * TODO: Add slippage tolerance
      * Swaps out of EFX into USDT
      * @param amount The amount of EFX to swap out of
      * @returns TransactResult
@@ -90,6 +91,7 @@ export class TokenService {
     }
 
     /**
+     * TODO: Add slippage tolerance
      * Swaps into EFX from USDT
      * @param amount The amount of USDT to swap into EFX
      * @returns TransactResult
