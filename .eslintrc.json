@@ -4,19 +4,26 @@
         "es2021": true,
         "node": true
     },
-    "extends": [
-        "standard",
-        "prettier/@typescript-eslint",
-        "plugin:pretties/recommended"
+    "extends": "standard-with-typescript",
+    "overrides": [
+        {
+            "env": {
+                "node": true
+            },
+            "files": [
+                ".eslintrc.{js,cjs}"
+            ],
+            "parserOptions": {
+                "sourceType": "script"
+            }
+        }
     ],
-    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 2021,
+        "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": [
-        "@typescript-eslint"
-    ],
     "rules": {
+        "indent": "off",
+        "@typescript-eslint/indent": ["error", 4]
     }
 }

@@ -1,13 +1,11 @@
-# SDK feature list.
+# SDK feature list
 
 - [x] EFX to FIAT conversion function
 - [x] Submit task action
-- [x] ~~Get task data from IPFS~~
+- [x] Get task data from IPFS
 - [x] Get pending payouts (copy from old)
 - [x] Payout action (copy from old)
-- [x] Cashout action (copy from old)
-
-
+- [ ] Cashout action (copy from old)
 
 ## Current methods list
 
@@ -27,7 +25,7 @@ for requestors.
 ### Client
 
 - [ ] connectAccount
-- [ ]EFX to usdt on defibox
+- [x] EFX to usdt on defibox
 
 ### Account
 
@@ -58,9 +56,7 @@ How will these functions change now that we are using NFT's?
 
 How would the interface for managing Qualifications look like?
 
-
-- [ ] mintQualification
-- [ ] 
+- [ ] ~~mintQualification~~
 
 ### Campaign
 

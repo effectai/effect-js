@@ -73,12 +73,12 @@ describe('Tasks', async () => {
     })
 
     // TODO: Disabled until fetch is fixed
-    // test('Get Task from Campaign', async () => {
-    //     const campaign = await client.tasks.getCampaign(0)
-    //     const reservation = await client.tasks.reserveTask(campaign.id)
-    //     const taskData = await client.tasks.getTaskData(reservation)
-    //     expect(taskData).toBeDefined()
-    // })
+    test('Get Task from Campaign', async () => {
+        const campaign = await client.tasks.getCampaign(0)
+        const reservation = await client.tasks.reserveTask(campaign.id)
+        const taskData = await client.tasks.getTaskData(reservation)
+        expect(taskData).toBeDefined()
+    })
 
 
     test('Check settings for task contract', async () => {

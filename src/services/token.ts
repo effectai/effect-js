@@ -1,4 +1,4 @@
-import { DefiBoxPair } from './../types/user';
+import { DefiBoxPair } from '../types/user';
 import { Asset, UInt128 } from '@wharfkit/antelope';
 import { Client } from '../client';
 import { TransactResult } from '@wharfkit/session';
@@ -16,6 +16,11 @@ export enum swapDirection {
 export class TokenService {
     constructor(private client: Client) {}
 
+    /**
+     * Returns a DefiBox pair, 
+     * @param pairEnum DefiBoxPairEnum
+     * @returns DefiBoxPair
+     */
     async getDefiBoxPair (pairEnum: DefiBoxPairEnum): Promise<DefiBoxPair> {
         try {
             const pairResponse = await this.client.eos.v1.chain.get_table_rows({
@@ -34,6 +39,10 @@ export class TokenService {
         }
     }
 
+    /**
+     * Returns the current EFX price in USDT from DefiBox
+     * @returns EFX price in USDT
+     */
     async getEfxPrice (): Promise<number> {
         try {
             const eosEfxPair = await this.getDefiBoxPair(DefiBoxPairEnum.EosEfx)
@@ -46,6 +55,11 @@ export class TokenService {
         }
     }
 
+    /**
+     * Swaps out of EFX into USDT
+     * @param amount The amount of EFX to swap out of
+     * @returns TransactResult
+     */
     async swapOut (amount: number): Promise<TransactResult> {
         try {
             this.client.requireSession()
@@ -75,11 +89,15 @@ export class TokenService {
         }
     }
 
+    /**
+     * Swaps into EFX from USDT
+     * @param amount The amount of USDT to swap into EFX
+     * @returns TransactResult
+     */
     async swapIn (amount: number): Promise<TransactResult> {
         try {
             this.client.requireSession()
             const efxPrice = await this.getEfxPrice()
-            // TODO: make sure if this is correct
             const valueAmount = 1 / efxPrice * amount
             return await this.client.session.transact({
                 "action": {
