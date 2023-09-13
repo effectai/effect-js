@@ -17,8 +17,6 @@
     "test:e2e": "vitest --config=test/e2e/vitest.e2e.config.js",
     "test:integration": "vitest --config=test/e2e/vitest.integration.config.js",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "webpack": "webpack --mode production --no-devtool -c webpack.config.js",
-    "webpack:dev": "webpack --mode development -c webpack.config.js",
     "build": "npm run build:esm",
     "build:cjs": "tsc --module commonjs",
     "build:esm": "tsc --module es2020",
@@ -28,10 +26,11 @@
     "docs:watch": "typedoc --watch --emit both",
     "lint": "eslint \"src/**\"",
     "prepare": "husky install",
-    "publish:public": "npm run prebuild && npm version patch && npm run build:cjs && npm run webpack && npm publish --access public",
-    "publish:next": "npm run prebuild && npm version patch &&  npm run build && npm run webpack && npm publish --tag next ",
-    "publish:cjs": "npm run prebuild && npm version patch &&  npm run build:cjs && npm run webpack && npm publish --tag cjs ",
-    "publish:esm": "npm run prebuild && npm version patch &&  npm run build:es && npm run webpack && npm publish --tag esm "
+    "publish:public": "npm run prebuild && npm version patch && npm run build:cjs && npm publish --access public",
+    "publish:next": "npm run prebuild && npm version patch && npm run build && npm publish --tag next",
+    "publish:cjs": "npm run prebuild && npm version patch && npm run build:cjs && npm publish --tag cjs",
+    "publish:esm": "npm run prebuild && npm version patch && npm run build:esm && npm publish --tag esm",
+    "publish:v2": "npm run prebuild && npm version patch && npm run build:esm && npm publish --tag v2"
   },
   "repository": {
     "type": "git",
