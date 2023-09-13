@@ -8,7 +8,7 @@ import {
     Asset,
     Name,
     NameType,
-    UInt128
+    UInt128,
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
 import { TransactResult } from '@wharfkit/session';
@@ -30,7 +30,7 @@ class ExtendedSymbol extends Struct {
 export class VAccountService {
     constructor(private client: Client) {}
 
-    async vtransfer(from_id: number, to_id: number, quantity: string) {
+    async vtransfer (from_id: number, to_id: number, quantity: string): Promise<TransactResult> {
         const transferAction = {
             account: this.client.config.vaccountContract,
             name: "vtransfer",
@@ -48,10 +48,10 @@ export class VAccountService {
                 fee: null,
             },
         }
-        return this.client.session.transact({ action: transferAction });
+        return await this.client.session.transact({ action: transferAction });
     }
 
-    async open() {
+    async open (): Promise<TransactResult> {
         const conf = this.client.config;
         const action = {
             account: conf.vaccountContract,
@@ -63,7 +63,7 @@ export class VAccountService {
                 payer: this.client.session.actor,
             },
         }
-        return this.client.session.transact({ action: action });
+        return await this.client.session.transact({ action: action });
     }
 
     /**
@@ -87,9 +87,9 @@ export class VAccountService {
     /**
      * Get all VAccount rows of the configured account and token contract
      */
-    async getAll() {
+    async getAll (): Promise<VAccount[]> {
         const { conf, keycs } = this.generateCheckSumForVAccount();
-        return await this.client.eos.v1.chain.get_table_rows({
+        const response = await this.client.eos.v1.chain.get_table_rows({
             code: conf.vaccountContract,
             table: 'account',
             scope: conf.vaccountContract,
@@ -98,6 +98,7 @@ export class VAccountService {
             index_position: 'secondary',
             key_type: 'sha256',
         });
+        return response.rows;
     }
 
     /**
@@ -108,59 +109,59 @@ export class VAccountService {
      */
     getPendingPayout = async (accountId: number): Promise<any> => {
         const response = await this.client.eos.v1.chain.get_table_rows({
-                code: this.client.config.tasksContract,
-                scope: this.client.config.tasksContract,
-                table: 'payment',
-                index_position: 'tertiary',
-                key_type: 'i64',
-                lower_bound: UInt128.from(accountId),
-                upper_bound: UInt128.from(accountId)
+            code: this.client.config.tasksContract,
+            scope: this.client.config.tasksContract,
+            table: 'payment',
+            index_position: 'tertiary',
+            key_type: 'i64',
+            lower_bound: UInt128.from(accountId),
+            upper_bound: UInt128.from(accountId)
         })
         console.debug(response)
         return response
     }
 
-  /**
+    /**
    * TODO: Define tests for this method
    * Receive tokens from completed tasks.
    * @param paymentId
    * @returns
    */
-  payout = async (): Promise<TransactResult> => {
-    this.client.requireSession()
+    async payout (): Promise<TransactResult> {
+        this.client.requireSession()
 
-    const actions = <any>[];
-    const vacc = await this.get()
-    const settings = await this.client.tasks.getForceSettings()
-    const payments = await this.getPendingPayout(vacc.id)
+        const actions = <any>[];
+        const vacc = await this.get()
+        const settings = await this.client.tasks.getForceSettings()
+        const payments = await this.getPendingPayout(vacc.id)
 
-    if (payments) {
-      for (const payment of payments.rows) {
-        // payout is only possible after x amount of days have passed since the last_submission_time
-        if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + settings.payout_delay_sec < ((Date.now() / 1000)))) {
-          actions.push({
-            account: this.client.config.tasksContract,
-            name: 'payout',
-            authorization: [{
-              actor: this.client.session.actor,
-              permission: this.client.session.permission
-            }],
-            data: {
-              payment_id: payment.id
+        if (payments) {
+            for (const payment of payments.rows) {
+                // payout is only possible after x amount of days have passed since the last_submission_time
+                if (((new Date(new Date(payment.last_submission_time) + 'UTC').getTime() / 1000) + settings.payout_delay_sec < ((Date.now() / 1000)))) {
+                    actions.push({
+                        account: this.client.config.tasksContract,
+                        name: 'payout',
+                        authorization: [{
+                            actor: this.client.session.actor,
+                            permission: this.client.session.permission
+                        }],
+                        data: {
+                            payment_id: payment.id
+                        }
+                    })
+                }
             }
-          })
+        } else {
+            throw new Error('No pending payouts found');
         }
-      }
-    } else {
-      throw new Error('No pending payouts found');
+        return await this.client.session.transact({ actions: actions });
     }
-    return await this.client.session.transact({ actions: actions });
-  }
 
     /**
      * Generate checkSum for vaccount
      */
-    generateCheckSumForVAccount () {
+    generateCheckSumForVAccount (): { conf: any, keycs: Checksum256 } {
         const conf = this.client.config;
         let enc = new ABIEncoder(32);
         Name.from(conf.tokenContract).toABI(enc);
