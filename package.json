@@ -30,7 +30,7 @@
     "publish:next": "npm run prebuild && npm version patch && npm run build && npm publish --tag next",
     "publish:cjs": "npm run prebuild && npm version patch && npm run build:cjs && npm publish --tag cjs",
     "publish:esm": "npm run prebuild && npm version patch && npm run build:esm && npm publish --tag esm",
-    "publish:v2": "npm run prebuild && npm version patch && npm run build:esm && npm publish --tag v2"
+    "publish:rc": "npm run prebuild && npm version patch && npm run build:esm && npm publish --tag rc"
   },
   "repository": {
     "type": "git",
