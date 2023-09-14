@@ -25,7 +25,7 @@ export class Client {
         this.config = configPresets[environment];
         this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, { 
             fetch : fetch || window.fetch
-         });
+        });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
 
@@ -34,19 +34,29 @@ export class Client {
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
 
-    login (actor: string, permission: string, privateKey: string) {
+    /**
+     * Login to the Effect Network with a private key
+     * @param actor EOS account name of the user
+     * @param permission EOS permission of the user
+     * @param privateKey EOS private key of the user
+     */
+    login (actor: string, permission: string, privateKey: string): void {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
         this.session = new Session({
-            actor: actor,
-            permission: permission,
+            actor,
+            permission,
+            walletPlugin,
             chain: {
                 id: this.config.eosChainId,
                 url: this.config.eosRpcUrl,
             },
-            walletPlugin,
         });
     }
 
+    /**
+     * Check if the user is logged in
+     * @returns {boolean} Whether or not the user is logged in
+     */
     isLoggedIn (): boolean {
         return this.session !== undefined && this.session !== null;
     }
