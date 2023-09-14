@@ -40,7 +40,7 @@ export class Client {
      * @param permission EOS permission of the user
      * @param privateKey EOS private key of the user
      */
-    loginWithPK (actor: string, permission: string, privateKey: string): void {
+    login (actor: string, permission: string, privateKey: string): void {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
         this.session = new Session({
             actor,
