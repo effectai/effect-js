@@ -23,7 +23,7 @@ export class Client {
      */
     constructor (environment: string = 'jungle4') {
         this.config = configPresets[environment];
-        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, { 
+        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
             fetch : fetch || window.fetch
         });
         this.eos = new APIClient({ provider: this.fetchProvider });
@@ -58,7 +58,7 @@ export class Client {
      * @returns {boolean} Whether or not the user is logged in
      */
     isLoggedIn (): boolean {
-        return this.session !== undefined && this.session !== null;
+        return this.session === undefined && this.session === null;
     }
 
     /**
