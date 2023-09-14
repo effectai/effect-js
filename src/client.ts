@@ -34,6 +34,15 @@ export class Client {
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
 
+
+    /**
+     * Login to the Effect Network with a session
+     * @param session Session object
+     */
+    loginWithSession (session: Session): void {
+        this.session = session;
+    }
+
     /**
      * Login to the Effect Network with a private key
      * @param actor EOS account name of the user
@@ -42,7 +51,7 @@ export class Client {
      */
     login (actor: string, permission: string, privateKey: string): void {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
-        this.session = new Session({
+        this.loginWithSession(new Session({
             actor,
             permission,
             walletPlugin,
@@ -50,16 +59,7 @@ export class Client {
                 id: this.config.eosChainId,
                 url: this.config.eosRpcUrl,
             },
-        });
-    }
-
-    /**
-     * Login to the Effect Network with a session
-     * @param session Session object
-     */
-    loginWithSession (session: Session): void {
-        console.debug('loginWithSession', session);
-        this.session = session;
+        }));
     }
 
     /**
