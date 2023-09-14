@@ -40,7 +40,7 @@ export class Client {
      * @param permission EOS permission of the user
      * @param privateKey EOS private key of the user
      */
-    login (actor: string, permission: string, privateKey: string): void {
+    loginWithPK (actor: string, permission: string, privateKey: string): void {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
         this.session = new Session({
             actor,
@@ -51,6 +51,15 @@ export class Client {
                 url: this.config.eosRpcUrl,
             },
         });
+    }
+
+    /**
+     * Login to the Effect Network with a session
+     * @param session Session object
+     */
+    loginWithSession (session: Session): void {
+        console.debug('loginWithSession', session);
+        this.session = session;
     }
 
     /**
