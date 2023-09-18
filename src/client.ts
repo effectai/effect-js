@@ -24,7 +24,7 @@ export class Client {
     constructor (environment: string = 'jungle4', fetchProviderOptions?: FetchProviderOptions) {
         this.config = configPresets[environment];
         this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-            fetch : fetch || $fetch || window.fetch || fetchProviderOptions
+            fetch : fetch || window?.fetch || fetchProviderOptions
         });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
