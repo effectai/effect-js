@@ -21,10 +21,10 @@ export class Client {
      * Create a new Effect Network Client instance
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
      */
-    constructor (environment: string = 'jungle4') {
+    constructor (environment: string = 'jungle4', fetchProvider?: FetchProvider) {
         this.config = configPresets[environment];
         this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-            fetch : fetch || window.fetch
+            fetch : fetch || window.fetch || fetchProvider
         });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
@@ -33,7 +33,6 @@ export class Client {
     ipfs = new IpfsService(this);
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
-
 
     /**
      * Login to the Effect Network with a session
