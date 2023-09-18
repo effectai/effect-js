@@ -5,7 +5,7 @@ import { TasksService } from './services/tasks';
 import { VAccountService } from './services/vaccount';
 import { TokenService } from './services/token';
 
-import { APIClient, FetchProvider } from '@wharfkit/antelope';
+import { APIClient, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 
@@ -21,10 +21,10 @@ export class Client {
      * Create a new Effect Network Client instance
      * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
      */
-    constructor (environment: string = 'jungle4', fetchProvider?: FetchProvider) {
+    constructor (environment: string = 'jungle4', fetchProviderOptions?: FetchProviderOptions) {
         this.config = configPresets[environment];
         this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-            fetch : fetch || window.fetch || fetchProvider
+            fetch : fetch || window.fetch || fetchProviderOptions
         });
         this.eos = new APIClient({ provider: this.fetchProvider });
     }
