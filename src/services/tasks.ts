@@ -25,7 +25,7 @@ export class TasksService {
      * Retrieve all campaigns published to Effect Network
      * @returns {Campaign[]} Promise<Campaign[]>
      */
-    async getAllCampaigns (): Promise<Campaign[]> {
+    async getAllCampaigns (ipfsFetch: boolean = true): Promise<Campaign[]> {
         const rows: Campaign[] = []
         let lowerBound: UInt128 = UInt128.from(0)
         let upperBound: UInt128 = UInt128.from(20)
@@ -51,6 +51,12 @@ export class TasksService {
             }
         }
 
+        if (ipfsFetch) {
+            for (const campaign of rows) {
+                campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+            }
+        }
+
         return rows
     }
 
@@ -59,7 +65,7 @@ export class TasksService {
      * @param id id of the campaign
      * @returns {Promise<Campaign>} Campaign
      */
-    async getCampaign (id: number): Promise<Campaign> {
+    async getCampaign (id: number, fetchIpfs: boolean = true): Promise<Campaign> {
         const response = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.tasksContract,
             table: 'campaign',
@@ -69,7 +75,10 @@ export class TasksService {
             limit: 1,
         })
 
-        const [campaign] = response.rows
+        const [campaign]: Campaign[] = response.rows
+        if (fetchIpfs) {
+            campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+        }
         return campaign
     }
 
