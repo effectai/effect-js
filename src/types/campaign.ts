@@ -1,29 +1,33 @@
 export interface Campaign {
     id: number
-    owner: string[]
+    tasks_done: number
+    total_tasks: number
+    active_batch: number
+    num_batches: number
+    owner: [string, string]
+    paused: number
     content: {
         field_0: number
         field_1: string
     }
+    max_task_time: number
     reward: {
         quantity: string
         contract: string
     }
-    qualis?: Array<{ key: number, value: number }>
+    qualis?: any[]
     info?: {
+        version: number
         title: string
         description: string
         instructions: string
         template: string
+        input_schema?: any
+        output_schema?: any
         image: string
-        category: string
-        example_task: {
-            image_url: string
-        }
-        version: number
-        webhook: string
-        reward: string
-        estimated_time: string
+        category?: any
+        example_task?: any
+        estimated_time: number
     }
 }
 
