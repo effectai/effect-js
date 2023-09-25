@@ -262,39 +262,34 @@ export class TasksService {
      * ```
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
-        try {
-            this.client.requireSession()
+        this.client.requireSession()
+        const myReservation = await this.getMyReservation(campaignId)
+        if (myReservation) {
+            return myReservation
+        } else {
+            const vacc = await this.client.vaccount.get()
+            await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'reservetask',
+                    authorization: [{
+                        actor: this.client.session.actor,
+                        permission: this.client.session.permission,
+                    }],
+                    data: {
+                        campaign_id: campaignId,
+                        account_id: vacc.id,
+                        quali_assets: qualiAssets,
+                        payer: this.client.session.actor,
+                        sig: null,
+                    },
+                }
+            })
 
-            const myReservation = await this.getMyReservation(campaignId)
-            if (myReservation) {
-                return myReservation
-            } else {
-                const vacc = await this.client.vaccount.get()
-                await this.client.session.transact({
-                    action: {
-                        account: this.client.config.tasksContract,
-                        name: 'reservetask',
-                        authorization: [{
-                            actor: this.client.session.actor,
-                            permission: this.client.session.permission,
-                        }],
-                        data: {
-                            campaign_id: campaignId,
-                            account_id: vacc.id,
-                            quali_assets: qualiAssets,
-                            payer: this.client.session.actor,
-                            sig: null,
-                        },
-                    }
-                })
+            // TODO: Sleep for a bit for now, use finality plugin later.
+            await new Promise(resolve => setTimeout(resolve, 3000))
 
-                // TODO: Sleep for a bit for now, use finality plugin later.
-                await new Promise(resolve => setTimeout(resolve, 3000))
-
-                return await this.getMyReservation(campaignId)
-            }
-        } catch (error) {
-            throw error
+            return await this.getMyReservation(campaignId)
         }
     }
 
