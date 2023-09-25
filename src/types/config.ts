@@ -9,7 +9,7 @@ export interface ClientConfig {
    * EOS Explorer Url
    * @default https://bloks.io
    */
-  eosExplorerUrl: string
+  explorerUrl: string
 
   /**
    * EOS RPC node URL
