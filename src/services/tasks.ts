@@ -135,7 +135,34 @@ export class TasksService {
       * Call submittask(camapign_id, task_idx, data, account_id, sig). Note to use _task_.task_idx for the task_idx parameter (not the ID).
       *     sig (for BSC only): to avoid replay attacks, the signature is (mark)(campaign_id)(task_idx)(data). The mark value is 5.
      */
-    async submitTask (campaignId: number, taskId: number, data: any): Promise<any> {}
+    async submitTask (campaignId: number, taskId: number, data: any): Promise<any> {
+        try {
+            const ipfsData = await this.client.ipfs.upload(data)
+            const vacc = await this.client.vaccount.get()
+            const response = await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'submittask',
+                    authorization: [{
+                        actor: this.client.session.actor,
+                        permission: this.client.session.permission,
+                    }],
+                    data: {
+                        campaign_id: campaignId,
+                        task_idx: taskId,
+                        data: ipfsData,
+                        account_id: vacc.id,
+                        payer: this.client.session.actor,
+                        sig: null,
+                    },
+                }
+            });
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Reserve next task
@@ -199,7 +226,6 @@ export class TasksService {
                 upper_bound: bound,
                 lower_bound: bound,
             })
-            
 
             const [ reservation ] = response.rows
             return reservation
@@ -298,8 +324,7 @@ export class TasksService {
      * @param accountId id of the account
      * @returns {Promise<Qualification>} Qualification NFT
      */
-    async getQualifications(accountId: number): Promise<any[]> {
-
+    async getQualifications (accountId: number): Promise<any[]> {
         // We should look at the current implementation for how AtomicAssets implemented this.
         // We can mock this by using atomic assets nfts on jungle
 
@@ -323,7 +348,6 @@ export class TasksService {
      *
      */
     async getQualificationCollection (): Promise<any> {
-
         const bounds: string = 'effect.network'
 
         const response = await this.client.eos.v1.chain.get_table_rows({
@@ -334,7 +358,6 @@ export class TasksService {
             upper_bound: UInt128.from(1),
             lower_bound: UInt128.from(1),
             index_position: 'primary',
-
         })
     }
 
