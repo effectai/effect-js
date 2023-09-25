@@ -14,7 +14,7 @@ export class Client {
 
     readonly config: ClientConfig;
     readonly fetchProvider: FetchProvider;
-    readonly eos!: APIClient;
+    readonly eos: APIClient;
     session!: Session;
 
     /**
@@ -59,6 +59,13 @@ export class Client {
                 url: this.config.eosRpcUrl,
             },
         }));
+    }
+
+    /**
+     * Logout from the Effect Network
+     */
+    logout (): void {
+        // this.session = null;
     }
 
     /**
