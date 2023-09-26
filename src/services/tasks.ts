@@ -183,7 +183,7 @@ export class TasksService {
                 scope: this.client.config.tasksContract,
             })
 
-            while(response.more) {
+            while (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 const lowerBound = UInt64.from(lastRow.id + 1)
                 const upperBound = UInt64.from(lastRow.id + 21)

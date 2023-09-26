@@ -7,14 +7,14 @@ export class Template {
     public info: object;
     private rendered!: string;
 
-    constructor(html, placeholders = {}, options = {}, info = {}) {
+    constructor (html: string, placeholders = {}, options = {}, info = {}) {
         this.html = html;
         this.placeholders = placeholders;
         this.options = options;
         this.info = info;
     }
 
-    public render(): string {
+    public render (): string {
         this.replacePlaceholders()
         this.injectJSVar('FORCE_OPTIONS',this.options);
         this.injectJSVar('FORCE_INFO',this.info);
@@ -24,7 +24,7 @@ export class Template {
         return this.rendered;
     }
 
-    static htmlEntities(str): string {
+    static htmlEntities (str): string {
         return String(str)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
