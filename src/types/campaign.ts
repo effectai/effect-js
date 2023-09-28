@@ -31,6 +31,25 @@ export interface Campaign {
     }
 }
 
+export interface InitCampaign {
+    quantity: string
+    max_task_time: number
+    qualis?: any[]
+    info: {
+        version: number
+        title: string
+        description: string
+        instructions: string
+        template: string
+        input_schema?: any
+        output_schema?: any
+        image: string
+        category?: any
+        example_task?: any
+        estimated_time: number
+    }
+}
+
 export interface Reservation {
     id: number
     task_idx: number
@@ -59,6 +78,12 @@ export interface Batch {
         quantity: string
         contract: string
     }
+}
+
+export interface InitBatch {
+    campaign_id: number
+    repetitions: number
+    data: any[]
 }
 
 /**
