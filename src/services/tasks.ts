@@ -136,10 +136,10 @@ export class TasksService {
       * Call submittask(camapign_id, task_idx, data, account_id, sig). Note to use _task_.task_idx for the task_idx parameter (not the ID).
       *     sig (for BSC only): to avoid replay attacks, the signature is (mark)(campaign_id)(task_idx)(data). The mark value is 5.
      */
-    async submitTask (campaignId: number, taskId: number, data: any): Promise<any> {
+    async submitTask (reservation: Reservation, data: any): Promise<TransactResult> {
+        console.debug('submitTask', reservation, data)
         try {
             const ipfsData = await this.client.ipfs.upload(data)
-            const vacc = await this.client.vaccount.get()
             const response = await this.client.session.transact({
                 action: {
                     account: this.client.config.tasksContract,
@@ -149,10 +149,10 @@ export class TasksService {
                         permission: this.client.session.permission,
                     }],
                     data: {
-                        campaign_id: campaignId,
-                        task_idx: taskId,
+                        campaign_id: UInt32.from(reservation.campaign_id),
+                        account_id: UInt32.from(reservation.account_id),
+                        task_idx: UInt32.from(reservation.task_idx),
                         data: ipfsData,
-                        account_id: vacc.id,
                         payer: this.client.session.actor,
                         sig: null,
                     },
@@ -165,11 +165,6 @@ export class TasksService {
         }
     }
 
-    /**
-     * Reserve next task
-     * The same process as above, ~~but make sure to update last_task_done for BSC users~~
-     */
-    async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
 
     /**
      * Retrieve all reservations
