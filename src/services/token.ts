@@ -66,12 +66,10 @@ export class TokenService {
                 "action": {
                     "account": this.client.config.tokenContract,
                     "name": "transfer",
-                    "authorization": [
-                      {
+                    "authorization": [{
                         "actor": this.client.session.actor,
                         "permission": this.client.session.permission
-                      }
-                    ],
+                    }],
                     "data": {
                       "from": this.client.session.actor,
                       "to": this.client.config.vaccountContract,
@@ -116,12 +114,10 @@ export class TokenService {
                 "action": {
                     "account": "effecttokens",
                     "name": "transfer",
-                    "authorization": [
-                      {
+                    "authorization": [{
                         "actor": this.client.session.actor,
                         "permission": this.client.session.permission
-                      }
-                    ],
+                    }],
                     "data": {
                       "from": this.client.session.actor,
                       "to": "swap.defi",
@@ -150,12 +146,10 @@ export class TokenService {
                 "action": {
                     "account": "tethertether",
                     "name": "transfer",
-                    "authorization": [
-                      {
+                    "authorization": [{
                         "actor": this.client.session.actor,
                         "permission": this.client.session.permission
-                      }
-                    ],
+                    }],
                     "data": {
                       "from": this.client.session.actor,
                       "to": "swap.defi",
