@@ -280,6 +280,23 @@ export class TasksService {
         }
     }
 
+    /**
+     * 
+     */
+    getAllAccTaskIdx = async (): Promise<any> => {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'acctaskidx',
+                scope: this.client.config.tasksContract,
+            })
+            console.debug('getAllAccTaskIdx', response)
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Retrieve all reservations
