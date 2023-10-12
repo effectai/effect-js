@@ -105,3 +105,10 @@ export interface TasksSettings {
     fee_percentage: string
     ram_payer?: string
 }
+
+
+export interface RepsDone {
+    campaign_id: number;
+    task_idx: number;
+    value: number;
+}
