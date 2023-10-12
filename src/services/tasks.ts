@@ -102,6 +102,52 @@ export class TasksService {
     }
 
     /**
+     * Create batch
+     */
+    async makeBatch (initBatch: InitBatch): Promise<any> {
+        this.client.requireSession()
+
+        try {
+            const settings = await this.getForceSettings()
+            const vacc = await this.client.vaccount.get()
+            const campaign = await this.getCampaign(initBatch.campaign_id)
+            const assetQuantity = Asset.from(campaign.reward.quantity)
+            const batchPrice = assetQuantity.value * initBatch.repetitions
+
+            // Check if the user has enough funds to pay for the batch
+            // if (Asset.from(vacc.balance.quantity).value < batchPrice) {
+            //     throw new Error('Not enough funds in vAccount to pay for batch')
+            // }
+
+            // Validate the batch before uploading, will throw error
+            if (campaign.info?.input_schema) {
+                validateBatchData(initBatch, campaign)
+            }
+
+            const newBatchId = campaign.num_batches + 1
+            const hash = await this.client.ipfs.upload(initBatch.data)
+            const makeBatch = this.client.action.makeBatchAction(settings, initBatch, hash)
+            const vTransfer = this.client.action.vTransferAction(settings, vacc, batchPrice)
+            const publishBatch = this.client.action.publishBatchAction(newBatchId, initBatch.repetitions) // TODO Check if batchId is correct.
+
+            let actions: any[]
+
+            if (Asset.from(vacc.balance.quantity).value < batchPrice) {
+                const depositAction = this.client.action.depositAction(assetQuantity.value, vacc)
+                actions = [depositAction, makeBatch, vTransfer, publishBatch]
+            } else {
+                actions = [makeBatch, vTransfer, publishBatch]
+            }
+
+            const response = await this.client.session.transact({ actions })
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
+    /**
      * Fetch the task data
      * Load the batch the task is in (get _task_.batch_id from the batch table)
      * Get the batch IPFS hash from batch.content.value
