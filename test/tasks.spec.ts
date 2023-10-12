@@ -43,7 +43,9 @@ describe('Tasks', async () => {
     })
 
     test('Get Batch from Campaign', async () => {
-        const batch = await client.tasks.getBatch(0)
+        const campaign = await client.tasks.getCampaign(3)
+        const batch = await client.tasks.getBatch(campaign.num_batches.valueOf())
+        console.debug('batch', batch)
         expect(batch).toBeDefined()
         expect(batch.id).toEqual(0)
     })
@@ -78,6 +80,20 @@ describe('Tasks', async () => {
         const reservation = await client.tasks.reserveTask(campaign.id)
         const taskData = await client.tasks.getTaskData(reservation)
         expect(taskData).toBeDefined()
+    })
+
+    test('Get reps done', async () => {
+        const repsDone = await client.tasks.getAllRepsDone()
+        console.log('repsDoneeeeeeeeeeeeeeeeeeee', repsDone)
+        expect(repsDone).toBeDefined()
+        expect(repsDone.length).toBeDefined()
+        expect(repsDone.length).toBeGreaterThan(0)
+    })
+
+    test('Get acctaskidx', async () => {
+        const acctaskidx = await client.tasks.getAllAccTaskIdx()
+        expect(acctaskidx).toBeDefined()
+        expect(acctaskidx).toBeTypeOf('number')
     })
 
 
