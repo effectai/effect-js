@@ -8,6 +8,7 @@ import { TokenService } from './services/token';
 import { APIClient, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
+import { ActionService } from './services/actions';
 
 export class Client {
     static __classname = 'Client'
@@ -33,6 +34,7 @@ export class Client {
     ipfs = new IpfsService(this);
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
+    action = new ActionService(this);
 
     /**
      * Login to the Effect Network with a session
