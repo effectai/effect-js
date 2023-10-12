@@ -83,6 +83,39 @@ export class TasksService {
     }
 
     /**
+     * Create a new campaign
+     * @param campaign InitCampaign
+     */
+    async makeCampaign (campaign: InitCampaign): Promise<TransactResult> {
+        this.client.requireSession()
+        try {
+            const hash = await this.client.ipfs.upload(campaign.info)
+            const response = await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'mkcampaign',
+                    authorization: [{
+                        actor: this.client.session.actor,
+                        permission: this.client.session.permission,
+                    }],
+                    data: {
+                        owner: this.client.session.actor,
+                        content: { field_0: 0, field_1: hash },
+                        max_task_time: campaign.max_task_time,
+                        reward: { quantity: campaign.quantity, contract: this.client.config.tokenContract },
+                        qualis: campaign.qualis ?? [], // TODO: Implement this later
+                        payer: this.client.session.actor,
+                    },
+                }
+            })
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
+    /**
      * Retrieve Batch by id
      * @param id id of the batch
      * @returns {Promise<Batch>} Batch
