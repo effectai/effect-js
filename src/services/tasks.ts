@@ -130,6 +130,26 @@ export class TasksService {
             throw new Error(error.message);
         }
     }
+
+    /**
+     * Task availability
+     * TODO: This is a WIP
+     */
+    async taskAvailable (reservation: Reservation): Promise<boolean> {
+        try {
+            const batch = await this.getBatch(reservation.batch_id)
+
+            // Is it true that when the num_tasks is equal to the task_idx that the batch there is still work to be done in the batch?
+            // How is this affected when there are more than 1 batches?
+            // How is this affected when there are more reps?
+            // Does num_tasks change when new tasks are added or removed?
+            return batch.num_tasks >= reservation.task_idx
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
     /**
      * Get repitions done for a task in a campaign.
      */
