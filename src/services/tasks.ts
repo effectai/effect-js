@@ -153,7 +153,6 @@ export class TasksService {
         this.client.requireSession()
 
         try {
-            const settings = await this.getForceSettings()
             const vacc = await this.client.vaccount.get()
             const campaign = await this.getCampaign(initBatch.campaign_id)
             const assetQuantity = Asset.from(campaign.reward.quantity)
@@ -171,8 +170,8 @@ export class TasksService {
 
             const newBatchId = campaign.num_batches + 1
             const hash = await this.client.ipfs.upload(initBatch.data)
-            const makeBatch = this.client.action.makeBatchAction(settings, initBatch, hash)
-            const vTransfer = this.client.action.vTransferAction(settings, vacc, batchPrice)
+            const makeBatch = await this.client.action.makeBatchAction(initBatch, hash)
+            const vTransfer = this.client.action.vTransferAction(vacc, batchPrice)
             const publishBatch = this.client.action.publishBatchAction(newBatchId, initBatch.repetitions) // TODO Check if batchId is correct.
 
             let actions: any[]

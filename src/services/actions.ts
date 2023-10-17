@@ -7,43 +7,49 @@ export class ActionService {
 
     constructor(private readonly client: Client) {}
 
-    makeBatchAction = (settings: TasksSettings, initBatch: InitBatch, hash: string): AnyAction => ({
-        account: this.client.config.tasksContract,
-        name: 'mkbatch',
-        authorization: [{
-            actor: this.client.session.actor  as unknown as NameType,
-            permission: this.client.session.permission  as unknown as NameType,
-        }],
-        data: {
-            id: settings.force_vaccount_id, // TODO determine ID
-            campaign_id: initBatch.campaign_id,
-            content: { field_0: 0, field_1: hash },
-            repetitions: initBatch.repetitions,
-            payer: this.client.session.actor,
-            sig: null,
-        },
-})
-
-    vTransferAction = (settings: TasksSettings, vacc: VAccount, batchPrice: number): AnyAction => ({
-        account: this.client.config.vaccountContract,
-        name: 'vtransfer',
-        authorization: [{
-            actor: this.client.session.actor as unknown as NameType,
-            permission: this.client.session.permission as unknown as NameType,
-        }],
-        data: {
-            from_id: vacc.id,
-            to_id: settings.force_vaccount_id,
-            quantity: {
-                quantity: batchPrice,
-                contract: this.client.config.tokenContract,
+    makeBatchAction = async (initBatch: InitBatch, hash: string): Promise<AnyAction> => {
+        const settings = await this.client.tasks.getForceSettings()
+        return {
+            account: this.client.config.tasksContract,
+            name: 'mkbatch',
+            authorization: [{
+                actor: this.client.session.actor as unknown as NameType,
+                permission: this.client.session.permission as unknown as NameType,
+            }],
+            data: {
+                id: settings.force_vaccount_id, // TODO determine ID
+                campaign_id: initBatch.campaign_id,
+                content: { field_0: 0, field_1: hash },
+                repetitions: initBatch.repetitions,
+                payer: this.client.session.actor,
+                sig: null,
             },
-            memo: '',
-            payer: this.client.session.actor,
-            sig: null,
-            fee: null,
-        },
-    })
+    }
+    }
+
+    vTransferAction = async (vacc: VAccount, batchPrice: number): Promise<AnyAction> => {
+        const settings = await this.client.tasks.getForceSettings()
+        return {
+            account: this.client.config.vaccountContract,
+            name: 'vtransfer',
+            authorization: [{
+                actor: this.client.session.actor as unknown as NameType,
+                permission: this.client.session.permission as unknown as NameType,
+            }],
+            data: {
+                from_id: vacc.id,
+                to_id: settings.force_vaccount_id,
+                quantity: {
+                    quantity: batchPrice,
+                    contract: this.client.config.tokenContract,
+                },
+                memo: '',
+                payer: this.client.session.actor,
+                sig: null,
+                fee: null,
+            },
+        }
+    }
 
     publishBatchAction = (batchId: number, numTasks: number): AnyAction => ({
         account: this.client.config.tasksContract,
