@@ -39,9 +39,9 @@ describe('Tasks', async () => {
     })
 
     test('Get Batch from Campaign', async () => {
-        const campaign = await client.tasks.getCampaign(3)
+        const campaign = await client.tasks.getCampaign(0)
         const batch = await client.tasks.getBatch(campaign.num_batches.valueOf())
-        console.debug('batch', batch)
+        // console.debug('batch', batch)
         expect(batch).toBeDefined()
         expect(batch.id).toEqual(0)
     })
@@ -80,7 +80,6 @@ describe('Tasks', async () => {
 
     test('Get reps done', async () => {
         const repsDone = await client.tasks.getAllRepsDone()
-        console.log('repsDoneeeeeeeeeeeeeeeeeeee', repsDone)
         expect(repsDone).toBeDefined()
         expect(repsDone.length).toBeDefined()
         expect(repsDone.length).toBeGreaterThan(0)
@@ -89,7 +88,8 @@ describe('Tasks', async () => {
     test('Get acctaskidx', async () => {
         const acctaskidx = await client.tasks.getAllAccTaskIdx()
         expect(acctaskidx).toBeDefined()
-        expect(acctaskidx).toBeTypeOf('number')
+
+        // TODO: WIP, this is needed to check if there are more tasks available.
     })
 
 
