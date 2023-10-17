@@ -112,3 +112,11 @@ export interface RepsDone {
     task_idx: number;
     value: number;
 }
+
+export interface DaoConfig {
+    stake_contract: string;
+    proposal_contract: string;
+    utl_token_sym: { sym: string; contract: string };
+    gov_token_sym: { sym: string; contract: string };
+    allowed_collections: string[];
+}
