@@ -9,6 +9,8 @@ import { APIClient, FetchProvider, FetchProviderOptions } from '@wharfkit/antelo
 import { Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 import { ActionService } from './services/actions';
+import { AtomicAssetsService } from './services/atomic';
+import { DaoService } from './services/dao';
 
 export class Client {
     static __classname = 'Client'
@@ -35,6 +37,8 @@ export class Client {
     vaccount = new VAccountService(this);
     efx = new TokenService(this);
     action = new ActionService(this);
+    atomic = new AtomicAssetsService(this);
+    dao = new DaoService(this);
 
     /**
      * Login to the Effect Network with a session
