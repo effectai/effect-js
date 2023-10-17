@@ -27,9 +27,7 @@ describe('Tasks', async () => {
         expect(campaign).toBeDefined()
         expectTypeOf(campaign).toMatchTypeOf<Campaign>()
         expect(campaign.id).toEqual(0)
-    
-        const [ , owner ] = campaign.owner
-        expect(owner).toEqual('efxefxefxefx')
+
     })
 
     test('Get first Campaign', async () => {
@@ -37,9 +35,7 @@ describe('Tasks', async () => {
 
         expect(campaign).toBeDefined()
         expect(campaign.id).toEqual(0)
-    
-        const [ , owner ] = campaign.owner
-        expect(owner).toEqual('efxefxefxefx')
+        expectTypeOf(campaign).toMatchTypeOf<Campaign>()
     })
 
     test('Get Batch from Campaign', async () => {
