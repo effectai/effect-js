@@ -4,7 +4,7 @@ import { DaoConfig } from "../types/campaign";
 export class DaoService {
     constructor (private readonly client: Client) {}
 
-    getDaoConfig = async (): Promise<DaoConfig> => {
+    getConfig = async (): Promise<DaoConfig> => {
         try {
             const { rows } = await this.client.eos.v1.chain.get_table_rows({
                 code: this.client.config.daoContract,
