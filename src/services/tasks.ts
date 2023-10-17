@@ -1,6 +1,8 @@
-import { Reservation, Batch, Campaign, TasksSettings } from './../types/campaign';
+import { Reservation, Batch, Campaign, TasksSettings, InitCampaign, InitBatch, RepsDone } from './../types/campaign';
 import { Client } from '../client';
 import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
+import { Asset, TransactResult } from '@wharfkit/session';
+import { validateBatchData } from './utils';
 
 export class TasksService {
     constructor(private client: Client) {}
