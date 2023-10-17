@@ -68,20 +68,30 @@ export class TasksService {
      * @returns {Promise<Campaign>} Campaign
      */
     async getCampaign (id: number, fetchIpfs: boolean = true): Promise<Campaign> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'campaign',
-            scope: this.client.config.tasksContract,
-            lower_bound: UInt128.from(id),
-            upper_bound: UInt128.from(id),
-            limit: 1,
-        })
-
-        const [campaign]: Campaign[] = response.rows
-        if (fetchIpfs) {
-            campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'campaign',
+                scope: this.client.config.tasksContract,
+                lower_bound: UInt128.from(id),
+                upper_bound: UInt128.from(id),
+                limit: 1,
+            })
+    
+            const [ campaign ]: Campaign[] = response.rows
+    
+            if (campaign === undefined) {
+                throw new Error(`Campaign with id ${id} not found`)
+            }
+    
+            if (fetchIpfs) {
+                campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+            }
+            return campaign
+        } catch (error) {
+            console.error(error)
+            throw error
         }
-        return campaign
     }
 
     /**
