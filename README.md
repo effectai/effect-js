@@ -102,12 +102,3 @@ Running `publish:next` will publish a pre-release of the SDK to the npm reposito
 ```bash
 npm run publish:next
 ```
-
-## TODO
-
-- [x] Basic tests schrijven voor de functie die we nu hebben (check wharfkit/antelope tests als voorbeeldje)
-- [x] Reservation aanmaken (without qualifications)
-- [x] Reservations ophalen
-- [ ] AtomicAssets ophalen van de user
-- [ ] hiervoor wharfkit/anchor gebruiken (niet de atomicassets js package)
-- [ ] Reservering aanmaken (met qualifications)
