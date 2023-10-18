@@ -6,7 +6,7 @@ import { VAccountService } from './services/vaccount';
 import { TokenService } from './services/token';
 
 import { APIClient, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
-import { Session } from "@wharfkit/session"
+import { Name, Session } from "@wharfkit/session"
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 import { ActionService } from './services/actions';
 import { AtomicAssetsService } from './services/atomic';
@@ -90,4 +90,17 @@ export class Client {
             throw new Error('Session is required for this method, please login.');
         }
     }
+
+    /**
+     * Retrieve the actor and permission from the session
+     * @returns [{ actor: Name; permission: Name }]
+     */
+    sessionAuth = (): Array<{ actor: Name; permission: Name }> => {
+        if (!this.session) {
+            throw new Error('Session is required for this method, please login.');
+        }
+        const { actor, permission } = this.session;
+        return [{ actor, permission }];
+    }
+
 }
