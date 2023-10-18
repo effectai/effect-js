@@ -29,6 +29,18 @@ export interface ClientConfig {
   ipfsEndpoint: string
 
   /**
+   * Atomic Hub IPFS endpoint
+   * @default https://atomichub-ipfs.com/ipfs/
+   */
+  atomicHubIpfsEndpoint: string
+
+  /**
+   * Atomic Hub Asset endpoint
+   * @default https://eos.atomichub.io/explorer/asset/
+   */
+  atomicHubAssetEndpoint: string
+
+  /**
    * Force Contract
    * @default tasks.efx
    */
@@ -88,7 +100,7 @@ export interface ClientConfig {
    * @default ""
    */
   eosRelayerUrl: string
-  
+
   /**
    * Cache ipfs requests, enable or disable the ability to cache ipfs requests.
    * @default true
