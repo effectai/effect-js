@@ -1,16 +1,10 @@
 import { Client } from '../src/client'
 import { describe, expect, expectTypeOf, test, } from 'vitest'
-import { config } from 'dotenv'
 import { VAccount } from '../src/types/user'
+import { AtomicAsset } from '../src/types/campaign'
 
-config({
-    path: './test/.env.test',
-    debug: true
-})
 
-console.log('process.env.VITE_EOSACC', process.env.VITE_EOSACC)
-
-describe('VAccount', async () => {
+describe('VAccount on jungle', async () => {
 
     const client = new Client('jungle4')
 
@@ -30,5 +24,17 @@ describe('VAccount', async () => {
         const [ , name ] = vaccount.address
         expect(name).toEqual(process.env.VITE_EOSACC)
         expectTypeOf(vaccount).toMatchTypeOf<VAccount>()
+    })
+})
+
+describe('VAccount on eos', async () => {
+    const client = new Client('eos')
+    
+    test('Get VAccount AtomicAsset', async () => {
+        const response = await client.vaccount.getAvatarAsset('cryptonode42')
+        expect(response).toBeDefined()
+        expect(response).not.toBeNull()
+        expect(response).toBeTypeOf('object')
+        expectTypeOf(response).toMatchTypeOf<AtomicAsset>()
     })
 })
