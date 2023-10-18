@@ -8,7 +8,7 @@ export class ActionService {
     constructor(private readonly client: Client) {}
 
     makeBatchAction = async (initBatch: InitBatch, hash: string): Promise<AnyAction> => {
-        const settings = await this.client.tasks.getForceSettings()
+        const { force_vaccount_id } = await this.client.tasks.getForceSettings()
         return {
             account: this.client.config.tasksContract,
             name: 'mkbatch',
@@ -17,7 +17,7 @@ export class ActionService {
                 permission: this.client.session.permission as unknown as NameType,
             }],
             data: {
-                id: settings.force_vaccount_id, // TODO determine ID
+                id: force_vaccount_id,
                 campaign_id: initBatch.campaign_id,
                 content: { field_0: 0, field_1: hash },
                 repetitions: initBatch.repetitions,
