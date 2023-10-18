@@ -12,6 +12,7 @@ import {
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
 import { TransactResult } from '@wharfkit/session';
+import { AtomicAsset } from '../types/campaign';
 
 @Variant.type('vaddress', [Checksum160, Name])
 class VAddress extends Variant {
@@ -99,6 +100,16 @@ export class VAccountService {
             key_type: 'sha256',
         });
         return response.rows;
+    }
+
+    /**
+     * Retrieve the avatar asset for the given account
+     * @param account
+     */
+    async getAvatarAsset (account: string): Promise<AtomicAsset> {
+        const avatar = await this.client.dao.getAvatar(account)
+        const asset = await this.client.atomic.getAsset(account, avatar.asset_id)
+        return asset
     }
 
     /**

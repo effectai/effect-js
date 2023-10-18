@@ -57,14 +57,4 @@ export class DaoService {
         return avatar
     }
 
-    /**
-     * Retrieve the avatar asset for the given account
-     * @param account
-     */
-    async getAvatarAsset (account: string): Promise<AtomicAsset> {
-        const avatar = await this.getAvatar(account)
-        const asset = await this.client.atomic.getAsset(account, avatar.asset_id)
-        return asset
-    }
-
 }
