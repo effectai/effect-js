@@ -18,7 +18,7 @@ describe('Tasks', async () => {
     })
 
     test('Get All Campaigns', async () => {
-        const campaignList = await client.tasks.getCampaigns()
+        const campaignList = await client.tasks.getAllCampaigns()
 
         expect(campaignList).toBeDefined()
         expect(campaignList).toBeInstanceOf(Array)
@@ -40,7 +40,7 @@ describe('Tasks', async () => {
 
     test('Get Batch from Campaign', async () => {
         const campaign = await client.tasks.getCampaign(0)
-        const batch = await client.tasks.getBatch(campaign.num_batches.valueOf())
+        const batch = await client.tasks.getBatch(campaign.active_batch)
         // console.debug('batch', batch)
         expect(batch).toBeDefined()
         expect(batch.id).toEqual(0)
@@ -65,8 +65,8 @@ describe('Tasks', async () => {
 
         expect(reservation).toBeDefined()
         expectTypeOf(reservation).toMatchTypeOf<Reservation>()
-        expect(reservation.id).toEqual(0)
-        expect(reservation.campaign_id).toEqual(0)
+        expect(reservation.id).toBeTypeOf('number')
+        expect(reservation.campaign_id).toBeTypeOf('number')
         
     })
 

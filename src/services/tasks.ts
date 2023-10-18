@@ -282,7 +282,7 @@ export class TasksService {
                 table: 'acctaskidx',
                 scope: this.client.config.tasksContract,
             })
-            console.debug('getAllAccTaskIdx', response)
+            // console.debug('getAllAccTaskIdx', response)
             return response.rows
         } catch (error) {
             console.error(error)
