@@ -86,16 +86,6 @@ export interface InitBatch {
     data: any[]
 }
 
-/**
- * TaskSettings
- * @property {string} vaccount_contract
- * @property {number} force_vaccount_id
- * @property {number} payout_delay_sec
- * @property {number} release_task_delay_sec
- * @property {string} fee_contract
- * @property {string} fee_percentage
- * @property {string} ram_payer - Deprecated
- */
 export interface TasksSettings {
     vaccount_contract: string
     force_vaccount_id: number
@@ -103,9 +93,8 @@ export interface TasksSettings {
     release_task_delay_sec: number
     fee_contract: string
     fee_percentage: string
-    ram_payer?: string
+    ram_payer?: string // Deprecated
 }
-
 
 export interface RepsDone {
     campaign_id: number;
@@ -125,9 +114,9 @@ export interface AtomicAsset {
     asset_id: string;
     collection_name: string;
     schema_name: string;
-    template_id: number;
+    template_id: string;
     ram_payer: string;
     backed_tokens: string[];
-    immutable_serialized_data: number[];
-    mutable_serialized_data: number[];
+    immutable_serialized_data: Uint8Array;
+    mutable_serialized_data: Uint8Array;
 }
