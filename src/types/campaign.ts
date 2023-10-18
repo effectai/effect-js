@@ -120,3 +120,14 @@ export interface DaoConfig {
     gov_token_sym: { sym: string; contract: string };
     allowed_collections: string[];
 }
+
+export interface AtomicAsset {
+    asset_id: string;
+    collection_name: string;
+    schema_name: string;
+    template_id: number;
+    ram_payer: string;
+    backed_tokens: string[];
+    immutable_serialized_data: number[];
+    mutable_serialized_data: number[];
+}
