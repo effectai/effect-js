@@ -2,14 +2,25 @@
 
 TODO
 
-- [ ] New loading spinner for when the data in the iframe gets loaded in.
+- [x] New loading spinner for when the data in the iframe gets loaded in.
 - [ ] Add error page for when the iframe or task fails to load
-- [ ] functions of the dao to get atomicassets into the typescript sdk
+- [x] functions of the dao to get atomicassets into the typescript sdk
 - [ ] Het laden van je profile photo in profile page
 - [ ] submissions of the tasks done
 - [ ] Retrieve qualifications and show them in the profile page
 - [ ] Pending payouts/claim, port over from old application
 - [ ] Check if it is possible to retrieve usdt price from defibox using mainnet config
+
+## TODO
+
+- [x] Basic tests schrijven voor de functie die we nu hebben (check wharfkit/antelope tests als voorbeeldje)
+- [x] Reservation aanmaken (without qualifications)
+- [x] Reservations ophalen
+- [x] AtomicAssets ophalen van de user
+- [x] hiervoor wharfkit/anchor gebruiken (niet de atomicassets js package)
+- [x] Reservering aanmaken (zonder qualifications)
+- [ ] Make reservation with qualification
+
 
 ## Debug this
 
