@@ -1,14 +1,26 @@
+import { AtomicAsset } from '../src/types/campaign';
 import { Client } from './../src/client';
-import {expect, test, describe} from 'vitest'
+import {expect, test, describe, expectTypeOf} from 'vitest'
 
 const client = new Client('eos')
 
-describe('EfxService', () => {
+describe('AtomicService', () => {
 
-    test('Should return the whitelisted assets from the DAO contract', async () => {
-        const whiteListedCollections = await client.atomic.getAtomicAssets()
-        expect(whiteListedCollections).toBeDefined()
-        expect(whiteListedCollections).not.toBeNull()
+    test('getAccountAssets()', async () => {
+        const accountAssets = await client.atomic.getAccountAssets('cryptonode42')
+        expect(accountAssets).toBeDefined()
+        expect(accountAssets).not.toBeNull()
+        expect(accountAssets).toBeInstanceOf(Array)
+        expect(accountAssets.length).toBeGreaterThan(0)
+        expectTypeOf(accountAssets).toMatchTypeOf<AtomicAsset[]>()
+    })
+
+    test('getAsset()', async () => {
+        const asset = await client.atomic.getAsset('cryptonode42', '2199025242551')
+        expect(asset).toBeDefined()
+        expect(asset).not.toBeNull()
+        expect(asset).toBeInstanceOf(Object)
+        expectTypeOf(asset).toMatchTypeOf<AtomicAsset>()
     })
 
 })
