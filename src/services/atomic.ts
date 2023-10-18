@@ -14,8 +14,9 @@ export class AtomicAssetsService {
     constructor (private readonly client: Client) {}
 
     /**
-     * Retrieve atomic assets from the atomicassets contract 
-     * @returns {Promise<any>} Returns the atomic assets config
+     * Retrieve atomic assets from the atomicassets contract  for the given account
+     * @param account eosio account name
+     * @returns {Promise<AtomicAsset[]>} Returns an array of atomic assets
      */
     getAccountAssets = async (account: string): Promise<AtomicAsset[]> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
@@ -28,13 +29,15 @@ export class AtomicAssetsService {
     }
 
     /**
-     * 
+     * Retrieve atomic assets from the atomicassets contract
+     * @param account eosio account name
      * @param assetId 
+     * @returns {Promise<AtomicAsset>} Returns the atomic asset config
      */
-    getAsset = async (owner: string, assetId: string): Promise<AtomicAsset> => {
+    getAsset = async (account: string, assetId: string): Promise<AtomicAsset> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.atomicAssetsContract,
-            scope: owner,
+            scope: account,
             table: 'assets',
             limit: 100,
             lower_bound: UInt128.from(assetId),
@@ -43,4 +46,10 @@ export class AtomicAssetsService {
         const [ asset ] = rows
         return asset
     }
+
+    /**
+     * TODO
+     * Mint an asset to the given account
+     */
+    mintAsset = async (): Promise<any> => {}
 }
