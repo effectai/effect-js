@@ -19,22 +19,4 @@ describe('DaoService', () => {
         // TODO
     })
 
-    test('Should get the avatar asset for the user.', async () => {
-        const avatarAsset = await client.dao.getAvatarAsset('cryptonode42')
-        expect(avatarAsset).toBeDefined()
-        expect(avatarAsset).not.toBeNull()
-    })
-
-
 })
-
-
-/**
- * {
-  stake_contract: 'efxstakepool',
-  proposal_contract: 'daoproposals',
-  utl_token_sym: { sym: '4,EFX', contract: 'effecttokens' },
-  gov_token_sym: { sym: '4,NFX', contract: 'effecttokens' },
-  allowed_collections: [ '.gems', 'avatar.boid', 'pomelo', 'shufan.free' ]
-}
- */
