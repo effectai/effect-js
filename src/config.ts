@@ -20,7 +20,6 @@ const configPresets: {[key: string]: ClientConfig} = {
         eosRelayerAccount: 'effectrelayr',
         eosRelayerPermission: 'active',
         eosRelayerUrl: 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
-        forceVaccountId: 0, // TODO
         ipfsCache: true
     },
     'eos': {
@@ -42,7 +41,6 @@ const configPresets: {[key: string]: ClientConfig} = {
         eosRelayerAccount: 'effectrelayr',
         eosRelayerPermission: 'active',
         eosRelayerUrl: 'https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app',
-        forceVaccountId: 0, // TODO
         ipfsCache: true
     }
 };

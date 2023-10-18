@@ -36,7 +36,6 @@ test('Client', async () => {
     expect(client.config).toHaveProperty('eosRelayerAccount')
     expect(client.config).toHaveProperty('eosRelayerPermission')
     expect(client.config).toHaveProperty('eosRelayerUrl')
-    expect(client.config).toHaveProperty('forceVaccountId')
     expect(client.config).toHaveProperty('ipfsCache')
 
 })

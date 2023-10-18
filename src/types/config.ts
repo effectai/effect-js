@@ -88,12 +88,7 @@ export interface ClientConfig {
    * @default ""
    */
   eosRelayerUrl: string
-
-  /**
-   * The Vaccount ID of the Force EOS account
-   */
-  forceVaccountId: number
-
+  
   /**
    * Cache ipfs requests, enable or disable the ability to cache ipfs requests.
    * @default true
