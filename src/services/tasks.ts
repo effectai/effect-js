@@ -15,8 +15,9 @@ export class TasksService {
      */
     async getAllCampaigns (ipfsFetch: boolean = true): Promise<Campaign[]> {
         const rows: Campaign[] = []
+        const boundDelta = 20
         let lowerBound: UInt128 = UInt128.from(0)
-        let upperBound: UInt128 = UInt128.from(20)
+        let upperBound: UInt128 = UInt128.from(boundDelta)
         let more = true
 
         while (more) {
@@ -33,7 +34,7 @@ export class TasksService {
             if (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 lowerBound = UInt128.from(lastRow.id + 1)
-                upperBound = UInt128.from(lastRow.id + 21)
+                upperBound = UInt128.from(lastRow.id + boundDelta )
             } else {
                 more = false
             }
@@ -85,23 +86,20 @@ export class TasksService {
      * @param campaign InitCampaign
      */
     async makeCampaign (campaign: InitCampaign): Promise<TransactResult> {
-        this.client.requireSession()
+        const authorization = this.client.sessionAuth()
         try {
             const hash = await this.client.ipfs.upload(campaign.info)
             const response = await this.client.session.transact({
                 action: {
                     account: this.client.config.tasksContract,
                     name: 'mkcampaign',
-                    authorization: [{
-                        actor: this.client.session.actor,
-                        permission: this.client.session.permission,
-                    }],
+                    authorization,
                     data: {
                         owner: this.client.session.actor,
                         content: { field_0: 0, field_1: hash },
                         max_task_time: campaign.max_task_time,
                         reward: { quantity: campaign.quantity, contract: this.client.config.tokenContract },
-                        qualis: campaign.qualis ?? [], // TODO: Implement this later
+                        qualis: campaign.qualis ?? [],
                         payer: this.client.session.actor,
                     },
                 }
@@ -248,18 +246,15 @@ export class TasksService {
       * Call submittask(camapign_id, task_idx, data, account_id, sig). Note to use _task_.task_idx for the task_idx parameter (not the ID).
       *     sig (for BSC only): to avoid replay attacks, the signature is (mark)(campaign_id)(task_idx)(data). The mark value is 5.
      */
-    async submitTask (reservation: Reservation, data: any): Promise<TransactResult> {
-        console.debug('submitTask', reservation, data)
+    async submitTask (reservation: Reservation, data: any): Promise<TransactResult> {   
+        const authorization = this.client.sessionAuth()
         try {
             const ipfsData = await this.client.ipfs.upload(data)
             const response = await this.client.session.transact({
                 action: {
                     account: this.client.config.tasksContract,
                     name: 'submittask',
-                    authorization: [{
-                        actor: this.client.session.actor,
-                        permission: this.client.session.permission,
-                    }],
+                    authorization,
                     data: {
                         campaign_id: UInt32.from(reservation.campaign_id),
                         account_id: UInt32.from(reservation.account_id),
@@ -413,7 +408,7 @@ export class TasksService {
      * ```
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
-        this.client.requireSession()
+        const authorization = this.client.sessionAuth()
         const myReservation = await this.getMyReservation(campaignId)
         if (myReservation) {
             return myReservation
@@ -423,10 +418,7 @@ export class TasksService {
                 action: {
                     account: this.client.config.tasksContract,
                     name: 'reservetask',
-                    authorization: [{
-                        actor: this.client.session.actor,
-                        permission: this.client.session.permission,
-                    }],
+                    authorization,
                     data: {
                         campaign_id: campaignId,
                         account_id: vacc.id,
