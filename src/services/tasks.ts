@@ -7,21 +7,7 @@ import { validateBatchData } from './utils';
 export class TasksService {
     constructor(private client: Client) {}
 
-    // TODO: Keep this one?
-    /**
-     * Retrieve all campaigns published to Effect Network
-     * @returns Campaign[]
-     */
-    async getCampaigns (): Promise<Campaign[]> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'campaign',
-            scope: this.client.config.tasksContract,
-        })
-        return response.rows
-    }
-
-    // TODO: Figure out which method works better, this `getAllCampaigns` or the `getCampaigns` above.
+    // TODO: https://wharfkit.com/guides/contract-kit/reading-tables
     // This needs to be tested when their are more campaigns on jungle.
     /**
      * Retrieve all campaigns published to Effect Network
