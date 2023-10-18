@@ -1,7 +1,7 @@
 import { Client } from './../src/client';
 import { DaoConfig } from '../src/types/campaign';
 
-import {expect, test, describe} from 'vitest'
+import {expect, test, describe, expectTypeOf} from 'vitest'
 
 const client = new Client('eos')
 
@@ -12,13 +12,19 @@ describe('DaoService', () => {
         expect(whiteListedCollections).toBeDefined()
         expect(whiteListedCollections).not.toBeNull()
         expect(whiteListedCollections).toBeTypeOf('object')
-
-        expect(whiteListedCollections).toHaveProperty('stake_contract')
-        expect(whiteListedCollections).toHaveProperty('proposal_contract')
-        expect(whiteListedCollections).toHaveProperty('utl_token_sym')
-        expect(whiteListedCollections).toHaveProperty('gov_token_sym')
-        expect(whiteListedCollections).toHaveProperty('allowed_collections')
+        expectTypeOf(whiteListedCollections).toMatchTypeOf<DaoConfig>()
     })
+
+    test('Should set the avatar asset for the user.', async () => {
+        // TODO
+    })
+
+    test('Should get the avatar asset for the user.', async () => {
+        const avatarAsset = await client.dao.getAvatarAsset('cryptonode42')
+        expect(avatarAsset).toBeDefined()
+        expect(avatarAsset).not.toBeNull()
+    })
+
 
 })
 
