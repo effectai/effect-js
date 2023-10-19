@@ -119,4 +119,17 @@ export interface AtomicAsset {
     backed_tokens: string[];
     immutable_serialized_data: Uint8Array;
     mutable_serialized_data: Uint8Array;
+    immutable_deserialized_data: AtomicAssetSchema;
+    mutable_deserialized_data: AtomicAssetSchema;
 }
+
+export interface SchemaObject {
+    name: string;
+    type: any; // The value for the type keyword will indicate it's type.
+}
+
+export interface AtomicAssetSchema {
+    schema_name: string;
+    format: SchemaObject[];
+}
+
