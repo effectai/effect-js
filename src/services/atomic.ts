@@ -1,6 +1,7 @@
 import { UInt128 } from "@wharfkit/antelope";
 import { type Client } from "../client";
-import { AtomicAsset } from "../types/campaign";
+import { AtomicAsset, SchemaObject, AtomicAssetSchema } from "../types/campaign";
+import { deserialize, ObjectSchema } from "atomicassets";
 
 /**
  * AtomicAssetsService
