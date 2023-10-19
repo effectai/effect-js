@@ -6,7 +6,7 @@ import { AtomicAsset } from '../src/types/campaign'
 
 describe('VAccount on jungle', async () => {
 
-    const client = new Client('jungle4')
+    const client = new Client('jungle')
 
     test('Client', async () => {
         expect(client).toBeInstanceOf(Client)
