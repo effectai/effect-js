@@ -23,4 +23,19 @@ describe('AtomicService', () => {
         expectTypeOf(asset).toMatchTypeOf<AtomicAsset>()
     })
 
+    test('getCollection()', async () => {
+        const collection = await client.atomic.getCollection('pomelo')
+        expect(collection).toBeDefined()
+        expect(collection).not.toBeNull()
+        expect(collection).toBeInstanceOf(Object)
+        expectTypeOf(collection).toMatchTypeOf<AtomicAsset>()
+    })
+
+    test('getSchema()', async () => {
+        const asset = await client.vaccount.getAvatarAsset('cryptonode42')
+        const schema = await client.atomic.getSchema(asset.collection_name, asset.schema_name)
+        expect(schema).toBeDefined()
+        expect(schema).not.toBeNull()
+    })
+
 })
