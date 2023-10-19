@@ -34,12 +34,17 @@ export class AtomicAssetsService {
      * @param assetId 
      * @returns {Promise<AtomicAsset>} Returns the atomic asset config
      */
-    getAsset = async (account: string, assetId: string): Promise<AtomicAsset> => {
+    // TODO: Figure out if there is a collection that ever has a schema with more than 100 rows
+    getCollection = async (collectionName: string): Promise<any> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.atomicAssetsContract,
-            scope: account,
-            table: 'assets',
+            scope: collectionName,
+            table: 'collections',
             limit: 100,
+        })
+        // console.debug('getCollection', rows)
+        return rows
+    }
 
     getSchema = async (collectionName: string, schemaName: string): Promise<AtomicAssetSchema> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
