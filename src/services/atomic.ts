@@ -40,11 +40,16 @@ export class AtomicAssetsService {
             scope: account,
             table: 'assets',
             limit: 100,
-            lower_bound: UInt128.from(assetId),
-            upper_bound: UInt128.from(assetId)
+
+    getSchema = async (collectionName: string, schemaName: string): Promise<AtomicAssetSchema> => {
+        const { rows } = await this.client.eos.v1.chain.get_table_rows({
+            code: this.client.config.atomicAssetsContract,
+            scope: collectionName,
+            table: 'schemas',
+            limit: 100
         })
-        const [ asset ] = rows
-        return asset
+        const schema = rows.find((schema: AtomicAssetSchema) => schema.schema_name === schemaName)
+        return schema
     }
 
     /**
