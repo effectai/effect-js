@@ -34,6 +34,32 @@ export class AtomicAssetsService {
      * @param assetId 
      * @returns {Promise<AtomicAsset>} Returns the atomic asset config
      */
+    getAsset = async (account: string, assetId: string, deserializeAsset: boolean = true): Promise<AtomicAsset> => {
+        try {
+            const { rows }: { rows: AtomicAsset[] } = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.atomicAssetsContract,
+                scope: account,
+                table: 'assets',
+                limit: 1,
+                lower_bound: UInt128.from(assetId),
+                upper_bound: UInt128.from(assetId)
+            })
+            const [ asset ] = rows
+            if (deserializeAsset) {
+                const schema = await this.getSchema(asset.collection_name, asset.schema_name)
+                const objectSchema = ObjectSchema(schema.format)
+                const mutable_deserialized_data = deserialize(asset.mutable_serialized_data, objectSchema)
+                const immutable_deserialized_data = deserialize(asset.immutable_serialized_data, objectSchema)
+                return { ...asset, immutable_deserialized_data, mutable_deserialized_data }
+            } else {
+                return asset
+            }
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
     // TODO: Figure out if there is a collection that ever has a schema with more than 100 rows
     getCollection = async (collectionName: string): Promise<any> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
