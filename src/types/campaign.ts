@@ -119,8 +119,13 @@ export interface AtomicAsset {
     backed_tokens: string[];
     immutable_serialized_data: Uint8Array;
     mutable_serialized_data: Uint8Array;
-    immutable_deserialized_data: AtomicAssetSchema;
-    mutable_deserialized_data: AtomicAssetSchema;
+    immutable_deserialized_data: any;
+    mutable_deserialized_data: any;
+}
+
+export interface AvatarAtomicAsset extends AtomicAsset {
+    img?: string;
+    video?: string;
 }
 
 export interface SchemaObject {
