@@ -12,7 +12,7 @@ import {
 } from '@wharfkit/antelope';
 import { VAccount } from '../types/user';
 import { TransactResult } from '@wharfkit/session';
-import { AtomicAsset } from '../types/campaign';
+import { AtomicAsset, AvatarAtomicAsset } from '../types/campaign';
 
 @Variant.type('vaddress', [Checksum160, Name])
 class VAddress extends Variant {
@@ -64,7 +64,7 @@ export class VAccountService {
                 payer: this.client.session.actor,
             },
         }
-        return await this.client.session.transact({ action: action });
+        return await this.client.session.transact({ action });
     }
 
     /**
@@ -106,10 +106,17 @@ export class VAccountService {
      * Retrieve the avatar asset for the given account
      * @param account
      */
-    async getAvatarAsset (account: string): Promise<AtomicAsset> {
-        const avatar = await this.client.dao.getAvatar(account)
-        const asset = await this.client.atomic.getAsset(account, avatar.asset_id)
-        return asset
+    async getAvatarAsset (account: string): Promise<AvatarAtomicAsset> {
+        const defaultImg = 'QmZQiEWsaTNpANMv9orwDvuGyMRkY5nQNazSB1KkW4pM6t'
+        const defaultVid = 'QmZQiEWsaTNpANMv9orwDvuGyMRkY5nQNazSB1KkW4pM6t'
+        const daoAvatar = await this.client.dao.getAvatar(account)
+        const asset = await this.client.atomic.getAsset(account, daoAvatar.asset_id)
+        console.debug(asset)
+        return {
+            ...asset,
+            img: asset.immutable_deserialized_data?.img ?? defaultImg,
+            video: asset.immutable_deserialized_data?.video ?? defaultVid,
+        }
     }
 
     /**
