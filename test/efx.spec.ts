@@ -1,4 +1,3 @@
-import { TokenService } from './../src/services/efx';
 import { Client } from './../src/client';
 
 import { expect, test, describe } from 'vitest'

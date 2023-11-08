@@ -20,7 +20,7 @@ test('Client', async () => {
     
     // Check that the config is defined correctly
     expect(client.config).toHaveProperty('network')
-    expect(client.config).toHaveProperty('eosExplorerUrl')
+    expect(client.config).toHaveProperty('explorerUrl')
     expect(client.config).toHaveProperty('eosRpcUrl')
     expect(client.config).toHaveProperty('eosChainId')
     expect(client.config).toHaveProperty('ipfsEndpoint')
@@ -36,7 +36,6 @@ test('Client', async () => {
     expect(client.config).toHaveProperty('eosRelayerAccount')
     expect(client.config).toHaveProperty('eosRelayerPermission')
     expect(client.config).toHaveProperty('eosRelayerUrl')
-    expect(client.config).toHaveProperty('forceVaccountId')
     expect(client.config).toHaveProperty('ipfsCache')
 
 })

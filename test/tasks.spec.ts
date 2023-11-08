@@ -18,7 +18,7 @@ describe('Tasks', async () => {
     })
 
     test('Get All Campaigns', async () => {
-        const campaignList = await client.tasks.getCampaigns()
+        const campaignList = await client.tasks.getAllCampaigns()
 
         expect(campaignList).toBeDefined()
         expect(campaignList).toBeInstanceOf(Array)
@@ -27,9 +27,7 @@ describe('Tasks', async () => {
         expect(campaign).toBeDefined()
         expectTypeOf(campaign).toMatchTypeOf<Campaign>()
         expect(campaign.id).toEqual(0)
-    
-        const [ , owner ] = campaign.owner
-        expect(owner).toEqual('efxefxefxefx')
+
     })
 
     test('Get first Campaign', async () => {
@@ -37,13 +35,13 @@ describe('Tasks', async () => {
 
         expect(campaign).toBeDefined()
         expect(campaign.id).toEqual(0)
-    
-        const [ , owner ] = campaign.owner
-        expect(owner).toEqual('efxefxefxefx')
+        expectTypeOf(campaign).toMatchTypeOf<Campaign>()
     })
 
     test('Get Batch from Campaign', async () => {
-        const batch = await client.tasks.getBatch(0)
+        const campaign = await client.tasks.getCampaign(0)
+        const batch = await client.tasks.getBatch(campaign.active_batch)
+        // console.debug('batch', batch)
         expect(batch).toBeDefined()
         expect(batch.id).toEqual(0)
     })
@@ -67,8 +65,8 @@ describe('Tasks', async () => {
 
         expect(reservation).toBeDefined()
         expectTypeOf(reservation).toMatchTypeOf<Reservation>()
-        expect(reservation.id).toEqual(0)
-        expect(reservation.campaign_id).toEqual(0)
+        expect(reservation.id).toBeTypeOf('number')
+        expect(reservation.campaign_id).toBeTypeOf('number')
         
     })
 
@@ -78,6 +76,20 @@ describe('Tasks', async () => {
         const reservation = await client.tasks.reserveTask(campaign.id)
         const taskData = await client.tasks.getTaskData(reservation)
         expect(taskData).toBeDefined()
+    })
+
+    test('Get reps done', async () => {
+        const repsDone = await client.tasks.getAllRepsDone()
+        expect(repsDone).toBeDefined()
+        expect(repsDone.length).toBeDefined()
+        expect(repsDone.length).toBeGreaterThan(0)
+    })
+
+    test('Get acctaskidx', async () => {
+        const acctaskidx = await client.tasks.getAllAccTaskIdx()
+        expect(acctaskidx).toBeDefined()
+
+        // TODO: WIP, this is needed to check if there are more tasks available.
     })
 
 

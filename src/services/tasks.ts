@@ -1,25 +1,13 @@
-import { Reservation, Batch, Campaign, TasksSettings } from './../types/campaign';
+import { Reservation, Batch, Campaign, TasksSettings, InitCampaign, InitBatch, RepsDone } from './../types/campaign';
 import { Client } from '../client';
 import { UInt128, UInt32, UInt64 } from '@wharfkit/antelope';
+import { Asset, TransactResult } from '@wharfkit/session';
+import { validateBatchData } from './utils';
 
 export class TasksService {
     constructor(private client: Client) {}
 
-    // TODO: Keep this one?
-    /**
-     * Retrieve all campaigns published to Effect Network
-     * @returns Campaign[]
-     */
-    async getCampaigns (): Promise<Campaign[]> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'campaign',
-            scope: this.client.config.tasksContract,
-        })
-        return response.rows
-    }
-
-    // TODO: Figure out which method works better, this `getAllCampaigns` or the `getCampaigns` above.
+    // TODO: https://wharfkit.com/guides/contract-kit/reading-tables
     // This needs to be tested when their are more campaigns on jungle.
     /**
      * Retrieve all campaigns published to Effect Network
@@ -27,8 +15,9 @@ export class TasksService {
      */
     async getAllCampaigns (ipfsFetch: boolean = true): Promise<Campaign[]> {
         const rows: Campaign[] = []
+        const boundDelta = 20
         let lowerBound: UInt128 = UInt128.from(0)
-        let upperBound: UInt128 = UInt128.from(20)
+        let upperBound: UInt128 = UInt128.from(boundDelta)
         let more = true
 
         while (more) {
@@ -45,7 +34,7 @@ export class TasksService {
             if (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 lowerBound = UInt128.from(lastRow.id + 1)
-                upperBound = UInt128.from(lastRow.id + 21)
+                upperBound = UInt128.from(lastRow.id + boundDelta )
             } else {
                 more = false
             }
@@ -66,20 +55,60 @@ export class TasksService {
      * @returns {Promise<Campaign>} Campaign
      */
     async getCampaign (id: number, fetchIpfs: boolean = true): Promise<Campaign> {
-        const response = await this.client.eos.v1.chain.get_table_rows({
-            code: this.client.config.tasksContract,
-            table: 'campaign',
-            scope: this.client.config.tasksContract,
-            lower_bound: UInt128.from(id),
-            upper_bound: UInt128.from(id),
-            limit: 1,
-        })
-
-        const [campaign]: Campaign[] = response.rows
-        if (fetchIpfs) {
-            campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'campaign',
+                scope: this.client.config.tasksContract,
+                lower_bound: UInt128.from(id),
+                upper_bound: UInt128.from(id),
+                limit: 1,
+            })
+    
+            const [ campaign ]: Campaign[] = response.rows
+    
+            if (campaign === undefined) {
+                throw new Error(`Campaign with id ${id} not found`)
+            }
+    
+            if (fetchIpfs) {
+                campaign.info = await this.client.ipfs.fetch(campaign.content.field_1)
+            }
+            return campaign
+        } catch (error) {
+            console.error(error)
+            throw error
         }
-        return campaign
+    }
+
+    /**
+     * Create a new campaign
+     * @param campaign InitCampaign
+     */
+    async makeCampaign (campaign: InitCampaign): Promise<TransactResult> {
+        const authorization = this.client.sessionAuth()
+        try {
+            const hash = await this.client.ipfs.upload(campaign.info)
+            const response = await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'mkcampaign',
+                    authorization,
+                    data: {
+                        owner: this.client.session.actor,
+                        content: { field_0: 0, field_1: hash },
+                        max_task_time: campaign.max_task_time,
+                        reward: { quantity: campaign.quantity, contract: this.client.config.tokenContract },
+                        qualis: campaign.qualis ?? [],
+                        payer: this.client.session.actor,
+                    },
+                }
+            })
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
     }
 
     /**
@@ -102,31 +131,113 @@ export class TasksService {
     }
 
     /**
+     * Create batch
+     */
+    async makeBatch (initBatch: InitBatch): Promise<any> {
+        this.client.requireSession()
+
+        try {
+            const vacc = await this.client.vaccount.get()
+            const campaign = await this.getCampaign(initBatch.campaign_id)
+            const assetQuantity = Asset.from(campaign.reward.quantity)
+            const batchPrice = assetQuantity.value * initBatch.repetitions
+
+            // Check if the user has enough funds to pay for the batch
+            // if (Asset.from(vacc.balance.quantity).value < batchPrice) {
+            //     throw new Error('Not enough funds in vAccount to pay for batch')
+            // }
+
+            // Validate the batch before uploading, will throw error
+            if (campaign.info?.input_schema) {
+                validateBatchData(initBatch, campaign)
+            }
+
+            const newBatchId = campaign.num_batches + 1
+            const hash = await this.client.ipfs.upload(initBatch.data)
+            const makeBatch = await this.client.action.makeBatchAction(initBatch, hash)
+            const vTransfer = this.client.action.vTransferAction(vacc, batchPrice)
+            const publishBatch = this.client.action.publishBatchAction(newBatchId, initBatch.repetitions) // TODO Check if batchId is correct.
+
+            let actions: any[]
+
+            if (Asset.from(vacc.balance.quantity).value < batchPrice) {
+                const depositAction = this.client.action.depositAction(assetQuantity.value, vacc)
+                actions = [depositAction, makeBatch, vTransfer, publishBatch]
+            } else {
+                actions = [makeBatch, vTransfer, publishBatch]
+            }
+
+            const response = await this.client.session.transact({ actions })
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
+    /**
      * Fetch the task data
      * Load the batch the task is in (get _task_.batch_id from the batch table)
      * Get the batch IPFS hash from batch.content.value
      * Load the IPFS object and confirm it is a JSON array. Get the _task_.task_idxth item from the array
      * Render the campaign template with that task data
      */
-    async getTaskData (reservation: Reservation): Promise<any[]> {
+    async getTaskData(reservation: Reservation): Promise<any> {
         try {
-            const batch = await this.getBatch(reservation.batch_id)
-            const ipfsData = await this.client.ipfs.fetch(batch.content.field_1)
+            const batch = await this.getBatch(reservation.batch_id);
+            const ipfsData = await this.client.ipfs.fetch(batch.content.field_1);
 
             // check if the ipfsData is an array
             if (!Array.isArray(ipfsData)) {
-                throw new Error(`Task data retrieved from IPFS is not an array. \n${ipfsData}`)
+                throw new Error(`Task data retrieved from IPFS is not an array. \n${String(ipfsData)}`);
             }
 
             // Check if there is a task at the index
-            if (!ipfsData.hasOwnProperty(reservation.task_idx)) {
-                throw new Error(`Task data retrieved from IPFS does not have a task at index ${reservation.task_idx}. \n${ipfsData}`)
+            const taskIndex = reservation.task_idx;
+            if (ipfsData.length <= taskIndex || taskIndex < 0) {
+                throw new Error(`Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(ipfsData)}`);
             }
 
-            return ipfsData[reservation.task_idx]
+            return ipfsData[taskIndex];
+        } catch (error) {
+            console.error(error);
+            throw new Error(error.message);
+        }
+    }
+
+    /**
+     * Task availability
+     * TODO: This is a WIP
+     */
+    async taskAvailable (reservation: Reservation): Promise<boolean> {
+        try {
+            const batch = await this.getBatch(reservation.batch_id)
+
+            // Is it true that when the num_tasks is equal to the task_idx that the batch there is still work to be done in the batch?
+            // How is this affected when there are more than 1 batches?
+            // How is this affected when there are more reps?
+            // Does num_tasks change when new tasks are added or removed?
+            return batch.num_tasks >= reservation.task_idx
         } catch (error) {
             console.error(error)
-            throw new Error(error.message)
+            throw error
+        }
+    }
+
+    /**
+     * Get repitions done for a task in a campaign.
+     */
+    async getAllRepsDone (): Promise<RepsDone[]> {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'repsdone',
+                scope: this.client.config.tasksContract,
+            })
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
         }
     }
 
@@ -135,13 +246,49 @@ export class TasksService {
       * Call submittask(camapign_id, task_idx, data, account_id, sig). Note to use _task_.task_idx for the task_idx parameter (not the ID).
       *     sig (for BSC only): to avoid replay attacks, the signature is (mark)(campaign_id)(task_idx)(data). The mark value is 5.
      */
-    async submitTask (campaignId: number, taskId: number, data: any): Promise<any> {}
+    async submitTask (reservation: Reservation, data: any): Promise<TransactResult> {   
+        const authorization = this.client.sessionAuth()
+        try {
+            const ipfsData = await this.client.ipfs.upload(data)
+            const response = await this.client.session.transact({
+                action: {
+                    account: this.client.config.tasksContract,
+                    name: 'submittask',
+                    authorization,
+                    data: {
+                        campaign_id: UInt32.from(reservation.campaign_id),
+                        account_id: UInt32.from(reservation.account_id),
+                        task_idx: UInt32.from(reservation.task_idx),
+                        data: ipfsData,
+                        payer: this.client.session.actor,
+                        sig: null,
+                    },
+                }
+            });
+            return response
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
-     * Reserve next task
-     * The same process as above, ~~but make sure to update last_task_done for BSC users~~
+     * 
      */
-    async reserveNextTask (campaignId: number, accountId: number, qualiAssets?: string[]): Promise<any> {}
+    getAllAccTaskIdx = async (): Promise<any> => {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'acctaskidx',
+                scope: this.client.config.tasksContract,
+            })
+            // console.debug('getAllAccTaskIdx', response)
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
 
     /**
      * Retrieve all reservations
@@ -155,7 +302,7 @@ export class TasksService {
                 scope: this.client.config.tasksContract,
             })
 
-            while(response.more) {
+            while (response.more) {
                 const lastRow = response.rows[response.rows.length - 1]
                 const lowerBound = UInt64.from(lastRow.id + 1)
                 const upperBound = UInt64.from(lastRow.id + 21)
@@ -199,7 +346,6 @@ export class TasksService {
                 upper_bound: bound,
                 lower_bound: bound,
             })
-            
 
             const [ reservation ] = response.rows
             return reservation
@@ -262,7 +408,7 @@ export class TasksService {
      * ```
      */
     async reserveTask (campaignId: number, qualiAssets?: string[]): Promise<Reservation> {
-        this.client.requireSession()
+        const authorization = this.client.sessionAuth()
         const myReservation = await this.getMyReservation(campaignId)
         if (myReservation) {
             return myReservation
@@ -272,10 +418,7 @@ export class TasksService {
                 action: {
                     account: this.client.config.tasksContract,
                     name: 'reservetask',
-                    authorization: [{
-                        actor: this.client.session.actor,
-                        permission: this.client.session.permission,
-                    }],
+                    authorization,
                     data: {
                         campaign_id: campaignId,
                         account_id: vacc.id,
@@ -298,8 +441,7 @@ export class TasksService {
      * @param accountId id of the account
      * @returns {Promise<Qualification>} Qualification NFT
      */
-    async getQualifications(accountId: number): Promise<any[]> {
-
+    async getQualifications (accountId: number): Promise<any[]> {
         // We should look at the current implementation for how AtomicAssets implemented this.
         // We can mock this by using atomic assets nfts on jungle
 
@@ -323,7 +465,6 @@ export class TasksService {
      *
      */
     async getQualificationCollection (): Promise<any> {
-
         const bounds: string = 'effect.network'
 
         const response = await this.client.eos.v1.chain.get_table_rows({
@@ -334,7 +475,6 @@ export class TasksService {
             upper_bound: UInt128.from(1),
             lower_bound: UInt128.from(1),
             index_position: 'primary',
-
         })
     }
 

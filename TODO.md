@@ -1,5 +1,38 @@
 # SDK feature list
 
+TODO
+
+- [x] New loading spinner for when the data in the iframe gets loaded in.
+- [ ] Add error page for when the iframe or task fails to load
+- [x] functions of the dao to get atomicassets into the typescript sdk
+- [ ] Het laden van je profile photo in profile page
+- [ ] submissions of the tasks done
+- [ ] Retrieve qualifications and show them in the profile page
+- [ ] Pending payouts/claim, port over from old application
+- [ ] Check if it is possible to retrieve usdt price from defibox using mainnet config
+
+## TODO
+
+- [x] Basic tests schrijven voor de functie die we nu hebben (check wharfkit/antelope tests als voorbeeldje)
+- [x] Reservation aanmaken (without qualifications)
+- [x] Reservations ophalen
+- [x] AtomicAssets ophalen van de user
+- [x] hiervoor wharfkit/anchor gebruiken (niet de atomicassets js package)
+- [x] Reservering aanmaken (zonder qualifications)
+- [ ] Make reservation with qualification
+
+
+## Debug this
+
+```txt
+tasks.ts:211 Uncaught (in promise) Error: Task data retrieved from IPFS does not have a task at index 4. 
+[{"id":1,"image":"https://ipfs.effect.ai/ipfs/QmVuSBpoSEUdHmB2owcbAQnModzfcbEme6w6nCkJDDJcy4"},{"id":2,"image":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Attentive_%2815531899006%29.jpg/1920px-Attentive_%2815531899006%29.jpg"},{"id":3,"image":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Comparison_carbon_dioxide_water_phase_diagrams.svg/1024px-Comparison_carbon_dioxide_water_phase_diagrams.svg.png"},{"id":4,"image":"https://upload.wikimedia.org/wikipedia/commons/5/54/Borphase.jpg"}]
+    at Proxy.getTaskData (tasks.ts:211:19)
+    at async submitTask (task.vue:80:18)
+```
+
+---
+
 - [x] EFX to FIAT conversion function
 - [x] Submit task action
 - [x] Get task data from IPFS

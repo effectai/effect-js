@@ -56,6 +56,51 @@ export class TokenService {
     }
 
     /**
+     * Deposit EFX into vaccount
+     */
+    async deposit (amount: number): Promise<TransactResult> {
+        try {
+            this.client.requireSession()
+            const vacc = await this.client.vaccount.get()
+            return await this.client.session.transact({
+                "action": {
+                    "account": this.client.config.tokenContract,
+                    "name": "transfer",
+                    "authorization": [{
+                        "actor": this.client.session.actor,
+                        "permission": this.client.session.permission
+                    }],
+                    "data": {
+                      "from": this.client.session.actor,
+                      "to": this.client.config.vaccountContract,
+                      "quantity": Asset.from(amount, '4,EFX'),
+                      "memo": `${vacc.id}`
+                    }
+                  }
+            })
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error depositing EFX')
+        }
+    }
+
+    /**
+     * TODO
+     * Withdraw EFX from vaccount
+     */
+
+
+    /**
+     * TODO
+     * Claim EFX from vaccount to user
+     */
+
+    /**
+     * TODO
+     * Claim EFX from vaccount to staking account.
+     */
+
+    /**
      * Swaps out of EFX into USDT
      * @param amount The amount of EFX to swap out of
      * @returns TransactResult
@@ -69,12 +114,10 @@ export class TokenService {
                 "action": {
                     "account": "effecttokens",
                     "name": "transfer",
-                    "authorization": [
-                      {
+                    "authorization": [{
                         "actor": this.client.session.actor,
                         "permission": this.client.session.permission
-                      }
-                    ],
+                    }],
                     "data": {
                       "from": this.client.session.actor,
                       "to": "swap.defi",
@@ -103,12 +146,10 @@ export class TokenService {
                 "action": {
                     "account": "tethertether",
                     "name": "transfer",
-                    "authorization": [
-                      {
+                    "authorization": [{
                         "actor": this.client.session.actor,
                         "permission": this.client.session.permission
-                      }
-                    ],
+                    }],
                     "data": {
                       "from": this.client.session.actor,
                       "to": "swap.defi",

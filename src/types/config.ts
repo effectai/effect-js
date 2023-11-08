@@ -9,7 +9,7 @@ export interface ClientConfig {
    * EOS Explorer Url
    * @default https://bloks.io
    */
-  eosExplorerUrl: string
+  explorerUrl: string
 
   /**
    * EOS RPC node URL
@@ -27,6 +27,18 @@ export interface ClientConfig {
    * @default https://ipfs.effect.ai
    */
   ipfsEndpoint: string
+
+  /**
+   * Atomic Hub IPFS endpoint
+   * @default https://atomichub-ipfs.com/ipfs/
+   */
+  atomicHubIpfsEndpoint: string
+
+  /**
+   * Atomic Hub Asset endpoint
+   * @default https://eos.atomichub.io/explorer/asset/
+   */
+  atomicHubAssetEndpoint: string
 
   /**
    * Force Contract
@@ -88,11 +100,6 @@ export interface ClientConfig {
    * @default ""
    */
   eosRelayerUrl: string
-
-  /**
-   * The Vaccount ID of the Force EOS account
-   */
-  forceVaccountId: number
 
   /**
    * Cache ipfs requests, enable or disable the ability to cache ipfs requests.
