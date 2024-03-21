@@ -389,7 +389,41 @@ export class TasksService {
     }
 
     /**
-     * Reserve a task, will check if the user already has a reservation for this campaign and return it, if not will create a new reservation and return it.
+     * Get all reservation of logged in user
+     * @returns {Promise<Reservation>} Reservation
+     */
+    async getAllMyReservations (): Promise<Reservation[]> {
+        try {
+            this.client.requireSession()
+
+            // create a composite Uint64 key from two Uint32 keys
+            const a = new Uint8Array(8);
+            a.set(UInt32.from(0).byteArray, 0);
+            a.set(UInt32.from(this.client.vaccountId).byteArray, 4);
+            const lowerBound = UInt64.from(a)
+            const b = new Uint8Array(8);
+            b.set(UInt32.from(0).byteArray, 0);
+            b.set(UInt32.max.toArray(), 4);
+            const upperBound = UInt64.from(b)
+
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                table: 'reservation',
+                index_position: 'secondary',
+                scope: this.client.config.tasksContract,
+                upper_bound: upperBound,
+                lower_bound: lowerBound,
+            })
+
+            return response.rows
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
+    }
+
+    /**
+     * Reserve a task, will check if the user already has a reservation fort his campaign and return it, if not will create a new reservation and return it.
      * @param campaignId id of the campaign
      * @param qualiAssets can be null, then the smart contract will search through all the assets of the user.
      * @returns {Promise<Reservation>} Reservation
@@ -483,18 +517,18 @@ export class TasksService {
      * @returns the payout delay in seconds
      * @throws error if the payout delay is not available
      */
-        getForceSettings = async (): Promise<TasksSettings> => {
-            try {
-                const response = await this.client.eos.v1.chain.get_table_rows({
-                    code: this.client.config.tasksContract,
-                    scope: this.client.config.tasksContract,
-                    table: 'settings',
-                })
-                const [config] = response.rows
-                return config
-            } catch (error) {
-                console.error(error)
-                throw new Error('Error retrieving Force settings')
-            }
+    getForceSettings = async (): Promise<TasksSettings> => {
+        try {
+            const response = await this.client.eos.v1.chain.get_table_rows({
+                code: this.client.config.tasksContract,
+                scope: this.client.config.tasksContract,
+                table: 'settings',
+            })
+            const [config] = response.rows
+            return config
+        } catch (error) {
+            console.error(error)
+            throw new Error('Error retrieving Force settings')
         }
+    }
 }

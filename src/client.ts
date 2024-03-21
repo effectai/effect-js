@@ -1,4 +1,5 @@
 import { ClientConfig } from './types/config';
+import { VAccount } from './types/user';
 import { configPresets } from './config';
 import { IpfsService } from './services/ipfs';
 import { TasksService } from './services/tasks';
@@ -19,6 +20,7 @@ export class Client {
     readonly fetchProvider: FetchProvider;
     readonly eos: APIClient;
     session!: Session;
+    vaccountId!: number;
 
     /**
      * Create a new Effect Network Client instance
@@ -44,8 +46,11 @@ export class Client {
      * Login to the Effect Network with a session
      * @param session Session object
      */
-    loginWithSession (session: Session): void {
+    async loginWithSession (session: Session): Promise<void> {
         this.session = session;
+        const vacc: VAccount = await this.vaccount.get();
+        this.vaccountId = vacc.id;
+        console.log(this.vaccountId)
     }
 
     /**
@@ -54,7 +59,7 @@ export class Client {
      * @param permission EOS permission of the user
      * @param privateKey EOS private key of the user
      */
-    login (actor: string, permission: string, privateKey: string): void {
+    async login (actor: string, permission: string, privateKey: string): Promise<void> {
         const walletPlugin = new WalletPluginPrivateKey(privateKey);
         this.loginWithSession(new Session({
             actor,
