@@ -63,14 +63,16 @@ export class Client {
     async loginWithSession(session: Session): Promise<void> {
         try {
             this.session = session;
-            const vacc: VAccount = await this.vaccount.get();
+            let vacc: VAccount = await this.vaccount.get();
 
             // if no vaccount is found, create one
             if (!vacc) {
                 await this.vaccount.open();
-                const newVaccount = await this.vaccount.get();
-                this.vaccountId = newVaccount.id;
+                vacc = await this.vaccount.get();
             }
+
+            this.vaccountId = vacc.id;
+
         } catch (e) {
             console.error(e);
             throw new AuthenticationError("Failed to login with session");
