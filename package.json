@@ -97,7 +97,6 @@
     "dependencies": {
         "@wharfkit/antelope": "^0.8.0",
         "@wharfkit/session": "^1.0.0",
-        "@wharfkit/transact-plugin-finality-callback": "^1.0.0",
         "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
         "ajv": "^8.12.0",
         "atomicassets": "^1.5.1"
