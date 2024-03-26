@@ -1,111 +1,149 @@
-import { ClientConfig } from './types/config';
-import { VAccount } from './types/user';
-import { configPresets } from './config';
-import { IpfsService } from './services/ipfs';
-import { TasksService } from './services/tasks';
-import { VAccountService } from './services/vaccount';
-import { TokenService } from './services/token';
+import { ClientConfig } from "./types/config";
+import { VAccount } from "./types/user";
+import { configPresets } from "./config";
+import { IpfsService } from "./services/ipfs";
+import { TasksService } from "./services/tasks";
+import { VAccountService } from "./services/vaccount";
+import { TokenService } from "./services/token";
 
-import { APIClient, FetchProvider, FetchProviderOptions } from '@wharfkit/antelope';
-import { Name, Session } from "@wharfkit/session"
-import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
-import { ActionService } from './services/actions';
-import { AtomicAssetsService } from './services/atomic';
-import { DaoService } from './services/dao';
+import {
+  APIClient,
+  FetchProvider,
+  FetchProviderOptions,
+} from "@wharfkit/antelope";
+import type { Name, Session } from "@wharfkit/session";
+import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
+import { ActionService } from "./services/actions";
+import { AtomicAssetsService } from "./services/atomic";
+import { DaoService } from "./services/dao";
+import {
+  AuthenticationError,
+  SessionNotFoundError,
+  TransactionError,
+} from "./errors";
+import { TxState, waitForTransaction } from "./services/utils";
 
 export class Client {
-    static __classname = 'Client'
+  static __classname = "Client";
 
-    readonly config: ClientConfig;
-    readonly fetchProvider: FetchProvider;
-    readonly eos: APIClient;
-    session!: Session;
-    vaccountId!: number;
+  readonly config: ClientConfig;
+  readonly fetchProvider: FetchProvider;
+  readonly eos: APIClient;
 
-    /**
-     * Create a new Effect Network Client instance
-     * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
-     */
-    constructor (environment: string = 'jungle4', fetchProviderOptions?: FetchProviderOptions) {
-        this.config = configPresets[environment];
-        this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-            fetch : fetchProviderOptions?.fetch ?? fetch ?? window?.fetch
-        });
-        this.eos = new APIClient({ provider: this.fetchProvider });
+  session: Session | null = null;
+  vaccountId: number | null = null;
+
+  tasks = new TasksService(this);
+  ipfs = new IpfsService(this);
+  vaccount = new VAccountService(this);
+  efx = new TokenService(this);
+  action = new ActionService(this);
+  atomic = new AtomicAssetsService(this);
+  dao = new DaoService(this);
+
+  /**
+   * Create a new Effect Network Client instance
+   * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
+   */
+  constructor(
+    environment: string = "jungle4",
+    fetchProviderOptions?: FetchProviderOptions,
+  ) {
+    this.config = configPresets[environment];
+    this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
+      fetch: fetchProviderOptions?.fetch ?? fetch ?? window?.fetch,
+    });
+    this.eos = new APIClient({ provider: this.fetchProvider });
+  }
+
+  /**
+   * Login to the Effect Network with a session
+   * @param session Session object
+   */
+  async loginWithSession(session: Session): Promise<void> {
+    try {
+      this.session = session;
+      let vacc: VAccount = await this.vaccount.get();
+
+      // if no vaccount is found, create one
+      if (!vacc) {
+        await this.vaccount.open();
+        const newVaccount = await this.vaccount.get();
+        this.vaccountId = newVaccount.id;
+      }
+    } catch (e) {
+      console.error(e);
+      throw new AuthenticationError("Failed to login with session");
+    }
+  }
+
+  /**
+   * Login to the Effect Network with a private key
+   * @param actor EOS account name of the user
+   * @param permission EOS permission of the user
+   * @param privateKey EOS private key of the user
+   */
+  async login(
+    actor: string,
+    permission: string,
+    privateKey: string,
+  ): Promise<void> {
+    const walletPlugin = new WalletPluginPrivateKey(privateKey);
+    this.loginWithSession(
+      new Session({
+        actor,
+        permission,
+        walletPlugin,
+        chain: {
+          id: this.config.eosChainId,
+          url: this.config.eosRpcUrl,
+        },
+      }),
+    );
+  }
+
+  useSession = () => {
+    if (!this.session) {
+      throw new SessionNotFoundError("Session is required for this method.");
     }
 
-    tasks = new TasksService(this);
-    ipfs = new IpfsService(this);
-    vaccount = new VAccountService(this);
-    efx = new TokenService(this);
-    action = new ActionService(this);
-    atomic = new AtomicAssetsService(this);
-    dao = new DaoService(this);
+    //TODO:: This would be nicer to implement in a more generic way
+    // e.g. integrate with Wharfkit TransactPlugin.
+    const transact = async ({ ...transact }) => {
+      // ensure session is set.
 
-    /**
-     * Login to the Effect Network with a session
-     * @param session Session object
-     */
-    async loginWithSession (session: Session): Promise<void> {
-        this.session = session;
-        const vacc: VAccount = await this.vaccount.get();
-        this.vaccountId = vacc.id;
-        console.log(this.vaccountId)
-    }
+      if (!this.session) {
+        throw new SessionNotFoundError("Session is required for this method.");
+      }
 
-    /**
-     * Login to the Effect Network with a private key
-     * @param actor EOS account name of the user
-     * @param permission EOS permission of the user
-     * @param privateKey EOS private key of the user
-     */
-    async login (actor: string, permission: string, privateKey: string): Promise<void> {
-        const walletPlugin = new WalletPluginPrivateKey(privateKey);
-        this.loginWithSession(new Session({
-            actor,
-            permission,
-            walletPlugin,
-            chain: {
-                id: this.config.eosChainId,
-                url: this.config.eosRpcUrl,
-            },
-        }));
-    }
+      try {
+        // Start the transaction
+        const transaction = await this.session.transact({ ...transact });
 
-    /**
-     * Logout from the Effect Network
-     */
-    logout (): void {
-        // this.session = null;
-    }
+        //wait for TX to be IN BLOCK
+        await waitForTransaction(
+          transaction.response!.transaction_id,
+          this.eos.v1.chain,
+          TxState.IN_BLOCK,
+        );
 
-    /**
-     * Check if the user is logged in
-     * @returns {boolean} Whether or not the user is logged in
-     */
-    isLoggedIn (): boolean {
-        return this.session === undefined && this.session === null;
-    }
+        return transaction;
+      } catch (error) {
+        console.error(error);
+        throw new TransactionError("Failed to transact");
+      }
+    };
 
-    /**
-     * Require a session to be set (make sure user is logged in), otherwise throw an error.
-     */
-    requireSession (): void {
-        if (!this.session) {
-            throw new Error('Session is required for this method, please login.');
-        }
-    }
-
-    /**
-     * Retrieve the actor and permission from the session
-     * @returns [{ actor: Name; permission: Name }]
-     */
-    sessionAuth = (): Array<{ actor: Name; permission: Name }> => {
-        if (!this.session) {
-            throw new Error('Session is required for this method, please login.');
-        }
-        const { actor, permission } = this.session;
-        return [{ actor, permission }];
-    }
-
+    return {
+      actor: this.session.actor,
+      permission: this.session.permission,
+      authorization: [
+        {
+          actor: this.session.actor,
+          permission: this.session.permission,
+        },
+      ],
+      transact,
+    };
+  };
 }
