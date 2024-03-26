@@ -11,9 +11,9 @@ export enum IpfsContentFormat {
 export class IpfsService {
     constructor(private readonly client: Client) {}
 
-    upload = async (obj: object): Promise<any> => {
+    upload = async (obj: unknown) => {
         try {
-            let blob = new Blob([JSON.stringify(obj)], {
+            const blob = new Blob([JSON.stringify(obj)], {
                 type: "application/json",
             });
 
@@ -55,17 +55,9 @@ export class IpfsService {
     fetch = async (
         hash: string,
         ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
-    ): Promise<any> => {
+    ) => {
         try {
-            let data: {
-                formData: () => any;
-                arrayBuffer: () => any;
-                blob: () => any;
-                text: () => any;
-                json: () => any;
-            };
-
-            data = await this.client.fetchProvider.fetch(
+           const data = await this.client.fetchProvider.fetch(
                 `${this.client.config.ipfsEndpoint}/ipfs/${hash}`,
             );
 

@@ -1,7 +1,6 @@
 import { TransactResult } from "@wharfkit/session";
 import { type Client } from "../client";
 import { AtomicAsset, DaoConfig } from "../types/campaign";
-import { SessionNotFoundError } from "../errors";
 
 export class DaoService {
     constructor(private readonly client: Client) {}

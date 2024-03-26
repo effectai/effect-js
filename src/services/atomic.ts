@@ -2,7 +2,6 @@ import { UInt128 } from "@wharfkit/antelope";
 import { type Client } from "../client";
 import {
     AtomicAsset,
-    SchemaObject,
     AtomicAssetSchema,
 } from "../types/campaign";
 import { deserialize, ObjectSchema } from "atomicassets";
@@ -84,7 +83,7 @@ export class AtomicAssetsService {
     };
 
     // TODO: Figure out if there is a collection that ever has a schema with more than 100 rows
-    getCollection = async (collectionName: string): Promise<any> => {
+    getCollection = async (collectionName: string): Promise<unknown> => {
         const { rows } = await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.atomicAssetsContract,
             scope: collectionName,
@@ -115,5 +114,5 @@ export class AtomicAssetsService {
      * TODO
      * Mint an asset to the given account
      */
-    mintAsset = async (): Promise<any> => {};
+    // mintAsset = async (): Promise<> => {};
 }

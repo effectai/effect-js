@@ -11,7 +11,7 @@ import {
     FetchProvider,
     FetchProviderOptions,
 } from "@wharfkit/antelope";
-import { Name, Session } from "@wharfkit/session";
+import { Name, Session, TransactArgs } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { ActionService } from "./services/actions";
 import { AtomicAssetsService } from "./services/atomic";
@@ -63,7 +63,7 @@ export class Client {
     async loginWithSession(session: Session): Promise<void> {
         try {
             this.session = session;
-            let vacc: VAccount = await this.vaccount.get();
+            const vacc: VAccount = await this.vaccount.get();
 
             // if no vaccount is found, create one
             if (!vacc) {
@@ -102,7 +102,12 @@ export class Client {
         );
     }
 
-    useSession = () => {
+    useSession = () : {
+        actor: Name;
+        permission: Name;
+        authorization: { actor: Name; permission: Name }[];
+    transact: ( ...args: TransactArgs[]) => ReturnType<Session["transact"]>;
+    } => {
         if (!this.session) {
             throw new SessionNotFoundError(
                 "Session is required for this method.",
@@ -112,8 +117,6 @@ export class Client {
         //TODO:: This would be nicer to implement in a more generic way
         // e.g. integrate with Wharfkit TransactPlugin.
         const transact = async ({ ...transact }) => {
-            // ensure session is set.
-
             if (!this.session) {
                 throw new SessionNotFoundError(
                     "Session is required for this method.",

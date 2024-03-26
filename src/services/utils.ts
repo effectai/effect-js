@@ -1,7 +1,6 @@
-import { Checksum256Type, UInt128, UInt32, UInt64 } from "@wharfkit/antelope";
-import { Campaign, InitBatch, TasksSettings } from "./../types/campaign";
+import { Checksum256Type, UInt32, UInt64 } from "@wharfkit/antelope";
+import { Campaign, InitBatch } from "./../types/campaign";
 import Ajv from "ajv";
-import { Checksum256, TransactContext } from "@wharfkit/session";
 import { ChainAPI } from "@wharfkit/antelope";
 
 // export class UtilityService {
@@ -54,10 +53,10 @@ export function createCompositeU64Key(lowerId: number, upperId: number) {
 }
 
 export enum TxState {
-    EXECUTED = "executed",
+    EXECUTED = "EXECUTED",
     SOFT_FAIL = "soft_fail",
     HARD_FAIL = "hard_fail",
-    EXPIRED = "expired",
+    EXPIRED = "EXPIRED",
     IRREVERSIBLE = "IRREVERSIBLE",
     IN_BLOCK = "IN_BLOCK",
 }
@@ -77,9 +76,9 @@ export function waitForTransaction(
                     const response =
                         await context.get_transaction_status(transactionId);
                     if (
-                        response.state == "soft_fail" ||
-                        response.state == "hard_fail" ||
-                        response.state == "expired"
+                        response.state == TxState.SOFT_FAIL ||
+                        response.state == TxState.HARD_FAIL ||
+                        response.state == TxState.EXPIRED
                     ) {
                         clearInterval(interval);
                         reject(response);

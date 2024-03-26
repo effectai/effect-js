@@ -219,14 +219,14 @@ export class VAccountService {
         const { actor } = this.client.useSession();
 
         const conf = this.client.config;
-        let enc = new ABIEncoder(32);
+        const enc = new ABIEncoder(32);
         Name.from(conf.tokenContract).toABI(enc);
         const vaddr = VAddress.from(Name.from(actor.toString()));
         enc.writeByte(vaddr.variantIdx);
         vaddr.value.toABI(enc);
 
         const key = enc.getBytes().hexString;
-        let arr = new Uint8Array(32);
+        const arr = new Uint8Array(32);
         arr.set(enc.getData(), 0);
         const keycs = Checksum256.from(arr);
 

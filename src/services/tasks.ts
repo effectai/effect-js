@@ -9,16 +9,12 @@ import {
 } from "./../types/campaign";
 import { Client } from "../client";
 import { UInt128, UInt32, UInt64 } from "@wharfkit/antelope";
-import { Asset, TransactResult } from "@wharfkit/session";
-import {
-    createCompositeU64Key,
-    validateBatchData,
-    waitForTransaction,
-} from "./utils";
+import { AnyAction, Asset, TransactResult } from "@wharfkit/session";
+import { createCompositeU64Key, validateBatchData } from "./utils";
 import { VAccountError } from "../errors";
 
 export class TasksService {
-    constructor(private client: Client) {}
+    constructor(private client: Client) { }
 
     // TODO: https://wharfkit.com/guides/contract-kit/reading-tables
     // This needs to be tested when their are more campaigns on jungle.
@@ -162,7 +158,7 @@ export class TasksService {
     /**
      * Create batch
      */
-    async makeBatch(initBatch: InitBatch): Promise<any> {
+    async makeBatch(initBatch: InitBatch): Promise<TransactResult> {
         try {
             const { transact } = this.client.useSession();
 
@@ -187,7 +183,7 @@ export class TasksService {
                 initBatch,
                 hash,
             );
-            const vTransfer = this.client.action.vTransferAction(
+            const vTransfer = await this.client.action.vTransferAction(
                 vacc,
                 batchPrice,
             );
@@ -196,7 +192,7 @@ export class TasksService {
                 initBatch.repetitions,
             ); // TODO Check if batchId is correct.
 
-            let actions: any[];
+            let actions: AnyAction[];
 
             if (Asset.from(vacc.balance.quantity).value < batchPrice) {
                 const depositAction = this.client.action.depositAction(
@@ -295,7 +291,7 @@ export class TasksService {
      */
     async submitTask(
         reservation: Reservation,
-        data: any,
+        data: unknown,
     ): Promise<TransactResult> {
         try {
             const { authorization, transact, actor } = this.client.useSession();
