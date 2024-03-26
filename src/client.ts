@@ -31,7 +31,7 @@ export class Client {
     readonly eos: APIClient;
 
     session: Session | null = null;
-    vaccountId: number | null = null;
+    vAccountId: number | null = null;
 
     tasks = new TasksService(this);
     ipfs = new IpfsService(this);
@@ -63,19 +63,17 @@ export class Client {
     async loginWithSession(session: Session): Promise<void> {
         try {
             this.session = session;
-            let vacc: VAccount = await this.vaccount.get();
+            const vAccount: VAccount | null = await this.vaccount.getOrCreate();
 
-            // if no vaccount is found, create one
-            if (!vacc) {
-                await this.vaccount.open();
-                vacc = await this.vaccount.get();
+            if(!vAccount) {
+                throw new AuthenticationError("Failed to login with session");
             }
 
-            this.vaccountId = vacc.id;
+            this.vAccountId = vAccount.id;
 
         } catch (e) {
             console.error(e);
-            throw new AuthenticationError("Failed to login with session");
+            throw e;
         }
     }
 

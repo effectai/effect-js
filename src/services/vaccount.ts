@@ -11,8 +11,8 @@ import {
     UInt128,
 } from "@wharfkit/antelope";
 import { VAccount } from "../types/user";
-import { TransactResult } from "@wharfkit/session";
-import { AtomicAsset, AvatarAtomicAsset } from "../types/campaign";
+import { AnyAction, TransactResult } from "@wharfkit/session";
+import { AvatarAtomicAsset } from "../types/campaign";
 import { SessionNotFoundError } from "../errors";
 
 @Variant.type("vaddress", [Checksum160, Name])
@@ -84,11 +84,22 @@ export class VAccountService {
         return await transact({ action });
     }
 
+    async getOrCreate(): Promise<VAccount | null> {
+        let vaccountInstance = await this.get();
+
+        if (!vaccountInstance) {
+            await this.open();
+            vaccountInstance = await this.get();
+        }
+
+        return vaccountInstance;
+    }
+
     /**
      * Get vAccount row of the configured account and token contract
      * @returns {Promise<VAccount>}
      */
-    async get(): Promise<VAccount> {
+    async get(): Promise<VAccount | null> {
         const { conf, keycs } = this.generateCheckSumForVAccount();
         const response = await this.client.eos.v1.chain.get_table_rows({
             code: conf.vaccountContract,
@@ -99,9 +110,11 @@ export class VAccountService {
             index_position: "secondary",
             key_type: "sha256",
         });
+
+
         return response.rows.find(
             (row: VAccount) => row.balance.contract === conf.tokenContract,
-        );
+        ) ?? null;
     }
 
     /**
@@ -174,8 +187,13 @@ export class VAccountService {
             );
         }
 
-        const actions = <any>[];
+        const actions = <AnyAction[]>[];
         const vacc = await this.get();
+
+        if (!vacc) {
+            throw new Error("No vAccount found");
+        }
+
         const settings = await this.client.tasks.getForceSettings();
         const payments = await this.getPendingPayout(vacc.id);
 
@@ -219,14 +237,14 @@ export class VAccountService {
         const { actor } = this.client.useSession();
 
         const conf = this.client.config;
-        const enc = new ABIEncoder(32);
+        let enc = new ABIEncoder(32);
         Name.from(conf.tokenContract).toABI(enc);
         const vaddr = VAddress.from(Name.from(actor.toString()));
         enc.writeByte(vaddr.variantIdx);
         vaddr.value.toABI(enc);
 
         const key = enc.getBytes().hexString;
-        const arr = new Uint8Array(32);
+        let arr = new Uint8Array(32);
         arr.set(enc.getData(), 0);
         const keycs = Checksum256.from(arr);
 

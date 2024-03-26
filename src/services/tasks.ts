@@ -163,6 +163,11 @@ export class TasksService {
             const { transact } = this.client.useSession();
 
             const vacc = await this.client.vaccount.get();
+
+            if (!vacc) {
+                throw new Error("No vAccount found");
+            }
+
             const campaign = await this.getCampaign(initBatch.campaign_id);
             const assetQuantity = Asset.from(campaign.reward.quantity);
             const batchPrice = assetQuantity.value * initBatch.repetitions;
@@ -408,14 +413,14 @@ export class TasksService {
      */
     async getMyReservation(campaignId: number): Promise<Reservation | null> {
         try {
-            if (!this.client.vaccountId)
+            if (!this.client.vAccountId)
                 throw new VAccountError(
                     "VAccount is required for this method.",
                 );
 
             const bound = createCompositeU64Key(
                 campaignId,
-                this.client.vaccountId,
+                this.client.vAccountId,
             );
 
             const response = await this.client.eos.v1.chain.get_table_rows({
@@ -443,11 +448,11 @@ export class TasksService {
      */
     async getAllMyReservations(): Promise<Reservation[]> {
         try {
-            if (!this.client.vaccountId) {
-                throw new Error("vaccountId is not set");
+            if (!this.client.vAccountId) {
+                throw new Error("vAccountId is not set");
             }
 
-            const lowerBound = createCompositeU64Key(0, this.client.vaccountId);
+            const lowerBound = createCompositeU64Key(0, this.client.vAccountId);
             const upperBound = createCompositeU64Key(0, Number(UInt32.max));
 
             const response = await this.client.eos.v1.chain.get_table_rows({
@@ -489,7 +494,11 @@ export class TasksService {
         try {
             const vacc = await this.client.vaccount.get();
 
-            const transaction = await transact({
+            if (!vacc) {
+                throw new Error("No vAccount found");
+            }
+
+            await transact({
                 action: {
                     account: this.client.config.tasksContract,
                     name: "reservetask",
@@ -540,9 +549,7 @@ export class TasksService {
      *
      */
     async getQualificationCollection(): Promise<any> {
-        const bounds: string = "effect.network";
-
-        const response = await this.client.eos.v1.chain.get_table_rows({
+        await this.client.eos.v1.chain.get_table_rows({
             code: this.client.config.atomicAssetsContract,
             table: "collections",
             scope: this.client.config.atomicAssetsContract,

@@ -69,6 +69,11 @@ export class TokenService {
             const { transact, actor, authorization } = this.client.useSession();
 
             const vacc = await this.client.vaccount.get();
+
+            if (!vacc) {
+                throw new Error("No vAccount found");
+            }
+
             return await transact({
                 action: {
                     account: this.client.config.tokenContract,
