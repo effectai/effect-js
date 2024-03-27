@@ -1,4 +1,5 @@
 import { type Client } from "../client";
+import { get, set } from "idb-keyval";
 
 export enum IpfsContentFormat {
   FormData = "formdata",
@@ -55,27 +56,50 @@ export class IpfsService {
   fetch = async (
     hash: string,
     ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
+    CACHE_TIME_IN_MS = 600_000,
   ) => {
     try {
+      // Create a cache key
+      const cacheKey = `${hash}-${ipfsContentForm}`;
+
+      // If we have the response cached, return it
+      const cachedItem = await get(cacheKey);
+      if (cachedItem && Date.now() < cachedItem.timestamp + CACHE_TIME_IN_MS) {
+        console.info("Returning cached item");
+        return cachedItem.data;
+      }
+
       const data = await this.client.fetchProvider.fetch(
         `${this.client.config.ipfsEndpoint}/ipfs/${hash}`,
       );
 
+      let result;
       // Return the IPFS content in the format you want
       switch (ipfsContentForm) {
         case IpfsContentFormat.FormData:
-          return data.formData();
+          result = data.formData();
+          break;
         case IpfsContentFormat.ArrayBuffer:
-          return data.arrayBuffer();
+          result = data.arrayBuffer();
+          break;
         case IpfsContentFormat.Blob:
-          return data.blob();
+          result = data.blob();
+          break;
         case IpfsContentFormat.Text:
-          return data.text();
+          result = data.text();
+          break;
         case IpfsContentFormat.JSON:
-          return await data.json();
+          result = await data.json();
+          break;
         default:
-          return data;
+          result = data;
+          break;
       }
+
+      // After we got the result, cache it
+      await set(cacheKey, { data: result, timestamp: Date.now() });
+
+      return result;
     } catch (error) {
       console.error(error);
     }

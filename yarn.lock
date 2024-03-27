@@ -855,13 +855,6 @@
     bn.js "^4.11.9"
     tslib "^2.1.0"
 
-"@wharfkit/transact-plugin-finality-callback@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wharfkit/transact-plugin-finality-callback/-/transact-plugin-finality-callback-1.0.0.tgz#f26e0c4a0b779a76afd63212f401eaba5ff253c5"
-  integrity sha512-xrDHub7tPaahUhLRxiS2B2XfIalj7VwXlJS78sPTs9kmS05ghWJC+N6WewDppKPsJI7EyS5tNEE6dT4NH/LdoA==
-  dependencies:
-    tslib "^2.1.0"
-
 "@wharfkit/wallet-plugin-privatekey@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@wharfkit/wallet-plugin-privatekey/-/wallet-plugin-privatekey-1.1.0.tgz#5985bff61895c54d2afbef359cd42da4f3871c7d"
@@ -1667,6 +1660,11 @@ html-escaper@^3.0.0:
   resolved "https://registry.yarnpkg.com/html-escaper/-/html-escaper-3.0.3.tgz#4d336674652beb1dcbc29ef6b6ba7f6be6fdfed6"
   integrity sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==
 
+idb-keyval@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.2.1.tgz#94516d625346d16f56f3b33855da11bfded2db33"
+  integrity sha512-8Sb3veuYCyrZL+VBt9LJfZjLUPWVvqn8tG28VqYNFCo43KHcKuq+b4EiXGeuaLAQWL2YmyDgMp2aSpH9JHsEQg==
+
 ignore@^5.2.0, ignore@^5.2.4:
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.3.1.tgz#5073e554cd42c5b33b394375f538b8593e34d4ef"
@@ -2471,6 +2469,7 @@ stream-http@^3.2.0:
     xtend "^4.0.2"
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
