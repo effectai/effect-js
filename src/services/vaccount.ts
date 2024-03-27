@@ -202,10 +202,13 @@ export class VAccountService {
     const payments = await this.getPendingPayout(vacc.id);
 
     if (payments) {
-      for (const payment of payments.rows) {
+      for (const payment of payments.rows as {
+        id: number;
+        last_submission_time: string;
+      }[]) {
         // payout is only possible after x amount of days have passed since the last_submission_time
         if (
-          new Date(new Date(payment.last_submission_time) + "UTC").getTime() /
+          new Date(new Date(payment?.last_submission_time) + "UTC").getTime() /
             1000 +
             settings.payout_delay_sec <
           Date.now() / 1000
