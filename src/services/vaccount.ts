@@ -11,7 +11,7 @@ import {
   UInt128,
   UInt64,
 } from "@wharfkit/antelope";
-import { VAccount } from "../types/user";
+import { Payment, VAccount } from "../types/user";
 import { AnyAction, TransactResult } from "@wharfkit/session";
 import { AvatarAtomicAsset } from "../types/campaign";
 import { SessionNotFoundError } from "../errors";
@@ -164,7 +164,7 @@ export class VAccountService {
    * @param accountId ID of  the given acccount
    * @returns the payment rows of the given `accountId`
    */
-  getPendingPayout = async (accountId: number) => {
+  getPendingPayout = async <T>(accountId: number) => {
     const response = (await this.client.eos.v1.chain.get_table_rows({
       code: this.client.config.tasksContract,
       scope: this.client.config.tasksContract,
@@ -173,7 +173,7 @@ export class VAccountService {
       key_type: "i64",
       lower_bound: UInt128.from(accountId),
       upper_bound: UInt128.from(accountId),
-    })) as GetTableRowsResponse<UInt64, unknown>;
+    })) as GetTableRowsResponse<UInt64, T>;
 
     return response;
   };
@@ -199,17 +199,13 @@ export class VAccountService {
     }
 
     const settings = await this.client.tasks.getForceSettings();
-    const payments = await this.getPendingPayout(vacc.id);
+    const payments = await this.getPendingPayout<Payment>(vacc.id);
 
     if (payments) {
-      for (const payment of payments.rows as {
-        //TODO:: make a better type for payment
-        id: number;
-        last_submission_time: string;
-      }[]) {
+      for (const payment of payments.rows) {
         // payout is only possible after x amount of days have passed since the last_submission_time
         if (
-          new Date(new Date(payment?.last_submission_time) + "UTC").getTime() /
+          new Date(new Date(payment.last_submission_time) + "UTC").getTime() /
             1000 +
             settings.payout_delay_sec <
           Date.now() / 1000
