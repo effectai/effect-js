@@ -203,6 +203,7 @@ export class VAccountService {
 
     if (payments) {
       for (const payment of payments.rows as {
+        //TODO:: make a better type for payment
         id: number;
         last_submission_time: string;
       }[]) {
