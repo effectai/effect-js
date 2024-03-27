@@ -113,7 +113,7 @@ export class Client {
 
     //TODO:: This would be nicer to implement in a more generic way
     // e.g. integrate with Wharfkit TransactPlugin.
-    const transact = async ({ ...transact }) => {
+    const transact = async ({ ...transactArgs }) => {
       if (!this.session) {
         throw new SessionNotFoundError("Session is required for this method.");
       }
@@ -121,7 +121,7 @@ export class Client {
       try {
         // Start the transaction
         const transaction = await this.session.transact({
-          ...transact,
+          ...transactArgs,
         });
 
         //wait for TX to be IN BLOCK
