@@ -1,89 +1,117 @@
-import { type Client } from '../client';
+import { type Client } from "../client";
+import { get, set } from "idb-keyval";
 
 export enum IpfsContentFormat {
-    FormData = 'formdata',
-    ArrayBuffer = 'arraybuffer',
-    Blob = 'blob',
-    Text = 'text',
-    JSON = 'json',
+  FormData = "formdata",
+  ArrayBuffer = "arraybuffer",
+  Blob = "blob",
+  Text = "text",
+  JSON = "json",
 }
 
 export class IpfsService {
-    constructor (private readonly client: Client) {}
+  constructor(private readonly client: Client) {}
 
-    upload = async (obj: object): Promise<any> => {
-        try {
-            let blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
+  upload = async (obj: unknown) => {
+    try {
+      const blob = new Blob([JSON.stringify(obj)], {
+        type: "application/json",
+      });
 
-            const formData = new FormData();
-            formData.append('file', blob);
+      const formData = new FormData();
+      formData.append("file", blob);
 
-            if (blob.size > 1024 * 1024 * 10) {
-                throw new Error('File too large, max file size is: 10MB');
-            } else {
-                const requestOptions: RequestInit = {
-                    method: 'POST',
-                    body: formData,
-                };
+      if (blob.size > 1024 * 1024 * 10) {
+        throw new Error("File too large, max file size is: 10MB");
+      } else {
+        const requestOptions: RequestInit = {
+          method: "POST",
+          body: formData,
+        };
 
-                const response = await this.client.fetchProvider.fetch(
-                    `${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`,
-                    requestOptions
-                );
+        const { ipfs } = this.client.useConfig();
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error in IPFS upload: ${errorText}`);
-                } else {
-                    const json = await response.json();
-                    return json.Hash as string;
-                }
-            }
-        } catch (error) {
-            throw new Error(error);
+        const response = await this.client.fetchProvider.fetch(
+          `${ipfs.ipfsEndpoint}/api/v0/add?pin=true`,
+          requestOptions,
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error in IPFS upload: ${errorText}`);
+        } else {
+          const json = await response.json();
+          return json.Hash as string;
         }
+      }
+    } catch (error: unknown) {
+      console.error("Error in IPFS upload", error);
+      throw error;
     }
+  };
 
-    /**
-     * Get IPFS Content in JSON, without caching, to be in getIpfsContent.
-     * @param {string} hash - hash of the IPFS content you want to fetch
-     * @param {IpfsContentFormat} format - format of the content you are fetching,
-     * @returns content of the ipfs hash in your preferred format
-     */
-    fetch = async (
-        hash: string,
-        ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON
-    ): Promise<any> => {
-        try {
-            let data: {
-                formData: () => any,
-                arrayBuffer: () => any,
-                blob: () => any,
-                text: () => any,
-                json: () => any
-            };
+  /**
+   * Get IPFS Content in JSON, without caching, to be in getIpfsContent.
+   * @param {string} hash - hash of the IPFS content you want to fetch
+   * @param {IpfsContentFormat} format - format of the content you are fetching,
+   * @returns content of the ipfs hash in your preferred format
+   */
+  fetch = async (
+    hash: string,
+    ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
+    cacheTimeInMs = this.client.options.ipfsCacheDurationInMs,
+  ) => {
+    try {
+      const { ipfs } = this.client.useConfig();
 
-            data = await this.client.fetchProvider.fetch(
-                `${this.client.config.ipfsEndpoint}/ipfs/${hash}`
-            );
+      const cacheKey = `${hash}-${ipfsContentForm}`;
 
-            // Return the IPFS content in the format you want
-            switch (ipfsContentForm) {
-                case IpfsContentFormat.FormData:
-                    return data.formData();
-                case IpfsContentFormat.ArrayBuffer:
-                    return data.arrayBuffer();
-                case IpfsContentFormat.Blob:
-                    return data.blob();
-                case IpfsContentFormat.Text:
-                    return data.text();
-                case IpfsContentFormat.JSON:
-                    return await data.json();
-                default:
-                    return data;
-            }
-        } catch (error) {
-            console.error(error)
+      if (cacheTimeInMs) {
+        // Create a cache key
+        const cacheKey = `${hash}-${ipfsContentForm}`;
+
+        // If we have the response cached, return it
+        const cachedItem = await get(cacheKey);
+        if (cachedItem && Date.now() < cachedItem.timestamp + cacheTimeInMs) {
+          return cachedItem.data;
         }
+      }
+
+      const data = await this.client.fetchProvider.fetch(
+        `${ipfs.ipfsEndpoint}/ipfs/${hash}`,
+      );
+
+      let result;
+      // Return the IPFS content in the format you want
+      switch (ipfsContentForm) {
+        case IpfsContentFormat.FormData:
+          result = data.formData();
+          break;
+        case IpfsContentFormat.ArrayBuffer:
+          result = data.arrayBuffer();
+          break;
+        case IpfsContentFormat.Blob:
+          result = data.blob();
+          break;
+        case IpfsContentFormat.Text:
+          result = data.text();
+          break;
+        case IpfsContentFormat.JSON:
+          result = await data.json();
+          break;
+        default:
+          result = data;
+          break;
+      }
+
+      // After we got the result, cache it
+      if (cacheTimeInMs) {
+        await set(cacheKey, { data: result, timestamp: Date.now() });
+      }
+
+      return result;
+    } catch (error) {
+      console.error(error);
     }
+  };
 }
