@@ -59,7 +59,7 @@ export class IpfsService {
   fetch = async (
     hash: string,
     ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
-    cacheTimeInMs = this.client.useOptions().ipfsCacheDurationInMs,
+    cacheTimeInMs = this.client.options.ipfsCacheDurationInMs,
   ) => {
     try {
       const { ipfs } = this.client.useConfig();
