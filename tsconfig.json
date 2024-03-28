@@ -16,7 +16,6 @@
         "target": "es2020",
         "outDir": "dist",
         "skipLibCheck": true,
-        "strictPropertyInitialization": false
     },
     "include": ["src/**/*"]
 }
