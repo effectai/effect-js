@@ -15,7 +15,6 @@ import { Payment, VAccount } from "../types/user";
 import { AnyAction, TransactResult } from "@wharfkit/session";
 import { AvatarAtomicAsset } from "../types/campaign";
 import { SessionNotFoundError } from "../errors";
-import { ClientConfig } from "../types";
 import { GetTableRowsResponse } from "./utils";
 
 @Variant.type("vaddress", [Checksum160, Name])
@@ -49,8 +48,10 @@ export class VAccountService {
       );
     }
 
+    const { contracts } = this.client.useConfig();
+
     const transferAction = {
-      account: this.client.config.vaccountContract,
+      account: contracts.vaccount,
       name: "vtransfer",
       authorization: [this.client.session.permissionLevel],
       data: {
@@ -58,7 +59,7 @@ export class VAccountService {
         to_id: to_id,
         quantity: {
           quantity: quantity,
-          contract: this.client.config.tokenContract,
+          contract: contracts.token,
         },
         memo: "",
         payer: this.client.session.actor,
@@ -71,15 +72,15 @@ export class VAccountService {
 
   async open(): Promise<TransactResult> {
     const { actor, authorization, transact } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
-    const conf = this.client.config;
     const action = {
-      account: conf.vaccountContract,
+      account: contracts.vaccount,
       name: "open",
       authorization,
       data: {
         acc: VAddress.from(Name.from(actor.toString())),
-        symbol: new ExtendedSymbol("4,EFX", conf.tokenContract),
+        symbol: new ExtendedSymbol("4,EFX", contracts.token),
         payer: actor,
       },
     };
@@ -103,11 +104,13 @@ export class VAccountService {
    * @returns {Promise<VAccount>}
    */
   async get(): Promise<VAccount | null> {
-    const { conf, keycs } = this.generateCheckSumForVAccount();
+    const keycs = this.generateCheckSumForVAccount();
+    const { contracts } = this.client.useConfig();
+
     const response = await this.client.eos.v1.chain.get_table_rows({
-      code: conf.vaccountContract,
+      code: contracts.vaccount,
       table: "account",
-      scope: conf.vaccountContract,
+      scope: contracts.vaccount,
       upper_bound: keycs,
       lower_bound: keycs,
       index_position: "secondary",
@@ -116,7 +119,7 @@ export class VAccountService {
 
     return (
       response.rows.find(
-        (row: VAccount) => row.balance.contract === conf.tokenContract,
+        (row: VAccount) => row.balance.contract === contracts.token,
       ) ?? null
     );
   }
@@ -125,16 +128,19 @@ export class VAccountService {
    * Get all VAccount rows of the configured account and token contract
    */
   async getAll(): Promise<VAccount[]> {
-    const { conf, keycs } = this.generateCheckSumForVAccount();
+    const keycs = this.generateCheckSumForVAccount();
+    const { contracts } = this.client.useConfig();
+
     const response = await this.client.eos.v1.chain.get_table_rows({
-      code: conf.vaccountContract,
+      code: contracts.vaccount,
       table: "account",
-      scope: conf.vaccountContract,
+      scope: contracts.vaccount,
       upper_bound: keycs,
       lower_bound: keycs,
       index_position: "secondary",
       key_type: "sha256",
     });
+
     return response.rows;
   }
 
@@ -165,9 +171,10 @@ export class VAccountService {
    * @returns the payment rows of the given `accountId`
    */
   getPendingPayout = async <T>(accountId: number) => {
+    const { contracts } = this.client.useConfig();
     const response = (await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.tasksContract,
-      scope: this.client.config.tasksContract,
+      code: contracts.tasks,
+      scope: contracts.tasks,
       table: "payment",
       index_position: "tertiary",
       key_type: "i64",
@@ -198,6 +205,7 @@ export class VAccountService {
       throw new Error("No vAccount found");
     }
 
+    const { contracts } = this.client.useConfig();
     const settings = await this.client.tasks.getForceSettings();
     const payments = await this.getPendingPayout<Payment>(vacc.id);
 
@@ -211,7 +219,7 @@ export class VAccountService {
           Date.now() / 1000
         ) {
           actions.push({
-            account: this.client.config.tasksContract,
+            account: contracts.tasks,
             name: "payout",
             authorization: [
               {
@@ -235,12 +243,12 @@ export class VAccountService {
   /**
    * Generate checkSum for vaccount
    */
-  generateCheckSumForVAccount(): { conf: ClientConfig; keycs: Checksum256 } {
+  generateCheckSumForVAccount(): Checksum256 {
+    const { contracts } = this.client.useConfig();
     const { actor } = this.client.useSession();
 
-    const conf = this.client.config;
     const enc = new ABIEncoder(32);
-    Name.from(conf.tokenContract).toABI(enc);
+    Name.from(contracts.token).toABI(enc);
     const vaddr = VAddress.from(Name.from(actor.toString()));
     enc.writeByte(vaddr.variantIdx);
     vaddr.value.toABI(enc);
@@ -250,6 +258,6 @@ export class VAccountService {
     arr.set(enc.getData(), 0);
     const keycs = Checksum256.from(arr);
 
-    return { conf, keycs };
+    return keycs;
   }
 }

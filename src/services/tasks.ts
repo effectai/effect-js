@@ -23,6 +23,8 @@ export class TasksService {
    * @returns {Campaign[]} Promise<Campaign[]>
    */
   async getAllCampaigns(ipfsFetch: boolean = true): Promise<Campaign[]> {
+    const { contracts } = this.client.useConfig();
+
     const rows: Campaign[] = [];
     const boundDelta = 20;
     let lowerBound: UInt128 = UInt128.from(0);
@@ -31,9 +33,9 @@ export class TasksService {
 
     while (more) {
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "campaign",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
         lower_bound: lowerBound,
         upper_bound: upperBound,
       });
@@ -64,11 +66,13 @@ export class TasksService {
    * @returns {Promise<Campaign>} Campaign
    */
   async getCampaign(id: number, fetchIpfs: boolean = true): Promise<Campaign> {
+    const { contracts } = this.client.useConfig();
+
     try {
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "campaign",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
         lower_bound: UInt128.from(id),
         upper_bound: UInt128.from(id),
         limit: 1,
@@ -96,12 +100,13 @@ export class TasksService {
    */
   async makeCampaign(campaign: InitCampaign): Promise<TransactResult> {
     const { transact, actor, permission } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     try {
       const hash = await this.client.ipfs.upload(campaign.info);
       const response = await transact({
         action: {
-          account: this.client.config.tasksContract,
+          account: contracts.tasks,
           name: "mkcampaign",
           authorization: [
             {
@@ -115,7 +120,7 @@ export class TasksService {
             max_task_time: campaign.max_task_time,
             reward: {
               quantity: campaign.quantity,
-              contract: this.client.config.tokenContract,
+              contract: contracts.token,
             },
             qualis: campaign.qualis ?? [],
             payer: actor,
@@ -135,10 +140,12 @@ export class TasksService {
    * @returns {Promise<Batch>} Batch
    */
   async getBatch(batchId: number): Promise<Batch> {
+    const { contracts } = this.client.useConfig();
+
     const response = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.tasksContract,
+      code: contracts.tasks,
       table: "batch",
-      scope: this.client.config.tasksContract,
+      scope: contracts.tasks,
       lower_bound: UInt128.from(batchId),
       upper_bound: UInt128.from(batchId),
       limit: 1,
@@ -268,10 +275,12 @@ export class TasksService {
    */
   async getAllRepsDone(): Promise<RepsDone[]> {
     try {
+      const { contracts } = this.client.useConfig();
+
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "repsdone",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
       });
       return response.rows;
     } catch (error) {
@@ -291,10 +300,13 @@ export class TasksService {
   ): Promise<TransactResult> {
     try {
       const { authorization, transact, actor } = this.client.useSession();
+      const { contracts } = this.client.useConfig();
+
       const ipfsData = await this.client.ipfs.upload(data);
+
       const response = await transact({
         action: {
-          account: this.client.config.tasksContract,
+          account: contracts.tasks,
           name: "submittask",
           authorization,
           data: {
@@ -318,11 +330,13 @@ export class TasksService {
    *
    */
   getAllAccTaskIdx = async (): Promise<unknown> => {
+    const { contracts } = this.client.useConfig();
+
     try {
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "acctaskidx",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
       });
       // console.debug('getAllAccTaskIdx', response)
       return response.rows;
@@ -337,11 +351,13 @@ export class TasksService {
    * @returns {Promise<Reservation[]>} Reservation[]
    */
   async getAllReservations(): Promise<Reservation[]> {
+    const { contracts } = this.client.useConfig();
+
     try {
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "reservation",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
       });
 
       while (response.more) {
@@ -349,9 +365,9 @@ export class TasksService {
         const lowerBound = UInt64.from(lastRow.id + 1);
         const upperBound = UInt64.from(lastRow.id + 21);
         const moreResponse = await this.client.eos.v1.chain.get_table_rows({
-          code: this.client.config.tasksContract,
+          code: contracts.tasks,
           table: "reservation",
-          scope: this.client.config.tasksContract,
+          scope: contracts.tasks,
           lower_bound: lowerBound,
           upper_bound: upperBound,
         });
@@ -376,14 +392,16 @@ export class TasksService {
     campaignId: number,
     accountId: number,
   ): Promise<Reservation> {
+    const { contracts } = this.client.useConfig();
+
     try {
       const bound = createCompositeU64Key(campaignId, accountId);
 
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "reservation",
         index_position: "secondary",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
         upper_bound: bound,
         lower_bound: bound,
       });
@@ -402,6 +420,8 @@ export class TasksService {
    * @returns {Promise<Reservation | null>} Reservation
    */
   async getMyReservation(campaignId: number): Promise<Reservation | null> {
+    const { contracts } = this.client.useConfig();
+
     try {
       if (!this.client.vAccountId)
         throw new VAccountError("VAccount is required for this method.");
@@ -409,10 +429,10 @@ export class TasksService {
       const bound = createCompositeU64Key(campaignId, this.client.vAccountId);
 
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "reservation",
         index_position: "secondary",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
         upper_bound: bound,
         lower_bound: bound,
       });
@@ -431,6 +451,8 @@ export class TasksService {
    * @returns {Promise<Reservation>} Reservation
    */
   async getAllMyReservations(): Promise<Reservation[]> {
+    const { contracts } = this.client.useConfig();
+
     try {
       if (!this.client.vAccountId) {
         throw new Error("vAccountId is not set");
@@ -440,10 +462,10 @@ export class TasksService {
       const upperBound = createCompositeU64Key(0, Number(UInt32.max));
 
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
+        code: contracts.tasks,
         table: "reservation",
         index_position: "secondary",
-        scope: this.client.config.tasksContract,
+        scope: contracts.tasks,
         upper_bound: upperBound,
         lower_bound: lowerBound,
       });
@@ -466,6 +488,7 @@ export class TasksService {
     qualiAssets?: string[],
   ): Promise<Reservation | null> {
     const { authorization, actor, transact } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     // Check if the user already has a reservation for this campaign
     const existingReservation = await this.getMyReservation(campaignId);
@@ -484,7 +507,7 @@ export class TasksService {
 
       await transact({
         action: {
-          account: this.client.config.tasksContract,
+          account: contracts.tasks,
           name: "reservetask",
           authorization,
           data: {
@@ -512,11 +535,12 @@ export class TasksService {
   async getQualifications(accountId: number): Promise<unknown[]> {
     // We should look at the current implementation for how AtomicAssets implemented this.
     // We can mock this by using atomic assets nfts on jungle
+    const { atomic } = this.client.useConfig();
 
     const response = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.atomicAssetsContract,
+      code: atomic.atomicContract,
       table: "assets",
-      scope: this.client.config.atomicAssetsContract,
+      scope: atomic.atomicContract,
       limit: 50,
       upper_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
       lower_bound: UInt128.from(accountId), // TODO: What bounds do I need to set?
@@ -533,10 +557,12 @@ export class TasksService {
    *
    */
   async getQualificationCollection(): Promise<void> {
+    const { atomic } = this.client.useConfig();
+
     await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.atomicAssetsContract,
+      code: atomic.atomicContract,
       table: "collections",
-      scope: this.client.config.atomicAssetsContract,
+      scope: atomic.atomicContract,
       limit: 1,
       upper_bound: UInt128.from(1),
       lower_bound: UInt128.from(1),
@@ -550,10 +576,12 @@ export class TasksService {
    * @throws error if the payout delay is not available
    */
   getForceSettings = async (): Promise<TasksSettings> => {
+    const { contracts } = this.client.useConfig();
+
     try {
       const response = await this.client.eos.v1.chain.get_table_rows({
-        code: this.client.config.tasksContract,
-        scope: this.client.config.tasksContract,
+        code: contracts.tasks,
+        scope: contracts.tasks,
         table: "settings",
       });
       const [config] = response.rows;

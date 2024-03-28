@@ -15,7 +15,7 @@
         "useUnknownInCatchVariables": false,
         "target": "es2020",
         "outDir": "dist",
-        "skipLibCheck": true
+        "skipLibCheck": true,
     },
     "include": ["src/**/*"]
 }

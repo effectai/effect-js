@@ -62,6 +62,7 @@ export class TokenService {
   async deposit(amount: number): Promise<TransactResult> {
     try {
       const { transact, actor, authorization } = this.client.useSession();
+      const { contracts } = this.client.useConfig();
 
       const vacc = await this.client.vaccount.get();
 
@@ -71,12 +72,12 @@ export class TokenService {
 
       return await transact({
         action: {
-          account: this.client.config.tokenContract,
+          account: contracts.token,
           name: "transfer",
           authorization,
           data: {
             from: actor,
-            to: this.client.config.vaccountContract,
+            to: contracts.vaccount,
             quantity: Asset.from(amount, "4,EFX"),
             memo: `${vacc.id}`,
           },

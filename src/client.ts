@@ -1,6 +1,4 @@
-import { ClientConfig } from "./types/config";
 import { VAccount } from "./types/user";
-import { configPresets } from "./config";
 import { IpfsService } from "./services/ipfs";
 import { TasksService } from "./services/tasks";
 import { VAccountService } from "./services/vaccount";
@@ -22,37 +20,51 @@ import {
   TransactionError,
 } from "./errors";
 import { TxState, waitForTransaction } from "./services/utils";
+import { jungle4 } from "./constants/network";
+import { Network } from "./types/network";
+
+export interface ClientOpts {
+  ipfsCache?: boolean;
+  fetchProviderOptions?: FetchProviderOptions;
+}
 
 export class Client {
-  static __classname = "Client";
-
-  readonly config: ClientConfig;
   readonly fetchProvider: FetchProvider;
   readonly eos: APIClient;
+  readonly network: Network;
+  readonly options: ClientOpts;
 
-  session: Session | null = null;
-  vAccountId: number | null = null;
+  public vAccountId: number | null = null;
+  public session: Session | null = null;
 
-  tasks = new TasksService(this);
-  ipfs = new IpfsService(this);
-  vaccount = new VAccountService(this);
-  efx = new TokenService(this);
-  action = new ActionService(this);
-  atomic = new AtomicAssetsService(this);
-  dao = new DaoService(this);
+  /**
+   * Services provided by the Effect Network Client
+   */
+
+  public readonly tasks: TasksService = new TasksService(this);
+  public readonly ipfs: IpfsService = new IpfsService(this);
+  public readonly vaccount: VAccountService = new VAccountService(this);
+  public readonly efx: TokenService = new TokenService(this);
+  public readonly action: ActionService = new ActionService(this);
+  public readonly atomic: AtomicAssetsService = new AtomicAssetsService(this);
+  public readonly dao: DaoService = new DaoService(this);
 
   /**
    * Create a new Effect Network Client instance
-   * @param {string} environment Which network you would like to connect to, defaults to 'jungle4'
+   * @param {Network} network Which network you would like to connect to, defaults to 'jungle4'
    */
+
   constructor(
-    environment: string = "jungle4",
-    fetchProviderOptions?: FetchProviderOptions,
+    network: Network = jungle4,
+    options: ClientOpts = { ipfsCache: true },
   ) {
-    this.config = configPresets[environment];
-    this.fetchProvider = new FetchProvider(this.config.eosRpcUrl, {
-      fetch: fetchProviderOptions?.fetch ?? fetch ?? window?.fetch,
+    this.options = options;
+    this.network = network;
+
+    this.fetchProvider = new FetchProvider(this.network.eosRpcUrl, {
+      fetch: options.fetchProviderOptions?.fetch ?? fetch ?? window?.fetch,
     });
+
     this.eos = new APIClient({ provider: this.fetchProvider });
   }
 
@@ -88,18 +100,29 @@ export class Client {
     privateKey: string,
   ): Promise<void> {
     const walletPlugin = new WalletPluginPrivateKey(privateKey);
+    const { eosRpcUrl, eosChainId } = this.network;
+
     this.loginWithSession(
       new Session({
         actor,
         permission,
         walletPlugin,
         chain: {
-          id: this.config.eosChainId,
-          url: this.config.eosRpcUrl,
+          id: eosChainId,
+          url: eosRpcUrl,
         },
       }),
     );
   }
+
+  useConfig = () => {
+    const { efx, ...rest } = this.network.config;
+
+    return {
+      contracts: efx.contracts,
+      ...rest,
+    };
+  };
 
   useSession = (): {
     actor: Name;
