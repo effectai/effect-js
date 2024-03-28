@@ -1,14 +1,7 @@
 import { Checksum256Type, UInt32, UInt64 } from "@wharfkit/antelope";
-import { Campaign, InitBatch } from "./../types/campaign";
+import { Campaign, InitBatch } from "./types/campaign";
 import Ajv from "ajv";
 import { ChainAPI } from "@wharfkit/antelope";
-
-export interface GetTableRowsResponse<Key, T> {
-  key: Key;
-  rows: T[];
-  more: boolean;
-  next_key: Key;
-}
 
 export const validateBatchData = async (
   batch: InitBatch,

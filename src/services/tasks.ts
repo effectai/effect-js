@@ -10,7 +10,7 @@ import {
 import { Client } from "../client";
 import { UInt128, UInt32, UInt64 } from "@wharfkit/antelope";
 import { AnyAction, Asset, TransactResult } from "@wharfkit/session";
-import { createCompositeU64Key, validateBatchData } from "./utils";
+import { createCompositeU64Key, validateBatchData } from "../utils";
 import { VAccountError } from "../errors";
 
 export class TasksService {

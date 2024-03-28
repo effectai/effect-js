@@ -19,7 +19,7 @@ import {
   SessionNotFoundError,
   TransactionError,
 } from "./errors";
-import { TxState, waitForTransaction } from "./services/utils";
+import { TxState, waitForTransaction } from "./utils";
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 
@@ -58,7 +58,9 @@ export class Client {
     network: Network = jungle4,
     options: ClientOpts = { ipfsCache: true },
   ) {
-    this.options = options;
+    const defaultOptions: ClientOpts = { ipfsCache: true };
+    this.options = { ...defaultOptions, ...options };
+
     this.network = network;
 
     this.fetchProvider = new FetchProvider(this.network.eosRpcUrl, {
@@ -114,6 +116,14 @@ export class Client {
       }),
     );
   }
+
+  useOptions = () => {
+    const { ipfsCache } = this.options;
+
+    return {
+      ipfsCache,
+    };
+  };
 
   useConfig = () => {
     const { efx, ...rest } = this.network.config;

@@ -63,15 +63,21 @@ export class IpfsService {
   ) => {
     try {
       const { ipfs } = this.client.useConfig();
-
-      // Create a cache key
+      const { ipfsCache } = this.client.useOptions();
       const cacheKey = `${hash}-${ipfsContentForm}`;
 
-      // If we have the response cached, return it
-      const cachedItem = await get(cacheKey);
-      if (cachedItem && Date.now() < cachedItem.timestamp + CACHE_TIME_IN_MS) {
-        console.info("Returning cached item");
-        return cachedItem.data;
+      if (ipfsCache) {
+        // Create a cache key
+        const cacheKey = `${hash}-${ipfsContentForm}`;
+
+        // If we have the response cached, return it
+        const cachedItem = await get(cacheKey);
+        if (
+          cachedItem &&
+          Date.now() < cachedItem.timestamp + CACHE_TIME_IN_MS
+        ) {
+          return cachedItem.data;
+        }
       }
 
       const data = await this.client.fetchProvider.fetch(
@@ -102,7 +108,9 @@ export class IpfsService {
       }
 
       // After we got the result, cache it
-      await set(cacheKey, { data: result, timestamp: Date.now() });
+      if (ipfsCache) {
+        await set(cacheKey, { data: result, timestamp: Date.now() });
+      }
 
       return result;
     } catch (error) {

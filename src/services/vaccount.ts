@@ -15,7 +15,7 @@ import { Payment, VAccount } from "../types/user";
 import { AnyAction, TransactResult } from "@wharfkit/session";
 import { AvatarAtomicAsset } from "../types/campaign";
 import { SessionNotFoundError } from "../errors";
-import { GetTableRowsResponse } from "./utils";
+import { GetTableRowsResponse } from "../types/helpers";
 
 @Variant.type("vaddress", [Checksum160, Name])
 class VAddress extends Variant {
@@ -170,7 +170,7 @@ export class VAccountService {
    * @param accountId ID of  the given acccount
    * @returns the payment rows of the given `accountId`
    */
-  getPendingPayout = async <T>(accountId: number) => {
+  getPendingPayout = async (accountId: number) => {
     const { contracts } = this.client.useConfig();
     const response = (await this.client.eos.v1.chain.get_table_rows({
       code: contracts.tasks,
@@ -180,7 +180,7 @@ export class VAccountService {
       key_type: "i64",
       lower_bound: UInt128.from(accountId),
       upper_bound: UInt128.from(accountId),
-    })) as GetTableRowsResponse<UInt64, T>;
+    })) as GetTableRowsResponse<UInt64, Payment>;
 
     return response;
   };
@@ -207,7 +207,7 @@ export class VAccountService {
 
     const { contracts } = this.client.useConfig();
     const settings = await this.client.tasks.getForceSettings();
-    const payments = await this.getPendingPayout<Payment>(vacc.id);
+    const payments = await this.getPendingPayout(vacc.id);
 
     if (payments) {
       for (const payment of payments.rows) {
