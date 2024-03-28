@@ -10,9 +10,11 @@ export class DaoService {
    * @returns {Promise<DaoConfig>} Returns the DAO config
    */
   getConfig = async (): Promise<DaoConfig> => {
+    const { contracts } = this.client.useConfig();
+
     const { rows } = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.daoContract,
-      scope: this.client.config.daoContract,
+      code: contracts.dao,
+      scope: contracts.dao,
       table: "config",
       limit: 1,
     });
@@ -26,11 +28,12 @@ export class DaoService {
    */
   async setAvatarAsset(asset: AtomicAsset): Promise<TransactResult> {
     const { actor, permission, transact } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     const response = await transact({
       actions: [
         {
-          account: this.client.config.daoContract,
+          account: contracts.dao,
           name: "setavatar",
           authorization: [
             {
@@ -58,8 +61,10 @@ export class DaoService {
   async getAvatar(
     account: string,
   ): Promise<{ type: number; asset_id: string }> {
+    const { contracts } = this.client.useConfig();
+
     const response = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.daoContract,
+      code: contracts.dao,
       scope: account,
       table: "avatar",
       limit: 1,

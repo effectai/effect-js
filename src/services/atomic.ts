@@ -20,8 +20,10 @@ export class AtomicAssetsService {
    * @returns {Promise<AtomicAsset[]>} Returns an array of atomic assets
    */
   getAccountAssets = async (account: string): Promise<AtomicAsset[]> => {
+    const { atomic } = this.client.useConfig();
+
     const { rows } = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.atomicAssetsContract,
+      code: atomic.atomicContract,
       scope: account,
       table: "assets",
       limit: 100,
@@ -41,9 +43,11 @@ export class AtomicAssetsService {
     deserializeAsset: boolean = true,
   ): Promise<AtomicAsset> => {
     try {
+      const { atomic } = this.client.useConfig();
+
       const { rows }: { rows: AtomicAsset[] } =
         await this.client.eos.v1.chain.get_table_rows({
-          code: this.client.config.atomicAssetsContract,
+          code: atomic.atomicContract,
           scope: account,
           table: "assets",
           limit: 1,
@@ -81,8 +85,10 @@ export class AtomicAssetsService {
 
   // TODO: Figure out if there is a collection that ever has a schema with more than 100 rows
   getCollection = async (collectionName: string): Promise<unknown> => {
+    const { atomic } = this.client.useConfig();
+
     const { rows } = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.atomicAssetsContract,
+      code: atomic.atomicContract,
       scope: collectionName,
       table: "collections",
       limit: 100,
@@ -95,8 +101,10 @@ export class AtomicAssetsService {
     collectionName: string,
     schemaName: string,
   ): Promise<AtomicAssetSchema> => {
+    const { atomic } = this.client.useConfig();
+
     const { rows } = await this.client.eos.v1.chain.get_table_rows({
-      code: this.client.config.atomicAssetsContract,
+      code: atomic.atomicContract,
       scope: collectionName,
       table: "schemas",
       limit: 100,

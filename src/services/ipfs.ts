@@ -29,8 +29,10 @@ export class IpfsService {
           body: formData,
         };
 
+        const { ipfs } = this.client.useConfig();
+
         const response = await this.client.fetchProvider.fetch(
-          `${this.client.config.ipfsEndpoint}/api/v0/add?pin=true`,
+          `${ipfs.ipfsEndpoint}/api/v0/add?pin=true`,
           requestOptions,
         );
 
@@ -59,6 +61,8 @@ export class IpfsService {
     CACHE_TIME_IN_MS = 600_000,
   ) => {
     try {
+      const { ipfs } = this.client.useConfig();
+
       // Create a cache key
       const cacheKey = `${hash}-${ipfsContentForm}`;
 
@@ -70,7 +74,7 @@ export class IpfsService {
       }
 
       const data = await this.client.fetchProvider.fetch(
-        `${this.client.config.ipfsEndpoint}/ipfs/${hash}`,
+        `${ipfs.ipfsEndpoint}/ipfs/${hash}`,
       );
 
       let result;

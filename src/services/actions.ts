@@ -12,9 +12,10 @@ export class ActionService {
   ): Promise<AnyAction> => {
     const { force_vaccount_id } = await this.client.tasks.getForceSettings();
     const { actor, permission } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     return {
-      account: this.client.config.tasksContract,
+      account: contracts.tasks,
       name: "mkbatch",
       authorization: [
         {
@@ -39,9 +40,10 @@ export class ActionService {
   ): Promise<AnyAction> => {
     const settings = await this.client.tasks.getForceSettings();
     const { actor, authorization } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     return {
-      account: this.client.config.vaccountContract,
+      account: contracts.vaccount,
       name: "vtransfer",
       authorization,
       data: {
@@ -49,7 +51,7 @@ export class ActionService {
         to_id: settings.force_vaccount_id,
         quantity: {
           quantity: batchPrice,
-          contract: this.client.config.tokenContract,
+          contract: contracts.token,
         },
         memo: "",
         payer: actor,
@@ -61,9 +63,10 @@ export class ActionService {
 
   publishBatchAction = (batchId: number, numTasks: number): AnyAction => {
     const { authorization } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     return {
-      account: this.client.config.tasksContract,
+      account: contracts.tasks,
       name: "publishbatch",
       authorization,
       data: {
@@ -76,14 +79,15 @@ export class ActionService {
 
   depositAction = (amount: number, vacc: VAccount): AnyAction => {
     const { actor, authorization } = this.client.useSession();
+    const { contracts } = this.client.useConfig();
 
     return {
-      account: this.client.config.tokenContract,
+      account: contracts.token,
       name: "transfer",
       authorization,
       data: {
         from: actor,
-        to: this.client.config.vaccountContract,
+        to: contracts.vaccount,
         quantity: Asset.from(amount, "4,EFX"),
         memo: `${vacc.id}`,
       },
