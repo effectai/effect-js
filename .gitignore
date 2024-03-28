@@ -114,3 +114,8 @@ test/.env.test.bak
 .vscode/launch.json
 
 utils/
+
+# ignore lock files
+package-lock.json
+yarn.lock
+bun.lock

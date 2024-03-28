@@ -44,8 +44,9 @@ export class IpfsService {
           return json.Hash as string;
         }
       }
-    } catch (error) {
-      throw new Error(error);
+    } catch (error: unknown) {
+      console.error("Error in IPFS upload", error);
+      throw error;
     }
   };
 

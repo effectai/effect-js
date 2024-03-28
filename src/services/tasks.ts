@@ -184,10 +184,12 @@ export class TasksService {
 
       const newBatchId = campaign.num_batches + 1;
       const hash = await this.client.ipfs.upload(initBatch.data);
+
       const makeBatch = await this.client.action.makeBatchAction(
         initBatch,
         hash,
       );
+
       const vTransfer = await this.client.action.vTransferAction(
         vacc,
         batchPrice,
@@ -246,8 +248,8 @@ export class TasksService {
 
       return ipfsData[taskIndex];
     } catch (error) {
-      console.error(error);
-      throw new Error(error.message);
+      console.error("Error while fetching task data:", error);
+      throw new Error("Error while fetching task data.");
     }
   }
 
