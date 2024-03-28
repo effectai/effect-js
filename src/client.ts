@@ -24,7 +24,7 @@ import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 
 export interface ClientOpts {
-  ipfsCache?: boolean;
+  ipfsCacheDurationInMs?: number | null;
   fetchProviderOptions?: FetchProviderOptions;
 }
 
@@ -54,11 +54,8 @@ export class Client {
    * @param {Network} network Which network you would like to connect to, defaults to 'jungle4'
    */
 
-  constructor(
-    network: Network = jungle4,
-    options: ClientOpts = { ipfsCache: true },
-  ) {
-    const defaultOptions: ClientOpts = { ipfsCache: true };
+  constructor(network: Network = jungle4, options: ClientOpts) {
+    const defaultOptions: ClientOpts = { ipfsCacheDurationInMs: 600_000 };
     this.options = { ...defaultOptions, ...options };
 
     this.network = network;
@@ -118,10 +115,10 @@ export class Client {
   }
 
   useOptions = () => {
-    const { ipfsCache } = this.options;
+    const { ipfsCacheDurationInMs } = this.options;
 
     return {
-      ipfsCache,
+      ipfsCacheDurationInMs,
     };
   };
 
