@@ -80,12 +80,6 @@ export const useWharfKitSession = (client: Client) => {
     }
   };
 
-  //get vAccount belonging to the session.
-  const getSessionVAccount = async () => {
-    const vAccounts = await getVAccounts(client, actor);
-    return vAccounts[0];
-  };
-
   return {
     actor,
     permission,
@@ -97,6 +91,5 @@ export const useWharfKitSession = (client: Client) => {
       },
     ],
     transact,
-    getSessionVAccount,
   };
 };
