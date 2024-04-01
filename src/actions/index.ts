@@ -25,12 +25,12 @@ export * from "./token/getDefiBoxPair";
 export * from "./token/swap";
 export * from "./token/getPrice";
 
+//we have to rename this because of duplicate function name
+export { getAvatar as getVAccountAvatar } from "./vaccount/getAvatar";
 export * from "./vaccount/createAccount";
 export * from "./vaccount/deposit";
 export * from "./vaccount/getAccounts";
-
-//we have to rename this because of duplicate function name
-export { getAvatar as getVAccountAvatar } from "./vaccount/getAvatar";
+export * from "./vaccount/watchAccount";
 export * from "./vaccount/getPendingPayout";
 export * from "./vaccount/payout";
 export * from "./vaccount/transfer";
