@@ -1,7 +1,7 @@
 import { AnyAction, Asset } from "@wharfkit/antelope";
 import { Client } from "../../../client";
 import { InitBatch } from "../../../types/campaign";
-import { useSession } from "../../session";
+import { useWharfKitSession } from "../../session";
 import { getCampaign } from "../campaigns/getCampaigns";
 import { useEFXContracts, validateBatchData } from "../../../utils";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
@@ -13,7 +13,7 @@ const depositAction = (
   amount: number,
   vAccount: VAccount,
 ): AnyAction => {
-  const { actor, authorization } = useSession(client);
+  const { actor, authorization } = useWharfKitSession(client);
   const { token, vaccount } = useEFXContracts(client);
 
   if (!vAccount || !vAccount.id) {
@@ -39,7 +39,7 @@ const createBatchAction = async (
   batch: InitBatch,
   hash: string,
 ): Promise<AnyAction> => {
-  const { actor, permission } = useSession(client);
+  const { actor, permission } = useWharfKitSession(client);
   const { tasks } = useEFXContracts(client);
 
   return {
@@ -68,7 +68,7 @@ const vTransferAction = (
   vAccountId: number,
   batchPrice: number,
 ): AnyAction => {
-  const { actor, authorization } = useSession(client);
+  const { actor, authorization } = useWharfKitSession(client);
   const { vaccount, token } = useEFXContracts(client);
 
   return {
@@ -95,7 +95,7 @@ const publishBatchAction = (
   batchId: number,
   numTasks: number,
 ): AnyAction => {
-  const { authorization } = useSession(client);
+  const { authorization } = useWharfKitSession(client);
   const { tasks } = useEFXContracts(client);
 
   return {
@@ -113,7 +113,7 @@ const publishBatchAction = (
 export const createBatch = async (client: Client, batch: InitBatch) => {
   try {
     const forceSettings = await getForceSettings(client);
-    const { transact } = useSession(client);
+    const { transact } = useWharfKitSession(client);
 
     const { vAccount } = client.state.getState();
 

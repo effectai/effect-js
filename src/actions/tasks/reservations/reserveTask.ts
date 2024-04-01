@@ -1,6 +1,6 @@
 import { Client } from "../../../client";
 import { useEFXContracts } from "../../../utils";
-import { useSession } from "../../session";
+import { useWharfKitSession } from "../../session";
 import { getReservationForCampaign } from "./getReservations";
 
 export const reserveTask = async (
@@ -8,9 +8,9 @@ export const reserveTask = async (
   campaignId: number,
   qualificationAssets?: string[],
 ) => {
-  const { authorization, actor, transact } = useSession(client);
-  const { tasks } = useEFXContracts(client);
-  const { vAccount } = client.state.getState();
+  const { authorization, actor, transact } = useWharfKitSession(client);
+  const { tasks: taskContract } = useEFXContracts(client);
+  const { vAccount } = client;
 
   if (!vAccount || !vAccount.id) {
     throw new Error("No vAccountId found");
@@ -31,7 +31,7 @@ export const reserveTask = async (
   try {
     await transact({
       action: {
-        account: tasks,
+        account: taskContract,
         name: "reservetask",
         authorization,
         data: {

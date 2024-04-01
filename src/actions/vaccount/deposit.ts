@@ -1,7 +1,7 @@
 import { Asset } from "@wharfkit/antelope";
 import { Client } from "../../client";
 import { useEFXContracts } from "../../utils";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 
 export const deposit = async (
   client: Client,
@@ -9,7 +9,7 @@ export const deposit = async (
   amount: number,
 ) => {
   try {
-    const { transact, actor, authorization } = useSession(client);
+    const { transact, actor, authorization } = useWharfKitSession(client);
     const { token, vaccount } = useEFXContracts(client);
 
     return await transact({

@@ -1,7 +1,7 @@
 import { Client } from "../../client";
 import { AtomicAsset } from "../../types/campaign";
 import { useEFXContracts } from "../../utils";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 
 /**
  * Set the avatar asset for the given account
@@ -9,7 +9,7 @@ import { useSession } from "../session";
  * @param asset
  */
 export const setAvatar = async (client: Client, asset: AtomicAsset) => {
-  const { actor, permission, transact } = useSession(client);
+  const { actor, permission, transact } = useWharfKitSession(client);
   const { dao } = useEFXContracts(client);
 
   const response = await transact({

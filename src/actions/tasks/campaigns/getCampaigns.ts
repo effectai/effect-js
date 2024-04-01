@@ -1,8 +1,3 @@
-/*
- * Retrieve all campaigns published to Effect Network
- * @returns {Campaign[]} Promise<Campaign[]>
- */
-
 import { UInt128 } from "@wharfkit/antelope";
 import { Client } from "../../../client";
 import { Campaign } from "../../../types";

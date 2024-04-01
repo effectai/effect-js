@@ -5,7 +5,7 @@ import { SessionNotFoundError, TransactionError } from "../errors";
 import { TxState, waitForTransaction } from "../utils";
 import { getVAccounts } from "./vaccount/getAccounts";
 
-export const setSession = async (client: Client, session: Session) => {
+export const setSession = async (client: Client, session: Session | null) => {
   client.state.setState({ session });
 };
 
@@ -32,10 +32,22 @@ export const createSession = async (
   await setSession(client, session);
 };
 
+export const watchSession = (
+  client: Client,
+  cb: (session: Session | null) => void,
+) => {
+  return client.state.subscribe(
+    ({ session: newState }, { session: oldState }) => {
+      if (oldState === newState) return;
+      cb(newState);
+    },
+  );
+};
+
 /* 
   Helper function to use session in actions
 */
-export const useSession = (client: Client) => {
+export const useWharfKitSession = (client: Client) => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");
   }

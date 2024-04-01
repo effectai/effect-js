@@ -2,13 +2,13 @@ import { Client } from "../../../client";
 import { InitCampaign } from "../../../types";
 import { useEFXContracts } from "../../../utils";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
-import { useSession } from "../../session";
+import { useWharfKitSession } from "../../session";
 
 export const createCampaign = async (
   client: Client,
   campaign: InitCampaign,
 ) => {
-  const { transact, actor, authorization } = useSession(client);
+  const { transact, actor, authorization } = useWharfKitSession(client);
   const { tasks, token } = useEFXContracts(client);
 
   try {

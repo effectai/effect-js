@@ -9,35 +9,27 @@ import { Session } from "@wharfkit/session";
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 
-export interface clientOpts {
+export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;
   fetchProviderOptions?: FetchProviderOptions;
 }
 
-export interface clientState {
+export interface ClientState {
   vAccount: VAccount | null;
   session: Session | null;
-  setVAccount: (vAccount: VAccount) => void;
-  setSession: (session: Session) => void;
+  setVAccount: (vAccount: VAccount | null) => void;
+  setSession: (session: Session | null) => void;
 }
 
 import { StoreApi, createStore } from "zustand/vanilla";
-
-export const testingFunction = () => {
-  console.log("testing");
-};
-
-export function anotherTestingFunction() {
-  console.log("another testing");
-}
+import { getVAccounts, watchSession } from "./actions";
 
 export class Client {
   readonly fetchProvider: FetchProvider;
   readonly network: Network;
-  readonly options: clientOpts;
+  readonly options: ClientOpts;
 
-  public state: StoreApi<clientState>;
-
+  public state: StoreApi<ClientState>;
   public provider: APIClient;
 
   get session(): Session | null {
@@ -53,8 +45,8 @@ export class Client {
    * @param {Network} network Which network you would like to connect to, defaults to 'jungle4'
    */
 
-  constructor(network: Network = jungle4, options: clientOpts) {
-    const defaultOptions: clientOpts = { ipfsCacheDurationInMs: 600_000 };
+  constructor(network: Network = jungle4, options: ClientOpts) {
+    const defaultOptions: ClientOpts = { ipfsCacheDurationInMs: 600_000 };
     this.options = { ...defaultOptions, ...options };
 
     this.network = network;
@@ -62,12 +54,14 @@ export class Client {
     this.state = createStore((set) => ({
       vAccount: null,
       session: null,
-      setVAccount: (vAccount: VAccount) => set({ vAccount }),
-      setSession: (session: Session) => set({ session }),
+      setVAccount: (vAccount: VAccount | null) => set({ vAccount }),
+      setSession: (session: Session | null) => set({ session }),
     }));
 
-    this.state.subscribe(({ session }) => {
-      console.log("[client] session changed!");
+    //subscribe to session changes
+    watchSession(this, async (session) => {
+      console.log("Session changed", session);
+      // If there is a session, set the vAccount
     });
 
     this.fetchProvider = new FetchProvider(this.network.eosRpcUrl, {
@@ -78,6 +72,6 @@ export class Client {
   }
 }
 
-export const createClient = (network: Network, opts: clientOpts) => {
+export const createClient = (network: Network, opts: ClientOpts) => {
   return new Client(network, opts);
 };

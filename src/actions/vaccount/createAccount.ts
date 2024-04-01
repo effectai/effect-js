@@ -2,14 +2,14 @@ import { Name } from "@wharfkit/session";
 import { Client } from "../../client";
 import { VAddress } from "../../constants/variants";
 import { ExtendedSymbol } from "../../constants/structs";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 
 export const createVAccount = async (client: Client) => {
   if (!client.session) {
     throw new Error("Session is required for this method.");
   }
 
-  const { actor, authorization, transact } = useSession(client);
+  const { actor, authorization, transact } = useWharfKitSession(client);
   const { contracts } = client.network.config.efx;
 
   const action = {

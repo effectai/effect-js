@@ -1,7 +1,7 @@
 import { UInt32 } from "@wharfkit/antelope";
 import { Client } from "../../client";
 import { useEFXContracts } from "../../utils";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 import { Reservation } from "../../types";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
 
@@ -13,7 +13,7 @@ export const submitTask = async (
   data: unknown,
 ) => {
   try {
-    const { authorization, transact, actor } = useSession(client);
+    const { authorization, transact, actor } = useWharfKitSession(client);
     const { tasks } = useEFXContracts(client);
 
     const ipfsData = await uploadIpfsResource(client, data);

@@ -32,3 +32,4 @@ export { getAvatar as getVAccountAvatar } from "./vaccount/getAvatar";
 export * from "./vaccount/getPendingPayout";
 export * from "./vaccount/payout";
 export * from "./vaccount/transfer";
+export * from "./session";

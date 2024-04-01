@@ -1,5 +1,5 @@
 import { Client } from "../../client";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 
 export const vTransfer = async (
   client: Client,
@@ -7,7 +7,7 @@ export const vTransfer = async (
   to_id: string,
   quantity: string,
 ) => {
-  const { transact, permissionLevel, actor } = useSession(client);
+  const { transact, permissionLevel, actor } = useWharfKitSession(client);
   const { contracts } = client.network.config.efx;
 
   const transferAction = {

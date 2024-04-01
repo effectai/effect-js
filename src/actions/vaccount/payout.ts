@@ -3,7 +3,7 @@ import { getVAccounts } from "./getAccounts";
 import { Client } from "../../client";
 import { getForceSettings } from "../tasks/getForceSettings";
 import { getPendingPayments } from "./getPendingPayout";
-import { useSession } from "../session";
+import { useWharfKitSession } from "../session";
 import { useEFXContracts } from "../../utils";
 
 export const payout = async (client: Client, actor: Name, permission: Name) => {
@@ -49,6 +49,6 @@ export const payout = async (client: Client, actor: Name, permission: Name) => {
     throw new Error("No pending payouts found");
   }
 
-  const { transact } = useSession(client);
+  const { transact } = useWharfKitSession(client);
   return await transact({ actions: actions });
 };
