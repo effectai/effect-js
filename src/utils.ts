@@ -1,7 +1,32 @@
-import { Checksum256Type, UInt32, UInt64 } from "@wharfkit/antelope";
-import { Campaign, InitBatch } from "./types/campaign";
+import {
+  ABIEncoder,
+  Checksum256,
+  Checksum256Type,
+  Name,
+  UInt32,
+  UInt64,
+} from "@wharfkit/antelope";
+import {
+  AtomicAsset,
+  AtomicAssetSchema,
+  Campaign,
+  InitBatch,
+} from "./types/campaign";
 import Ajv from "ajv";
 import { ChainAPI } from "@wharfkit/antelope";
+import { VAddress } from "./constants/variants";
+import { Client } from "./client";
+import { ObjectSchema, deserialize } from "atomicassets";
+
+export const useEFXContracts = (client: Client) => {
+  const { contracts } = client.network.config.efx;
+
+  return contracts;
+};
+
+export const useNetworkConfig = (client: Client) => {
+  return client.network.config;
+};
 
 export const validateBatchData = async (
   batch: InitBatch,
@@ -93,3 +118,45 @@ export function waitForTransaction(
     });
   }
 }
+
+export const generateCheckSumForVAccount = (
+  actor: Name,
+  tokenContract: string,
+): Checksum256 => {
+  const enc = new ABIEncoder(32);
+  Name.from(tokenContract).toABI(enc);
+  const vaddr = VAddress.from(Name.from(actor.toString()));
+  enc.writeByte(vaddr.variantIdx);
+  vaddr.value.toABI(enc);
+
+  const arr = new Uint8Array(32);
+  arr.set(enc.getData(), 0);
+  const keycs = Checksum256.from(arr);
+
+  return keycs;
+};
+
+export const deserializeAsset = (
+  asset: AtomicAsset,
+  schema: AtomicAssetSchema,
+) => {
+  const objectSchema = ObjectSchema(schema.format);
+  const mutable_deserialized_data = deserialize(
+    asset.mutable_serialized_data,
+    objectSchema,
+  );
+  const immutable_deserialized_data = deserialize(
+    asset.immutable_serialized_data,
+    objectSchema,
+  );
+
+  return {
+    ...asset,
+    immutable_deserialized_data,
+    mutable_deserialized_data,
+  };
+};
+
+export const testUtil = () => {
+  console.log("Test util function");
+};
