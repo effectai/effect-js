@@ -28,8 +28,13 @@ export * from "./token/getPrice";
 export * from "./vaccount/createAccount";
 export * from "./vaccount/deposit";
 export * from "./vaccount/getAccounts";
+
+//we have to rename this because of duplicate function name
 export { getAvatar as getVAccountAvatar } from "./vaccount/getAvatar";
 export * from "./vaccount/getPendingPayout";
 export * from "./vaccount/payout";
 export * from "./vaccount/transfer";
-export * from "./session";
+
+export * from "./session/createSession";
+export * from "./session/setSession";
+export * from "./session/watchSession";
