@@ -1,7 +1,7 @@
 import { Client } from "../../client";
 import { AtomicAsset } from "../../types/campaign";
 import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 
 /**
  * Set the avatar asset for the given account

@@ -2,7 +2,7 @@ import { AnyAction, Asset, Name } from "@wharfkit/antelope";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
 import { Client } from "../../client";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 
 export enum swapDirection {
   EfxToUsdt = `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,

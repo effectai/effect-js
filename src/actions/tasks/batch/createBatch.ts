@@ -1,7 +1,7 @@
 import { AnyAction, Asset } from "@wharfkit/antelope";
 import { Client } from "../../../client";
 import { InitBatch } from "../../../types/campaign";
-import { useWharfKitSession } from "../../session";
+import { useWharfKitSession } from "../../../utils/session";
 import { getCampaign } from "../campaigns/getCampaigns";
 import { useEFXContracts, validateBatchData } from "../../../utils";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";

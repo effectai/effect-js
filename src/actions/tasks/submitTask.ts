@@ -1,7 +1,7 @@
 import { UInt32 } from "@wharfkit/antelope";
 import { Client } from "../../client";
 import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 import { Reservation } from "../../types";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
 

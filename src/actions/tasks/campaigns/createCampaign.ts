@@ -2,7 +2,7 @@ import { Client } from "../../../client";
 import { InitCampaign } from "../../../types";
 import { useEFXContracts } from "../../../utils";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
-import { useWharfKitSession } from "../../session";
+import { useWharfKitSession } from "../../../utils/session";
 
 export const createCampaign = async (
   client: Client,

@@ -1,5 +1,5 @@
 import { Client } from "../../client";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 
 export const vTransfer = async (
   client: Client,

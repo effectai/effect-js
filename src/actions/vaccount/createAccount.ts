@@ -2,7 +2,7 @@ import { Name } from "@wharfkit/session";
 import { Client } from "../../client";
 import { VAddress } from "../../constants/variants";
 import { ExtendedSymbol } from "../../constants/structs";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 
 export const createVAccount = async (client: Client) => {
   if (!client.session) {

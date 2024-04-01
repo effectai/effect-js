@@ -1,4 +1,4 @@
-import { Name } from "@wharfkit/antelope";
+import type { Name } from "@wharfkit/antelope";
 import { Client } from "../../client";
 import { VAccount } from "../../types";
 import { generateCheckSumForVAccount } from "../../utils";

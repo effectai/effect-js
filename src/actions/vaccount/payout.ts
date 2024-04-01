@@ -3,7 +3,7 @@ import { getVAccounts } from "./getAccounts";
 import { Client } from "../../client";
 import { getForceSettings } from "../tasks/getForceSettings";
 import { getPendingPayments } from "./getPendingPayout";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 import { useEFXContracts } from "../../utils";
 
 export const payout = async (client: Client, actor: Name, permission: Name) => {

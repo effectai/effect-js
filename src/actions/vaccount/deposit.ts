@@ -1,7 +1,7 @@
 import { Asset } from "@wharfkit/antelope";
 import { Client } from "../../client";
 import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../session";
+import { useWharfKitSession } from "../../utils/session";
 
 export const deposit = async (
   client: Client,

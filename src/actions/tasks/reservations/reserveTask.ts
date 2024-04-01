@@ -1,6 +1,6 @@
 import { Client } from "../../../client";
 import { useEFXContracts } from "../../../utils";
-import { useWharfKitSession } from "../../session";
+import { useWharfKitSession } from "../../../utils/session";
 import { getReservationForCampaign } from "./getReservations";
 
 export const reserveTask = async (
