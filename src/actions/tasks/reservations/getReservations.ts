@@ -9,6 +9,7 @@ const _getReservations = async (
   client: Client,
   lowerBound?: UInt64,
   upperBound?: UInt64,
+  indexPosition: "secondary" | "fourth" = "secondary",
 ) => {
   const { tasks } = useEFXContracts(client);
 
@@ -16,9 +17,9 @@ const _getReservations = async (
     scope: tasks,
     code: tasks,
     table: "reservation",
-    index_position: "secondary",
-    upper_bound: lowerBound,
-    lower_bound: upperBound,
+    index_position: indexPosition,
+    upper_bound: upperBound,
+    lower_bound: lowerBound,
   })) as GetTableRowsResponse<UInt64, Reservation>;
 };
 
@@ -35,18 +36,36 @@ export const getReservationsForCampaign = async (
   client: Client,
   campaignId: number,
 ) => {
-  const lowerBound = createCompositeU64Key(campaignId, 0);
-  const upperBound = createCompositeU64Key(campaignId, Number(UInt32.max));
-  return _getReservations(client, lowerBound, upperBound);
+  try {
+    const lowerBound = createCompositeU64Key(campaignId, 0);
+    const upperBound = createCompositeU64Key(campaignId, Number(UInt32.max()));
+
+    return _getReservations(client, lowerBound, upperBound);
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };
 
 export const getReservationsForVAccount = async (
   client: Client,
   vAccountId: number,
 ) => {
-  const lowerBound = createCompositeU64Key(0, vAccountId);
-  const upperBound = createCompositeU64Key(0, Number(UInt32.max));
-  return _getReservations(client, lowerBound, upperBound);
+  try {
+    if (!vAccountId) throw new Error("vAccountId is required");
+
+    const data = await _getReservations(
+      client,
+      UInt64.from(vAccountId),
+      UInt64.from(vAccountId),
+      "fourth",
+    );
+
+    return data.rows;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };
 
 export const getReservationForCampaign = async (
@@ -54,6 +73,12 @@ export const getReservationForCampaign = async (
   campaignId: number,
   vAccountId: number,
 ) => {
-  const key = createCompositeU64Key(campaignId, vAccountId);
-  return _getReservations(client, key, key);
+  try {
+    const bound = createCompositeU64Key(campaignId, vAccountId);
+    const data = await _getReservations(client, bound, bound);
+    return data.rows[0];
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };

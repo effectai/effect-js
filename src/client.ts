@@ -5,12 +5,13 @@ import {
   FetchProvider,
   FetchProviderOptions,
 } from "@wharfkit/antelope";
-import { Session } from "@wharfkit/session";
+import type { Session } from "@wharfkit/session";
+
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 
 import { StoreApi, createStore } from "zustand/vanilla";
-import { getVAccounts, watchSession } from "./actions";
+import { getVAccounts } from "./actions";
 
 export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;
@@ -32,9 +33,9 @@ export class Client {
   readonly fetchProvider: FetchProvider;
   readonly network: Network;
   readonly options: ClientOpts;
+  readonly provider: APIClient;
 
   public state: StoreApi<ClientState>;
-  public provider: APIClient;
 
   get session(): Session | null {
     return this.state.getState().session;

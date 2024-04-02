@@ -3,3 +3,4 @@ export * from "./client";
 export * from "./template";
 export * from "./types";
 export * from "./actions";
+export * from "./errors";

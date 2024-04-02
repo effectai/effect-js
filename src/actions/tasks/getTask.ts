@@ -1,4 +1,5 @@
 import { Client } from "../../client";
+import { TaskIpfsError } from "../../errors";
 import { Reservation } from "../../types";
 import { getIpfsResource } from "../ipfs/getIpfsResource";
 import { getBatch } from "./batch/getBatch";
@@ -14,22 +15,22 @@ export const getTaskData = async (
 
     // check if the ipfsData is an array
     if (!Array.isArray(ipfsData)) {
-      throw new Error(
+      throw new TaskIpfsError(
         `Task data retrieved from IPFS is not an array. \n${String(ipfsData)}`,
       );
     }
 
     // Check if there is a task at the index
     if (ipfsData.length <= taskIndex || taskIndex < 0) {
-      throw new Error(
+      throw new TaskIpfsError(
         `Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(ipfsData)}`,
       );
     }
 
     return ipfsData[taskIndex];
-  } catch (error) {
+  } catch (error: unknown | TaskIpfsError) {
     console.error("Error while fetching task data:", error);
-    throw new Error("Error while fetching task data.");
+    throw error;
   }
 };
 

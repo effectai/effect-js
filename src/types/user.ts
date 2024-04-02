@@ -48,4 +48,8 @@ export interface DefiBoxPair {
 export interface Payment {
   id: number;
   last_submission_time: string;
+  pending: {
+    quantity: string;
+    contract: string;
+  };
 }
