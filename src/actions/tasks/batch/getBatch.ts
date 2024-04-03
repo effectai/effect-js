@@ -1,5 +1,5 @@
 import { UInt128 } from "@wharfkit/antelope";
-import { Client } from "../../../client";
+import type { Client } from "../../../client";
 import { useEFXContracts } from "../../../utils";
 
 export const getBatch = async (client: Client, batchId: number) => {

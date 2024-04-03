@@ -2,10 +2,10 @@
     "name": "@effectai/effect-js",
     "version": "2.0.0",
     "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "browser": "dist/index.js",
-    "types": "./dist/index.d.ts",
+    "main": "./dist/exports/index.js",
+    "module": "./dist/exports/index.js",
+    "browser": "dist/exports/index.js",
+    "types": "./dist/exports/index.d.ts",
     "files": [
         "dist"
     ],
@@ -76,6 +76,7 @@
         "ajv": "^8.12.0",
         "atomicassets": "^1.5.1",
         "idb-keyval": "^6.2.1",
+        "node-fetch": "^3.3.2",
         "zustand": "^4.5.2"
     }
 }

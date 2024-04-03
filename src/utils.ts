@@ -156,7 +156,3 @@ export const deserializeAsset = (
     mutable_deserialized_data,
   };
 };
-
-export const testUtil = () => {
-  console.log("Test util function");
-};

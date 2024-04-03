@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 
 export const uploadIpfsResource = async (client: Client, obj: unknown) => {
   try {

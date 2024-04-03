@@ -1,5 +1,5 @@
-import { Client } from "../../../client";
-import { InitCampaign } from "../../../types";
+import type { Client } from "../../../client";
+import type { InitCampaign } from "../../../types/campaign";
 import { useEFXContracts } from "../../../utils";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 import { useWharfKitSession } from "../../../utils/session";

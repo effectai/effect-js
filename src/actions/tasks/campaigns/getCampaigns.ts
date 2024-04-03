@@ -1,6 +1,6 @@
 import { UInt128 } from "@wharfkit/antelope";
-import { Client } from "../../../client";
-import { Campaign } from "../../../types";
+import type { Client } from "../../../client";
+import type { Campaign } from "../../../types/campaign";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
 
 export const getCampaigns = async (

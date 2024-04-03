@@ -1,6 +1,7 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
+import type { Reservation } from "../../types/campaign";
+
 import { TaskIpfsError } from "../../errors";
-import { Reservation } from "../../types";
 import { getIpfsResource } from "../ipfs/getIpfsResource";
 import { getBatch } from "./batch/getBatch";
 

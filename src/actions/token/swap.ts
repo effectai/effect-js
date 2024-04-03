@@ -1,7 +1,7 @@
 import { AnyAction, Asset, Name } from "@wharfkit/antelope";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { useWharfKitSession } from "../../utils/session";
 
 export enum swapDirection {
@@ -63,7 +63,7 @@ export const swap = async (
 ) => {
   try {
     const { transact, actor, authorization } = useWharfKitSession(client);
-    const efxPrice = await getPrice(client);
+    const efxPrice = await getPrice();
 
     const action = buildSwapAction(
       direction,

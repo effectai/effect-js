@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { GetTableRowsResponse } from "../../types/helpers";
 
 //TODO:: Define the ForceSettings type

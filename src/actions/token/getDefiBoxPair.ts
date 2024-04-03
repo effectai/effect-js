@@ -1,30 +1,27 @@
-import { UInt128 } from "@wharfkit/antelope";
-import { Client } from "../../client";
-
 export enum DefiBoxPairEnum {
   EosEfx = 191,
   EosUsdt = 12,
 }
 
-export const getDefiBoxPair = async (
-  client: Client,
-  pairEnum: DefiBoxPairEnum,
-) => {
+export const getDefiBoxPair = async (pairEnum: DefiBoxPairEnum) => {
   try {
-    const { provider } = client;
+    const result = await window.fetch(
+      `https://eos.greymass.com/v1/chain/get_table_rows`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          json: true,
+          code: "swap.defi",
+          scope: "swap.defi",
+          table: "pairs",
+          limit: 1,
+          lower_bound: pairEnum.valueOf(),
+          upper_bound: pairEnum.valueOf(),
+        }),
+      },
+    );
 
-    const pairResponse = await provider.v1.chain.get_table_rows({
-      code: "swap.defi",
-      scope: "swap.defi",
-      table: "pairs",
-      limit: 1,
-      lower_bound: UInt128.from(pairEnum.valueOf()),
-      upper_bound: UInt128.from(pairEnum.valueOf()),
-    });
-
-    const [pair] = pairResponse.rows;
-
-    return pair;
+    return result.json().then((data) => data.rows[0]);
   } catch (error) {
     console.error(error);
     throw new Error("Error retrieving EFX Ticker Price from DefiBox");

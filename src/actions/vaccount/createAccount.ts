@@ -1,5 +1,5 @@
 import { Name } from "@wharfkit/session";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { VAddress } from "../../constants/variants";
 import { ExtendedSymbol } from "../../constants/structs";
 import { useWharfKitSession } from "../../utils/session";

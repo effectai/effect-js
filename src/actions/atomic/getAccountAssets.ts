@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 
 export const getAccountAssets = async (client: Client, account: string) => {
   const { atomic } = client.network.config;

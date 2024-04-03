@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { get, set } from "idb-keyval";
 
 export enum IpfsContentFormat {

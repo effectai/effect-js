@@ -1,7 +1,7 @@
 import { UInt32, UInt64 } from "@wharfkit/antelope";
-import { Client } from "../../../client";
+import type { Client } from "../../../client";
 import { createCompositeU64Key, useEFXContracts } from "../../../utils";
-import { Reservation } from "../../../types";
+import type { Reservation } from "../../../types/campaign";
 import { GetTableRowsResponse } from "../../../types/helpers";
 
 // Private helper function to get reservations

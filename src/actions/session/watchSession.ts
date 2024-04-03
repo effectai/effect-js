@@ -1,5 +1,5 @@
 import { Session } from "@wharfkit/session";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 
 export const watchSession = (
   client: Client,

@@ -11,7 +11,7 @@ import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 
 import { StoreApi, createStore } from "zustand/vanilla";
-import { getVAccounts } from "./actions";
+import { getVAccounts } from "./actions/vaccount/getAccounts";
 
 export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;

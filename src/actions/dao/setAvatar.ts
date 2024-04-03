@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { AtomicAsset } from "../../types/campaign";
 import { useEFXContracts } from "../../utils";
 import { useWharfKitSession } from "../../utils/session";

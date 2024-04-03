@@ -1,5 +1,5 @@
-import { Client } from "../../client";
-import { VAccount } from "../../types";
+import type { Client } from "../../client";
+import type { VAccount } from "../../types/user";
 
 export const watchAccount = (
   client: Client,
@@ -8,8 +8,6 @@ export const watchAccount = (
   return client.state.subscribe(
     ({ vAccount: newState }, { vAccount: oldState }) => {
       if (oldState === newState) return;
-
-      console.log("Account changed", newState, oldState);
       cb(newState);
     },
   );

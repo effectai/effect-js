@@ -1,6 +1,6 @@
 import { AnyAction, Name } from "@wharfkit/antelope";
 import { getVAccounts } from "./getAccounts";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { getForceSettings } from "../tasks/getForceSettings";
 import { getPendingPayments } from "./getPendingPayout";
 import { useWharfKitSession } from "../../utils/session";

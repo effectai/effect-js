@@ -1,4 +1,4 @@
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { getAsset } from "../atomic/getAsset";
 import { getAvatar as getDaoAvatar } from "../dao/getAvatar";
 

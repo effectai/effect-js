@@ -1,8 +1,8 @@
 import { UInt32 } from "@wharfkit/antelope";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { useEFXContracts } from "../../utils";
 import { useWharfKitSession } from "../../utils/session";
-import { Reservation } from "../../types";
+import type { Reservation } from "../../types/campaign";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
 
 //TODO:: make task data strongly typed.

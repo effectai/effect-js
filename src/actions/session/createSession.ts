@@ -1,5 +1,5 @@
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { Session } from "@wharfkit/session";
 import { setSession } from "./setSession";
 

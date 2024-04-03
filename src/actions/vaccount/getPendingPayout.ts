@@ -1,5 +1,5 @@
 import { UInt128, UInt64 } from "@wharfkit/antelope";
-import { Client } from "../../client";
+import type { Client } from "../../client";
 import { GetTableRowsResponse } from "../../types/helpers";
 import { Payment } from "../../types/user";
 
