@@ -1,5 +1,4 @@
 import type { Client } from "../../client";
-import { useLocalStorageApi } from "../../utils/storage";
 
 export enum IpfsContentFormat {
   FormData = "formdata",
@@ -9,35 +8,33 @@ export enum IpfsContentFormat {
   JSON = "json",
 }
 
+export type CachedItem = {
+  data: unknown;
+  timestamp: number;
+};
+
 export const getIpfsResource = async (
   client: Client,
   hash: string,
   ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
 ) => {
   try {
-    //clear local storage
-
     const { ipfs } = client.network.config;
     const { ipfsCacheDurationInMs } = client.options;
-
-    const localStorage = await useLocalStorageApi();
-
+    const cache = client.cache;
     const cacheKey = `${hash}-${ipfsContentForm}`;
 
     if (ipfsCacheDurationInMs) {
       // Create a cache key
       const cacheKey = `${hash}-${ipfsContentForm}`;
-      const cachedItem = localStorage.getItem(cacheKey);
 
+      const cachedItem = (await cache.get(cacheKey)) as CachedItem | undefined;
       // If we have the response cached, return it
-      if (cachedItem !== null) {
-        const parsedItem = JSON.parse(cachedItem);
-        if (
-          parsedItem &&
-          Date.now() < parsedItem.timestamp + ipfsCacheDurationInMs
-        ) {
-          return parsedItem.data;
-        }
+      if (
+        cachedItem &&
+        Date.now() < cachedItem.timestamp + ipfsCacheDurationInMs
+      ) {
+        return cachedItem.data;
       }
     }
 
@@ -70,10 +67,7 @@ export const getIpfsResource = async (
 
     // After we got the result, cache it
     if (ipfsCacheDurationInMs) {
-      localStorage.setItem(
-        cacheKey,
-        JSON.stringify({ data: result, timestamp: Date.now() }, null, 2),
-      );
+      cache.set(cacheKey, { data: result, timestamp: Date.now() });
     }
 
     return result;

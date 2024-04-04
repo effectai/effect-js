@@ -5,14 +5,18 @@ import {
 } from "@wharfkit/antelope";
 import type { Session } from "@wharfkit/session";
 
+import { Cache, MemoryCache } from "./cache";
+
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
 import { EffectSession } from "./session";
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
+import { CacheManager, IDBCache, createCacheManager } from "./cache";
 
 export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;
   fetchProviderOptions?: FetchProviderOptions;
+  cacheImplementation?: Cache;
 }
 
 const defaultClientOpts: ClientOpts = {
@@ -25,6 +29,8 @@ export class Client {
   public readonly options: ClientOpts;
   public readonly provider: APIClient;
 
+  public cache: CacheManager;
+
   constructor(network: Network = jungle4, options: ClientOpts) {
     this.options = { ...defaultClientOpts, ...options };
 
@@ -35,6 +41,14 @@ export class Client {
     });
 
     this.provider = new APIClient({ provider: this.fetchProvider });
+
+    if (options.cacheImplementation) {
+      this.cache = createCacheManager(options.cacheImplementation);
+    } else if (typeof indexedDB !== "undefined") {
+      this.cache = createCacheManager(new IDBCache());
+    } else {
+      this.cache = createCacheManager(new MemoryCache());
+    }
   }
 
   private _session: EffectSession | null = null;
