@@ -1,8 +1,7 @@
-import { AnyAction, Asset, Name } from "@wharfkit/antelope";
+import { AnyAction, Asset, NameType } from "@wharfkit/antelope";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
 import type { Client } from "../../client";
-import { useWharfKitSession } from "../../utils/session";
 
 export enum swapDirection {
   EfxToUsdt = `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
@@ -11,8 +10,8 @@ export enum swapDirection {
 
 export const buildSwapAction = (
   direction: swapDirection,
-  actor: Name,
-  authorization: { permission: Name; actor: Name }[],
+  actor: NameType,
+  authorization: { permission: NameType; actor: NameType }[],
   amount: number,
   efxPrice: number,
 ) => {
@@ -62,7 +61,11 @@ export const swap = async (
   direction: swapDirection,
 ) => {
   try {
-    const { transact, actor, authorization } = useWharfKitSession(client);
+    if (!client.session) {
+      throw new Error("Session is required for this method.");
+    }
+
+    const { transact, actor, authorization } = client.session;
     const efxPrice = await getPrice();
 
     const action = buildSwapAction(

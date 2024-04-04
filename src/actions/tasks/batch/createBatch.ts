@@ -1,19 +1,24 @@
 import { AnyAction, Asset } from "@wharfkit/antelope";
 import { InitBatch } from "../../../types/campaign";
-import { useWharfKitSession } from "../../../utils/session";
+import { useEFXContracts } from "../../../utils/state";
 import { getCampaign } from "../campaigns/getCampaigns";
-import { useEFXContracts, validateBatchData } from "../../../utils";
+import { validateBatchData } from "../../../utils/validate";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 import { ForceSettings, getForceSettings } from "../getForceSettings";
 import type { VAccount } from "../../../types/user";
 import type { Client } from "../../../client";
+import { SessionNotFoundError } from "../../../errors";
 
 const depositAction = (
   client: Client,
   amount: number,
   vAccount: VAccount,
 ): AnyAction => {
-  const { actor, authorization } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { actor, authorization } = client.session;
   const { token, vaccount } = useEFXContracts(client);
 
   if (!vAccount || !vAccount.id) {
@@ -39,7 +44,11 @@ const createBatchAction = async (
   batch: InitBatch,
   hash: string,
 ): Promise<AnyAction> => {
-  const { actor, permission } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { actor, permission } = client.session;
   const { tasks } = useEFXContracts(client);
 
   return {
@@ -68,7 +77,11 @@ const vTransferAction = (
   vAccountId: number,
   batchPrice: number,
 ): AnyAction => {
-  const { actor, authorization } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { actor, authorization } = client.session;
   const { vaccount, token } = useEFXContracts(client);
 
   return {
@@ -95,7 +108,11 @@ const publishBatchAction = (
   batchId: number,
   numTasks: number,
 ): AnyAction => {
-  const { authorization } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { authorization } = client.session;
   const { tasks } = useEFXContracts(client);
 
   return {
@@ -112,10 +129,12 @@ const publishBatchAction = (
 
 export const createBatch = async (client: Client, batch: InitBatch) => {
   try {
-    const forceSettings = await getForceSettings(client);
-    const { transact } = useWharfKitSession(client);
+    if (!client.session) {
+      throw new SessionNotFoundError("Session is required for this method.");
+    }
 
-    const { vAccount } = client.state.getState();
+    const forceSettings = await getForceSettings(client);
+    const { transact, vAccount } = client.session;
 
     if (!vAccount) {
       throw new Error("No vAccountId found");

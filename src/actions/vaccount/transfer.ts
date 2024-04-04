@@ -1,5 +1,5 @@
 import type { Client } from "../../client";
-import { useWharfKitSession } from "../../utils/session";
+import { SessionNotFoundError } from "../../errors";
 
 export const vTransfer = async (
   client: Client,
@@ -7,7 +7,10 @@ export const vTransfer = async (
   to_id: string,
   quantity: string,
 ) => {
-  const { transact, permissionLevel, actor } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+  const { transact, permissionLevel, actor } = client.session;
   const { contracts } = client.network.config.efx;
 
   const transferAction = {

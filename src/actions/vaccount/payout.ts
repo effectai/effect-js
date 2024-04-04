@@ -1,23 +1,19 @@
 import { AnyAction, Name } from "@wharfkit/antelope";
-import { getVAccounts } from "./getAccounts";
 import type { Client } from "../../client";
 import { getForceSettings } from "../tasks/getForceSettings";
 import { getPendingPayments } from "./getPendingPayout";
-import { useWharfKitSession } from "../../utils/session";
-import { useEFXContracts } from "../../utils";
+import { useEFXContracts } from "../../utils/state";
+import { VAccountError } from "../../errors";
 
 export const payout = async (client: Client, actor: Name, permission: Name) => {
-  const vacc = await getVAccounts(client, actor);
-
-  if (!vacc) {
-    throw new Error("No vAccounts found");
+  if (!client.session?.vAccount) {
+    throw new VAccountError("vAccount is not set.");
   }
 
   const { tasks } = useEFXContracts(client);
   const forceSettings = await getForceSettings(client);
 
-  //TODO:: what in case of multiple VAccounts ?
-  const payments = await getPendingPayments(client, vacc[0].id);
+  const payments = await getPendingPayments(client, client.session.vAccount.id);
 
   const actions = <AnyAction[]>[];
 
@@ -49,6 +45,6 @@ export const payout = async (client: Client, actor: Name, permission: Name) => {
     throw new Error("No pending payouts found");
   }
 
-  const { transact } = useWharfKitSession(client);
+  const { transact } = client.session;
   return await transact({ actions: actions });
 };

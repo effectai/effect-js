@@ -1,6 +1,7 @@
 import { UInt32, UInt64 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
-import { createCompositeU64Key, useEFXContracts } from "../../../utils";
+import { useEFXContracts } from "../../../utils/state";
+import { createCompositeU64Key } from "../../../utils/keys";
 import type { Reservation } from "../../../types/campaign";
 import { GetTableRowsResponse } from "../../../types/helpers";
 

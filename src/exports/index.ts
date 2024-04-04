@@ -12,7 +12,6 @@ export { uploadIpfsResource } from "./../actions/ipfs/uploadIpfsResource";
 
 export { createSession } from "./../actions/session/createSession";
 export { setSession } from "./../actions/session/setSession";
-export { watchSession } from "./../actions/session/watchSession";
 
 export { createBatch } from "./../actions/tasks/batch/createBatch";
 export { getBatch } from "./../actions/tasks/batch/getBatch";
@@ -41,12 +40,11 @@ export { submitTask } from "./../actions/tasks/submitTask";
 
 export { getPrice } from "./../actions/token/getPrice";
 
-export { watchAccount } from "./../actions/vaccount/watchAccount";
 export { getVAccounts } from "./../actions/vaccount/getAccounts";
 export { getPendingPayments } from "./../actions/vaccount/getPendingPayout";
 export { createVAccount } from "./../actions/vaccount/createAccount";
 
-export { type Client, createClient } from "./../client";
+export { type Client, createClient, type EffectSession } from "./../client";
 
 export { TaskIpfsError } from "./errors";
 

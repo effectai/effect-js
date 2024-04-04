@@ -1,6 +1,5 @@
 import type { Client } from "../../../client";
-import { useEFXContracts } from "../../../utils";
-import { useWharfKitSession } from "../../../utils/session";
+import { useEFXContracts } from "../../../utils/state";
 import { getReservationForCampaign } from "./getReservations";
 
 export const reserveTask = async (
@@ -8,12 +7,16 @@ export const reserveTask = async (
   campaignId: number,
   qualificationAssets?: string[],
 ) => {
-  const { authorization, actor, transact } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new Error("Session is required for this method.");
+  }
+
+  const { authorization, actor, transact } = client.session;
   const { tasks: taskContract } = useEFXContracts(client);
-  const { vAccount } = client;
+  const { vAccount } = client.session;
 
   if (!vAccount || !vAccount.id) {
-    throw new Error("No vAccountId found");
+    throw new Error("Vaccount is not set.");
   }
 
   // Check if the user already has a reservation for this campaign

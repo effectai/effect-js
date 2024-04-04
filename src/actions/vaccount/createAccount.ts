@@ -1,15 +1,17 @@
 import { Name } from "@wharfkit/session";
 import type { Client } from "../../client";
-import { VAddress } from "../../constants/variants";
-import { ExtendedSymbol } from "../../constants/structs";
-import { useWharfKitSession } from "../../utils/session";
+import { VAddress } from "../../utils/variants";
+import { ExtendedSymbol } from "../../utils/structs";
 
-export const createVAccount = async (client: Client) => {
+export const createVAccount = async (client: Client, _account?: Name) => {
   if (!client.session) {
     throw new Error("Session is required for this method.");
   }
 
-  const { actor, authorization, transact } = useWharfKitSession(client);
+  // If no account is provided, use the current session actor
+  const account = _account ?? client.session.actor;
+
+  const { authorization, transact, actor } = client.session;
   const { contracts } = client.network.config.efx;
 
   const action = {
@@ -17,7 +19,7 @@ export const createVAccount = async (client: Client) => {
     name: "open",
     authorization,
     data: {
-      acc: VAddress.from(Name.from(actor.toString())),
+      acc: VAddress.from(Name.from(account.toString())),
       symbol: new ExtendedSymbol("4,EFX", contracts.token),
       payer: actor,
     },

@@ -1,5 +1,5 @@
 import type { Client } from "../../client";
-import { useEFXContracts } from "../../utils";
+import { useEFXContracts } from "../../utils/state";
 
 /**
  * Retrieve the avatar for the given account

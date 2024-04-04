@@ -1,14 +1,18 @@
 import type { Client } from "../../../client";
+import { SessionNotFoundError } from "../../../errors";
 import type { InitCampaign } from "../../../types/campaign";
-import { useEFXContracts } from "../../../utils";
+import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
-import { useWharfKitSession } from "../../../utils/session";
 
 export const createCampaign = async (
   client: Client,
   campaign: InitCampaign,
 ) => {
-  const { transact, actor, authorization } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { transact, actor, authorization } = client.session;
   const { tasks, token } = useEFXContracts(client);
 
   try {

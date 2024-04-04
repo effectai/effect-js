@@ -1,7 +1,7 @@
 import { Asset } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../../utils/session";
+import { useEFXContracts } from "../../utils/state";
+import { SessionNotFoundError } from "../../errors";
 
 export const deposit = async (
   client: Client,
@@ -9,7 +9,11 @@ export const deposit = async (
   amount: number,
 ) => {
   try {
-    const { transact, actor, authorization } = useWharfKitSession(client);
+    if (!client.session) {
+      throw new SessionNotFoundError("Session is required for this method.");
+    }
+
+    const { transact, actor, authorization } = client.session;
     const { token, vaccount } = useEFXContracts(client);
 
     return await transact({

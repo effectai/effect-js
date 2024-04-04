@@ -38,6 +38,8 @@ export const getIpfsResource = async (
       `${ipfs.ipfsEndpoint}/ipfs/${hash}`,
     );
 
+    console.log("data:", data);
+
     let result;
     // Return the IPFS content in the format you want
     switch (ipfsContentForm) {

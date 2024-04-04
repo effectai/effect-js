@@ -1,9 +1,9 @@
 import { UInt32 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../../utils/session";
+import { useEFXContracts } from "../../utils/state";
 import type { Reservation } from "../../types/campaign";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
+import { SessionNotFoundError } from "../../errors";
 
 //TODO:: make task data strongly typed.
 
@@ -13,7 +13,11 @@ export const submitTask = async (
   data: unknown,
 ) => {
   try {
-    const { authorization, transact, actor } = useWharfKitSession(client);
+    if (!client.session) {
+      throw new SessionNotFoundError("Session is required for this method.");
+    }
+
+    const { authorization, transact, actor } = client.session;
     const { tasks } = useEFXContracts(client);
 
     const ipfsData = await uploadIpfsResource(client, data);

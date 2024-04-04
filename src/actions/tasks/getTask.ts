@@ -13,7 +13,6 @@ export const getTaskData = async (
   try {
     const batch = await getBatch(client, batchId);
     const ipfsData = await getIpfsResource(client, batch.content.field_1);
-
     // check if the ipfsData is an array
     if (!Array.isArray(ipfsData)) {
       throw new TaskIpfsError(
@@ -27,6 +26,8 @@ export const getTaskData = async (
         `Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(ipfsData)}`,
       );
     }
+
+    console.log(ipfsData[taskIndex]);
 
     return ipfsData[taskIndex];
   } catch (error: unknown | TaskIpfsError) {

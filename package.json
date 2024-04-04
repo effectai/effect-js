@@ -75,8 +75,6 @@
         "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
         "ajv": "^8.12.0",
         "atomicassets": "^1.5.1",
-        "idb-keyval": "^6.2.1",
-        "node-fetch": "^3.3.2",
-        "zustand": "^4.5.2"
+        "idb-keyval": "^6.2.1"
     }
 }

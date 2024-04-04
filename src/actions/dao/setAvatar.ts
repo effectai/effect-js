@@ -1,7 +1,7 @@
 import type { Client } from "../../client";
+import { SessionNotFoundError } from "../../errors";
 import { AtomicAsset } from "../../types/campaign";
-import { useEFXContracts } from "../../utils";
-import { useWharfKitSession } from "../../utils/session";
+import { useEFXContracts } from "../../utils/state";
 
 /**
  * Set the avatar asset for the given account
@@ -9,7 +9,11 @@ import { useWharfKitSession } from "../../utils/session";
  * @param asset
  */
 export const setAvatar = async (client: Client, asset: AtomicAsset) => {
-  const { actor, permission, transact } = useWharfKitSession(client);
+  if (!client.session) {
+    throw new SessionNotFoundError("Session is required for this method.");
+  }
+
+  const { actor, permission, transact } = client.session;
   const { dao } = useEFXContracts(client);
 
   const response = await transact({

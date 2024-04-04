@@ -1,7 +1,7 @@
 import type { Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { VAccount } from "../../types/user";
-import { generateCheckSumForVAccount } from "../../utils";
+import { generateCheckSumForVAccount } from "../../utils/keys";
 
 export const getVAccounts = async (
   client: Client,

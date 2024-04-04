@@ -1,4 +1,4 @@
 export * from "./../constants/config";
 export * from "./../constants/network";
-export * from "./../constants/structs";
-export * from "./../constants/variants";
+export * from "../utils/structs";
+export * from "../utils/variants";
