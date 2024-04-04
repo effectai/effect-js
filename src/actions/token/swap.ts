@@ -1,4 +1,4 @@
-import { AnyAction, Asset, NameType } from "@wharfkit/antelope";
+import { AnyAction, Asset, type Name } from "@wharfkit/antelope";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
 import type { Client } from "../../client";
@@ -12,8 +12,8 @@ export enum swapDirection {
 
 export const buildSwapAction = (
   direction: swapDirection,
-  actor: NameType,
-  authorization: { permission: NameType; actor: NameType }[],
+  actor: Name,
+  authorization: { permission: Name; actor: Name }[],
   amount: number,
   efxPrice: number,
 ) => {

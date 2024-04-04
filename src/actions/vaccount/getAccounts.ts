@@ -1,7 +1,8 @@
-import type { Name } from "@wharfkit/antelope";
+import type { Name, UInt64Type } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { VAccount } from "../../types/user";
 import { generateCheckSumForVAccount } from "../../utils/keys";
+import { NotFoundError } from "../../errors";
 
 export const getVAccounts = async (
   client: Client,
@@ -23,4 +24,33 @@ export const getVAccounts = async (
   });
 
   return response.rows;
+};
+
+export const getAccountById = async ({
+  client,
+  accountId,
+}: {
+  client: Client;
+  accountId: UInt64Type;
+}) => {
+  const { provider, network } = client;
+  const { contracts } = network.config.efx;
+
+  const response = await provider.v1.chain.get_table_rows({
+    code: contracts.vaccount,
+    scope: contracts.vaccount,
+    table: "account",
+    limit: 1,
+    key_type: "i64",
+    upper_bound: accountId,
+    lower_bound: accountId,
+  });
+
+  const account = response.rows[0];
+
+  if (!account) {
+    throw new NotFoundError(`Account with id ${accountId} not found`);
+  }
+
+  return account;
 };

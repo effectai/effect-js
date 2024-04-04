@@ -37,12 +37,18 @@ export {
   getTaskDataByReservation,
 } from "./../actions/tasks/getTask";
 export { submitTask } from "./../actions/tasks/submitTask";
+export { getSubmissions } from "./../actions/tasks/getSubmissions";
 
 export { getPrice } from "./../actions/token/getPrice";
 
-export { getVAccounts } from "./../actions/vaccount/getAccounts";
+export {
+  getVAccounts,
+  getAccountById,
+} from "./../actions/vaccount/getAccounts";
 export { getPendingPayments } from "./../actions/vaccount/getPendingPayout";
 export { createVAccount } from "./../actions/vaccount/createAccount";
+export { payout } from "./../actions/vaccount/payout";
+export { withdraw } from "./../actions/vaccount/withdraw";
 
 export { type Client, createClient } from "./../client";
 export { EffectSession } from "./../session";
@@ -51,6 +57,12 @@ export { TaskIpfsError } from "./errors";
 
 export { jungle4, eos, defaultNetworkConfig } from "./constants";
 
-export type { Campaign, Reservation, Payment, VAccount } from "./types";
+export type {
+  Campaign,
+  Reservation,
+  Payment,
+  VAccount,
+  Submission,
+} from "./types";
 
 export { Template } from "./template";

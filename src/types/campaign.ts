@@ -137,3 +137,14 @@ export interface AtomicAssetSchema {
   schema_name: string;
   format: SchemaObject[];
 }
+
+export interface Submission {
+  id: number;
+  task_idx: number;
+  account_id: number;
+  batch_id: number;
+  campaign_id: number;
+  submitted_on: string;
+  data: unknown;
+  content: unknown | null;
+}
