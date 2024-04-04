@@ -1,5 +1,3 @@
-import { VAccount } from "./types/user";
-
 import {
   APIClient,
   FetchProvider,
@@ -9,8 +7,8 @@ import type { Session } from "@wharfkit/session";
 
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
-import { createVAccount, getVAccounts } from "./exports";
 import { EffectSession } from "./session";
+import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 
 export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;
@@ -47,19 +45,21 @@ export class Client {
 
   public setSession = async (session: Session | null) => {
     try {
-      this._session = session ? new EffectSession(session) : null;
-      // after setting the session, also try to set the vAccount
-      if (this._session) {
-        let [account] = await getVAccounts(this, this._session.actor);
-
-        if (!account) {
-          // create a vAccount for this user.
-          await createVAccount(this, this._session.actor);
-          [account] = await getVAccounts(this, this._session.actor);
-        }
-
-        this._session.setVAccount(account);
+      if (!session) {
+        this._session = null;
+        return this._session;
       }
+
+      // Get Vaccount for this user
+      const account = await getOrCreateVAccount({
+        client: this,
+        actor: session.actor,
+        session,
+      });
+
+      this._session = session ? new EffectSession(session, account) : null;
+
+      return this._session;
     } catch (e: unknown) {
       console.error(e);
       throw new Error("Failed to set session");

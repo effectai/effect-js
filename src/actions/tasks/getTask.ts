@@ -27,8 +27,6 @@ export const getTaskData = async (
       );
     }
 
-    console.log(ipfsData[taskIndex]);
-
     return ipfsData[taskIndex];
   } catch (error: unknown | TaskIpfsError) {
     console.error("Error while fetching task data:", error);

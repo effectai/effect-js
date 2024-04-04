@@ -22,19 +22,14 @@ export class EffectSession {
     return this._vAccount;
   }
 
-  constructor(session: Session) {
+  constructor(session: Session, vAccount: VAccount) {
     this.actor = session.actor;
     this.permission = session.permission;
     this.permissionLevel = session.permissionLevel;
     this.wharfKitSession = session;
     this.authorization = [{ actor: this.actor, permission: this.permission }];
-
-    this._vAccount = null;
-  }
-
-  public setVAccount = (vAccount: VAccount) => {
     this._vAccount = vAccount;
-  };
+  }
 
   public transact = async (args: TransactArgs) => {
     try {
