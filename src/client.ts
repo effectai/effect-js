@@ -5,17 +5,12 @@ import {
   FetchProvider,
   FetchProviderOptions,
 } from "@wharfkit/antelope";
-import type {
-  Name,
-  PermissionLevelType,
-  Session,
-  TransactArgs,
-} from "@wharfkit/session";
+import type { Session } from "@wharfkit/session";
 
 import { jungle4 } from "./constants/network";
 import { Network } from "./types/network";
-import { TransactionError } from "./errors";
-import { TxState, waitForTransaction } from "./utils";
+import { createVAccount, getVAccounts } from "./exports";
+import { EffectSession } from "./session";
 
 export interface ClientOpts {
   ipfsCacheDurationInMs?: number | null;
@@ -25,13 +20,6 @@ export interface ClientOpts {
 const defaultClientOpts: ClientOpts = {
   ipfsCacheDurationInMs: 600_000, // 10 minutes
 };
-
-export interface ClientState {
-  vAccount: VAccount | null;
-  session: Session | null;
-  setVAccount: (vAccount: VAccount | null) => void;
-  setSession: (session: Session | null) => void;
-}
 
 export class Client {
   public readonly fetchProvider: FetchProvider;
@@ -57,57 +45,25 @@ export class Client {
     return this._session;
   }
 
-  public setSession = (session: Session | null) => {
-    this._session = session ? new EffectSession(session) : null;
-  };
-}
-
-export class EffectSession {
-  public readonly actor: Name;
-  public readonly permission: Name;
-  public readonly permissionLevel: PermissionLevelType;
-  public readonly wharfKitSession: Session;
-  public readonly authorization: { actor: Name; permission: Name }[];
-
-  private _vAccount: VAccount | null;
-
-  get vAccount(): VAccount | null {
-    return this._vAccount;
-  }
-
-  constructor(session: Session) {
-    this.actor = session.actor;
-    this.permission = session.permission;
-    this.permissionLevel = session.permissionLevel;
-    this.wharfKitSession = session;
-    this.authorization = [{ actor: this.actor, permission: this.permission }];
-
-    this._vAccount = null;
-  }
-
-  public transact = async (args: TransactArgs) => {
+  public setSession = async (session: Session | null) => {
     try {
-      // Start the transaction
-      const transaction = await this.wharfKitSession.transact({
-        ...args,
-      });
+      this._session = session ? new EffectSession(session) : null;
+      // after setting the session, also try to set the vAccount
+      if (this._session) {
+        let [account] = await getVAccounts(this, this._session.actor);
 
-      //wait for TX to be IN BLOCK
-      await waitForTransaction(
-        transaction.response!.transaction_id,
-        this.wharfKitSession.client.v1.chain,
-        TxState.IN_BLOCK,
-      );
+        if (!account) {
+          // create a vAccount for this user.
+          await createVAccount(this, this._session.actor);
+          [account] = await getVAccounts(this, this._session.actor);
+        }
 
-      return transaction;
-    } catch (error) {
-      console.error(error);
-      throw new TransactionError("Failed to transact");
+        this._session.setVAccount(account);
+      }
+    } catch (e: unknown) {
+      console.error(e);
+      throw new Error("Failed to set session");
     }
-  };
-
-  setVAccount = (vAccount: VAccount) => {
-    this._vAccount = vAccount;
   };
 }
 
