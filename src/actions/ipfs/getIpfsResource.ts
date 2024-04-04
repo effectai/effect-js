@@ -1,5 +1,5 @@
 import type { Client } from "../../client";
-import { get, set } from "idb-keyval";
+import { useLocalStorageApi } from "../../utils/storage";
 
 export enum IpfsContentFormat {
   FormData = "formdata",
@@ -15,22 +15,29 @@ export const getIpfsResource = async (
   ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
 ) => {
   try {
+    //clear local storage
+
     const { ipfs } = client.network.config;
     const { ipfsCacheDurationInMs } = client.options;
+
+    const localStorage = await useLocalStorageApi();
 
     const cacheKey = `${hash}-${ipfsContentForm}`;
 
     if (ipfsCacheDurationInMs) {
       // Create a cache key
       const cacheKey = `${hash}-${ipfsContentForm}`;
+      const cachedItem = localStorage.getItem(cacheKey);
 
       // If we have the response cached, return it
-      const cachedItem = await get(cacheKey);
-      if (
-        cachedItem &&
-        Date.now() < cachedItem.timestamp + ipfsCacheDurationInMs
-      ) {
-        return cachedItem.data;
+      if (cachedItem !== null) {
+        const parsedItem = JSON.parse(cachedItem);
+        if (
+          parsedItem &&
+          Date.now() < parsedItem.timestamp + ipfsCacheDurationInMs
+        ) {
+          return parsedItem.data;
+        }
       }
     }
 
@@ -63,7 +70,10 @@ export const getIpfsResource = async (
 
     // After we got the result, cache it
     if (ipfsCacheDurationInMs) {
-      await set(cacheKey, { data: result, timestamp: Date.now() });
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({ data: result, timestamp: Date.now() }, null, 2),
+      );
     }
 
     return result;

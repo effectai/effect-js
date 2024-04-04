@@ -44,7 +44,8 @@ export { getVAccounts } from "./../actions/vaccount/getAccounts";
 export { getPendingPayments } from "./../actions/vaccount/getPendingPayout";
 export { createVAccount } from "./../actions/vaccount/createAccount";
 
-export { type Client, createClient, type EffectSession } from "./../client";
+export { type Client, createClient } from "./../client";
+export { EffectSession } from "./../session";
 
 export { TaskIpfsError } from "./errors";
 
