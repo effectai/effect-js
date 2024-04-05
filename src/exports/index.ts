@@ -40,6 +40,7 @@ export { submitTask } from "./../actions/tasks/submitTask";
 export { getSubmissions } from "./../actions/tasks/getSubmissions";
 
 export { getPrice } from "./../actions/token/getPrice";
+export { getBalance } from "./../actions/token/getBalance";
 
 export {
   getVAccounts,
@@ -47,8 +48,10 @@ export {
 } from "./../actions/vaccount/getAccounts";
 export { getPendingPayments } from "./../actions/vaccount/getPendingPayout";
 export { createVAccount } from "./../actions/vaccount/createAccount";
-export { payout } from "./../actions/vaccount/payout";
-export { withdraw } from "./../actions/vaccount/withdraw";
+
+export { claim, claimActions } from "../actions/vaccount/claim";
+export { withdraw, withdrawAction } from "./../actions/vaccount/withdraw";
+export { payout } from "../actions/vaccount/payout";
 
 export { type Client, createClient } from "./../client";
 export { EffectSession } from "./../session";
