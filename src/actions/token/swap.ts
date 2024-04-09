@@ -4,9 +4,7 @@ import { getPrice } from "./getPrice";
 import type { Client } from "../../client";
 
 export enum swapDirection {
-  // @ts-expect-error
   EfxToUsdt = `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
-  // @ts-expect-error
   UsdtToEfx = `${DefiBoxPairEnum.EosUsdt}-${DefiBoxPairEnum.EosEfx}`,
 }
 
