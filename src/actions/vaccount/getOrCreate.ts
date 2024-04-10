@@ -16,11 +16,13 @@ export const getOrCreateVAccount = async ({
 
     if (!account) {
       await createVAccount({ client, session, account: actor });
+
       [account] = await getVAccounts(client, actor);
     }
 
     return account;
   } catch (error) {
+    console.log(error);
     throw new Error("Failed to get or create vAccount");
   }
 };

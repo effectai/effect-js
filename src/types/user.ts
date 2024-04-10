@@ -47,6 +47,8 @@ export interface DefiBoxPair {
 //TODO:: this type is not complete..
 export interface Payment {
   id: number;
+  account_id: number;
+  batch_id: number;
   last_submission_time: string;
   pending: {
     quantity: string;

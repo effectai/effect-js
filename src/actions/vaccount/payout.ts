@@ -1,6 +1,6 @@
 import { AnyAction, ExtendedAsset, Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import { getPendingPayments } from "./getPendingPayout";
+import { getPendingPayments } from "./getPendingPayments";
 import { useEFXContracts } from "../../utils/state";
 import { VAccountError } from "../../errors";
 import { claimActions } from "./claim";
@@ -15,7 +15,7 @@ export const payout = async (client: Client, actor: Name) => {
   const { tasks, vaccount, token } = useEFXContracts(client);
   const { authorization } = client.session;
 
-  const { claimablePayments } = await getPendingPayments(
+  const { claimablePayments, totalEfxClaimable } = await getPendingPayments(
     client,
     client.session.vAccount.id,
   );
@@ -38,13 +38,6 @@ export const payout = async (client: Client, actor: Name) => {
     throw new Error("No pending payouts found");
   }
 
-  const totalEfxPending =
-    claimablePayments.reduce(
-      (acc, p) =>
-        acc + parseFloat(p.pending.quantity.match(/[0-9.]+/)?.[0] || "0") || 0,
-      0,
-    ) || 0;
-
   // Withdraw it to the vAccount
   actions.push(
     withdrawAction({
@@ -54,7 +47,7 @@ export const payout = async (client: Client, actor: Name) => {
       authorization,
       quantity: ExtendedAsset.from({
         contract: token,
-        quantity: `${totalEfxPending.toFixed(4)} EFX`,
+        quantity: `${totalEfxClaimable.toFixed(4)} EFX`,
       }),
       memo: "",
     }),

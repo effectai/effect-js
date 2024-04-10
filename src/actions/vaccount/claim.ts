@@ -1,7 +1,6 @@
 import { AnyAction, Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import { getForceSettings } from "../tasks/getForceSettings";
-import { getPendingPayments } from "./getPendingPayout";
+import { getPendingPayments } from "./getPendingPayments";
 import { useEFXContracts } from "../../utils/state";
 import { VAccountError } from "../../errors";
 import { Payment } from "../../exports";

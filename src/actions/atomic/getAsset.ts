@@ -1,8 +1,30 @@
 import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import { AtomicAsset } from "../../types/campaign";
+import { AtomicAsset, AtomicAssetSchema } from "../../types/campaign";
 import { getSchema } from "./getSchema";
-import { deserializeAsset } from "../../utils";
+
+import { ObjectSchema, deserialize } from "atomicassets";
+
+export const deserializeAsset = (
+  asset: AtomicAsset,
+  schema: AtomicAssetSchema,
+) => {
+  const objectSchema = ObjectSchema(schema.format);
+  const mutable_deserialized_data = deserialize(
+    asset.mutable_serialized_data,
+    objectSchema,
+  );
+  const immutable_deserialized_data = deserialize(
+    asset.immutable_serialized_data,
+    objectSchema,
+  );
+
+  return {
+    ...asset,
+    immutable_deserialized_data,
+    mutable_deserialized_data,
+  };
+};
 
 export const getAsset = async (
   client: Client,

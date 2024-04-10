@@ -46,7 +46,10 @@ export {
   getVAccounts,
   getAccountById,
 } from "./../actions/vaccount/getAccounts";
-export { getPendingPayments } from "./../actions/vaccount/getPendingPayout";
+export {
+  getPendingPayments,
+  getTimeToClaim,
+} from "../actions/vaccount/getPendingPayments";
 export { createVAccount } from "./../actions/vaccount/createAccount";
 
 export { claim, claimActions } from "../actions/vaccount/claim";

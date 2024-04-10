@@ -1,7 +1,4 @@
-import { Checksum256Type } from "@wharfkit/antelope";
-import { AtomicAsset, AtomicAssetSchema } from "./types/campaign";
-import { ChainAPI } from "@wharfkit/antelope";
-import { ObjectSchema, deserialize } from "atomicassets";
+import type { ChainAPI, Checksum256Type } from "@wharfkit/antelope";
 
 export enum TxState {
   EXECUTED = "EXECUTED",
@@ -48,24 +45,3 @@ export function waitForTransaction(
     });
   }
 }
-
-export const deserializeAsset = (
-  asset: AtomicAsset,
-  schema: AtomicAssetSchema,
-) => {
-  const objectSchema = ObjectSchema(schema.format);
-  const mutable_deserialized_data = deserialize(
-    asset.mutable_serialized_data,
-    objectSchema,
-  );
-  const immutable_deserialized_data = deserialize(
-    asset.immutable_serialized_data,
-    objectSchema,
-  );
-
-  return {
-    ...asset,
-    immutable_deserialized_data,
-    mutable_deserialized_data,
-  };
-};
