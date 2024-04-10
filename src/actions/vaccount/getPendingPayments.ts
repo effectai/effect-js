@@ -12,6 +12,17 @@ export const isClaimable = (p: Payment, forceSettings: ForceSettings) => {
   );
 };
 
+export const extractAndParseQuantity = (quantity: string) =>
+  parseFloat(quantity.match(/[0-9.]+/)?.[0] || "0");
+
+export const getTimeToClaim = (p: Payment, forceSettings: ForceSettings) => {
+  return (
+    new Date(new Date(p.last_submission_time) + "UTC").getTime() / 1000 +
+    forceSettings.payout_delay_sec -
+    Date.now() / 1000
+  );
+};
+
 export const getPendingPayments = async (
   client: Client,
   vAccountId: number,
@@ -35,10 +46,20 @@ export const getPendingPayments = async (
     isClaimable(p, forceSettings),
   );
 
-  console.log(claimablePayments);
+  const totalEfxPending = data.rows.reduce(
+    (acc, p) => acc + extractAndParseQuantity(p.pending.quantity) || 0,
+    0,
+  );
+
+  const totalEfxClaimable = claimablePayments.reduce(
+    (acc, p) => acc + extractAndParseQuantity(p.pending.quantity) || 0,
+    0,
+  );
 
   return {
     pendingPayments: data.rows,
     claimablePayments,
+    totalEfxPending,
+    totalEfxClaimable,
   };
 };

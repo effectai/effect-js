@@ -21,7 +21,7 @@ export const createVAccount = async ({
   // If no account is provided, use the current session actor
   const acc = account ?? sessionToUse.actor;
 
-  const { transact, actor } = sessionToUse;
+  const { actor } = sessionToUse;
   const { contracts } = client.network.config.efx;
 
   const authorization = [
@@ -42,5 +42,5 @@ export const createVAccount = async ({
     },
   };
 
-  return await transact({ action });
+  return await sessionToUse.transact({ action });
 };

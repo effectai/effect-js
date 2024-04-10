@@ -5,7 +5,7 @@ import {
   TransactArgs,
 } from "@wharfkit/session";
 import { VAccount } from "./exports";
-import { TxState, waitForTransaction } from "./utils";
+import { TxState, waitForTransaction } from "./utils/transaction";
 import { TransactionError } from "./errors";
 
 export class EffectSession {
