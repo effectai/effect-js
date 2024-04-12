@@ -6,7 +6,7 @@ import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 
 export const createCampaign = async (
   client: Client,
-  campaign: InitCampaign,
+  campaign: InitCampaign
 ) => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");

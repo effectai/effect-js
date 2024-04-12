@@ -13,7 +13,7 @@ export function waitForTransaction(
   transactionId: Checksum256Type,
   context: ChainAPI,
   state: TxState = TxState.IRREVERSIBLE,
-  maxRetries = 3,
+  maxRetries = 3
 ) {
   {
     return new Promise((resolve, reject) => {

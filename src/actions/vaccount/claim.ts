@@ -17,7 +17,7 @@ export const claim = async (client: Client) => {
 
   const { claimablePayments } = await getPendingPayments(
     client,
-    client.session.vAccount.id,
+    client.session.vAccount.id
   );
 
   const actions = <AnyAction[]>[];
@@ -28,7 +28,7 @@ export const claim = async (client: Client) => {
         payments: claimablePayments,
         tasks,
         authorization,
-      }),
+      })
     );
   } else {
     throw new Error("No pending payouts found");

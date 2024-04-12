@@ -21,7 +21,7 @@ export const uploadIpfsResource = async (client: Client, obj: unknown) => {
 
       const response = await client.fetchProvider.fetch(
         `${ipfs.ipfsEndpoint}/api/v0/add?pin=true`,
-        requestOptions,
+        requestOptions
       );
 
       if (!response.ok) {

@@ -3,7 +3,7 @@ name: Deploy on gh-pages
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   deploy:
@@ -14,8 +14,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2.1.4
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Cache dependencies
         uses: actions/cache@v2.1.3
@@ -46,4 +46,3 @@ jobs:
 
       # - run: npm run test
       # - run: EOS_PRIVATE_KEY=${{ secrets.TEST_PRIVATEKEY_PIXEOS1GSWAP }} EOS_ACCOUNT_NAME=${{ secrets.TEST_ACCOUNTNAME_PIXEOS }} EOS_ACCOUNT_PERMISSION=${{ secrets.TEST_PERMISSION_PIXEOS }} EOS_PUBLIC_KEY=${{ secrets.TEST_PUBLICKEY_PIXEOS }} npm run test
-          

@@ -7,7 +7,7 @@ export const createSession = async (
   client: Client,
   actor: string,
   permission: string,
-  privateKey: string,
+  privateKey: string
 ) => {
   const walletPlugin = new WalletPluginPrivateKey(privateKey);
 

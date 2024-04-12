@@ -22,7 +22,7 @@ export function createCompositeU64Key(lowerId: number, upperId: number) {
 
 export const generateCheckSumForVAccount = (
   actor: Name,
-  tokenContract: string,
+  tokenContract: string
 ): Checksum256 => {
   const enc = new ABIEncoder(32);
   Name.from(tokenContract).toABI(enc);

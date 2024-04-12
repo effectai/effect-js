@@ -10,7 +10,7 @@ import { SessionNotFoundError } from "../../errors";
 export const submitTask = async (
   client: Client,
   reservation: Reservation,
-  data: unknown,
+  data: unknown
 ) => {
   try {
     if (!client.session) {

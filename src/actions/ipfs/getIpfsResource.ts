@@ -16,7 +16,7 @@ export type CachedItem = {
 export const getIpfsResource = async (
   client: Client,
   hash: string,
-  ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
+  ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON
 ) => {
   try {
     const { ipfs } = client.network.config;
@@ -39,7 +39,7 @@ export const getIpfsResource = async (
     }
 
     const data = await client.fetchProvider.fetch(
-      `${ipfs.ipfsEndpoint}/ipfs/${hash}`,
+      `${ipfs.ipfsEndpoint}/ipfs/${hash}`
     );
 
     let result;

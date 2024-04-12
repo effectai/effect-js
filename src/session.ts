@@ -42,7 +42,7 @@ export class EffectSession {
       await waitForTransaction(
         transaction.response!.transaction_id,
         this.wharfKitSession.client.v1.chain,
-        TxState.IN_BLOCK,
+        TxState.IN_BLOCK
       );
 
       return transaction;

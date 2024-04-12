@@ -7,7 +7,7 @@ export const getBalance = async (client: Client, actor: Name) => {
 
   const [balance] = await provider.v1.chain.get_currency_balance(
     contracts.token,
-    actor,
+    actor
   );
 
   if (!balance) {

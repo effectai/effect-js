@@ -25,7 +25,7 @@ export const getTimeToClaim = (p: Payment, forceSettings: ForceSettings) => {
 
 export const getPendingPayments = async (
   client: Client,
-  vAccountId: number,
+  vAccountId: number
 ) => {
   const { network, provider } = client;
   const { contracts } = network.config.efx;
@@ -43,17 +43,17 @@ export const getPendingPayments = async (
   const forceSettings = await getForceSettings(client);
 
   const claimablePayments = data.rows.filter((p) =>
-    isClaimable(p, forceSettings),
+    isClaimable(p, forceSettings)
   );
 
   const totalEfxPending = data.rows.reduce(
     (acc, p) => acc + extractAndParseQuantity(p.pending.quantity) || 0,
-    0,
+    0
   );
 
   const totalEfxClaimable = claimablePayments.reduce(
     (acc, p) => acc + extractAndParseQuantity(p.pending.quantity) || 0,
-    0,
+    0
   );
 
   return {

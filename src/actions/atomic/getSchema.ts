@@ -4,7 +4,7 @@ import { AtomicAssetSchema } from "../../types/campaign";
 export const getSchema = async (
   client: Client,
   collectionName: string,
-  schemaName: string,
+  schemaName: string
 ): Promise<AtomicAssetSchema> => {
   const { atomic } = client.network.config;
   const { provider } = client;
@@ -17,7 +17,7 @@ export const getSchema = async (
   });
 
   const schema = rows.find(
-    (schema: AtomicAssetSchema) => schema.schema_name === schemaName,
+    (schema: AtomicAssetSchema) => schema.schema_name === schemaName
   );
   return schema;
 };

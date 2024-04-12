@@ -7,7 +7,7 @@ const client = createClient(jungle4, {});
 
 //jungle 4 test key
 const walletPlugin = new WalletPluginPrivateKey(
-  "5KSG1pLHubiQ2JD4G4Pr32zxz7oQvpagBofYPrdS1FALKVjxdPM",
+  "5KSG1pLHubiQ2JD4G4Pr32zxz7oQvpagBofYPrdS1FALKVjxdPM"
 );
 
 //set a test session to jungle

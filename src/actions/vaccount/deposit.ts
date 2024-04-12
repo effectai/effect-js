@@ -6,7 +6,7 @@ import { SessionNotFoundError } from "../../errors";
 export const deposit = async (
   client: Client,
   vaccountId: number,
-  amount: number,
+  amount: number
 ) => {
   try {
     if (!client.session) {

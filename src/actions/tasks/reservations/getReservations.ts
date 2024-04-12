@@ -10,7 +10,7 @@ const _getReservations = async (
   client: Client,
   lowerBound?: UInt64,
   upperBound?: UInt64,
-  indexPosition: "secondary" | "fourth" = "secondary",
+  indexPosition: "secondary" | "fourth" = "secondary"
 ) => {
   const { tasks } = useEFXContracts(client);
 
@@ -35,7 +35,7 @@ export const getReservations = async (client: Client) => {
 
 export const getReservationsForCampaign = async (
   client: Client,
-  campaignId: number,
+  campaignId: number
 ) => {
   try {
     const lowerBound = createCompositeU64Key(campaignId, 0);
@@ -50,7 +50,7 @@ export const getReservationsForCampaign = async (
 
 export const getReservationsForVAccount = async (
   client: Client,
-  vAccountId: number,
+  vAccountId: number
 ) => {
   try {
     if (!vAccountId) throw new Error("vAccountId is required");
@@ -59,7 +59,7 @@ export const getReservationsForVAccount = async (
       client,
       UInt64.from(vAccountId),
       UInt64.from(vAccountId),
-      "fourth",
+      "fourth"
     );
 
     return data.rows;
@@ -72,7 +72,7 @@ export const getReservationsForVAccount = async (
 export const getReservationForCampaign = async (
   client: Client,
   campaignId: number,
-  vAccountId: number,
+  vAccountId: number
 ) => {
   try {
     const bound = createCompositeU64Key(campaignId, vAccountId);

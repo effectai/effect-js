@@ -7,16 +7,16 @@ import { ObjectSchema, deserialize } from "atomicassets";
 
 export const deserializeAsset = (
   asset: AtomicAsset,
-  schema: AtomicAssetSchema,
+  schema: AtomicAssetSchema
 ) => {
   const objectSchema = ObjectSchema(schema.format);
   const mutable_deserialized_data = deserialize(
     asset.mutable_serialized_data,
-    objectSchema,
+    objectSchema
   );
   const immutable_deserialized_data = deserialize(
     asset.immutable_serialized_data,
-    objectSchema,
+    objectSchema
   );
 
   return {
@@ -30,7 +30,7 @@ export const getAsset = async (
   client: Client,
   account: string,
   assetId: string,
-  doDeserializeAsset: boolean = true,
+  doDeserializeAsset: boolean = true
 ) => {
   try {
     const { provider } = client;
@@ -52,7 +52,7 @@ export const getAsset = async (
       const schema = await getSchema(
         client,
         asset.collection_name,
-        asset.schema_name,
+        asset.schema_name
       );
       return deserializeAsset(asset, schema);
     } else {

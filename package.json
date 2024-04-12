@@ -1,81 +1,81 @@
 {
-    "name": "@effectai/effect-js",
-    "version": "2.0.0",
-    "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
-    "main": "./dist/exports/index.js",
-    "module": "./dist/exports/index.js",
-    "browser": "dist/exports/index.js",
-    "types": "./dist/exports/index.d.ts",
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "test": "vitest run",
-        "dev": "tsc -w",
-        "build": "tsc --module es2020",
-        "lint": "eslint . --ext .ts --fix"
+  "name": "@effectai/effect-js",
+  "version": "2.0.0",
+  "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+  "main": "./dist/exports/index.js",
+  "module": "./dist/exports/index.js",
+  "browser": "dist/exports/index.js",
+  "types": "./dist/exports/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "dev": "tsc -w",
+    "build": "tsc --module es2020",
+    "lint": "eslint . --ext .ts --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/effectai/effect-js.git"
+  },
+  "keywords": [
+    "effect",
+    "efx",
+    "future",
+    "work",
+    "ai",
+    "crypto",
+    "blockchain",
+    "microtask",
+    "task",
+    "micro-task"
+  ],
+  "author": {
+    "name": "Effect-AI",
+    "url": "https://effect.network",
+    "email": "dev@effect.ai"
+  },
+  "contributors": [
+    {
+      "name": "Laurens Verspeek",
+      "email": "laurens@effect.ai"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/effectai/effect-js.git"
+    {
+      "name": "David Britt",
+      "email": "david@effect.ai"
     },
-    "keywords": [
-        "effect",
-        "efx",
-        "future",
-        "work",
-        "ai",
-        "crypto",
-        "blockchain",
-        "microtask",
-        "task",
-        "micro-task"
-    ],
-    "author": {
-        "name": "Effect-AI",
-        "url": "https://effect.network",
-        "email": "dev@effect.ai"
-    },
-    "contributors": [
-        {
-            "name": "Laurens Verspeek",
-            "email": "laurens@effect.ai"
-        },
-        {
-            "name": "David Britt",
-            "email": "david@effect.ai"
-        },
-        {
-            "name": "Jaïr Zijp",
-            "email": "jair@effect.ai"
-        }
-    ],
-    "publishConfig": {
-        "access": "public"
-    },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/effectai/effect-js/issues"
-    },
-    "homepage": "https://github.com/effectai/effect-js#readme",
-    "devDependencies": {
-        "@types/dotenv": "^8.2.0",
-        "@types/node": "^20.5.2",
-        "@typescript-eslint/eslint-plugin": "^7.4.0",
-        "@typescript-eslint/parser": "^7.4.0",
-        "dotenv": "^16.3.1",
-        "eslint": "^8.57.0",
-        "prettier": "^3.2.5",
-        "typescript": "^5.4.3",
-        "vitest": "^1.4.0"
-    },
-    "dependencies": {
-        "@wharfkit/antelope": "^1.0.7",
-        "@wharfkit/session": "^1.2.8",
-        "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
-        "ajv": "^8.12.0",
-        "atomicassets": "^1.5.1",
-        "idb-keyval": "^6.2.1",
-        "node-localstorage": "^3.0.5"
+    {
+      "name": "Jaïr Zijp",
+      "email": "jair@effect.ai"
     }
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/effectai/effect-js/issues"
+  },
+  "homepage": "https://github.com/effectai/effect-js#readme",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^20.5.2",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
+  },
+  "dependencies": {
+    "@wharfkit/antelope": "^1.0.7",
+    "@wharfkit/session": "^1.2.8",
+    "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
+    "ajv": "^8.12.0",
+    "atomicassets": "^1.5.1",
+    "idb-keyval": "^6.2.1",
+    "node-localstorage": "^3.0.5"
+  }
 }

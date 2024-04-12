@@ -157,4 +157,4 @@ function forceOnload() {
 window.addEventListener("load", forceOnload, false);
 window.addEventListener("resize", forceResize, false);
 setInterval(forceResize, 1000)
-</script>`
+</script>`;

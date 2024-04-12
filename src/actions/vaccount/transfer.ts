@@ -5,7 +5,7 @@ export const vTransfer = async (
   client: Client,
   from_id: string,
   to_id: string,
-  quantity: string,
+  quantity: string
 ) => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");

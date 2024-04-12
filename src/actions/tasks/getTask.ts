@@ -8,7 +8,7 @@ import { getBatch } from "./batch/getBatch";
 export const getTaskData = async (
   client: Client,
   taskIndex: number,
-  batchId: number,
+  batchId: number
 ) => {
   try {
     const batch = await getBatch(client, batchId);
@@ -16,14 +16,16 @@ export const getTaskData = async (
     // check if the ipfsData is an array
     if (!Array.isArray(ipfsData)) {
       throw new TaskIpfsError(
-        `Task data retrieved from IPFS is not an array. \n${String(ipfsData)}`,
+        `Task data retrieved from IPFS is not an array. \n${String(ipfsData)}`
       );
     }
 
     // Check if there is a task at the index
     if (ipfsData.length <= taskIndex || taskIndex < 0) {
       throw new TaskIpfsError(
-        `Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(ipfsData)}`,
+        `Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(
+          ipfsData
+        )}`
       );
     }
 
@@ -36,7 +38,7 @@ export const getTaskData = async (
 
 export const getTaskDataByReservation = (
   client: Client,
-  reservation: Reservation,
+  reservation: Reservation
 ) => {
   return getTaskData(client, reservation.task_idx, reservation.batch_id);
 };

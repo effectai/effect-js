@@ -1,19 +1,19 @@
 {
-    "compilerOptions": {
-        "downlevelIteration": true,
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "importHelpers": true,
-        "isolatedModules": true,
-        "lib": ["dom", "es2020"],
-        "module": "es2020",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "declaration": true,
-        "strict": true,
-        "target": "es2020",
-        "outDir": "dist",
-        "skipLibCheck": true,
-    },
-    "include": ["src/**/*"]
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "lib": ["dom", "es2020"],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+    "target": "es2020",
+    "outDir": "dist",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
 }

@@ -5,7 +5,7 @@ import { getIpfsResource } from "../../ipfs/getIpfsResource";
 
 export const getCampaigns = async (
   client: Client,
-  ipfsFetch: boolean = true,
+  ipfsFetch: boolean = true
 ): Promise<Campaign[]> => {
   const { contracts } = client.network.config.efx;
   const provider = client.provider;
@@ -47,7 +47,7 @@ export const getCampaigns = async (
 
 export const getCampaign = async (
   client: Client,
-  id: number,
+  id: number
 ): Promise<Campaign> => {
   const { contracts } = client.network.config.efx;
 

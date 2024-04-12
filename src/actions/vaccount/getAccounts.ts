@@ -6,7 +6,7 @@ import { NotFoundError } from "../../errors";
 
 export const getVAccounts = async (
   client: Client,
-  actor: Name,
+  actor: Name
 ): Promise<VAccount[]> => {
   const { provider, network } = client;
   const { contracts } = network.config.efx;

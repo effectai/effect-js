@@ -17,7 +17,7 @@ export const payout = async (client: Client, actor: Name) => {
 
   const { claimablePayments, totalEfxClaimable } = await getPendingPayments(
     client,
-    client.session.vAccount.id,
+    client.session.vAccount.id
   );
 
   if (!claimablePayments.length) {
@@ -32,7 +32,7 @@ export const payout = async (client: Client, actor: Name) => {
         payments: claimablePayments,
         tasks,
         authorization,
-      }),
+      })
     );
   } else {
     throw new Error("No pending payouts found");
@@ -50,7 +50,7 @@ export const payout = async (client: Client, actor: Name) => {
         quantity: `${totalEfxClaimable.toFixed(4)} EFX`,
       }),
       memo: "",
-    }),
+    })
   );
 
   const { transact } = client.session;

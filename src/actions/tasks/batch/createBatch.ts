@@ -12,7 +12,7 @@ import { SessionNotFoundError } from "../../../errors";
 const depositAction = (
   client: Client,
   amount: number,
-  vAccount: VAccount,
+  vAccount: VAccount
 ): AnyAction => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");
@@ -42,7 +42,7 @@ const createBatchAction = async (
   client: Client,
   forceSettings: ForceSettings,
   batch: InitBatch,
-  hash: string,
+  hash: string
 ): Promise<AnyAction> => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");
@@ -75,7 +75,7 @@ const vTransferAction = (
   client: Client,
   forceSettings: ForceSettings,
   vAccountId: number,
-  batchPrice: number,
+  batchPrice: number
 ): AnyAction => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");
@@ -106,7 +106,7 @@ const vTransferAction = (
 const publishBatchAction = (
   client: Client,
   batchId: number,
-  numTasks: number,
+  numTasks: number
 ): AnyAction => {
   if (!client.session) {
     throw new SessionNotFoundError("Session is required for this method.");
@@ -161,20 +161,20 @@ export const createBatch = async (client: Client, batch: InitBatch) => {
       client,
       forceSettings,
       batch,
-      hash,
+      hash
     );
 
     const vTransfer = vTransferAction(
       client,
       forceSettings,
       vAccount.id,
-      batchPrice,
+      batchPrice
     );
 
     const publishBatch = publishBatchAction(
       client,
       newBatchId,
-      batch.repetitions,
+      batch.repetitions
     );
 
     // TODO Check if batchId is correct.

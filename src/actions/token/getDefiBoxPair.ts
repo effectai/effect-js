@@ -18,7 +18,7 @@ export const getDefiBoxPair = async (pairEnum: DefiBoxPairEnum) => {
           lower_bound: pairEnum.valueOf(),
           upper_bound: pairEnum.valueOf(),
         }),
-      },
+      }
     );
 
     return result.json().then((data) => data.rows[0]);

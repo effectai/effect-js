@@ -5,7 +5,7 @@ import { getReservationForCampaign } from "./getReservations";
 export const reserveTask = async (
   client: Client,
   campaignId: number,
-  qualificationAssets?: string[],
+  qualificationAssets?: string[]
 ) => {
   if (!client.session) {
     throw new Error("Session is required for this method.");
@@ -23,7 +23,7 @@ export const reserveTask = async (
   const existingReservation = await getReservationForCampaign(
     client,
     campaignId,
-    vAccount.id,
+    vAccount.id
   );
 
   // If there's already a reservation, return it

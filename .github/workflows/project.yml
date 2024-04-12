@@ -15,5 +15,3 @@ jobs:
           project-url: https://github.com/orgs/effectai/projects/6 # bounty board project
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bounty
-
-

@@ -3,7 +3,7 @@ import type { Campaign, InitBatch } from "../types/campaign";
 
 export const validateBatchData = async (
   batch: InitBatch,
-  campaign: Campaign,
+  campaign: Campaign
 ) => {
   const ajv = new Ajv();
   if (!campaign.info?.input_schema) {
