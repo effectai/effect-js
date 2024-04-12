@@ -52,15 +52,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        uses: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
-      - name: Publish to NPM
-        uses: changesets/action@v1
-        with:
-          createGithubReleases: ${{ github.ref == 'refs/heads/main' }}
-          publish: yarn changeset:publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # https://docs.npmjs.com/generating-provenance-statements
-          NPM_CONFIG_PROVENANCE: true
+      # - name: Publish to NPM
+      #   uses: changesets/action@v1
+      #   with:
+      #     createGithubReleases: ${{ github.ref == 'refs/heads/main' }}
+      #     publish: yarn changeset:publish
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #     # https://docs.npmjs.com/generating-provenance-statements
+      #     NPM_CONFIG_PROVENANCE: true
