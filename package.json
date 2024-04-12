@@ -13,43 +13,27 @@
     "test": "vitest run",
     "dev": "tsc -w",
     "build": "tsc --module es2020",
-    "lint": "eslint . --ext .ts --fix"
+    "lint": "eslint . --ext .ts --fix",
+    "format": "prettier --write .",
+    "changeset": "changeset",
+    "changeset:public": "bun scripts/updateVersion.ts && yarn build && changeset publish",
+    "changeset:version": "changeset version && yarn install --frozen-lockfile && bun scripts/updateVersion.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/effectai/effect-js.git"
   },
   "keywords": [
-    "effect",
     "efx",
-    "future",
-    "work",
-    "ai",
-    "crypto",
+    "AI",
     "blockchain",
-    "microtask",
-    "task",
-    "micro-task"
+    "microtasks"
   ],
   "author": {
     "name": "Effect-AI",
     "url": "https://effect.network",
-    "email": "dev@effect.ai"
+    "email": "hello@effect.ai"
   },
-  "contributors": [
-    {
-      "name": "Laurens Verspeek",
-      "email": "laurens@effect.ai"
-    },
-    {
-      "name": "David Britt",
-      "email": "david@effect.ai"
-    },
-    {
-      "name": "Jaïr Zijp",
-      "email": "jair@effect.ai"
-    }
-  ],
   "publishConfig": {
     "access": "public"
   },
@@ -59,6 +43,8 @@
   },
   "homepage": "https://github.com/effectai/effect-js#readme",
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.5",
+    "@changesets/cli": "^2.23.2",
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.5.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",

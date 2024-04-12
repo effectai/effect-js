@@ -72,3 +72,5 @@ export type {
 } from "./types";
 
 export { Template } from "./template";
+
+export { version } from "./version";
