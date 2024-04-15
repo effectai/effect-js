@@ -2,47 +2,52 @@ import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
 import type { Campaign } from "../../../types/campaign";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
+import { GetTableRowsResponse } from "../../../types/helpers";
 
-export const getCampaigns = async (
+export const getCampaigns = async ({
+  client,
+  page = 1,
+  limit = 20,
+  reverse = false,
+  ipfsFetch = true,
+} : {
   client: Client,
-  ipfsFetch: boolean = true
-): Promise<Campaign[]> => {
+  ipfsFetch?: boolean,
+  page?: number,
+  limit?: number,
+  reverse?: boolean,
+}): Promise<GetTableRowsResponse<UInt128, Campaign>> => {
   const { contracts } = client.network.config.efx;
   const provider = client.provider;
 
   const rows: Campaign[] = [];
-  const boundDelta = 20;
-  let lowerBound: UInt128 = UInt128.from(0);
-  let upperBound: UInt128 = UInt128.from(boundDelta);
-  let more = true;
+  const lowerBound: UInt128 = UInt128.from((page - 1) * limit);
+  const upperBound: UInt128 = UInt128.from(999999);
 
-  while (more) {
-    const response = await provider.v1.chain.get_table_rows({
+  const response = await provider.v1.chain.get_table_rows({
+      key_type: "i128",
       code: contracts.tasks,
       table: "campaign",
       scope: contracts.tasks,
       lower_bound: lowerBound,
       upper_bound: upperBound,
-    });
+      limit,
+      reverse
+  });
 
-    rows.push(...response.rows);
-
-    if (response.more) {
-      const lastRow = response.rows[response.rows.length - 1];
-      lowerBound = UInt128.from(lastRow.id + 1);
-      upperBound = UInt128.from(lastRow.id + boundDelta);
-    } else {
-      more = false;
-    }
-  }
-
-  if (ipfsFetch) {
-    for (const campaign of rows) {
+  for (const row of response.rows) {
+    const campaign: Campaign = row;
+    if (ipfsFetch) {
       campaign.info = await getIpfsResource(client, campaign.content.field_1);
     }
+    rows.push(campaign);
   }
 
-  return rows;
+  return {
+    rows,
+    next_key: response.next_key,
+    more: response.more,
+  }
 };
 
 export const getCampaign = async (
@@ -53,8 +58,8 @@ export const getCampaign = async (
 
   try {
     const response = await client.provider.v1.chain.get_table_rows({
-      code: contracts.tasks,
       table: "campaign",
+      code: contracts.tasks,
       scope: contracts.tasks,
       lower_bound: UInt128.from(id),
       upper_bound: UInt128.from(id),
