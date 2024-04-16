@@ -1,4 +1,4 @@
-import { IAssetRow } from "atomicassets/build/API/Rpc/RpcCache";
+import type { IAssetRow } from "atomicassets/build/API/Rpc/RpcCache";
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";

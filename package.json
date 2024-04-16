@@ -13,6 +13,7 @@
 		"build": "tsc --module es2020",
 		"lint": "bun biome lint --apply .",
 		"format": "biome format --write .",
+		"check": "bun biome check --apply .",
 		"changeset": "changeset",
 		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
 		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts"
