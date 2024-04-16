@@ -85,7 +85,7 @@ export interface Batch {
 export interface InitBatch {
 	campaign_id: number;
 	repetitions: number;
-	data: unknown[];
+	data: Record<string, unknown>;
 }
 
 export interface TasksSettings {

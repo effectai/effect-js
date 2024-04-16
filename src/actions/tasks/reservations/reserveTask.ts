@@ -2,11 +2,17 @@ import type { Client } from "../../../client";
 import { useEFXContracts } from "../../../utils/state";
 import { getReservationForCampaign } from "./getReservations";
 
-export const reserveTask = async (
-	client: Client,
-	campaignId: number,
-	qualificationAssets?: string[],
-) => {
+export type ReserveTaskArgs = {
+	client: Client;
+	campaignId: number;
+	qualificationAssets?: string[];
+};
+
+export const reserveTask = async ({
+	client,
+	campaignId,
+	qualificationAssets,
+}: ReserveTaskArgs) => {
 	if (!client.session) {
 		throw new Error("Session is required for this method.");
 	}
@@ -20,11 +26,11 @@ export const reserveTask = async (
 	}
 
 	// Check if the user already has a reservation for this campaign
-	const existingReservation = await getReservationForCampaign(
+	const existingReservation = await getReservationForCampaign({
 		client,
 		campaignId,
-		vAccount.id,
-	);
+		vAccountId: vAccount.id,
+	});
 
 	// If there's already a reservation, return it
 	if (existingReservation) {
@@ -47,7 +53,11 @@ export const reserveTask = async (
 			},
 		});
 
-		return await getReservationForCampaign(client, campaignId, vAccount.id);
+		return await getReservationForCampaign({
+			client,
+			campaignId,
+			vAccountId: vAccount.id,
+		});
 	} catch (error) {
 		console.error("Error while reserving task:", error);
 		return null;

@@ -4,10 +4,15 @@ import { NotFoundError } from "../../errors";
 import type { VAccount } from "../../types/user";
 import { generateCheckSumForVAccount } from "../../utils/keys";
 
-export const getVAccounts = async (
-	client: Client,
-	actor: Name,
-): Promise<VAccount[]> => {
+export type GetVAccountsArgs = {
+	client: Client;
+	actor: Name;
+};
+
+export const getVAccounts = async ({
+	client,
+	actor,
+}: GetVAccountsArgs): Promise<VAccount[]> => {
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 
@@ -26,13 +31,15 @@ export const getVAccounts = async (
 	return response.rows;
 };
 
+export type GetAccountByIdArgs = {
+	client: Client;
+	accountId: UInt64Type;
+};
+
 export const getAccountById = async ({
 	client,
 	accountId,
-}: {
-	client: Client;
-	accountId: UInt64Type;
-}) => {
+}: GetAccountByIdArgs) => {
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 

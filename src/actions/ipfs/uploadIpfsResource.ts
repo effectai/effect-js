@@ -1,10 +1,18 @@
 import type { Client } from "../../client";
 
-export const uploadIpfsResource = async (client: Client, obj: unknown) => {
+export type UploadIpfsResourceArgs = {
+	client: Client;
+	data: Record<string, unknown>;
+};
+
+export const uploadIpfsResource = async ({
+	client,
+	data,
+}: UploadIpfsResourceArgs) => {
 	try {
 		const { ipfs } = client.network.config;
 
-		const blob = new Blob([JSON.stringify(obj)], {
+		const blob = new Blob([JSON.stringify(data)], {
 			type: "application/json",
 		});
 

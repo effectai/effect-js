@@ -1,12 +1,11 @@
 import type { Client } from "../../client";
 import { useEFXContracts } from "../../utils/state";
 
-/**
- * Retrieve the DAO config
- * @returns {Promise<DaoConfig>} Returns the DAO config
- */
+export type GetDaoSettingsArgs = {
+	client: Client;
+};
 
-export const getDaoSettings = async (client: Client) => {
+export const getDaoSettings = async ({ client }: GetDaoSettingsArgs) => {
 	const { dao } = useEFXContracts(client);
 	const { provider } = client;
 

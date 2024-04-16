@@ -3,17 +3,28 @@ import type { Reservation } from "../../types/campaign";
 
 import { TaskIpfsError } from "../../errors";
 import { getIpfsResource } from "../ipfs/getIpfsResource";
-import { getBatch } from "./batch/getBatch";
+import { getBatchById } from "./batch/getBatch";
 
-export const getTaskData = async (
-	client: Client,
-	taskIndex: number,
-	batchId: number,
-) => {
+export type GetTaskDataArgs = {
+	client: Client;
+	taskIndex: number;
+	batchId: number;
+};
+
+export const getTaskData = async ({
+	client,
+	taskIndex,
+	batchId,
+}: GetTaskDataArgs) => {
 	try {
-		const batch = await getBatch(client, batchId);
-		const ipfsData = await getIpfsResource(client, batch.content.field_1);
-		// check if the ipfsData is an array
+		const batch = await getBatchById({ client, id: batchId });
+
+		const ipfsData = await getIpfsResource({
+			client,
+			hash: batch.content.field_1,
+		});
+
+		// Check if the ipfsData is an array
 		if (!Array.isArray(ipfsData)) {
 			throw new TaskIpfsError(
 				`Task data retrieved from IPFS is not an array. \n${String(ipfsData)}`,
@@ -40,5 +51,9 @@ export const getTaskDataByReservation = (
 	client: Client,
 	reservation: Reservation,
 ) => {
-	return getTaskData(client, reservation.task_idx, reservation.batch_id);
+	return getTaskData({
+		client,
+		taskIndex: reservation.task_idx,
+		batchId: reservation.batch_id,
+	});
 };

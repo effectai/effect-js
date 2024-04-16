@@ -1,7 +1,12 @@
 import type { Name } from "@wharfkit/session";
 import type { Client } from "../../exports";
 
-export const getBalance = async (client: Client, actor: Name) => {
+export type GetBalanceArgs = {
+	client: Client;
+	actor: Name;
+};
+
+export const getBalance = async ({ client, actor }: GetBalanceArgs) => {
 	const { network, provider } = client;
 	const { contracts } = network.config.efx;
 

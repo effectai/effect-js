@@ -1,28 +1,39 @@
+import type { AnyAction } from "@wharfkit/antelope";
 import type { Client } from "../../client";
+import type { ForceSettings } from "../tasks/getForceSettings";
 import { SessionNotFoundError } from "../../errors";
+import { useEFXContracts } from "../../utils/state";
 
-export const vTransfer = async (
-	client: Client,
-	from_id: string,
-	to_id: string,
-	quantity: string,
-) => {
+export type vTransferActionArgs = {
+	client: Client;
+	from_id: number;
+	to_id: number;
+	quantity: number;
+};
+
+export const vTransferAction = ({
+	client,
+	to_id,
+	from_id,
+	quantity,
+}: vTransferActionArgs): AnyAction => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}
-	const { transact, permissionLevel, actor } = client.session;
-	const { contracts } = client.network.config.efx;
 
-	const transferAction = {
-		account: contracts.vaccount,
+	const { actor, authorization } = client.session;
+	const { vaccount, token } = useEFXContracts(client);
+
+	return {
+		account: vaccount,
 		name: "vtransfer",
-		authorization: [permissionLevel],
+		authorization,
 		data: {
-			from_id: from_id,
-			to_id: to_id,
+			from_id,
+			to_id,
 			quantity: {
 				quantity: quantity,
-				contract: contracts.token,
+				contract: token,
 			},
 			memo: "",
 			payer: actor,
@@ -30,5 +41,32 @@ export const vTransfer = async (
 			fee: null,
 		},
 	};
+};
+
+export type vTransferArgs = {
+	client: Client;
+	from_id: number;
+	to_id: number;
+	quantity: number;
+};
+
+export const vTransfer = async ({
+	client,
+	from_id,
+	to_id,
+	quantity,
+}: vTransferArgs) => {
+	if (!client.session) {
+		throw new SessionNotFoundError("Session is required for this method.");
+	}
+	const { transact } = client.session;
+
+	const transferAction = vTransferAction({
+		client,
+		to_id,
+		from_id,
+		quantity,
+	});
+
 	return await transact({ action: transferAction });
 };

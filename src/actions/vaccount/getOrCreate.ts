@@ -12,12 +12,12 @@ export const getOrCreateVAccount = async ({
 	session?: Session;
 }) => {
 	try {
-		let [account] = await getVAccounts(client, actor);
+		let [account] = await getVAccounts({ client, actor });
 
 		if (!account) {
 			await createVAccount({ client, session, account: actor });
 
-			[account] = await getVAccounts(client, actor);
+			[account] = await getVAccounts({ client, actor });
 		}
 
 		return account;

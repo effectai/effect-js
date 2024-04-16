@@ -26,10 +26,15 @@ export const getTimeToClaim = (p: Payment, forceSettings: ForceSettings) => {
 	);
 };
 
-export const getPendingPayments = async (
-	client: Client,
-	vAccountId: number,
-) => {
+export type GetPendingPaymentsArgs = {
+	client: Client;
+	vAccountId: number;
+};
+
+export const getPendingPayments = async ({
+	client,
+	vAccountId,
+}: GetPendingPaymentsArgs) => {
 	const { network, provider } = client;
 	const { contracts } = network.config.efx;
 
@@ -43,7 +48,7 @@ export const getPendingPayments = async (
 		upper_bound: UInt128.from(vAccountId),
 	})) as GetTableRowsResponse<UInt64, Payment>;
 
-	const forceSettings = await getForceSettings(client);
+	const forceSettings = await getForceSettings({ client });
 
 	const claimablePayments = data.rows.filter((p) =>
 		isClaimable(p, forceSettings),

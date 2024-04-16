@@ -2,47 +2,26 @@ import { type AnyAction, Asset } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
 import { SessionNotFoundError } from "../../../errors";
 import type { InitBatch } from "../../../types/campaign";
-import type { VAccount } from "../../../types/user";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
-import { getCampaign } from "../campaigns/getCampaigns";
 import { type ForceSettings, getForceSettings } from "../getForceSettings";
+import { getCampaignById } from "../campaigns/getCampaignById";
+import { depositAction } from "../../vaccount/deposit";
+import { vTransferAction } from "../../vaccount/transfer";
 
-const depositAction = (
-	client: Client,
-	amount: number,
-	vAccount: VAccount,
-): AnyAction => {
-	if (!client.session) {
-		throw new SessionNotFoundError("Session is required for this method.");
-	}
-
-	const { actor, authorization } = client.session;
-	const { token, vaccount } = useEFXContracts(client);
-
-	if (!vAccount || !vAccount.id) {
-		throw new Error("No vAccount found");
-	}
-
-	return {
-		account: token,
-		name: "transfer",
-		authorization,
-		data: {
-			from: actor,
-			to: vaccount,
-			quantity: Asset.from(amount, "4,EFX"),
-			memo: `${vAccount.id}`,
-		},
-	};
+export type CreateBatchActionArgs = {
+	client: Client;
+	forceSettings: ForceSettings;
+	batch: InitBatch;
+	hash: string;
 };
 
-const createBatchAction = async (
-	client: Client,
-	forceSettings: ForceSettings,
-	batch: InitBatch,
-	hash: string,
-): Promise<AnyAction> => {
+export const createBatchAction = ({
+	client,
+	forceSettings,
+	batch,
+	hash,
+}: CreateBatchActionArgs): AnyAction => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}
@@ -70,43 +49,17 @@ const createBatchAction = async (
 	};
 };
 
-const vTransferAction = (
-	client: Client,
-	forceSettings: ForceSettings,
-	vAccountId: number,
-	batchPrice: number,
-): AnyAction => {
-	if (!client.session) {
-		throw new SessionNotFoundError("Session is required for this method.");
-	}
-
-	const { actor, authorization } = client.session;
-	const { vaccount, token } = useEFXContracts(client);
-
-	return {
-		account: vaccount,
-		name: "vtransfer",
-		authorization,
-		data: {
-			from_id: vAccountId,
-			to_id: forceSettings.force_vaccount_id,
-			quantity: {
-				quantity: batchPrice,
-				contract: token,
-			},
-			memo: "",
-			payer: actor,
-			sig: null,
-			fee: null,
-		},
-	};
+export type PublishBatchActionArgs = {
+	client: Client;
+	batchId: number;
+	numTasks: number;
 };
 
-const publishBatchAction = (
-	client: Client,
-	batchId: number,
-	numTasks: number,
-): AnyAction => {
+export const publishBatchAction = ({
+	client,
+	batchId,
+	numTasks,
+}: PublishBatchActionArgs): AnyAction => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}
@@ -126,20 +79,25 @@ const publishBatchAction = (
 	};
 };
 
-export const createBatch = async (client: Client, batch: InitBatch) => {
+export type CreateBatchArgs = {
+	client: Client;
+	batch: InitBatch;
+};
+
+export const createBatch = async ({ client, batch }: CreateBatchArgs) => {
 	try {
 		if (!client.session) {
 			throw new SessionNotFoundError("Session is required for this method.");
 		}
 
-		const forceSettings = await getForceSettings(client);
+		const forceSettings = await getForceSettings({ client });
 		const { transact, vAccount } = client.session;
 
 		if (!vAccount) {
 			throw new Error("No vAccountId found");
 		}
 
-		const campaign = await getCampaign(client, batch.campaign_id);
+		const campaign = await getCampaignById({ client, id: batch.campaign_id });
 		const assetQuantity = Asset.from(campaign.reward.quantity);
 		const batchPrice = assetQuantity.value * batch.repetitions;
 
@@ -155,33 +113,37 @@ export const createBatch = async (client: Client, batch: InitBatch) => {
 		// }
 
 		const newBatchId = campaign.num_batches + 1;
-		const hash = await uploadIpfsResource(client, batch.data);
+		const hash = await uploadIpfsResource({ client, data: batch.data });
 
-		const makeBatch = await createBatchAction(
+		const makeBatch = createBatchAction({
 			client,
 			forceSettings,
 			batch,
 			hash,
-		);
+		});
 
-		const vTransfer = vTransferAction(
+		const vTransfer = vTransferAction({
 			client,
-			forceSettings,
-			vAccount.id,
-			batchPrice,
-		);
+			from_id: vAccount.id,
+			to_id: forceSettings.force_vaccount_id,
+			quantity: batchPrice,
+		});
 
-		const publishBatch = publishBatchAction(
+		const publishBatch = publishBatchAction({
 			client,
-			newBatchId,
-			batch.repetitions,
-		);
+			batchId: newBatchId,
+			numTasks: batch.repetitions,
+		});
 
 		// TODO Check if batchId is correct.
 		let actions: AnyAction[];
 
 		if (Asset.from(vAccount.balance.quantity).value < batchPrice) {
-			const deposit = depositAction(client, assetQuantity.value, vAccount);
+			const deposit = depositAction({
+				client,
+				amount: assetQuantity.value,
+				vAccountId: vAccount.id,
+			});
 			actions = [deposit, makeBatch, vTransfer, publishBatch];
 		} else {
 			actions = [makeBatch, vTransfer, publishBatch];

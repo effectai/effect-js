@@ -3,12 +3,12 @@ import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
 
-/**
- * Set the avatar asset for the given account
- * @param client
- * @param asset
- */
-export const setAvatar = async (client: Client, asset: IAssetRow) => {
+export type SetAvatarArgs = {
+	client: Client;
+	asset: IAssetRow;
+};
+
+export const setAvatar = async ({ client, asset }: SetAvatarArgs) => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}

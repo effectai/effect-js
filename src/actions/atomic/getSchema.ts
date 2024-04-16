@@ -1,11 +1,17 @@
 import type { ISchemaRow } from "atomicassets/build/API/Rpc/RpcCache";
 import type { Client } from "../../client";
 
-export const getSchema = async (
-	client: Client,
-	collectionName: string,
-	schemaName: string,
-): Promise<ISchemaRow> => {
+export type getSchemaArgs = {
+	client: Client;
+	collectionName: string;
+	schemaName: string;
+};
+
+export const getSchema = async ({
+	client,
+	collectionName,
+	schemaName,
+}: getSchemaArgs): Promise<ISchemaRow> => {
 	const { atomic } = client.network.config;
 	const { provider } = client;
 

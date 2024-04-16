@@ -4,19 +4,21 @@ import type { Campaign, CampaignInfo } from "../../../types/campaign";
 import type { GetTableRowsResponse } from "../../../types/helpers";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
 
+export type GetCampaignsArgs = {
+	client: Client;
+	page?: number;
+	limit?: number;
+	reverse?: boolean;
+	ipfsFetch?: boolean;
+};
+
 export const getCampaigns = async ({
 	client,
 	page = 1,
 	limit = 20,
 	reverse = false,
 	ipfsFetch = true,
-}: {
-	client: Client;
-	ipfsFetch?: boolean;
-	page?: number;
-	limit?: number;
-	reverse?: boolean;
-}): Promise<GetTableRowsResponse<UInt128, Campaign>> => {
+}: GetCampaignsArgs): Promise<GetTableRowsResponse<UInt128, Campaign>> => {
 	const { contracts } = client.network.config.efx;
 	const provider = client.provider;
 
@@ -36,10 +38,10 @@ export const getCampaigns = async ({
 	for (const row of response.rows) {
 		const campaign: Campaign = row;
 		if (ipfsFetch) {
-			campaign.info = (await getIpfsResource(
+			campaign.info = (await getIpfsResource({
 				client,
-				campaign.content.field_1,
-			)) as CampaignInfo;
+				hash: campaign.content.field_1,
+			})) as CampaignInfo;
 		}
 		rows.push(campaign);
 	}
@@ -49,29 +51,4 @@ export const getCampaigns = async ({
 		next_key: response.next_key,
 		more: response.more,
 	};
-};
-
-export const getCampaign = async (
-	client: Client,
-	id: number,
-): Promise<Campaign> => {
-	const { contracts } = client.network.config.efx;
-
-	try {
-		const response = await client.provider.v1.chain.get_table_rows({
-			table: "campaign",
-			code: contracts.tasks,
-			scope: contracts.tasks,
-			lower_bound: UInt128.from(id),
-			upper_bound: UInt128.from(id),
-			limit: 1,
-		});
-
-		const [campaign] = response.rows;
-		campaign.info = await getIpfsResource(client, campaign.content.field_1);
-		return campaign;
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
 };

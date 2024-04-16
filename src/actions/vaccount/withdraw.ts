@@ -1,7 +1,12 @@
 import type { AnyAction, ExtendedAsset, Name } from "@wharfkit/antelope";
 import type { Client } from "../../exports";
 
-export const withdraw = async (client: Client, quantity: ExtendedAsset) => {
+export type WithdrawArgs = {
+	client: Client;
+	quantity: ExtendedAsset;
+};
+
+export const withdraw = async ({ client, quantity }: WithdrawArgs) => {
 	if (!client.session?.vAccount) {
 		throw new Error("vAccount is not set.");
 	}
@@ -21,20 +26,22 @@ export const withdraw = async (client: Client, quantity: ExtendedAsset) => {
 	return await transact({ action });
 };
 
+export type WithdrawActionArgs = {
+	from_id: number;
+	to_account: Name;
+	quantity: ExtendedAsset;
+	account: string;
+	authorization: { actor: Name; permission: Name }[];
+	memo: string;
+};
+
 export const withdrawAction = ({
 	from_id,
 	to_account,
 	quantity,
 	account,
 	authorization,
-}: {
-	from_id: number;
-	to_account: Name;
-	quantity: ExtendedAsset;
-	account: string;
-	memo: string;
-	authorization: { actor: Name; permission: Name }[];
-}): AnyAction => {
+}: WithdrawActionArgs): AnyAction => {
 	return {
 		account,
 		name: "withdraw",

@@ -7,7 +7,11 @@ export type ForceSettings = {
 	force_vaccount_id: number;
 };
 
-export const getForceSettings = async (client: Client) => {
+export type GetForceSettingsArgs = {
+	client: Client;
+};
+
+export const getForceSettings = async ({ client }: GetForceSettingsArgs) => {
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 

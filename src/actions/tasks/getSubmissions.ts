@@ -3,13 +3,15 @@ import type { Client, Submission } from "../../exports";
 import type { GetTableRowsResponse } from "../../types/helpers";
 import { useEFXContracts } from "../../utils/state";
 
+export type GetSubmissionsArgs = {
+	client: Client;
+	reverse?: boolean;
+};
+
 export const getSubmissions = async ({
 	client,
 	reverse = false,
-}: {
-	client: Client;
-	reverse?: boolean;
-}) => {
+}: GetSubmissionsArgs) => {
 	try {
 		const { provider } = client;
 		const { tasks } = useEFXContracts(client);

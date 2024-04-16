@@ -7,7 +7,12 @@ import { getPendingPayments } from "./getPendingPayments";
 import { withdrawAction } from "./withdraw";
 
 /* claim & withdraw EFX to VAccount */
-export const payout = async (client: Client, actor: Name) => {
+export type PayoutArgs = {
+	client: Client;
+	actor: Name;
+};
+
+export const payout = async ({ client, actor }: PayoutArgs) => {
 	if (!client.session?.vAccount) {
 		throw new VAccountError("vAccount is not set.");
 	}
@@ -15,10 +20,10 @@ export const payout = async (client: Client, actor: Name) => {
 	const { tasks, vaccount, token } = useEFXContracts(client);
 	const { authorization } = client.session;
 
-	const { claimablePayments, totalEfxClaimable } = await getPendingPayments(
+	const { claimablePayments, totalEfxClaimable } = await getPendingPayments({
 		client,
-		client.session.vAccount.id,
-	);
+		vAccountId: client.session.vAccount.id,
+	});
 
 	if (!claimablePayments.length) {
 		throw new Error("No payouts currently claimable.");

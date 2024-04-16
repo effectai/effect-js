@@ -13,11 +13,17 @@ export type CachedItem = {
 	timestamp: number;
 };
 
-export const getIpfsResource = async (
-	client: Client,
-	hash: string,
-	ipfsContentForm: IpfsContentFormat = IpfsContentFormat.JSON,
-) => {
+export type GetIpfsResourceArgs = {
+	client: Client;
+	hash: string;
+	ipfsContentForm?: IpfsContentFormat;
+};
+
+export const getIpfsResource = async ({
+	client,
+	hash,
+	ipfsContentForm = IpfsContentFormat.JSON,
+}: GetIpfsResourceArgs) => {
 	try {
 		const { ipfs } = client.network.config;
 		const { ipfsCacheDurationInMs } = client.options;

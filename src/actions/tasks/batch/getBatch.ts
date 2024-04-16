@@ -2,7 +2,12 @@ import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
 import { useEFXContracts } from "../../../utils/state";
 
-export const getBatch = async (client: Client, batchId: number) => {
+export type GetBatchByIdArgs = {
+	client: Client;
+	id: number;
+};
+
+export const getBatchById = async ({ client, id }: GetBatchByIdArgs) => {
 	const { provider } = client;
 	const { tasks } = useEFXContracts(client);
 
@@ -10,8 +15,8 @@ export const getBatch = async (client: Client, batchId: number) => {
 		code: tasks,
 		table: "batch",
 		scope: tasks,
-		lower_bound: UInt128.from(batchId),
-		upper_bound: UInt128.from(batchId),
+		lower_bound: UInt128.from(id),
+		upper_bound: UInt128.from(id),
 		limit: 1,
 	});
 

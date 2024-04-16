@@ -7,7 +7,11 @@ import { getPendingPayments } from "./getPendingPayments";
 
 /* Claims pending amount to vAccount */
 
-export const claim = async (client: Client) => {
+export type ClaimArgs = {
+	client: Client;
+};
+
+export const claim = async ({ client }: ClaimArgs) => {
 	if (!client.session?.vAccount) {
 		throw new VAccountError("vAccount is not set.");
 	}
@@ -15,10 +19,10 @@ export const claim = async (client: Client) => {
 	const { tasks } = useEFXContracts(client);
 	const { authorization } = client.session;
 
-	const { claimablePayments } = await getPendingPayments(
+	const { claimablePayments } = await getPendingPayments({
 		client,
-		client.session.vAccount.id,
-	);
+		vAccountId: client.session.vAccount.id,
+	});
 
 	const actions = <AnyAction[]>[];
 
@@ -38,15 +42,17 @@ export const claim = async (client: Client) => {
 	return await transact({ actions: actions });
 };
 
+export type ClaimActionsArgs = {
+	payments: Payment[];
+	tasks: string;
+	authorization: { actor: Name; permission: Name }[];
+};
+
 export const claimActions = ({
 	payments,
 	tasks,
 	authorization,
-}: {
-	payments: Payment[];
-	tasks: string;
-	authorization: { actor: Name; permission: Name }[];
-}): AnyAction[] => {
+}: ClaimActionsArgs): AnyAction[] => {
 	const actions = <AnyAction[]>[];
 
 	for (const payment of payments) {

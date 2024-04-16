@@ -3,15 +3,17 @@ import type { Client } from "../../client";
 import { ExtendedSymbol } from "../../utils/structs";
 import { VAddress } from "../../utils/variants";
 
+export type CreateVAccountArgs = {
+	client: Client;
+	session?: Session;
+	account?: Name;
+};
+
 export const createVAccount = async ({
 	client,
 	session,
 	account,
-}: {
-	client: Client;
-	session?: Session;
-	account?: Name;
-}) => {
+}: CreateVAccountArgs) => {
 	const sessionToUse = session ?? client.session;
 
 	if (!sessionToUse) {

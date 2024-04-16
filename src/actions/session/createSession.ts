@@ -3,12 +3,19 @@ import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import type { Client } from "../../client";
 import { setSession } from "./setSession";
 
-export const createSession = async (
-	client: Client,
-	actor: string,
-	permission: string,
-	privateKey: string,
-) => {
+export type CreateSessionArgs = {
+	client: Client;
+	actor: string;
+	permission: string;
+	privateKey: string;
+};
+
+export const createSession = async ({
+	client,
+	actor,
+	permission,
+	privateKey,
+}: CreateSessionArgs) => {
 	const walletPlugin = new WalletPluginPrivateKey(privateKey);
 
 	const { eosRpcUrl, eosChainId } = client.network;
@@ -23,5 +30,5 @@ export const createSession = async (
 		walletPlugin,
 	});
 
-	await setSession(client, session);
+	await setSession({ client, session });
 };

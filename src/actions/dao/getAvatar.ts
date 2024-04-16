@@ -1,13 +1,12 @@
 import type { Client } from "../../client";
 import { useEFXContracts } from "../../utils/state";
 
-/**
- * Retrieve the avatar for the given account
- * @param account
- * @returns
- * @example { type: 0, asset_id: '2199025109172' }
- */
-export const getAvatar = async (client: Client, account: string) => {
+export type GetAvatarArgs = {
+	client: Client;
+	account: string;
+};
+
+export const getAvatar = async ({ client, account }: GetAvatarArgs) => {
 	const { dao } = useEFXContracts(client);
 	const { provider } = client;
 

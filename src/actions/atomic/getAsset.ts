@@ -13,6 +13,7 @@ export const deserializeAsset = (asset: IAssetRow, schema: ISchemaRow) => {
 		asset.mutable_serialized_data,
 		objectSchema,
 	);
+
 	const immutable_deserialized_data = deserialize(
 		asset.immutable_serialized_data,
 		objectSchema,
@@ -25,12 +26,19 @@ export const deserializeAsset = (asset: IAssetRow, schema: ISchemaRow) => {
 	};
 };
 
-export const getAsset = async (
-	client: Client,
-	account: string,
-	assetId: string,
+export type getAssetArgs = {
+	client: Client;
+	account: string;
+	assetId: string;
+	doDeserializeAsset?: boolean;
+};
+
+export const getAsset = async ({
+	client,
+	account,
+	assetId,
 	doDeserializeAsset = true,
-) => {
+}: getAssetArgs) => {
 	try {
 		const { provider } = client;
 		const { atomicContract } = client.network.config.atomic;
@@ -47,11 +55,12 @@ export const getAsset = async (
 		const [asset] = rows;
 
 		if (doDeserializeAsset) {
-			const schema = await getSchema(
+			const schema = await getSchema({
 				client,
-				asset.collection_name,
-				asset.schema_name,
-			);
+				collectionName: asset.collection_name,
+				schemaName: asset.schema_name,
+			});
+
 			return deserializeAsset(asset, schema);
 		}
 		return asset;

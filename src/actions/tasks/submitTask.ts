@@ -5,13 +5,17 @@ import type { Reservation } from "../../types/campaign";
 import { useEFXContracts } from "../../utils/state";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
 
-//TODO:: make task data strongly typed.
+export type SubmitTaskArgs = {
+	client: Client;
+	reservation: Reservation;
+	data: Record<string, unknown>;
+};
 
-export const submitTask = async (
-	client: Client,
-	reservation: Reservation,
-	data: unknown,
-) => {
+export const submitTask = async ({
+	client,
+	reservation,
+	data,
+}: SubmitTaskArgs) => {
 	try {
 		if (!client.session) {
 			throw new SessionNotFoundError("Session is required for this method.");
@@ -20,7 +24,7 @@ export const submitTask = async (
 		const { authorization, transact, actor } = client.session;
 		const { tasks } = useEFXContracts(client);
 
-		const ipfsData = await uploadIpfsResource(client, data);
+		const ipfsData = await uploadIpfsResource({ client, data });
 
 		const response = await transact({
 			action: {

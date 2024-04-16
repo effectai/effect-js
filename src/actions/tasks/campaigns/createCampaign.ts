@@ -4,10 +4,15 @@ import type { InitCampaign } from "../../../types/campaign";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 
-export const createCampaign = async (
-	client: Client,
-	campaign: InitCampaign,
-) => {
+export type CreateCampaignArgs = {
+	client: Client;
+	campaign: InitCampaign;
+};
+
+export const createCampaign = async ({
+	client,
+	campaign,
+}: CreateCampaignArgs) => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}
@@ -16,7 +21,7 @@ export const createCampaign = async (
 	const { tasks, token } = useEFXContracts(client);
 
 	try {
-		const hash = await uploadIpfsResource(client, campaign.info);
+		const hash = await uploadIpfsResource({ client, data: campaign.info });
 
 		const response = await transact({
 			action: {
