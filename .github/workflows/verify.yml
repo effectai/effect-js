@@ -14,10 +14,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Lint code
-        run: yarn format && yarn lint
+        run: bun format && bun lint
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
@@ -25,16 +25,16 @@ jobs:
         with:
           commit_message: "chore: format"
           commit_user_name: "github-actions[bot]"
-   
+
   build:
     name: Build
     needs: lint
     runs-on: ubuntu-latest
-    timeout-minutes: 5  
+    timeout-minutes: 5
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v4
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
       - name: Build
-        run: yarn build
+        run: bun build

@@ -7,16 +7,16 @@ import { useEFXContracts } from "../../utils/state";
  */
 
 export const getDaoSettings = async (client: Client) => {
-  const { dao } = useEFXContracts(client);
-  const { provider } = client;
+	const { dao } = useEFXContracts(client);
+	const { provider } = client;
 
-  const { rows } = await provider.v1.chain.get_table_rows({
-    code: dao,
-    scope: dao,
-    table: "config",
-    limit: 1,
-  });
+	const { rows } = await provider.v1.chain.get_table_rows({
+		code: dao,
+		scope: dao,
+		table: "config",
+		limit: 1,
+	});
 
-  const [config] = rows;
-  return config;
+	const [config] = rows;
+	return config;
 };

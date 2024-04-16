@@ -1,29 +1,29 @@
 export enum DefiBoxPairEnum {
-  EosEfx = 191,
-  EosUsdt = 12,
+	EosEfx = 191,
+	EosUsdt = 12,
 }
 
 export const getDefiBoxPair = async (pairEnum: DefiBoxPairEnum) => {
-  try {
-    const result = await window.fetch(
-      `https://eos.greymass.com/v1/chain/get_table_rows`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          json: true,
-          code: "swap.defi",
-          scope: "swap.defi",
-          table: "pairs",
-          limit: 1,
-          lower_bound: pairEnum.valueOf(),
-          upper_bound: pairEnum.valueOf(),
-        }),
-      }
-    );
+	try {
+		const result = await window.fetch(
+			"https://eos.greymass.com/v1/chain/get_table_rows",
+			{
+				method: "POST",
+				body: JSON.stringify({
+					json: true,
+					code: "swap.defi",
+					scope: "swap.defi",
+					table: "pairs",
+					limit: 1,
+					lower_bound: pairEnum.valueOf(),
+					upper_bound: pairEnum.valueOf(),
+				}),
+			},
+		);
 
-    return result.json().then((data) => data.rows[0]);
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error retrieving EFX Ticker Price from DefiBox");
-  }
+		return result.json().then((data) => data.rows[0]);
+	} catch (error) {
+		console.error(error);
+		throw new Error("Error retrieving EFX Ticker Price from DefiBox");
+	}
 };

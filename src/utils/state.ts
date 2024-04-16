@@ -2,7 +2,7 @@
 import type { Client } from "../client";
 
 export const useEFXContracts = (client: Client) => {
-  const { contracts } = client.network.config.efx;
+	const { contracts } = client.network.config.efx;
 
-  return contracts;
+	return contracts;
 };

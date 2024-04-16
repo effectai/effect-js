@@ -18,23 +18,23 @@ export { getBatch } from "./../actions/tasks/batch/getBatch";
 
 export { createCampaign } from "./../actions/tasks/campaigns/createCampaign";
 export {
-  getCampaign,
-  getCampaigns,
+	getCampaign,
+	getCampaigns,
 } from "./../actions/tasks/campaigns/getCampaigns";
 
 export {
-  getReservations,
-  getReservationForCampaign,
-  getReservationsForVAccount,
-  getReservationsForCampaign,
+	getReservations,
+	getReservationForCampaign,
+	getReservationsForVAccount,
+	getReservationsForCampaign,
 } from "./../actions/tasks/reservations/getReservations";
 export { reserveTask } from "./../actions/tasks/reservations/reserveTask";
 
 export { getForceSettings } from "./../actions/tasks/getForceSettings";
 export { getRepetitions } from "./../actions/tasks/getRepetitions";
 export {
-  getTaskData,
-  getTaskDataByReservation,
+	getTaskData,
+	getTaskDataByReservation,
 } from "./../actions/tasks/getTask";
 export { submitTask } from "./../actions/tasks/submitTask";
 export { getSubmissions } from "./../actions/tasks/getSubmissions";
@@ -43,12 +43,12 @@ export { getPrice } from "./../actions/token/getPrice";
 export { getBalance } from "./../actions/token/getBalance";
 
 export {
-  getVAccounts,
-  getAccountById,
+	getVAccounts,
+	getAccountById,
 } from "./../actions/vaccount/getAccounts";
 export {
-  getPendingPayments,
-  getTimeToClaim,
+	getPendingPayments,
+	getTimeToClaim,
 } from "../actions/vaccount/getPendingPayments";
 export { createVAccount } from "./../actions/vaccount/createAccount";
 
@@ -64,11 +64,11 @@ export { TaskIpfsError } from "./errors";
 export { jungle4, eos, defaultNetworkConfig } from "./constants";
 
 export type {
-  Campaign,
-  Reservation,
-  Payment,
-  VAccount,
-  Submission,
+	Campaign,
+	Reservation,
+	Payment,
+	VAccount,
+	Submission,
 } from "./types";
 
 export { Template } from "./template";

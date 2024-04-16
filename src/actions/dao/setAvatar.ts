@@ -1,6 +1,6 @@
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
-import { AtomicAsset } from "../../types/campaign";
+import type { AtomicAsset } from "../../types/campaign";
 import { useEFXContracts } from "../../utils/state";
 
 /**
@@ -9,31 +9,31 @@ import { useEFXContracts } from "../../utils/state";
  * @param asset
  */
 export const setAvatar = async (client: Client, asset: AtomicAsset) => {
-  if (!client.session) {
-    throw new SessionNotFoundError("Session is required for this method.");
-  }
+	if (!client.session) {
+		throw new SessionNotFoundError("Session is required for this method.");
+	}
 
-  const { actor, permission, transact } = client.session;
-  const { dao } = useEFXContracts(client);
+	const { actor, permission, transact } = client.session;
+	const { dao } = useEFXContracts(client);
 
-  const response = await transact({
-    actions: [
-      {
-        account: dao,
-        name: "setavatar",
-        authorization: [
-          {
-            actor,
-            permission,
-          },
-        ],
-        data: {
-          account: actor,
-          asset_id: asset.asset_id,
-        },
-      },
-    ],
-  });
+	const response = await transact({
+		actions: [
+			{
+				account: dao,
+				name: "setavatar",
+				authorization: [
+					{
+						actor,
+						permission,
+					},
+				],
+				data: {
+					account: actor,
+					asset_id: asset.asset_id,
+				},
+			},
+		],
+	});
 
-  return response;
+	return response;
 };

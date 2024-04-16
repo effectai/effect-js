@@ -61,7 +61,7 @@ Change requests cover both architectural and functional changes to how Effect wo
 
 1. **Use the GitHub search** and check someone else didn't get there first
 1. Take a moment to think about the best way to make a case for, and explain what you're thinking. Are you sure this shouldn't really be
-   a [bug report](#bug-reports) or a [feature request](#feature-requests)?  Is it really one idea or is it many? What's the context? What problem are you solving? Why is what you are suggesting better than what's already there?
+   a [bug report](#bug-reports) or a [feature request](#feature-requests)? Is it really one idea or is it many? What's the context? What problem are you solving? Why is what you are suggesting better than what's already there?
 
 ## Working on Effect-js
 
@@ -82,7 +82,7 @@ Pull requests are awesome. If you're looking to raise a PR for something which d
 
 ### Testing
 
-Effect is used by many libraries across the EOSIO ecosystem, so proper testing is absolutely essential prior to opening a pull request. This can be done in Effect by running `yarn build-production`.  This command will build the distrubution bundles (`yarn build-all`) and test each environment accordingly (`yarn test-all`).
+Effect is used by many libraries across the EOSIO ecosystem, so proper testing is absolutely essential prior to opening a pull request. This can be done in Effect by running `yarn build-production`. This command will build the distrubution bundles (`yarn build-all`) and test each environment accordingly (`yarn test-all`).
 
 #### Automated Unit Test Suite
 
@@ -90,15 +90,15 @@ Effect is used by many libraries across the EOSIO ecosystem, so proper testing i
 
 #### Integration Test Suite
 
-Integration tests will only work with a local node running on port 8888 and with test accounts "bob" and "alice".  This can be accomplished by following the [Effect Developer Getting Started Guide](https://dev.effect.network).
+Integration tests will only work with a local node running on port 8888 and with test accounts "bob" and "alice". This can be accomplished by following the [Effect Developer Getting Started Guide](https://dev.effect.network).
 
 ##### Web Environment
 
-Run `yarn build-web` to create the `dist-web` folder and web distrubution modules then `yarn test-web`.  This will run through the `tests/web.html` file using Cypress to inform you on the command line of any test failures.
+Run `yarn build-web` to create the `dist-web` folder and web distrubution modules then `yarn test-web`. This will run through the `tests/web.html` file using Cypress to inform you on the command line of any test failures.
 
 ##### NodeJS Environment
 
-Run `yarn build` to build the NPM distribution bundle then run `yarn test-node`.  This will create an out of box node environment with `tests/node.js` then test that environment with Jest and relay the results to the command line.
+Run `yarn build` to build the NPM distribution bundle then run `yarn test-node`. This will create an out of box node environment with `tests/node.js` then test that environment with Jest and relay the results to the command line.
 
 ### Quality Assurance
 
@@ -128,7 +128,7 @@ Examples of unacceptable behavior include:
 
 ## Contributor License & Acknowledgments
 
-Whenever you make a contribution to this project, you license your contribution under the same terms as set out in LICENSE, and you represent and warrant that you have the right to license your contribution under those terms.  Whenever you make a contribution to this project, you also certify in the terms of the Developer’s Certificate of Origin set out below:
+Whenever you make a contribution to this project, you license your contribution under the same terms as set out in LICENSE, and you represent and warrant that you have the right to license your contribution under those terms. Whenever you make a contribution to this project, you also certify in the terms of the Developer’s Certificate of Origin set out below:
 
 ```txt
 Developer Certificate of Origin

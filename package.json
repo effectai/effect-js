@@ -1,67 +1,58 @@
 {
-  "name": "@effectai/effect-js",
-  "version": "2.0.0",
-  "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
-  "main": "./dist/exports/index.js",
-  "module": "./dist/exports/index.js",
-  "browser": "dist/exports/index.js",
-  "types": "./dist/exports/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "test": "vitest run",
-    "dev": "tsc -w",
-    "build": "tsc --module es2020",
-    "lint": "eslint . --ext .ts --fix",
-    "format": "prettier --write .",
-    "changeset": "changeset",
-    "changeset:public": "bun scripts/updateVersion.ts && yarn build && changeset publish",
-    "changeset:version": "changeset version && yarn install --frozen-lockfile && bun scripts/updateVersion.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/effectai/effect-js.git"
-  },
-  "keywords": [
-    "efx",
-    "AI",
-    "blockchain",
-    "microtasks"
-  ],
-  "author": {
-    "name": "Effect-AI",
-    "url": "https://effect.network",
-    "email": "hello@effect.ai"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/effectai/effect-js/issues"
-  },
-  "homepage": "https://github.com/effectai/effect-js#readme",
-  "devDependencies": {
-    "@changesets/changelog-github": "^0.4.5",
-    "@changesets/cli": "^2.23.2",
-    "@types/dotenv": "^8.2.0",
-    "@types/node": "^20.5.2",
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.4.0",
-    "dotenv": "^16.3.1",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.3",
-    "vitest": "^1.4.0"
-  },
-  "dependencies": {
-    "@wharfkit/antelope": "^1.0.7",
-    "@wharfkit/session": "^1.2.8",
-    "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
-    "ajv": "^8.12.0",
-    "atomicassets": "^1.5.1",
-    "idb-keyval": "^6.2.1",
-    "node-localstorage": "^3.0.5"
-  }
+	"name": "@effectai/effect-js",
+	"version": "2.0.0",
+	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+	"main": "./dist/exports/index.js",
+	"module": "./dist/exports/index.js",
+	"browser": "dist/exports/index.js",
+	"types": "./dist/exports/index.d.ts",
+	"files": ["dist"],
+	"scripts": {
+		"test": "vitest run",
+		"dev": "tsc -w",
+		"build": "tsc --module es2020",
+		"lint": "bun biome lint --apply .",
+		"format": "biome format --write .",
+		"changeset": "changeset",
+		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
+		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/effectai/effect-js.git"
+	},
+	"keywords": ["efx", "AI", "blockchain", "microtasks"],
+	"author": {
+		"name": "Effect-AI",
+		"url": "https://effect.network",
+		"email": "hello@effect.ai"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/effectai/effect-js/issues"
+	},
+	"homepage": "https://github.com/effectai/effect-js#readme",
+	"devDependencies": {
+		"@changesets/changelog-github": "^0.4.5",
+		"@changesets/cli": "^2.23.2",
+		"@types/dotenv": "^8.2.0",
+		"@types/node": "^20.5.2",
+		"dotenv": "^16.3.1",
+		"typescript": "^5.4.3",
+		"vitest": "^1.4.0",
+		"@biomejs/biome": "1.7.0"
+	},
+	"dependencies": {
+		"@wharfkit/antelope": "^1.0.7",
+		"@wharfkit/session": "^1.2.8",
+		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
+		"ajv": "^8.12.0",
+		"atomicassets": "^1.5.1",
+		"idb-keyval": "^6.2.1",
+		"node-localstorage": "^3.0.5"
+	},
+	"trustedDependencies": ["@biomejs/biome"]
 }
