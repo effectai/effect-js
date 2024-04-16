@@ -88,8 +88,6 @@ export const getReservationForCampaign = async ({
 	vAccountId,
 }: GetReservationForCampaignArgs) => {
 	try {
-		console.log("getting reservation for campaign..", campaignId, vAccountId);
-
 		const bound = createCompositeU64Key(campaignId, vAccountId);
 		const data = await getReservations({
 			client,
