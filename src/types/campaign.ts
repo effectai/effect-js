@@ -62,6 +62,12 @@ export interface Reservation {
   campaign_id: number;
 }
 
+export interface AccTaskIdx {
+  account_id: number;
+  campaign_id: number;
+  value: number;
+}
+
 export interface Batch {
   id: number;
   campaign_id: number;
