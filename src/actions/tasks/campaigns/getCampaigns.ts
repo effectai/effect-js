@@ -22,7 +22,6 @@ export const getCampaigns = async ({
 
   const rows: Campaign[] = [];
   const lowerBound: UInt128 = UInt128.from((page - 1) * limit);
-  const upperBound: UInt128 = UInt128.from(999999);
 
   const response = await provider.v1.chain.get_table_rows({
       key_type: "i128",
@@ -30,7 +29,6 @@ export const getCampaigns = async ({
       table: "campaign",
       scope: contracts.tasks,
       lower_bound: lowerBound,
-      upper_bound: upperBound,
       limit,
       reverse
   });
