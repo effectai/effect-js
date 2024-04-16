@@ -81,6 +81,12 @@ export class Client {
 	};
 }
 
-export const createClient = (network: Network, opts: ClientOpts) => {
-	return new Client(network, opts);
+export const createClient = ({
+	network,
+	options = {},
+}: {
+	network: Network;
+	options?: ClientOpts;
+}) => {
+	return new Client(network, options);
 };
