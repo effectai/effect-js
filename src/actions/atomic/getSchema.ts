@@ -1,11 +1,11 @@
+import type { ISchemaRow } from "atomicassets/build/API/Rpc/RpcCache";
 import type { Client } from "../../client";
-import type { AtomicAssetSchema } from "../../types/campaign";
 
 export const getSchema = async (
 	client: Client,
 	collectionName: string,
 	schemaName: string,
-): Promise<AtomicAssetSchema> => {
+): Promise<ISchemaRow> => {
 	const { atomic } = client.network.config;
 	const { provider } = client;
 
@@ -17,7 +17,7 @@ export const getSchema = async (
 	});
 
 	const schema = rows.find(
-		(schema: AtomicAssetSchema) => schema.schema_name === schemaName,
+		(schema: ISchemaRow) => schema.schema_name === schemaName,
 	);
 
 	return schema;

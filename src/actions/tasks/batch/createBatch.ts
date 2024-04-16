@@ -4,7 +4,6 @@ import { SessionNotFoundError } from "../../../errors";
 import type { InitBatch } from "../../../types/campaign";
 import type { VAccount } from "../../../types/user";
 import { useEFXContracts } from "../../../utils/state";
-import { validateBatchData } from "../../../utils/validate";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 import { getCampaign } from "../campaigns/getCampaigns";
 import { type ForceSettings, getForceSettings } from "../getForceSettings";
@@ -150,9 +149,10 @@ export const createBatch = async (client: Client, batch: InitBatch) => {
 		// }
 
 		// Validate the batch before uploading, will throw error
-		if (campaign.info?.input_schema) {
-			validateBatchData(batch, campaign);
-		}
+		// TODO::
+		// if (campaign.info?.input_schema) {
+		// 	validateBatchData(batch, campaign);
+		// }
 
 		const newBatchId = campaign.num_batches + 1;
 		const hash = await uploadIpfsResource(client, batch.data);

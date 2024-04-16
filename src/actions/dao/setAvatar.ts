@@ -1,6 +1,6 @@
+import { IAssetRow } from "atomicassets/build/API/Rpc/RpcCache";
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
-import type { AtomicAsset } from "../../types/campaign";
 import { useEFXContracts } from "../../utils/state";
 
 /**
@@ -8,7 +8,7 @@ import { useEFXContracts } from "../../utils/state";
  * @param client
  * @param asset
  */
-export const setAvatar = async (client: Client, asset: AtomicAsset) => {
+export const setAvatar = async (client: Client, asset: IAssetRow) => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}

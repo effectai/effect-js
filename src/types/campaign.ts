@@ -16,19 +16,21 @@ export interface Campaign {
 		contract: string;
 	};
 	qualis?: unknown[];
-	info?: {
-		version: number;
-		title: string;
-		description: string;
-		instructions: string;
-		template: string;
-		input_schema?: unknown;
-		output_schema?: unknown;
-		image: string;
-		category?: unknown;
-		example_task?: unknown;
-		estimated_time: number;
-	};
+	info?: CampaignInfo;
+}
+
+export interface CampaignInfo {
+	version: number;
+	title: string;
+	description: string;
+	instructions: string;
+	template: string;
+	input_schema?: unknown;
+	output_schema?: unknown;
+	image: string;
+	category?: unknown;
+	example_task?: unknown;
+	estimated_time: number;
 }
 
 export interface InitCampaign {
