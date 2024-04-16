@@ -1,18 +1,37 @@
-# Get Campaigns
-
+# Get Campaigns [Queries the Effect SDK API for a list of campaigns.]
 
 ## Usage
 
-
-```typescript 
+```ts [example.ts]
 import { getCampaigns } from '@effectai/effect-js'
+import { client } from './config'
 
-const campaigns = await getCampaigns({ // [!code focus:7]
+const campaigns = await getCampaigns({ // [!code focus]
     client,
     limit: 10,
+    page: 1
 });
 ```
 
+## Returns
 
+- **Type:**  [`Promise<GetTableRowsResponse<UInt128, Campaign>>`](/docs/glossary/types#campaign)
+- **Description:** A list of campaigns.
+- **Properties:**
+  - **rows:** An array of campaigns.
+  - **more:** A boolean indicating if there are more campaigns to fetch.
+  - **next_key:** A string that can be used to fetch the next page of campaigns.
 
 ## Parameters
+
+### client
+- **Type:** `Client`
+
+### limit (optional) 
+- **Type:** `number`
+- **Default:** `10`
+
+### page (optional)
+- **Type:** `number`
+- **Default:** `1`
+

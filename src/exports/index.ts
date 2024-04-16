@@ -69,6 +69,7 @@ export type {
 	Payment,
 	VAccount,
 	Submission,
+	GetTableRowsResponse,
 } from "./types";
 
 export { Template } from "./template";
