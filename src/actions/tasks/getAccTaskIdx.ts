@@ -3,7 +3,7 @@ import type { Client } from "../../client";
 import { createCompositeU64Key } from "../../utils/keys";
 import { useEFXContracts } from "../../utils/state";
 import type { Acctaskidx } from "../../@generated/types/effecttasks2";
-import type { GetTableRowsResponse } from "../../exports";
+import type { GetTableRowsResponse, Serialized } from "../../exports";
 
 export type GetAccTaskIdxArgs = {
 	client: Client;
@@ -22,14 +22,14 @@ export const getAccTaskIdx = async ({
 
 		const compositeKey = createCompositeU64Key(campaignId, accountId);
 
-		const response = (await provider.v1.chain.get_table_rows({
+		const { rows } = (await provider.v1.chain.get_table_rows({
 			code: tasks,
 			table: "acctaskidx",
 			lower_bound: compositeKey,
 			upper_bound: compositeKey,
-		})) as GetTableRowsResponse<UInt64, Acctaskidx>;
+		})) as GetTableRowsResponse<UInt64, Serialized<Acctaskidx>>;
 
-		return response;
+		return rows[0];
 	} catch (error) {
 		console.error(error);
 		throw error;

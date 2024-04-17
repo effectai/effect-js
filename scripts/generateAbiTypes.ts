@@ -15,6 +15,7 @@ const main = async () => {
 	for (const abi of abis) {
 		const abiData = await getAbi(abi);
 		const t = transform(abiData.abi);
+
 		Bun.write(`src/@generated/types/${abi}.ts`, t.out.join("\n"));
 		Bun.write(
 			`src/@generated/abi/${abi}.ts`,

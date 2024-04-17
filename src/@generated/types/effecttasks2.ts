@@ -14,6 +14,7 @@ import {
 	UInt8,
 	Variant,
 	ABISerializable,
+	UInt32Type,
 } from "@wharfkit/antelope";
 
 @TypeAlias("B_vector_uint64_E")

@@ -156,10 +156,13 @@ export { TaskIpfsError } from "./errors";
 
 export { jungle4, eos, defaultNetworkConfig } from "./constants";
 
+export type { Campaign, Reservation } from "./../@generated/types/effecttasks2";
+
 export type {
 	Payment,
 	VAccount,
 	GetTableRowsResponse,
+	Serialized,
 } from "./types";
 
 export { Template } from "./template";
