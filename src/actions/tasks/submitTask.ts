@@ -1,9 +1,9 @@
 import { UInt32 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
-import type { Reservation } from "../../types/campaign";
 import { useEFXContracts } from "../../utils/state";
 import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
+import type { Reservation } from "../../@generated/types/effecttasks2";
 
 export type SubmitTaskArgs = {
 	client: Client;

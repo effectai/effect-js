@@ -1,13 +1,25 @@
-import type { UInt32 } from "@wharfkit/antelope";
+import type { Name, UInt32 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../exports";
-import type { IAssetRow } from "atomicassets/build/API/Rpc/RpcCache";
 
 export type getAccountAssetsArgs = {
 	client: Client;
-	account: string;
+	account: Name;
 };
 
+//Override this interface, atomicassets exports a broken type.
+export interface IAssetRow {
+	asset_id: string;
+	collection_name: string;
+	schema_name: string;
+	template_id: number;
+	ram_payer: string;
+	backed_tokens: string[];
+	immutable_serialized_data: Uint8Array;
+	mutable_serialized_data: Uint8Array;
+}
+
+//TODO:: Implement Pagination
 export const getAccountAssets = async ({
 	client,
 	account,

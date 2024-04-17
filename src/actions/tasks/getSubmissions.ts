@@ -1,7 +1,8 @@
 import type { UInt64Type } from "@wharfkit/antelope";
-import type { Client, Submission } from "../../exports";
+import type { Client } from "../../exports";
 import type { GetTableRowsResponse } from "../../types/helpers";
 import { useEFXContracts } from "../../utils/state";
+import type { Submission } from "../../@generated/types/effecttasks2";
 
 export type GetSubmissionsArgs = {
 	client: Client;

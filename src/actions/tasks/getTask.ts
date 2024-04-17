@@ -1,14 +1,15 @@
+import type { UInt32Type } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import type { Reservation } from "../../types/campaign";
 
 import { TaskIpfsError } from "../../errors";
 import { getIpfsResource } from "../ipfs/getIpfsResource";
 import { getBatchById } from "./batch/getBatch";
+import type { Reservation } from "../../@generated/types/effecttasks2";
 
 export type GetTaskDataArgs = {
 	client: Client;
-	taskIndex: number;
-	batchId: number;
+	taskIndex: UInt32Type;
+	batchId: UInt32Type;
 };
 
 export const getTaskData = async ({

@@ -1,10 +1,10 @@
-import type { Campaign } from "../../../types/campaign";
+import type { Campaign } from "../../../@generated/types/effecttasks2";
 import { getIpfsResource, type Client } from "../../../exports";
-import { UInt128 } from "@wharfkit/antelope";
+import { UInt128, type UInt32Type } from "@wharfkit/antelope";
 
 export type getCampaignByIdArgs = {
 	client: Client;
-	id: number;
+	id: UInt32Type;
 };
 
 export const getCampaignById = async ({

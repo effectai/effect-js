@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"downlevelIteration": true,
 		"esModuleInterop": true,
-		"experimentalDecorators": true,
 		"importHelpers": true,
+		"experimentalDecorators": true,
 		"isolatedModules": true,
 		"lib": ["dom", "es2020"],
 		"module": "es2020",
@@ -15,5 +15,5 @@
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*", "abis/**/*"],
 }

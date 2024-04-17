@@ -1,8 +1,12 @@
 import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
-import type { Campaign, CampaignInfo } from "../../../types/campaign";
 import type { GetTableRowsResponse } from "../../../types/helpers";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
+import type { Campaign } from "../../../@generated/types/effecttasks2";
+
+export type CampaignWithInfo = Campaign & {
+	info: unknown;
+};
 
 export type GetCampaignsArgs = {
 	client: Client;
@@ -36,12 +40,12 @@ export const getCampaigns = async ({
 	});
 
 	for (const row of response.rows) {
-		const campaign: Campaign = row;
+		const campaign: CampaignWithInfo = row;
 		if (ipfsFetch) {
-			campaign.info = (await getIpfsResource({
+			campaign.info = await getIpfsResource({
 				client,
 				hash: campaign.content.field_1,
-			})) as CampaignInfo;
+			});
 		}
 		rows.push(campaign);
 	}

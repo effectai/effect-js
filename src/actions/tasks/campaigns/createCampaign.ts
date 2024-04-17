@@ -1,18 +1,24 @@
+import type { Mkcampaign } from "../../../@generated/types/effecttasks2";
 import type { Client } from "../../../client";
 import { SessionNotFoundError } from "../../../errors";
-import type { InitCampaign } from "../../../types/campaign";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 
 export type CreateCampaignArgs = {
 	client: Client;
-	campaign: InitCampaign;
+	campaign: Mkcampaign;
+	data: Record<string, unknown>;
 };
 
 export const createCampaign = async ({
 	client,
 	campaign,
+	data,
 }: CreateCampaignArgs) => {
+	if (!data) {
+		throw new Error("Data is required for this method.");
+	}
+
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
 	}
@@ -21,7 +27,7 @@ export const createCampaign = async ({
 	const { tasks, token } = useEFXContracts(client);
 
 	try {
-		const hash = await uploadIpfsResource({ client, data: campaign.info });
+		const hash = await uploadIpfsResource({ client, data });
 
 		const response = await transact({
 			action: {
@@ -33,7 +39,7 @@ export const createCampaign = async ({
 					content: { field_0: 0, field_1: hash },
 					max_task_time: campaign.max_task_time,
 					reward: {
-						quantity: campaign.quantity,
+						quantity: campaign.reward.quantity,
 						contract: token,
 					},
 					qualis: campaign.qualis ?? [],

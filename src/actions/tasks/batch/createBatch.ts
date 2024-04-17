@@ -1,18 +1,18 @@
 import { type AnyAction, Asset } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
 import { SessionNotFoundError } from "../../../errors";
-import type { InitBatch } from "../../../types/campaign";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 import { type ForceSettings, getForceSettings } from "../getForceSettings";
 import { getCampaignById } from "../campaigns/getCampaignById";
 import { depositAction } from "../../vaccount/deposit";
 import { vTransferAction } from "../../vaccount/transfer";
+import type { Mkbatch } from "../../../@generated/types/effecttasks2";
 
 export type CreateBatchActionArgs = {
 	client: Client;
 	forceSettings: ForceSettings;
-	batch: InitBatch;
+	batch: Mkbatch;
 	hash: string;
 };
 
@@ -81,10 +81,11 @@ export const publishBatchAction = ({
 
 export type CreateBatchArgs = {
 	client: Client;
-	batch: InitBatch;
+	batch: Mkbatch;
+	data: Record<string, unknown>;
 };
 
-export const createBatch = async ({ client, batch }: CreateBatchArgs) => {
+export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 	try {
 		if (!client.session) {
 			throw new SessionNotFoundError("Session is required for this method.");
@@ -99,7 +100,7 @@ export const createBatch = async ({ client, batch }: CreateBatchArgs) => {
 
 		const campaign = await getCampaignById({ client, id: batch.campaign_id });
 		const assetQuantity = Asset.from(campaign.reward.quantity);
-		const batchPrice = assetQuantity.value * batch.repetitions;
+		const batchPrice = assetQuantity.value * batch.repetitions.toNumber();
 
 		// Check if the user has enough funds to pay for the batch
 		// if (Asset.from(vacc.balance.quantity).value < batchPrice) {
@@ -112,8 +113,8 @@ export const createBatch = async ({ client, batch }: CreateBatchArgs) => {
 		// 	validateBatchData(batch, campaign);
 		// }
 
-		const newBatchId = campaign.num_batches + 1;
-		const hash = await uploadIpfsResource({ client, data: batch.data });
+		const newBatchId = campaign.num_batches.toNumber() + 1;
+		const hash = await uploadIpfsResource({ client, data });
 
 		const makeBatch = createBatchAction({
 			client,
@@ -132,7 +133,7 @@ export const createBatch = async ({ client, batch }: CreateBatchArgs) => {
 		const publishBatch = publishBatchAction({
 			client,
 			batchId: newBatchId,
-			numTasks: batch.repetitions,
+			numTasks: batch.repetitions.toNumber(),
 		});
 
 		// TODO Check if batchId is correct.
