@@ -3,7 +3,7 @@ import type { Client } from "../../client";
 import { createCompositeU64Key } from "../../utils/keys";
 import { useEFXContracts } from "../../utils/state";
 import type { Acctaskidx } from "../../@generated/types/effecttasks2";
-import type { GetTableRowsResponse, Serialized } from "../../exports";
+import type { GetTableRowsResponse } from "../../exports";
 
 export type GetAccTaskIdxArgs = {
 	client: Client;
@@ -27,7 +27,7 @@ export const getAccTaskIdx = async ({
 			table: "acctaskidx",
 			lower_bound: compositeKey,
 			upper_bound: compositeKey,
-		})) as GetTableRowsResponse<UInt64, Serialized<Acctaskidx>>;
+		})) as GetTableRowsResponse<UInt64, Acctaskidx>;
 
 		return rows[0];
 	} catch (error) {

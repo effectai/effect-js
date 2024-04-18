@@ -162,7 +162,6 @@ export type {
 	Payment,
 	VAccount,
 	GetTableRowsResponse,
-	Serialized,
 } from "./types";
 
 export { Template } from "./template";

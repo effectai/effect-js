@@ -6,14 +6,15 @@
 		"experimentalDecorators": true,
 		"isolatedModules": true,
 		"lib": ["dom", "es2020"],
-		"module": "es2020",
+		"module": "ESNext",
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"declaration": true,
 		"strict": true,
-		"target": "es2020",
+		"target": "ESNext",
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
+	"exclude": ["node_modules/**/*"],
 	"include": ["src/**/*", "abis/**/*"],
 }

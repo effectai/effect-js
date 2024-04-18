@@ -1,10 +1,10 @@
 import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
-import type { GetTableRowsResponse, Serialized } from "../../../types/helpers";
+import type { GetTableRowsResponse } from "../../../types/helpers";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
 import type { Campaign } from "../../../@generated/types/effecttasks2";
 
-export type CampaignWithInfo = Serialized<Campaign> & {
+export type CampaignWithInfo = Campaign & {
 	info?: unknown;
 };
 
@@ -22,9 +22,7 @@ export const getCampaigns = async ({
 	limit = 20,
 	reverse = false,
 	ipfsFetch = true,
-}: GetCampaignsArgs): Promise<
-	GetTableRowsResponse<UInt128, Serialized<Campaign>>
-> => {
+}: GetCampaignsArgs): Promise<GetTableRowsResponse<UInt128, Campaign>> => {
 	const { contracts } = client.network.config.efx;
 	const provider = client.provider;
 
@@ -39,7 +37,7 @@ export const getCampaigns = async ({
 		lower_bound: lowerBound,
 		limit,
 		reverse,
-	})) as GetTableRowsResponse<UInt128, Serialized<Campaign>>;
+	})) as GetTableRowsResponse<UInt128, Campaign>;
 
 	for (const row of response.rows) {
 		const campaign: CampaignWithInfo = row;

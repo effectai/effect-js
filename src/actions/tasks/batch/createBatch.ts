@@ -100,7 +100,7 @@ export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 
 		const campaign = await getCampaignById({ client, id: batch.campaign_id });
 		const assetQuantity = Asset.from(campaign.reward.quantity);
-		const batchPrice = assetQuantity.value * batch.repetitions.toNumber();
+		const batchPrice = assetQuantity.value * batch.repetitions;
 
 		// Check if the user has enough funds to pay for the batch
 		// if (Asset.from(vacc.balance.quantity).value < batchPrice) {
@@ -113,7 +113,7 @@ export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 		// 	validateBatchData(batch, campaign);
 		// }
 
-		const newBatchId = campaign.num_batches.toNumber() + 1;
+		const newBatchId = campaign.num_batches + 1;
 		const hash = await uploadIpfsResource({ client, data });
 
 		const makeBatch = createBatchAction({
@@ -133,7 +133,7 @@ export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 		const publishBatch = publishBatchAction({
 			client,
 			batchId: newBatchId,
-			numTasks: batch.repetitions.toNumber(),
+			numTasks: batch.repetitions,
 		});
 
 		// TODO Check if batchId is correct.

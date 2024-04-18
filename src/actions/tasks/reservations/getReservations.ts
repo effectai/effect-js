@@ -1,6 +1,6 @@
 import { UInt32, UInt64 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
-import type { GetTableRowsResponse, Serialized } from "../../../types/helpers";
+import type { GetTableRowsResponse } from "../../../types/helpers";
 import { createCompositeU64Key } from "../../../utils/keys";
 import { useEFXContracts } from "../../../utils/state";
 import type { Reservation } from "../../../@generated/types/effecttasks2";
@@ -27,7 +27,7 @@ export const getReservations = async ({
 		index_position: indexPosition,
 		upper_bound: upperBound,
 		lower_bound: lowerBound,
-	})) as GetTableRowsResponse<UInt64, Serialized<Reservation>>;
+	})) as GetTableRowsResponse<UInt64, Reservation>;
 };
 
 export type GetReservationsForCampaignArgs = {
