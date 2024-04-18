@@ -1,4 +1,4 @@
-import type { UInt64 } from "@wharfkit/antelope";
+import { UInt32, type UInt64 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { createCompositeU64Key } from "../../utils/keys";
 import { useEFXContracts } from "../../utils/state";
@@ -8,7 +8,7 @@ import type { GetTableRowsResponse } from "../../exports";
 export type GetAccTaskIdxArgs = {
 	client: Client;
 	accountId: number;
-	campaignId: number;
+	campaignId?: number;
 };
 
 export const getAccTaskIdx = async ({
@@ -20,16 +20,20 @@ export const getAccTaskIdx = async ({
 		const { tasks } = useEFXContracts(client);
 		const { provider } = client;
 
-		const compositeKey = createCompositeU64Key(campaignId, accountId);
+		const lowerBound = createCompositeU64Key(campaignId || 0, accountId);
+		const upperBound = createCompositeU64Key(
+			campaignId || Number(UInt32.max),
+			accountId,
+		);
 
 		const { rows } = (await provider.v1.chain.get_table_rows({
 			code: tasks,
 			table: "acctaskidx",
-			lower_bound: compositeKey,
-			upper_bound: compositeKey,
+			lower_bound: lowerBound,
+			upper_bound: upperBound,
 		})) as GetTableRowsResponse<UInt64, Acctaskidx>;
 
-		return rows[0];
+		return rows;
 	} catch (error) {
 		console.error(error);
 		throw error;

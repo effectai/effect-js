@@ -41,9 +41,9 @@ export const getReservationsForCampaign = async ({
 }: GetReservationsForCampaignArgs) => {
 	try {
 		const lowerBound = createCompositeU64Key(campaignId, 0);
-		const upperBound = createCompositeU64Key(campaignId, Number(UInt32.max()));
-
-		return getReservations({ client, lowerBound, upperBound });
+		const upperBound = createCompositeU64Key(campaignId, Number(UInt32.max));
+		const { rows } = await getReservations({ client, lowerBound, upperBound });
+		return rows;
 	} catch (e) {
 		console.error(e);
 		throw e;
