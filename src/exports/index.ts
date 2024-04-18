@@ -62,6 +62,8 @@ export {
 
 export {
 	getCampaigns,
+	type CampaignInfo,
+	type CampaignWithInfo,
 	type GetCampaignsArgs,
 } from "./../actions/tasks/campaigns/getCampaigns";
 
@@ -156,7 +158,11 @@ export { TaskIpfsError } from "./errors";
 
 export { jungle4, eos, defaultNetworkConfig } from "./constants";
 
-export type { Campaign, Reservation } from "./../@generated/types/effecttasks2";
+export type {
+	Campaign,
+	Reservation,
+	Batch,
+} from "./../@generated/types/effecttasks2";
 
 export type {
 	Payment,

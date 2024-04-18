@@ -4,8 +4,22 @@ import type { GetTableRowsResponse } from "../../../types/helpers";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
 import type { Campaign } from "../../../@generated/types/effecttasks2";
 
+export type CampaignInfo = {
+	category: string;
+	description: string;
+	estimated_time: number;
+	example_task: string;
+	image: string;
+	instructions: string;
+	input_schema: null;
+	output_schema: null;
+	template: string;
+	title: string;
+	version: number;
+};
+
 export type CampaignWithInfo = Campaign & {
-	info?: unknown;
+	info?: CampaignInfo;
 };
 
 export type GetCampaignsArgs = {
@@ -43,10 +57,11 @@ export const getCampaigns = async ({
 		const campaign: CampaignWithInfo = row;
 
 		if (ipfsFetch) {
-			campaign.info = await getIpfsResource({
+			campaign.info = (await getIpfsResource({
 				client,
 				hash: campaign.content.field_1,
-			});
+			})) as CampaignInfo;
+			console.log(campaign.info);
 		}
 
 		rows.push(campaign);
