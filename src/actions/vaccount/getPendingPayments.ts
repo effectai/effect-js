@@ -2,12 +2,10 @@ import { type UInt64, UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../types/helpers";
 import type { Payment } from "../../types/user";
-import {
-	type ForceSettings,
-	getForceSettings,
-} from "../tasks/getForceSettings";
+import { getForceSettings } from "../tasks/getForceSettings";
+import type { Settings } from "../../@generated/types/effecttasks2";
 
-export const isClaimable = (p: Payment, forceSettings: ForceSettings) => {
+export const isClaimable = (p: Payment, forceSettings: Settings) => {
 	return (
 		new Date(`${new Date(p.last_submission_time)}UTC`).getTime() / 1000 +
 			forceSettings.payout_delay_sec <
@@ -18,7 +16,7 @@ export const isClaimable = (p: Payment, forceSettings: ForceSettings) => {
 export const extractAndParseQuantity = (quantity: string) =>
 	Number.parseFloat(quantity.match(/[0-9.]+/)?.[0] || "0");
 
-export const getTimeToClaim = (p: Payment, forceSettings: ForceSettings) => {
+export const getTimeToClaim = (p: Payment, forceSettings: Settings) => {
 	return (
 		new Date(`${new Date(p.last_submission_time)}UTC`).getTime() / 1000 +
 		forceSettings.payout_delay_sec -

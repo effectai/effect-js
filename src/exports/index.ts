@@ -86,7 +86,6 @@ export {
 
 export {
 	getForceSettings,
-	type ForceSettings,
 	type GetForceSettingsArgs,
 } from "./../actions/tasks/getForceSettings";
 
@@ -161,6 +160,7 @@ export { jungle4, eos, defaultNetworkConfig } from "./constants";
 export type {
 	Campaign,
 	Reservation,
+	Settings,
 	Batch,
 } from "./../@generated/types/effecttasks2";
 

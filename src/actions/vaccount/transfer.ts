@@ -1,6 +1,5 @@
 import type { AnyAction } from "@wharfkit/antelope";
 import type { Client } from "../../client";
-import type { ForceSettings } from "../tasks/getForceSettings";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
 

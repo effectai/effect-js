@@ -3,15 +3,15 @@ import type { Client } from "../../../client";
 import { SessionNotFoundError } from "../../../errors";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
-import { type ForceSettings, getForceSettings } from "../getForceSettings";
+import { getForceSettings } from "../getForceSettings";
 import { getCampaignById } from "../campaigns/getCampaignById";
 import { depositAction } from "../../vaccount/deposit";
 import { vTransferAction } from "../../vaccount/transfer";
-import type { Mkbatch } from "../../../@generated/types/effecttasks2";
+import type { Mkbatch, Settings } from "../../../@generated/types/effecttasks2";
 
 export type CreateBatchActionArgs = {
 	client: Client;
-	forceSettings: ForceSettings;
+	forceSettings: Settings;
 	batch: Mkbatch;
 	hash: string;
 };

@@ -1,11 +1,6 @@
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../types/helpers";
-
-//TODO:: Define the ForceSettings type
-export type ForceSettings = {
-	payout_delay_sec: number;
-	force_vaccount_id: number;
-};
+import type { Settings } from "../../@generated/types/effecttasks2";
 
 export type GetForceSettingsArgs = {
 	client: Client;
@@ -20,7 +15,7 @@ export const getForceSettings = async ({ client }: GetForceSettingsArgs) => {
 			code: contracts.tasks,
 			scope: contracts.tasks,
 			table: "settings",
-		})) as GetTableRowsResponse<unknown, ForceSettings>;
+		})) as GetTableRowsResponse<unknown, Settings>;
 
 		const [config] = response.rows;
 		return config;

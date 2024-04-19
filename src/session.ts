@@ -3,6 +3,7 @@ import type {
 	PermissionLevelType,
 	Session,
 	TransactArgs,
+	TransactOptions,
 } from "@wharfkit/session";
 import { TransactionError } from "./errors";
 import type { VAccount } from "./exports";
@@ -32,23 +33,18 @@ export class EffectSession {
 	}
 
 	public transact = async (args: TransactArgs) => {
-		try {
-			// Start the transaction
-			const transaction = await this.wharfKitSession.transact({
-				...args,
-			});
+		// Start the transaction
+		const transaction = await this.wharfKitSession.transact({
+			...args,
+		});
 
-			//wait for TX to be IN BLOCK
-			await waitForTransaction(
-				transaction.response?.transaction_id,
-				this.wharfKitSession.client.v1.chain,
-				TxState.IN_BLOCK,
-			);
+		//wait for TX to be IN BLOCK
+		await waitForTransaction(
+			transaction.response?.transaction_id,
+			this.wharfKitSession.client.v1.chain,
+			TxState.IN_BLOCK,
+		);
 
-			return transaction;
-		} catch (error) {
-			console.error(error);
-			throw new TransactionError("Failed to transact");
-		}
+		return transaction;
 	};
 }

@@ -8,14 +8,13 @@ import type { Session } from "@wharfkit/session";
 import { type Cache, MemoryCache } from "./cache";
 
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
-import { type CacheManager, IDBCache, createCacheManager } from "./cache";
-import { jungle4 } from "./constants/network";
 import { EffectSession } from "./session";
 import type { Network } from "./types/network";
+import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 
 export interface ClientOpts {
 	ipfsCacheDurationInMs?: number | null;
-	fetchProviderOptions?: FetchProviderOptions;
+	fetchProvider?: FetchProviderOptions;
 	cacheImplementation?: Cache;
 }
 
@@ -31,19 +30,25 @@ export class Client {
 
 	public cache: CacheManager;
 
+	private _session: EffectSession | null = null;
+
+	public get session(): EffectSession | null {
+		return this._session;
+	}
+
 	constructor(network: Network, options: ClientOpts) {
 		this.options = { ...defaultClientOpts, ...options };
 
 		this.network = network;
 
 		this.fetchProvider = new FetchProvider(this.network.eosRpcUrl, {
-			fetch: options.fetchProviderOptions?.fetch ?? fetch ?? window?.fetch,
+			fetch: this.options.fetchProvider?.fetch,
 		});
 
 		this.provider = new APIClient({ provider: this.fetchProvider });
 
-		if (options.cacheImplementation) {
-			this.cache = createCacheManager(options.cacheImplementation);
+		if (this.options.cacheImplementation) {
+			this.cache = createCacheManager(this.options.cacheImplementation);
 		} else if (typeof indexedDB !== "undefined") {
 			this.cache = createCacheManager(new IDBCache());
 		} else {
@@ -51,12 +56,7 @@ export class Client {
 		}
 	}
 
-	private _session: EffectSession | null = null;
-
-	public get session(): EffectSession | null {
-		return this._session;
-	}
-
+	// Set the session for the client
 	public setSession = async (session: Session | null) => {
 		try {
 			if (!session) {
@@ -64,13 +64,14 @@ export class Client {
 				return this._session;
 			}
 
-			// Get Vaccount for this user
+			// Get or create the vAccount
 			const account = await getOrCreateVAccount({
 				client: this,
 				actor: session.actor,
 				session,
 			});
 
+			// Only set the session if the vAccount was created successfully
 			this._session = session ? new EffectSession(session, account) : null;
 
 			return this._session;
