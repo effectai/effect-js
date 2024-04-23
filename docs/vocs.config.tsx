@@ -36,7 +36,7 @@ export default defineConfig({
     },
   },
   topNav: [
-    { text: 'Docs', link: '/docs/getting-started', match: '/docs' },
+    { text: 'Docs', link: '/docs/gettingStarted', match: '/docs' },
     {
       text: 'Examples',
       link: 'https://github.com/effectai/effect-js/tree/main/examples',
@@ -44,12 +44,6 @@ export default defineConfig({
     {
       text: pkg.version,
       items: [
-        {
-          text: `Migrating to ${toPatchVersionRange(pkg.version)}`,
-          link: `/docs/migration-guide#_${toPatchVersionRange(
-            pkg.version,
-          ).replace(/\./g, '-')}-breaking-changes`,
-        },
         {
           text: 'Changelog',
           link: 'https://github.com/effectai/effect-js/blob/main/CHANGELOG.MD',
