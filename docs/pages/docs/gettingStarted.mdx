@@ -1,0 +1,77 @@
+# Getting Started [Get started with the SDK in just a few lines of code.]
+
+## Overview
+
+## Installation
+
+Use your favorite package manager to install the SDK.
+
+  :::code-group
+
+  ```bash [npm]
+
+  npm i @effectai/effect-js
+  ```
+
+  ```bash [bun]
+  bun i @effectai/effect-js
+  ```
+
+  ```bash [pnpm]
+  pnpm i @effectai/effect-js
+  ```
+  :::
+## Quick Start
+
+### 1. Import the SDK
+
+```typescript
+import { createClient } from '@effectai/sdk'
+```
+
+### 2. Instantiate the EffectAI Client
+
+Here the handy dandy `createClient` function is used to create a client instance.
+It takes two optional arguments, the first one is the network configuration, the second one is the options object.
+You can read more about the options object in the [ClientOptions](#client-options) section.
+
+```typescript
+// This would be ideal, the big question is if using mainnet should be explicitly passed or not.
+const client = createClient()
+
+// But currently it is like this:
+import { jungle4 } from '@effectai/sdk'
+// Atleast the opts ({}) object is now optional
+const client = createClient(jungle4)
+```
+
+
+### 3. Use the SDK
+
+```typescript
+// TODO These should also be re-exported from @effectai/sdk
+import { Session } from "@wharfkit/session";
+import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
+
+
+const walletPlugin = new WalletPluginPrivateKey("your_private_key_here")
+
+const session = new Session({
+    actor: "forcedev1234",
+    permission: "active",
+    walletPlugin,
+
+    // Isn't this redundant, we're already passing this in the createClient function
+    chain: {
+      id: "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
+      url: "https://jungle4.greymass.com",
+    },
+})
+```
+
+### 1.
+
+## Live example
+
+TODO:: insert example
+
