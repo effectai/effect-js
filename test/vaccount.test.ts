@@ -10,13 +10,10 @@ describe("Client SDK", () => {
 		client = await testClient();
 	});
 
-	test("Client defined", () => {
-		expect(client).toBeDefined();
-	});
-
-	test("Client session connected", async () => {
-		expect(client.session).toBeDefined();
-		expect(client.session?.vAccount).toBeDefined();
-		expect(client.session?.actor.toString()).toEqual("forcedev1234");
+	test("getVAccounts", async () => {
+		const actor = Name.from("forcedev1234");
+		const [vacc] = await getVAccounts({ client, actor });
+		expect(vacc.address[1]).toEqual("forcedev1234");
+		expect(vacc.id).toBeNumber();
 	});
 });
