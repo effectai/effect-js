@@ -13,6 +13,9 @@ If you want to add contributions to this repository, please follow the instructi
 ## 🏠 Local Development
 Follow the docs to Set Up Your Local Development Environment to contribute to the framework and documentation. 
 
+### `.env`
 
+To run the tests locally, you will need to provide an EOS account that can be used to make transactions on your behalf.
+Copy the `.env.example` file to `.env.testnet` and fill in the required parameters.
 
 
