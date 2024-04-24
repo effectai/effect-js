@@ -11,7 +11,6 @@ export const getAvatar = async (client: Client, account: string) => {
 		account,
 		assetId: daoAvatar.asset_id,
 	});
-	console.debug(asset);
 	return {
 		...asset,
 		img: asset.immutable_deserialized_data?.img ?? defaultImg,

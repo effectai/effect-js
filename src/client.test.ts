@@ -19,7 +19,6 @@ describe("Client", async () => {
 	test("Connect Client to Session", async () => {
 		const client = createClient({ network });
 
-		console.debug("client.session", client.session);
 		expect(client.session).toBeNull();
 
 		// Create wallet with privatekey
@@ -45,18 +44,15 @@ describe("Client", async () => {
 	});
 });
 
-describe("Client testHelper", () => {
-	let client: Client;
-	beforeAll(async () => {
-		client = await testClientSession();
-	});
-
-	test("testClient defined", () => {
+describe("Client testHelper", async () => {
+	test("testClient defined", async () => {
+		const client = await testClientSession();
 		expect(client).toBeDefined();
 		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
 	test("testClient session connected", async () => {
+		const client = await testClientSession();
 		expect(client.session).toBeDefined();
 		expect(client.session?.vAccount).toBeDefined();
 		expect(client.session?.actor).toBeInstanceOf(Name);
