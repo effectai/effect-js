@@ -1,8 +1,6 @@
 import { expect, test, describe, beforeAll } from "bun:test";
-import { testClient } from "./helpers";
+import { testClient } from "./testHelper";
 import type { Client } from "../src/client";
-import { getVAccounts, getAccountById } from "../src/exports";
-import { Name } from "@wharfkit/antelope";
 
 describe("Client SDK", () => {
 	let client: Client;
