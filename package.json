@@ -10,9 +10,10 @@
     "dist"
   ],
   "scripts": {
-    "test": "bun test",
-    "test:watch": "bun test --watch",
-    "test:coverage": "bun test --coverage",
+    "test": "bun --env-file=.env.testnet test",
+    "test:watch": "bun --env-file=.env.testnet test --watch",
+    "test:coverage": "bun --env-file=.env.testnet test --coverage",
+    "test:mainnet": "bun --env-file=.env.mainnet test",
     "dev": "tsc -w",
     "build": "tsc --module es2020",
     "lint": "bun biome lint --apply .",
@@ -53,8 +54,6 @@
     "@changesets/changelog-github": "^0.4.5",
     "@changesets/cli": "^2.23.2",
     "@greymass/abi2core": "^2.0.1",
-    "@types/dotenv": "^8.2.0",
-    "dotenv": "^16.3.1",
     "typescript": "^5.4.3"
   },
   "dependencies": {
