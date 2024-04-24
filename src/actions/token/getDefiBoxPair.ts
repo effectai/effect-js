@@ -5,7 +5,9 @@ export enum DefiBoxPairEnum {
 
 export const getDefiBoxPair = async (pairEnum: DefiBoxPairEnum) => {
 	try {
-		const result = await window.fetch(
+		// TODO: Check how resilient this is, otherwise figure out how to use FetchProvider from the SDK Client.
+		const useFetch = fetch ?? window.fetch;
+		const result = await useFetch(
 			"https://eos.greymass.com/v1/chain/get_table_rows",
 			{
 				method: "POST",
