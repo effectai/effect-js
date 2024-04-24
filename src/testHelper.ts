@@ -7,34 +7,38 @@ import type { Client } from "./../src/client";
 declare module "bun" {
 	interface Env {
 		PERMISSION: string;
-		NETWORK: string;
-		ACCOUNTNAME: string;
+		NETWORK_NAME: string;
+		ACTOR: string;
 		PRIVATE_KEY: string;
 		PUBLIC_KEY: string;
 	}
 }
 
-export const testClient = async (): Promise<Client> => {
-	const client = createClient({
-		network: Bun.env.NETWORK === "mainnet" ? eos : jungle4,
-	});
+export const destructureEnv = () => ({
+	network: Bun.env.NETWORK_NAME === "mainnet" ? eos : jungle4,
+	networkName: Bun.env.NETWORK,
+	permission: Bun.env.PERMISSION,
+	actor: Bun.env.ACTOR,
+	privateKey: Bun.env.PRIVATE_KEY,
+	publicKey: Bun.env.PUBLIC_KEY,
+});
 
-	// Test Key
-	const walletPlugin = new WalletPluginPrivateKey(Bun.env.PRIVATE_KEY);
+export const testClientSession = async (): Promise<Client> => {
+	const { network, permission, actor, privateKey } = destructureEnv();
+	const client = createClient({ network });
 
-	// Determine network specifig config
-	const { eosRpcUrl, eosChainId } =
-		Bun.env.NETWORK === "mainnet" ? eos : jungle4;
+	// Set up wallet with privatekey
+	const walletPlugin = new WalletPluginPrivateKey(privateKey);
 
-	// Create Session
+	// Set up session with wallet and chain
 	const session = new Session({
-		actor: Bun.env.ACCOUNTNAME,
-		permission: Bun.env.PERMISSION,
-		chain: {
-			id: eosChainId,
-			url: eosRpcUrl,
-		},
+		actor,
+		permission,
 		walletPlugin,
+		chain: {
+			id: network.eosChainId,
+			url: network.eosRpcUrl,
+		},
 	});
 
 	// Connect session to client
