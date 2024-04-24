@@ -10,7 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "test": "vitest run",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "dev": "tsc -w",
     "build": "tsc --module es2020",
     "lint": "bun biome lint --apply .",
