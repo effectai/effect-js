@@ -12,6 +12,7 @@
   "scripts": {
     "test": "bun test",
     "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
     "dev": "tsc -w",
     "build": "tsc --module es2020",
     "lint": "bun biome lint --apply .",
@@ -54,8 +55,7 @@
     "@greymass/abi2core": "^2.0.1",
     "@types/dotenv": "^8.2.0",
     "dotenv": "^16.3.1",
-    "typescript": "^5.4.3",
-    "vitest": "^1.4.0"
+    "typescript": "^5.4.3"
   },
   "dependencies": {
     "@wharfkit/antelope": "^1.0.7",
