@@ -3,9 +3,11 @@ import type {
 	EfxConfig,
 	IpfsConfig,
 	RelayerConfig,
+	Network,
 } from "../types/network";
+import { eos } from "../exports";
 
-export const efxConfig: EfxConfig = {
+export const efxTestnetConfig: EfxConfig = {
 	token: {
 		symbol: "EFX",
 		precision: 4,
@@ -17,6 +19,22 @@ export const efxConfig: EfxConfig = {
 		feepool: "efxfeepool11",
 		proposals: "efxproposals",
 		vaccount: "efxaccount11",
+		dao: "theeffectdao",
+	},
+};
+
+export const efxMainnetConfig: EfxConfig = {
+	token: {
+		symbol: "EFX",
+		precision: 4,
+	},
+	contracts: {
+		tasks: "force.efx",
+		token: "effecttokens",
+		stake: "efxstakepool",
+		feepool: "feepool.efx",
+		proposals: "daoproposals",
+		vaccount: "vaccount.efx",
 		dao: "theeffectdao",
 	},
 };
@@ -38,9 +56,9 @@ export const relayerConfig: RelayerConfig = {
 		"https://vaccount-relayer-service-jungle-96xyn.ondigitalocean.app",
 };
 
-export const defaultNetworkConfig = {
-	efx: efxConfig,
+export const defaultNetworkConfig = (network: string) => ({
+	efx: network === "eos" ? efxMainnetConfig : efxTestnetConfig,
 	ipfs: ipfsConfig,
 	atomic: atomicConfig,
 	relayer: relayerConfig,
-};
+});

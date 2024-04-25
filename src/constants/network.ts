@@ -8,7 +8,7 @@ export const jungle4: Network = {
 	eosChainId:
 		"73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
 
-	config: defaultNetworkConfig,
+	config: defaultNetworkConfig("jungle4"),
 };
 
 export const eos: Network = {
@@ -17,6 +17,5 @@ export const eos: Network = {
 	eosRpcUrl: "https://eos.greymass.com/",
 	eosChainId:
 		"73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
-
-	config: defaultNetworkConfig,
+	config: defaultNetworkConfig("eos"),
 };
