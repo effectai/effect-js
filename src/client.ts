@@ -4,9 +4,7 @@ import {
 	type FetchProviderOptions,
 } from "@wharfkit/antelope";
 import type { Session } from "@wharfkit/session";
-
 import { type Cache, MemoryCache } from "./cache";
-
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 import { EffectSession } from "./session";
 import type { Network } from "./types/network";
@@ -103,7 +101,6 @@ export class Client {
 	 *
 	 * // Use the client to create a batch with the session
 	 * await createBatch({ client, batch, data })
-	 *
 	 * ```
 	 */
 	public setSession = async (session: Session | null) => {
