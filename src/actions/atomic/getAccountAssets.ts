@@ -7,7 +7,8 @@ export type getAccountAssetsArgs = {
 	account: Name;
 };
 
-//Override this interface, atomicassets exports a broken type.
+// TODO: What does this comment mean?
+// Override this interface, atomicassets exports a broken type.
 export interface IAssetRow {
 	asset_id: string;
 	collection_name: string;
@@ -19,7 +20,7 @@ export interface IAssetRow {
 	mutable_serialized_data: Uint8Array;
 }
 
-//TODO:: Implement Pagination
+// TODO:: Implement Pagination
 export const getAccountAssets = async ({
 	client,
 	account,

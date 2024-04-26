@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeAll } from "bun:test";
+import { jungle4, eos } from "../src/exports";
 import { testClientSession, destructureEnv } from "./testHelper";
 import { createClient, Client as ClientConstructor } from "./client";
-import type { Client } from "./client";
 import { Name } from "@wharfkit/antelope";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { Session } from "@wharfkit/session";
@@ -56,5 +56,15 @@ describe("Client testHelper", async () => {
 		expect(client.session).toBeDefined();
 		expect(client.session?.vAccount).toBeDefined();
 		expect(client.session?.actor).toBeInstanceOf(Name);
+	});
+});
+
+describe("Test mainnet config", async () => {
+	test("mainnet config", async () => {
+		const client = createClient({ network: eos });
+	});
+
+	test("Testnet config", async () => {
+		const client = createClient({ network: jungle4 });
 	});
 });
