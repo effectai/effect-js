@@ -9,6 +9,11 @@ export type GetVAccountsArgs = {
 	actor: Name;
 };
 
+/**
+ * Get all virtual accounts for a given account
+ * @param {GetVAccountsArgs} getVAccountargs - Object with sdk client and account name
+ * @returns {Promise<VAccount[]>} VAccount[] - Array of Effect Virtual Accounts
+ */
 export const getVAccounts = async ({
 	client,
 	actor,
