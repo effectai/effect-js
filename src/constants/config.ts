@@ -3,9 +3,7 @@ import type {
 	EfxConfig,
 	IpfsConfig,
 	RelayerConfig,
-	Network,
 } from "../types/network";
-import { eos } from "../exports";
 
 export const efxTestnetConfig: EfxConfig = {
 	token: {
