@@ -7,6 +7,11 @@ import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { Session } from "@wharfkit/session";
 import { EffectSession } from "./session";
 
+describe("Log network", async () => {
+	const { network } = destructureEnv();
+	console.log(`🧭 Testing with network: ${network.eosRpcUrl}\n`);
+});
+
 describe("Client", async () => {
 	const { network, actor, permission, privateKey } = destructureEnv();
 
