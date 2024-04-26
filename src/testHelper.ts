@@ -15,12 +15,12 @@ declare module "bun" {
 }
 
 export const destructureEnv = () => ({
-	network: Bun.env.NETWORK_NAME === "mainnet" ? eos : jungle4,
-	networkName: Bun.env.NETWORK,
-	permission: Bun.env.PERMISSION,
-	actor: Bun.env.ACTOR,
-	privateKey: Bun.env.PRIVATE_KEY,
-	publicKey: Bun.env.PUBLIC_KEY,
+	network: process.env.NETWORK_NAME === "mainnet" ? eos : jungle4,
+	networkName: process.env.NETWORK,
+	permission: process.env.PERMISSION,
+	actor: process.env.ACTOR,
+	privateKey: process.env.PRIVATE_KEY,
+	publicKey: process.env.PUBLIC_KEY,
 });
 
 export const testClientSession = async (): Promise<Client> => {
