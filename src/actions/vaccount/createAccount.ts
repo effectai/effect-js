@@ -1,4 +1,4 @@
-import { Name, type Session } from "@wharfkit/session";
+import type { Name, TransactResult, Session } from "@wharfkit/session";
 import type { Client } from "../../client";
 import { ExtendedSymbol } from "../../utils/structs";
 import { VAddress } from "../../utils/variants";
@@ -37,7 +37,7 @@ export const createVAccount = async ({
 	client,
 	session,
 	account,
-}: CreateVAccountArgs) => {
+}: CreateVAccountArgs): Promise<TransactResult> => {
 	const sessionToUse = session ?? client.session;
 
 	if (!sessionToUse) {
@@ -45,10 +45,10 @@ export const createVAccount = async ({
 	}
 
 	// If no account is provided, use the current session actor
-	const acc = account ?? sessionToUse.actor;
+	const acc: Name = account ?? sessionToUse.actor;
 
 	const { actor } = sessionToUse;
-	const { contracts } = client.network.config.efx;
+	const { contracts, token } = client.network.config.efx;
 
 	const authorization = [
 		{
@@ -62,8 +62,11 @@ export const createVAccount = async ({
 		name: "open",
 		authorization,
 		data: {
-			acc: VAddress.from(Name.from(acc.toString())),
-			symbol: new ExtendedSymbol("4,EFX", contracts.token),
+			acc: VAddress.from(acc),
+			symbol: new ExtendedSymbol(
+				`${token.precision},${token.symbol}`,
+				contracts.token,
+			),
 			payer: actor,
 		},
 	};
