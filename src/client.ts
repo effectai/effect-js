@@ -4,11 +4,11 @@ import {
 	type FetchProviderOptions,
 } from "@wharfkit/antelope";
 import type { Session } from "@wharfkit/session";
+import type { Network } from "./types/network";
 import { type Cache, MemoryCache } from "./cache";
+import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 import { EffectSession } from "./session";
-import type { Network } from "./types/network";
-import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 
 export interface ClientOpts {
 	ipfsCacheDurationInMs?: number | null;
