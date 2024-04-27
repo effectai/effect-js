@@ -25,7 +25,7 @@ Use your favorite package manager to install the SDK.
 
 ### 1. Import the SDK
 
-```typescript
+```ts
 import { createClient } from '@effectai/effect-js'
 ```
 
@@ -35,7 +35,7 @@ Here the handy dandy `createClient` function is used to create a client instance
 It takes two optional arguments, the first one is the network configuration, the second one is the options object.
 You can read more about the options object in the [ClientOptions](#client-options) section.
 
-```typescript
+```ts
 // This would be ideal, the big question is if using mainnet should be explicitly passed or not.
 const client = createClient()
 
@@ -52,7 +52,7 @@ This means, that you need to creat one client, and you can pass that client as a
 
 Here is an example of how to get the balance of an account, assuming that the client is already set up as described above.
 
-```typescript
+```ts
 import { getVAccounts, getAccountById } from "@effectai/effect-js";
 import { Name } from "@wharfkit/antelope";
 
@@ -86,9 +86,9 @@ Afterwards we can set up the Session object, which allows us to specify other pa
 
 Last but not least we connect the session to the client, and the client will be ready to use.
 
-```typescript
+```ts
 // TODO These should also be re-exported from @effectai/effect-js
-import { createBatch } from "@effectai/effect-js";
+import { createBatch, createVAccount } from "@effectai/effect-js";
 import { Session } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey"
 
@@ -98,21 +98,60 @@ const session = new Session({
     actor: "forcedev1234",
     permission: "active",
     walletPlugin,
-
-    // Isn't this redundant, we're already passing this in the createClient function
     chain: {
-      id: "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
-      url: "https://jungle4.greymass.com",
+		  id: jungle4.eosChainId,
+		  url: jungle4.eosRpcUrl,
     },
 })
 
 // Connect the session to the client.
 await session.setSession(session)
 
-// Now you can use the client to make transactions.
-await createBatch({ client, batch, data });
+// Now you can use the client to make authenticated transactions.
+const account = Name.from("efxforce1112");
+await createVAccount({ client, account });
 ```
 
+## Full example
+
+```ts
+import { Session, Name } from "@wharfkit/session";
+import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
+import {
+	createClient,
+	jungle4,
+	eos, // Use `eos` to use mainnet
+	getVAccounts,
+	createVAccount,
+} from "@effectai/effect-js";
+
+const client = createClient({ network: jungle4 });
+
+// Make unauthenticated requests
+const actor = Name.from("forcedev1234");
+const [vacc] = await getVAccounts({ client, actor });
+
+// Set up wallet with privatekey
+const walletPlugin = new WalletPluginPrivateKey("your_private_key_here");
+
+// Set up session with wallet and chain
+const session = new Session({
+	actor: "forcedev1234",
+	permission: "active",
+	walletPlugin,
+	chain: {
+		id: jungle4.eosChainId,
+		url: jungle4.eosRpcUrl,
+	},
+});
+
+// Connect session to client
+await client.setSession(session);
+
+// Now you can use the client to make authenticated transactions.
+const account = Name.from("efxforce1112");
+await createVAccount({ client, account });
+```
 
 Now that we have a basic understaning of how to set up the client, we can move on to more advanced topics.
 Read more on the following pages.
