@@ -17,17 +17,12 @@ export const createSession = async ({
 	privateKey,
 }: CreateSessionArgs) => {
 	const walletPlugin = new WalletPluginPrivateKey(privateKey);
-
-	const { eosRpcUrl, eosChainId } = client.network;
-
+	const { eosRpcUrl: url, eosChainId: id } = client.network;
 	const session = new Session({
 		actor,
 		permission,
-		chain: {
-			id: eosChainId,
-			url: eosRpcUrl,
-		},
 		walletPlugin,
+		chain: { id, url },
 	});
 
 	await setSession({ client, session });
