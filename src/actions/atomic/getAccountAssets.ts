@@ -16,8 +16,8 @@ export interface IAssetRow {
 	template_id: number;
 	ram_payer: string;
 	backed_tokens: string[];
-	immutable_serialized_data: Uint8Array;
-	mutable_serialized_data: Uint8Array;
+	immutable_serialized_data: number[];
+	mutable_serialized_data: number[];
 }
 
 // TODO:: Implement Pagination
