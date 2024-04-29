@@ -7,21 +7,49 @@ import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { Session } from "@wharfkit/session";
 import { EffectSession } from "./session";
 
-describe("Log network", async () => {
-	const { network } = destructureEnv();
-	console.log(`🧭 Testing with network: ${network.eosRpcUrl}\n`);
-});
-
 describe("Client", async () => {
-	const { network, actor, permission, privateKey } = destructureEnv();
-
-	test("createClient", () => {
-		const client = createClient({ network });
+	test("createClient TestNet", () => {
+		const client = createClient({ network: jungle4 });
 		expect(client).toBeDefined();
 		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
-	test("Connect Client to Session", async () => {
+	test("createClient Mainnet", () => {
+		const client = createClient({ network: eos });
+		expect(client).toBeDefined();
+		expect(client).toBeInstanceOf(ClientConstructor);
+	});
+
+	test("Connect Client to Session Mainnet", async () => {
+		const { network, permission, actor, privateKey } = destructureEnv(eos);
+		const client = createClient({ network });
+
+		expect(client.session).toBeNull();
+
+		// Create wallet with privatekey
+		const walletPlugin = new WalletPluginPrivateKey(privateKey);
+
+		// Set up session with wallet
+		const session = new Session({
+			actor,
+			permission,
+			walletPlugin,
+			chain: {
+				id: network.eosChainId,
+				url: network.eosRpcUrl,
+			},
+		});
+
+		// connect session to client
+		await client.setSession(session);
+
+		expect(client.session).toBeDefined();
+		expect(client.session).toBeInstanceOf(EffectSession);
+		expect(client.session?.vAccount?.address[1]).toEqual(actor);
+	});
+
+	test("Connect Client to Session Testnet", async () => {
+		const { network, permission, actor, privateKey } = destructureEnv(jungle4);
 		const client = createClient({ network });
 
 		expect(client.session).toBeNull();
@@ -50,26 +78,29 @@ describe("Client", async () => {
 });
 
 describe("Client testHelper", async () => {
-	test("testClient defined", async () => {
-		const client = await testClientSession();
+	test("testClient defined Mainnet", async () => {
+		const client = await testClientSession(eos);
 		expect(client).toBeDefined();
 		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
-	test("testClient session connected", async () => {
-		const client = await testClientSession();
+	test("testClient session connected Mainnet", async () => {
+		const client = await testClientSession(eos);
 		expect(client.session).toBeDefined();
 		expect(client.session?.vAccount).toBeDefined();
 		expect(client.session?.actor).toBeInstanceOf(Name);
 	});
-});
 
-describe("Test mainnet config", async () => {
-	test("mainnet config", async () => {
-		const client = createClient({ network: eos });
+	test("testClient defined testnet", async () => {
+		const client = await testClientSession(jungle4);
+		expect(client).toBeDefined();
+		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
-	test("Testnet config", async () => {
-		const client = createClient({ network: jungle4 });
+	test("testClient session connected Testnet", async () => {
+		const client = await testClientSession(jungle4);
+		expect(client.session).toBeDefined();
+		expect(client.session?.vAccount).toBeDefined();
+		expect(client.session?.actor).toBeInstanceOf(Name);
 	});
 });

@@ -10,9 +10,9 @@
     "dist"
   ],
   "scripts": {
-    "test": "bun --env-file=.env.testnet test",
-    "test:watch": "bun --env-file=.env.testnet test --watch",
-    "test:coverage": "bun --env-file=.env.testnet test --coverage",
+    "test": "bun --env-file=.env test",
+    "test:watch": "bun --env-file=.env test --watch",
+    "test:coverage": "bun --env-file=.env test --coverage",
     "test:mainnet": "bun --env-file=.env.mainnet test",
     "dev": "tsc -w",
     "build": "tsc --module es2020",
