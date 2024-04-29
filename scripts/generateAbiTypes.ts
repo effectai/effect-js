@@ -1,5 +1,5 @@
 import { transform } from "@greymass/abi2core";
-import { ABI } from "@wharfkit/antelope";
+import type { ABI } from "@wharfkit/antelope";
 
 const getAbi = async (name: string) => {
 	const abis = await fetch("https://jungle4.cryptolions.io/v1/chain/get_abi", {
