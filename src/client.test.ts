@@ -77,28 +77,33 @@ describe("Client", async () => {
 	});
 });
 
-describe("Client testHelper", async () => {
+describe("Client testHelper Mainnet", async () => {
+	const testEnvNetwork = eos;
+
 	test("testClient defined Mainnet", async () => {
-		const client = await testClientSession(eos);
+		const client = await testClientSession({ testEnvNetwork });
 		expect(client).toBeDefined();
 		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
 	test("testClient session connected Mainnet", async () => {
-		const client = await testClientSession(eos);
+		const client = await testClientSession({ testEnvNetwork });
 		expect(client.session).toBeDefined();
 		expect(client.session?.vAccount).toBeDefined();
 		expect(client.session?.actor).toBeInstanceOf(Name);
 	});
+});
 
+describe("Client testHelper Testnet", async () => {
+	const testEnvNetwork = jungle4;
 	test("testClient defined testnet", async () => {
-		const client = await testClientSession(jungle4);
+		const client = await testClientSession({ testEnvNetwork });
 		expect(client).toBeDefined();
 		expect(client).toBeInstanceOf(ClientConstructor);
 	});
 
 	test("testClient session connected Testnet", async () => {
-		const client = await testClientSession(jungle4);
+		const client = await testClientSession({ testEnvNetwork });
 		expect(client.session).toBeDefined();
 		expect(client.session?.vAccount).toBeDefined();
 		expect(client.session?.actor).toBeInstanceOf(Name);

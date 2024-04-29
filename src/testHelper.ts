@@ -48,9 +48,12 @@ export const destructureEnv = (networkEnv: Network) => {
 	};
 };
 
-export const testClientSession = async (testEnv: Network): Promise<Client> => {
+export const testClientSession = async ({
+	testEnvNetwork,
+}: { testEnvNetwork: Network }): Promise<Client> => {
 	// Retrieve parameters for session.
-	const { network, permission, actor, privateKey } = destructureEnv(testEnv);
+	const { network, permission, actor, privateKey } =
+		destructureEnv(testEnvNetwork);
 	const { eosRpcUrl: url, eosChainId: id } = network;
 
 	// Create client
@@ -65,6 +68,7 @@ export const testClientSession = async (testEnv: Network): Promise<Client> => {
 		permission,
 		walletPlugin,
 		chain: { id, url },
+		permissionLevel: { actor, permission },
 	});
 
 	// Connect session to client

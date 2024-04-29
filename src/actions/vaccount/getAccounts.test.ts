@@ -4,6 +4,7 @@ import { testClientSession } from "../../testHelper";
 import type { Client } from "../../client";
 import { getVAccounts, getAccountById } from "./getAccounts";
 import { Name } from "@wharfkit/antelope";
+import { jungle4 } from "../../exports";
 
 describe("Get Virtual Accounts", () => {
 	const vaccExample: VAccount = {
@@ -18,30 +19,16 @@ describe("Get Virtual Accounts", () => {
 
 	let client: Client;
 	beforeAll(async () => {
-		client = await testClientSession();
+		client = await testClientSession({ testEnvNetwork: jungle4 });
 	});
 
-	test.if(Bun.env.NETWORK_NAME === "mainnet")(
-		"getVAccounts() on mainnet",
-		async () => {
-			const actor = Name.from("force.efx");
-			const vaccs = await getVAccounts({ client, actor });
-			expect(vaccs).toBeDefined();
-			expect(vaccs).toBeArray();
-			expect(vaccs[0]).toContainKeys(Object.keys(vaccExample));
-		},
-	);
-
-	test.if(Bun.env.NETWORK_NAME === "testnet")(
-		"getVAccounts() on testnet",
-		async () => {
-			const actor = Name.from("efxforce1112");
-			const vaccs = await getVAccounts({ client, actor });
-			expect(vaccs).toBeDefined();
-			expect(vaccs).toBeArray();
-			expect(vaccs[0]).toContainKeys(Object.keys(vaccExample));
-		},
-	);
+	test("getVAccounts() on testnet", async () => {
+		const actor = Name.from("efxforce1112");
+		const vaccs = await getVAccounts({ client, actor });
+		expect(vaccs).toBeDefined();
+		expect(vaccs).toBeArray();
+		expect(vaccs[0]).toContainKeys(Object.keys(vaccExample));
+	});
 
 	test("getAccountById()", async () => {
 		const vacc = await getAccountById({ client, accountId: 0 });
