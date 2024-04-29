@@ -2,19 +2,28 @@ import { type AnyAction, Asset, type Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
+import type { TransactResult } from "@wharfkit/session";
 
 export const swapDirection = {
 	EfxToUsdt: `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
 	UsdtToEfx: `${DefiBoxPairEnum.EosUsdt}-${DefiBoxPairEnum.EosEfx}`,
 };
 
-export const buildSwapAction = (
-	direction: string,
-	actor: Name,
-	authorization: { permission: Name; actor: Name }[],
-	amount: number,
-	efxPrice: number,
-) => {
+export type BuildSwapActionArgs = {
+	direction: string;
+	actor: Name;
+	authorization: { permission: Name; actor: Name }[];
+	amount: number;
+	efxPrice: number;
+};
+
+export const buildSwapAction = ({
+	direction,
+	actor,
+	authorization,
+	amount,
+	efxPrice,
+}: BuildSwapActionArgs): AnyAction => {
 	if (!authorization || !authorization.length || !actor) {
 		throw new Error("No authorization provided");
 	}
@@ -55,11 +64,17 @@ export const buildSwapAction = (
 	return swapAction[direction];
 };
 
-export const swap = async (
-	client: Client,
-	amount: number,
-	direction: string,
-) => {
+export type SwapArgs = {
+	client: Client;
+	amount: number;
+	direction: string;
+};
+
+export const swap = async ({
+	client,
+	amount,
+	direction,
+}: SwapArgs): Promise<TransactResult> => {
 	try {
 		if (!client.session) {
 			throw new Error("Session is required for this method.");
@@ -68,13 +83,13 @@ export const swap = async (
 		const { transact, actor, authorization } = client.session;
 		const efxPrice = await getPrice();
 
-		const action = buildSwapAction(
+		const action = buildSwapAction({
 			direction,
 			actor,
 			authorization,
 			amount,
 			efxPrice,
-		);
+		});
 
 		return await transact({ action });
 	} catch (e) {
