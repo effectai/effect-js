@@ -1,7 +1,15 @@
 import { describe, test, expect } from "bun:test";
 import { getPrice } from "./getPrice";
 import { getBalance } from "./getBalance";
+import {
+  swap,
+  buildSwapAction,
+  swapDirection,
+  SwapArgs,
+  swapDirectionEnum,
+} from "./swap";
 import { createClient } from "../../client";
+import { testClientSession } from "../../testHelper";
 import { eos } from "../../exports";
 import { Name } from "@wharfkit/antelope";
 
@@ -35,5 +43,35 @@ describe("getBalance", async () => {
     const actor = Name.from("cryptonode99");
 
     expect(async () => await getBalance({ client, actor })).toThrowError();
+  });
+});
+
+describe("buildSwapAction", async () => {
+  test.todo("buildSwapAction() should return a swap action object.");
+});
+
+describe("Swap", async () => {
+  const testEnvNetwork = eos; // Mainnet
+  test("swap() should throw an error when Session is not set on Client.", async () => {
+    const swapArgs: SwapArgs = {
+      client: createClient({ network: testEnvNetwork }),
+      amount: 1,
+      direction: swapDirectionEnum.UsdtToEfx,
+    };
+    expect(async () => await swap(swapArgs)).toThrow(
+      new Error("Swap: Session is required for this method."),
+    );
+  });
+
+  test.skip("swap() should throw an Error when making a swap from a non existent account.", async () => {
+    const client = await testClientSession({ testEnvNetwork });
+
+    const swapArgs: SwapArgs = {
+      client,
+      amount: 3,
+      direction: swapDirectionEnum.UsdtToEfx,
+    };
+
+    const result = await swap(swapArgs);
   });
 });
