@@ -1,31 +1,56 @@
-import { Session } from "@wharfkit/session";
+import { PrivateKey, type PrivateKeyType, Session } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { jungle4, eos } from "../src/exports";
 import { createClient } from "./../src/client";
 import type { Client } from "./../src/client";
+import type { Network } from "./types/network";
 
 declare module "bun" {
 	interface Env {
-		PERMISSION: string;
-		NETWORK_NAME: string;
-		ACTOR: string;
-		PRIVATE_KEY: string;
-		PUBLIC_KEY: string;
+		TESTNET_PERMISSION: string;
+		TESTNET_NETWORK_NAME: string;
+		TESTNET_ACTOR: string;
+		TESTNET_PRIVATE_KEY: string;
+		MAINNET_PERMISSION: string;
+		MAINNET_NETWORK_NAME: string;
+		MAINNET_ACTOR: string;
+		MAINNET_PRIVATE_KEY: string;
 	}
 }
 
-export const destructureEnv = () => ({
-	network: process.env.NETWORK_NAME === "mainnet" ? eos : jungle4,
-	networkName: process.env.NETWORK,
-	permission: process.env.PERMISSION,
-	actor: process.env.ACTOR,
-	privateKey: process.env.PRIVATE_KEY,
-	publicKey: process.env.PUBLIC_KEY,
-});
+export interface testEnv {
+	network: Network;
+	networkName: string;
+	permission: string;
+	actor: string;
+	privateKey: PrivateKeyType;
+}
 
-export const testClientSession = async (): Promise<Client> => {
+export const destructureEnv = (networkEnv: Network) => {
+	// Mainnet Config
+	if (networkEnv === eos) {
+		return {
+			network: eos,
+			networkName: process.env.MAINNET_NETWORK_NAME,
+			permission: process.env.MAINNET_PERMISSION,
+			actor: process.env.MAINNET_ACTOR,
+			privateKey: PrivateKey.from(process.env.MAINNET_PRIVATE_KEY),
+		};
+	}
+
+	// Testnet Config
+	return {
+		network: jungle4,
+		networkName: process.env.TESTNET_NETWORK_NAME,
+		permission: process.env.TESTNET_PERMISSION,
+		actor: process.env.TESTNET_ACTOR,
+		privateKey: PrivateKey.from(process.env.TESTNET_PRIVATE_KEY),
+	};
+};
+
+export const testClientSession = async (testEnv: Network): Promise<Client> => {
 	// Retrieve parameters for session.
-	const { network, permission, actor, privateKey } = destructureEnv();
+	const { network, permission, actor, privateKey } = destructureEnv(testEnv);
 	const { eosRpcUrl: url, eosChainId: id } = network;
 
 	// Create client
