@@ -1,4 +1,9 @@
-import { PrivateKey, type PrivateKeyType, Session } from "@wharfkit/session";
+import {
+	PrivateKey,
+	type PrivateKeyType,
+	Session,
+	PermissionLevel,
+} from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { jungle4, eos } from "../src/exports";
 import { createClient } from "./../src/client";
@@ -60,7 +65,11 @@ export const testClientSession = async ({
 	const client = createClient({ network });
 
 	// Set up wallet with privatekey
-	const walletPlugin = new WalletPluginPrivateKey(privateKey);
+	const pk: PrivateKeyType = PrivateKey.fromString(
+		privateKey.toString(),
+		false,
+	);
+	const walletPlugin = new WalletPluginPrivateKey(pk);
 
 	// Set up session with wallet and chain
 	const session = new Session({
@@ -68,7 +77,7 @@ export const testClientSession = async ({
 		permission,
 		walletPlugin,
 		chain: { id, url },
-		permissionLevel: { actor, permission },
+		permissionLevel: PermissionLevel.from(`${actor}@${permission}`),
 	});
 
 	// Connect session to client
