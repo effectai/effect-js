@@ -28,7 +28,7 @@ export const buildSwapAction = (
 	const swapAction: {
 		[key: string]: AnyAction;
 	} = {
-		efxToUsdt: {
+		[swapDirection.EfxToUsdt]: {
 			account: "effecttokens",
 			name: "transfer",
 			authorization,
@@ -39,7 +39,7 @@ export const buildSwapAction = (
 				memo: `swap,${valueAmount},${swapDirection.EfxToUsdt}`,
 			},
 		},
-		usdtToEfx: {
+		[swapDirection.UsdtToEfx]: {
 			account: "tethertether",
 			name: "transfer",
 			authorization,
@@ -75,6 +75,10 @@ export const swap = async (
 			amount,
 			efxPrice,
 		);
+
+		if (!action) {
+			throw new Error("Invalid swap action");
+		}
 
 		return await transact({ action });
 	} catch (e) {

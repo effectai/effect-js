@@ -107,6 +107,7 @@ export {
 
 export { getPrice } from "./../actions/token/getPrice";
 export { getBalance, type GetBalanceArgs } from "./../actions/token/getBalance";
+export { swap, swapDirection } from "./../actions/token/swap";
 
 export {
 	getVAccounts,
