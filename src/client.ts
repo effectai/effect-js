@@ -9,9 +9,6 @@ import { type Cache, MemoryCache } from "./cache";
 import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 import { EffectSession } from "./session";
-import type { Network } from "./types/network";
-import { type CacheManager, IDBCache, createCacheManager } from "./cache";
-import { chains } from "./constants/network";
 
 export interface ClientOpts {
 	ipfsCacheDurationInMs?: number | null;
@@ -159,7 +156,7 @@ export const createClient = ({
 	options = {},
 }: {
 	network: Network;
-	session: Session;
+	session?: Session;
 	options?: ClientOpts;
 }) => {
 	return new Client(network, options);
