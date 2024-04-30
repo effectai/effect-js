@@ -2,6 +2,7 @@ import { type AnyAction, Asset, type Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
+import { useEFXContracts } from "../../utils/state";
 
 export const swapDirection = {
 	EfxToUsdt: `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
@@ -13,6 +14,7 @@ export const buildSwapAction = (
 	actor: Name,
 	authorization: { permission: Name; actor: Name }[],
 	amount: number,
+	tokenContract: string,
 	efxPrice: number,
 ) => {
 	if (!authorization || !authorization.length || !actor) {
@@ -29,7 +31,7 @@ export const buildSwapAction = (
 		[key: string]: AnyAction;
 	} = {
 		[swapDirection.EfxToUsdt]: {
-			account: "effecttokens",
+			account: tokenContract,
 			name: "transfer",
 			authorization,
 			data: {
@@ -66,6 +68,7 @@ export const swap = async (
 		}
 
 		const { transact, actor, authorization } = client.session;
+		const { token } = useEFXContracts(client);
 		const efxPrice = await getPrice();
 
 		const action = buildSwapAction(
@@ -73,6 +76,7 @@ export const swap = async (
 			actor,
 			authorization,
 			amount,
+			token,
 			efxPrice,
 		);
 

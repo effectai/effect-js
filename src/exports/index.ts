@@ -148,6 +148,13 @@ export {
 	type vTransferActionArgs,
 } from "./../actions/vaccount/transfer";
 
+export {
+	deposit,
+	depositAction,
+	type DepositActionArgs,
+	type DepositArgs,
+} from "./../actions/vaccount/deposit";
+
 export { payout, type PayoutArgs } from "../actions/vaccount/payout";
 
 export { type Client, type ClientOpts, createClient } from "./../client";

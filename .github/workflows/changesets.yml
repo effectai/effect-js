@@ -40,23 +40,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
-    name: Release
-    needs: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      id-token: write
+  # release:
+  #   name: Release
+  #   needs: verify
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 5
+  #   permissions:
+  #     contents: write
+  #     id-token: write
 
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+  #     - uses: oven-sh/setup-bun@v1
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: bun install --frozen-lockfile
 
       # - name: Publish to NPM
       #   uses: changesets/action@v1
