@@ -61,7 +61,6 @@ export const getCampaigns = async ({
 				client,
 				hash: campaign.content.field_1,
 			})) as CampaignInfo;
-			console.log(campaign.info);
 		}
 
 		rows.push(campaign);
