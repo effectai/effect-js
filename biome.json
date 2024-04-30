@@ -14,7 +14,9 @@
 	"linter": {
 		"ignore": [
 			"dist",
-			"test"
+			"test",
+			"scripts",
+			"docs"
 		],
 		"enabled": true,
 		"rules": {
