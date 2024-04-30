@@ -5,10 +5,7 @@
 		"importHelpers": true,
 		"experimentalDecorators": true,
 		"isolatedModules": true,
-		"lib": [
-			"dom",
-			"es2020"
-		],
+		"lib": ["dom", "es2020"],
 		"module": "ESNext",
 		"moduleResolution": "node",
 		"sourceMap": true,
@@ -18,12 +15,6 @@
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
-	"exclude": [
-		"node_modules/**/*",
-		"**/*.test.ts"
-	],
-	"include": [
-		"src/**/*",
-		"abis/**/*"
-	]
+	"exclude": ["node_modules/**/*", "**/*.test.ts"],
+	"include": ["src/**/*", "abis/**/*"]
 }
