@@ -16,5 +16,5 @@
 		"skipLibCheck": true
 	},
 	"exclude": ["node_modules/**/*"],
-	"include": ["src/**/*", "abis/**/*"],
+	"include": ["src/**/*", "abis/**/*"]
 }
