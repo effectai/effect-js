@@ -107,6 +107,7 @@ export {
 
 export { getPrice } from "./../actions/token/getPrice";
 export { getBalance, type GetBalanceArgs } from "./../actions/token/getBalance";
+export { swap, swapDirection } from "./../actions/token/swap";
 
 export {
 	getVAccounts,
@@ -146,6 +147,13 @@ export {
 	type vTransferArgs,
 	type vTransferActionArgs,
 } from "./../actions/vaccount/transfer";
+
+export {
+	deposit,
+	depositAction,
+	type DepositActionArgs,
+	type DepositArgs,
+} from "./../actions/vaccount/deposit";
 
 export { payout, type PayoutArgs } from "../actions/vaccount/payout";
 

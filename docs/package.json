@@ -1,16 +1,16 @@
 {
-  "name": "site",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "dev": "vocs dev",
-    "build": "vocs build --searchIndex false && vocs search-index",
-    "preview": "vocs preview"
-  },
-  "devDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "vocs": "^1.0.0-alpha.46",
-    "@types/bun": "latest"
-  }
+	"name": "site",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "vocs dev",
+		"build": "vocs build --searchIndex false && vocs search-index",
+		"preview": "vocs preview"
+	},
+	"devDependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"vocs": "^1.0.0-alpha.46",
+		"@types/bun": "latest"
+	}
 }

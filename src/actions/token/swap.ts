@@ -7,6 +7,7 @@ import {
 import type { Client } from "../../client";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
 import { getPrice } from "./getPrice";
+import { useEFXContracts } from "../../utils/state";
 
 export const swapDirection = {
 	EfxToUsdt: `${DefiBoxPairEnum.EosEfx}-${DefiBoxPairEnum.EosUsdt}`,
@@ -18,6 +19,7 @@ export const buildSwapAction = (
 	actor: Name,
 	authorization: PermissionLevelType[],
 	amount: number,
+	tokenContract: string,
 	efxPrice: number,
 ) => {
 	if (!authorization || !authorization.length || !actor) {
@@ -34,7 +36,7 @@ export const buildSwapAction = (
 		[key: string]: AnyAction;
 	} = {
 		[swapDirection.EfxToUsdt]: {
-			account: "effecttokens",
+			account: tokenContract,
 			name: "transfer",
 			authorization,
 			data: {
@@ -70,7 +72,8 @@ export const swap = async (
 			throw new Error("Session is required for this method.");
 		}
 
-		const { transact, wharfKitSession, actor, authorization } = client.session;
+		const { transact, actor, authorization } = client.session;
+		const { token } = useEFXContracts(client);
 		const efxPrice = await getPrice();
 
 		const action = buildSwapAction(
@@ -78,6 +81,7 @@ export const swap = async (
 			actor,
 			authorization,
 			amount,
+			token,
 			efxPrice,
 		);
 

@@ -1,5 +1,9 @@
 import type { Campaign } from "../../../@generated/types/effecttasks2";
-import { getIpfsResource, type Client } from "../../../exports";
+import {
+	type CampaignWithInfo,
+	getIpfsResource,
+	type Client,
+} from "../../../exports";
 import { UInt128, type UInt32Type } from "@wharfkit/antelope";
 
 export type getCampaignByIdArgs = {
@@ -10,7 +14,7 @@ export type getCampaignByIdArgs = {
 export const getCampaignById = async ({
 	client,
 	id,
-}: getCampaignByIdArgs): Promise<Campaign> => {
+}: getCampaignByIdArgs): Promise<CampaignWithInfo> => {
 	const { contracts } = client.network.config.efx;
 
 	const response = await client.provider.v1.chain.get_table_rows({

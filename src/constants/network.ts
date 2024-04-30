@@ -19,3 +19,5 @@ export const eos: Network = {
 		"73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
 	config: defaultNetworkConfig("eos"),
 };
+
+export const chains = [eos, jungle4];
