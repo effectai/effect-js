@@ -1,11 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import { getPrice } from "./getPrice";
 import { getBalance } from "./getBalance";
-import {
-	swap,
-	swapDirection,
-	// SwapArgs,
-} from "./swap";
+import { swap, type SwapArgs } from "./swap";
 import { createClient } from "../../client";
 import { testClientSession } from "../../testHelper";
 import { eos, jungle4 } from "../../exports";
@@ -45,32 +41,24 @@ describe("Swap", async () => {
 	// Use Mainnet
 
 	test("swap() should throw an error when Session is not set on Client.", async () => {
-		// const swapArgs: SwapArgs = {
-		// 	client: createClient({ network: testEnvNetwork }),
-		// 	amount: 1,
-		// 	direction: swapDirection.UsdtToEfx,
-		// };
-		// const { client, amount, direction } = swapArgs;
+		const swapArgs: SwapArgs = {
+			client: createClient({ network: jungle4 }),
+			amount: 1,
+			direction: "UsdtToEfx",
+		};
 
-		const client = createClient({ network: jungle4 });
-		const amount = 1;
-		const direction = swapDirection.UsdtToEfx;
-		expect(async () => await swap(client, amount, direction)).toThrow(
+		expect(async () => await swap(swapArgs)).toThrow(
 			new Error("Error swapping: Error: Session is required for this method."),
 		);
 	});
 
-	test.skip("swap()", async () => {
-		const client = await testClientSession({ testEnvNetwork: jungle4 });
+	test("swap() should fail when amount is 0", async () => {
+		const swapArgs: SwapArgs = {
+			client: await testClientSession({ testEnvNetwork: jungle4 }),
+			amount: 0,
+			direction: "UsdtToEfx",
+		};
 
-		// const swapArgs: SwapArgs = {
-		// 	client,
-		// 	amount: 3,
-		// 	direction: swapDirectionEnum.UsdtToEfx,
-		// };
-
-		const amount = 3;
-		const direction = swapDirection.UsdtToEfx;
-		const result = await swap(client, amount, direction);
+		expect(async () => await swap(swapArgs)).toThrow();
 	});
 });
