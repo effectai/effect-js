@@ -2,7 +2,7 @@ import {
 	type AnyAction,
 	Asset,
 	type Name,
-	PermissionLevelType,
+	type PermissionLevelType,
 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
@@ -62,18 +62,20 @@ export const buildSwapAction = (
 	return swapAction[direction];
 };
 
-export const swap = async (
-	client: Client,
-	amount: number,
-	direction: string,
-) => {
+export type SwapArgs = {
+	client: Client;
+	amount: number;
+	direction: "EfxToUsdt" | "UsdtToEfx";
+};
+
+export const swap = async ({ client, amount, direction }: SwapArgs) => {
 	try {
 		if (!client.session) {
 			throw new Error("Session is required for this method.");
 		}
 
 		const { transact, actor, authorization } = client.session;
-		const { token } = useEFXContracts(client);
+		const { token: tokenContract } = useEFXContracts(client);
 		const efxPrice = await getPrice();
 
 		const action = buildSwapAction(
@@ -81,7 +83,7 @@ export const swap = async (
 			actor,
 			authorization,
 			amount,
-			token,
+			tokenContract,
 			efxPrice,
 		);
 
