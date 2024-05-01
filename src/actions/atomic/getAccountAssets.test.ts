@@ -1,8 +1,7 @@
 import { test, expect, describe } from "bun:test";
 import { getAccountAssets, type IAssetRow } from "./getAccountAssets";
-import { destructureEnv, testClientSession } from "../../testHelper";
 import { Name } from "@wharfkit/antelope";
-import { createClient, eos, jungle4 } from "../../exports";
+import { createClient, eos } from "../../exports";
 
 describe("getAccountAssets", async () => {
 	const accountAssetExample: IAssetRow = {
