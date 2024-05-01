@@ -1,0 +1,30 @@
+## Adding tasks
+
+Adding tasks to a campaign is done through <u>batches</u> batches are a collection of tasks that are added to a campaign. Each batch can contain multiple tasks.
+Let's start by creating a batch with 3 tasks to our newly created image classification campaign.
+
+```ts [example.ts]
+import { createBatch } from '@effectai/effect-js'
+
+const { actor } = client.session
+
+const batch = await createBatch({
+  client,
+  batch: {
+      campaign_id: '<..>', // the id of the campaign
+      repetitions: 1 // number of times each task should be repeated
+      payer: actor // the actor that will pay the workers for the tasks
+  }
+  data: [
+    {
+      image: 'https://example.com/image.jpg', //task 1 image placeholder
+    },
+    {
+      image: 'https://example.com/image2.jpg', //task 2 image placeholder
+    },
+    {
+      image: 'https://example.com/image3.jpg', // task 3 image placeholder
+    }
+  ]
+})
+```

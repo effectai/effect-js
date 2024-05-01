@@ -1,13 +1,17 @@
-import type { Mkcampaign } from "../../../@generated/types/effecttasks2";
+import type {
+	Content,
+	Mkcampaign,
+} from "../../../@generated/types/effecttasks2";
 import type { Client } from "../../../client";
 import { SessionNotFoundError } from "../../../errors";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
+import type { CampaignInfo } from "./getCampaigns";
 
 export type CreateCampaignArgs = {
 	client: Client;
-	campaign: Mkcampaign;
-	data: Record<string, unknown>;
+	campaign: Omit<Mkcampaign, "content">;
+	data: CampaignInfo;
 };
 
 export const createCampaign = async ({
@@ -27,6 +31,7 @@ export const createCampaign = async ({
 	const { tasks, token } = useEFXContracts(client);
 
 	try {
+		// Upload Campaign data to IPFS
 		const hash = await uploadIpfsResource({ client, data });
 
 		const response = await transact({

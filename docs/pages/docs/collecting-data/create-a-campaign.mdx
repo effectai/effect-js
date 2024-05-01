@@ -1,0 +1,43 @@
+## Creating Your First Campaign
+
+Campaigns are the main way to collect data on Effect Network.
+A campaign is a <u>collection of tasks</u> that need to be completed by workers. Each task is a small piece of work that needs to be done. For example, a task could be to label an image, transcribe a piece of audio, or answer a question.
+ They are created by the data requester (you) and contain information like the reward for the workers, the template for the tasks, the instructions for the workers etc.
+
+### Creating a campaign
+
+```ts [example.ts]
+import { createCampaign } from '@effectai/effect-js'
+
+// get the actor from the session
+const { actor } = client.session
+
+// example template
+const template = '<html>...</html>'
+
+const campaign = await createCampaign({
+  client,
+  data: { 
+      title: 'My first campaign',
+      category: 'Image Labeling', // Category of the campaign e.g. Image Labeling, Audio Transcription etc.
+      description: 'This is a description of my first campaign', // Description of the campaign
+      estimated_time: 3600, // Estimated time to complete a task in seconds
+      example_task: 'This is an example task',
+      image: 'https://example.com/image.png',
+      instructions: 'This is the instructions for the workers',
+      input_schema: null,
+      output_schema: null,
+      template,
+      version: 1,
+  },
+  campaign: {
+    owner: actor,
+    reward: { quantity: '1', contract: 'effecttokens' },
+    max_task_time: 3600,
+    qualis: [],
+    payer: actor,
+  },
+})
+```
+
+Wooooho! You have created your first campaign. You can now view the campaign on the [Effect Network](https://app.effect.network/campaigns) before you start collecting data, you need to add tasks to the campaign. You can do this by following the [Adding Tasks](/docs/collecting-data/add-tasks) guide.

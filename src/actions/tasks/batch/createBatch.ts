@@ -81,7 +81,7 @@ export const publishBatchAction = ({
 
 export type CreateBatchArgs = {
 	client: Client;
-	batch: Mkbatch;
+	batch: Omit<Mkbatch, "content">;
 	data: Record<string, unknown>;
 };
 
