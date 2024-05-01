@@ -1,4 +1,3 @@
-import type { Campaign } from "../../../@generated/types/effecttasks2";
 import {
 	type CampaignWithInfo,
 	getIpfsResource,
@@ -27,11 +26,8 @@ export const getCampaignById = async ({
 	});
 
 	const [campaign] = response.rows;
-
-	campaign.info = await getIpfsResource({
-		client,
-		hash: campaign.content.field_1,
-	});
+	const { field_1: hash } = campaign.content;
+	campaign.info = await getIpfsResource({ client, hash });
 
 	return campaign;
 };
