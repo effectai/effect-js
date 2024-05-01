@@ -1,5 +1,5 @@
 {
-	"name": "@effectai/effect-js",
+	"name": "@effectai/sdk",
 	"version": "2.0.0",
 	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
 	"main": "./dist/exports/index.js",
