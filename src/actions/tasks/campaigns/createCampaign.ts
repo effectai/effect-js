@@ -37,18 +37,16 @@ export const createCampaignAction = ({
 
 export type CreateCampaignArgs = {
 	client: Client;
-	campaign: CampaignInfo;
-	reward: number;
-	maxTaskTime: number;
-	qualitications?: Quali[];
+	campaign: CampaignInfo & {
+		reward: number;
+		maxTaskTime: number;
+		qualitications?: Quali[];
+	};
 };
 
 export const createCampaign = async ({
 	client,
 	campaign,
-	reward,
-	maxTaskTime,
-	qualitications,
 }: CreateCampaignArgs) => {
 	if (!client.session) {
 		throw new SessionNotFoundError("Session is required for this method.");
@@ -65,14 +63,14 @@ export const createCampaign = async ({
 			action: createCampaignAction({
 				client,
 				campaign: {
-					max_task_time: maxTaskTime,
+					max_task_time: campaign.maxTaskTime,
 					reward: {
-						quantity: `${reward.toFixed(4)} EFX`, // `1.0000 EFX`
+						quantity: `${campaign.reward.toFixed(4)} EFX`, // `1.0000 EFX`
 						contract: token,
 					},
 					payer: client.session.actor.toString(),
-					content: { field_0: maxTaskTime, field_1: hash },
-					qualis: qualitications ?? [],
+					content: { field_0: 0, field_1: hash },
+					qualis: campaign.qualitications ?? [],
 					owner: ["name", client.session.actor.toString()],
 				},
 			}),
