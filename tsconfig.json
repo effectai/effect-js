@@ -1,21 +1,22 @@
+/// <reference no-default-lib="true" />
 {
 	"compilerOptions": {
-		"rootDir": "./",
+		"rootDir": "./src",
 		"downlevelIteration": true,
-		"esModuleInterop": true,
+		"esModuleInterop": false,
 		"importHelpers": true,
 		"experimentalDecorators": true,
 		"isolatedModules": true,
-		"lib": ["dom", "es2020"],
-		"module": "ESNext",
+		"lib": ["DOM", "ES2020"],
 		"moduleResolution": "node",
+		"module": "ESNext",
 		"sourceMap": true,
 		"declaration": true,
 		"strict": true,
-		"target": "ESNext",
+		"target": "ES2021",
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
-	"exclude": ["node_modules/**/*", "**/*.test.ts"],
+	"exclude": ["node_modules/**/*", "**/*.test.ts",],
 	"include": ["src/**/*", "abis/**/*", "test/testHelper.ts"]
 }
