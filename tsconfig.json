@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"rootDir": "./",
 		"downlevelIteration": true,
 		"esModuleInterop": true,
 		"importHelpers": true,
@@ -16,5 +17,5 @@
 		"skipLibCheck": true
 	},
 	"exclude": ["node_modules/**/*", "**/*.test.ts"],
-	"include": ["src/**/*", "abis/**/*"]
+	"include": ["src/**/*", "abis/**/*", "test/testHelper.ts"]
 }

@@ -81,26 +81,34 @@ export const publishBatchAction = ({
 
 export type CreateBatchArgs = {
 	client: Client;
-	batch: Omit<Mkbatch, "content">;
-	data: Record<string, unknown>;
+	campaignId: number;
+	repetitions: number;
+	reward: number;
+	taskData: Record<string, unknown>;
 };
 
-export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
+export const createBatch = async ({
+	client,
+	campaignId,
+	repetitions,
+	reward,
+	taskData,
+}: CreateBatchArgs) => {
 	try {
 		if (!client.session) {
 			throw new SessionNotFoundError("Session is required for this method.");
 		}
 
 		const forceSettings = await getForceSettings({ client });
-		const { transact, vAccount } = client.session;
+		const { transact, vAccount, actor } = client.session;
 
 		if (!vAccount) {
-			throw new Error("No vAccountId found");
+			throw new Error("vAccount not found");
 		}
 
-		const campaign = await getCampaignById({ client, id: batch.campaign_id });
-		const assetQuantity = Asset.from(campaign.reward.quantity);
-		const batchPrice = assetQuantity.value * batch.repetitions;
+		const campaign = await getCampaignById({ client, id: campaignId });
+		const assetQuantity = Asset.from(reward, " EFX");
+		const batchPrice = assetQuantity.value * repetitions;
 
 		// Check if the user has enough funds to pay for the batch
 		// if (Asset.from(vacc.balance.quantity).value < batchPrice) {
@@ -114,12 +122,18 @@ export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 		// }
 
 		const newBatchId = campaign.num_batches + 1;
-		const hash = await uploadIpfsResource({ client, data });
+		const hash = await uploadIpfsResource({ client, data: taskData });
 
 		const makeBatch = createBatchAction({
 			client,
 			forceSettings,
-			batch,
+			batch: {
+				id: newBatchId,
+				payer: actor.toString(),
+				campaign_id: campaignId,
+				repetitions,
+				content: { field_0: 0, field_1: hash },
+			},
 			hash,
 		});
 
@@ -133,7 +147,7 @@ export const createBatch = async ({ client, batch, data }: CreateBatchArgs) => {
 		const publishBatch = publishBatchAction({
 			client,
 			batchId: newBatchId,
-			numTasks: batch.repetitions,
+			numTasks: repetitions,
 		});
 
 		// TODO Check if batchId is correct.

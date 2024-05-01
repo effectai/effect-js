@@ -1,63 +1,64 @@
 {
-	"name": "@effectai/effect-js",
-	"version": "2.0.0",
-	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
-	"main": "./dist/exports/index.js",
-	"module": "./dist/exports/index.js",
-	"browser": "dist/exports/index.js",
-	"types": "./dist/exports/index.d.ts",
-	"files": ["dist"],
-	"scripts": {
-		"test": "bun --env-file=.env test",
-		"test:watch": "bun --env-file=.env test --watch",
-		"test:coverage": "bun --env-file=.env test --coverage",
-		"test:mainnet": "bun --env-file=.env.mainnet test",
-		"dev": "tsc -w",
-		"build": "tsc --module es2020",
-		"lint": "bun biome lint --apply .",
-		"format": "biome format --write .",
-		"check": "bun biome check --apply .",
-		"changeset": "changeset",
-		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
-		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
-		"docs:dev": "cd docs && bun run dev",
-		"docs:build": "cd docs && bun run build",
-		"docs:preview": "cd docs && bun run preview"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/effectai/effect-js.git"
-	},
-	"keywords": ["efx", "AI", "blockchain", "microtasks"],
-	"author": {
-		"name": "Effect-AI",
-		"url": "https://effect.network",
-		"email": "hello@effect.ai"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/effectai/effect-js/issues"
-	},
-	"homepage": "https://github.com/effectai/effect-js#readme",
-	"devDependencies": {
-		"@biomejs/biome": "1.7.0",
-		"@changesets/changelog-github": "^0.4.5",
-		"@changesets/cli": "^2.23.2",
-		"@size-limit/preset-big-lib": "^11.1.2",
-		"@greymass/abi2core": "^2.0.1",
-		"typescript": "^5.4.3"
-	},
-	"dependencies": {
-		"@wharfkit/antelope": "^1.0.7",
-		"@wharfkit/session": "^1.2.8",
-		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
-		"ajv": "^8.12.0",
-		"atomicassets": "^1.5.1",
-		"idb-keyval": "^6.2.1",
-		"node-localstorage": "^3.0.5"
-	},
-	"trustedDependencies": ["@biomejs/biome"]
+  "name": "@effectai/effect-js",
+  "version": "2.0.0",
+  "description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+  "main": "./dist/exports/index.js",
+  "module": "./dist/exports/index.js",
+  "browser": "dist/exports/index.js",
+  "types": "./dist/exports/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "test": "bun --env-file=.env test",
+    "test:watch": "bun --env-file=.env test --watch",
+    "test:coverage": "bun --env-file=.env test --coverage",
+    "test:mainnet": "bun --env-file=.env.mainnet test",
+    "dev": "tsc -w",
+    "build": "tsc --module es2020",
+    "lint": "bun biome lint --apply .",
+    "format": "biome format --write .",
+    "check": "bun biome check --apply .",
+    "changeset": "changeset",
+    "changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
+    "changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
+    "docs:dev": "cd docs && bun run dev",
+    "docs:build": "cd docs && bun run build",
+    "docs:preview": "cd docs && bun run preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/effectai/effect-js.git"
+  },
+  "keywords": ["efx", "AI", "blockchain", "microtasks"],
+  "author": {
+    "name": "Effect-AI",
+    "url": "https://effect.network",
+    "email": "hello@effect.ai"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/effectai/effect-js/issues"
+  },
+  "homepage": "https://github.com/effectai/effect-js#readme",
+  "devDependencies": {
+    "@biomejs/biome": "1.7.0",
+    "@changesets/changelog-github": "^0.4.5",
+    "@changesets/cli": "^2.23.2",
+    "@greymass/abi2core": "^2.0.1",
+    "@size-limit/preset-big-lib": "^11.1.2",
+    "@types/bun": "^1.1.1",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "@wharfkit/antelope": "^1.0.7",
+    "@wharfkit/session": "^1.2.8",
+    "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
+    "ajv": "^8.12.0",
+    "atomicassets": "^1.5.1",
+    "idb-keyval": "^6.2.1",
+    "node-localstorage": "^3.0.5"
+  },
+  "trustedDependencies": ["@biomejs/biome"]
 }

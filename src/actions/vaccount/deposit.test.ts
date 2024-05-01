@@ -1,9 +1,9 @@
 import { describe, test, expect } from "bun:test";
 import { deposit } from "./deposit";
-import { destructureEnv, testClientSession } from "../../testHelper";
 import { eos, jungle4 } from "../../exports";
 import { getOrCreateVAccount } from "./getOrCreate";
 import { Name } from "@wharfkit/antelope";
+import { testClientSession, destructureEnv } from "../../../test/src/utils";
 
 describe("deposit", async () => {
 	test.todo("Should throw an error when Session is not set on Client.", () => {

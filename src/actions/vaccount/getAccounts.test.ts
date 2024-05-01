@@ -1,7 +1,8 @@
 import { expect, test, describe, beforeAll } from "bun:test";
 import type { VAccount } from "../../types/user";
-import { testClientSession } from "../../testHelper";
 import type { Client } from "../../client";
+import { testClientSession } from "../../../test/src/utils";
+
 import { getVAccounts, getAccountById } from "./getAccounts";
 import { Name } from "@wharfkit/antelope";
 import { jungle4 } from "../../exports";

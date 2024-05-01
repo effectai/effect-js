@@ -5,10 +5,10 @@ import {
 	PermissionLevel,
 } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
-import { jungle4, eos } from "../src/exports";
-import { createClient } from "./../src/client";
-import type { Client } from "./../src/client";
-import type { Network } from "./types/network";
+import { jungle4, eos } from "../../src/exports";
+import { createClient } from "../../src/client";
+import type { Client } from "../../src/client";
+import type { Network } from "../../src/types/network";
 
 declare module "bun" {
 	interface Env {

@@ -1,9 +1,12 @@
+import { Name } from "@wharfkit/antelope";
+
 import { expect, test, describe, mock } from "bun:test";
-import { destructureEnv, testClientSession } from "../../testHelper";
+
 import { createClient } from "../../client";
 import { createVAccount } from "./createAccount";
-import { Name } from "@wharfkit/antelope";
+
 import { jungle4 } from "../../exports";
+import { destructureEnv, testClientSession } from "../../../test/src/utils.js";
 
 describe("Create Virtual account", () => {
 	const testEnvNetwork = jungle4;
