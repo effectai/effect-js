@@ -1,11 +1,11 @@
 import { expect, test, describe, beforeAll } from "bun:test";
 import { jungle4, eos } from "../src/exports";
-import { testClientSession, destructureEnv } from "./testHelper";
 import { createClient, Client as ClientConstructor } from "./client";
 import { Name } from "@wharfkit/antelope";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { Session } from "@wharfkit/session";
 import { EffectSession } from "./session";
+import { destructureEnv, testClientSession } from "../test/src/utils";
 
 describe("Client", async () => {
 	test("createClient TestNet", () => {
