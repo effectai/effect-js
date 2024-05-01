@@ -17,6 +17,6 @@
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
-	"exclude": ["node_modules/**/*", "**/*.test.ts",],
+	"exclude": ["node_modules/**/*", "**/*.test.ts"],
 	"include": ["src/**/*", "abis/**/*", "test/testHelper.ts"]
 }
