@@ -116,5 +116,9 @@ export const createClient = ({
 		return client;
 	}
 
+	if (!network) {
+		throw new Error("Network configuration is required to create a client.");
+	}
+
 	return new Client(network, options);
 };
