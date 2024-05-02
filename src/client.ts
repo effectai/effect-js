@@ -101,7 +101,10 @@ export const createClient = ({
 
 	if (session) {
 		// if session is given here, retrieve the network from session
-		const chain = networks.find((network) => network.id === session.chain.id);
+
+		const chain = networks.find(
+			(network) => network.id === session.chain.id.hexString,
+		);
 
 		if (!chain)
 			throw new Error(

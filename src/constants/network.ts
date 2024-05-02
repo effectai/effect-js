@@ -28,8 +28,8 @@ export const jungle4: Network = {
 
 export const eos: Network = {
 	name: "eos",
-	url: "https://eos.eosq.eosnation.io/",
-	id: "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
+	url: "https://eos.greymass.com/",
+	id: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
 	config: {
 		efx: {
 			token: {
