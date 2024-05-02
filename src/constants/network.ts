@@ -51,4 +51,4 @@ export const eos: Network = {
 	},
 };
 
-export const chains = [eos, jungle4];
+export const networks = [eos, jungle4];

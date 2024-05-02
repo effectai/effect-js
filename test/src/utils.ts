@@ -32,24 +32,12 @@ export interface testEnv {
 }
 
 export const destructureEnv = (networkEnv: Network) => {
-	// Mainnet Config
-	if (networkEnv === eos) {
-		return {
-			network: eos,
-			networkName: process.env.MAINNET_NETWORK_NAME,
-			permission: process.env.MAINNET_PERMISSION,
-			actor: process.env.MAINNET_ACTOR,
-			privateKey: PrivateKey.from(process.env.MAINNET_PRIVATE_KEY),
-		};
-	}
-
-	// Testnet Config
 	return {
 		network: jungle4,
-		networkName: process.env.TESTNET_NETWORK_NAME,
-		permission: process.env.TESTNET_PERMISSION,
-		actor: process.env.TESTNET_ACTOR,
-		privateKey: PrivateKey.from(process.env.TESTNET_PRIVATE_KEY),
+		networkName: process.env.NETWORK_NAME,
+		permission: process.env.PERMISSION!,
+		actor: process.env.ACTOR!,
+		privateKey: PrivateKey.from(process.env.PRIVATE_KEY!),
 	};
 };
 
@@ -59,7 +47,12 @@ export const testClientSession = async ({
 	// Retrieve parameters for session.
 	const { network, permission, actor, privateKey } =
 		destructureEnv(testEnvNetwork);
-	const { eosRpcUrl: url, eosChainId: id } = network;
+
+	if (!privateKey) {
+		throw new Error("Private key not found");
+	}
+
+	const { url, id } = network;
 
 	// Create client
 	const client = createClient({ network });
@@ -69,6 +62,7 @@ export const testClientSession = async ({
 		privateKey.toString(),
 		false,
 	);
+
 	const walletPlugin = new WalletPluginPrivateKey(pk);
 
 	// Set up session with wallet and chain

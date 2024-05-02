@@ -35,8 +35,8 @@ describe("Client", async () => {
 			permission,
 			walletPlugin,
 			chain: {
-				id: network.eosChainId,
-				url: network.eosRpcUrl,
+				id: network.id,
+				url: network.url,
 			},
 		});
 
@@ -63,8 +63,8 @@ describe("Client", async () => {
 			permission,
 			walletPlugin,
 			chain: {
-				id: network.eosChainId,
-				url: network.eosRpcUrl,
+				id: network.id,
+				url: network.url,
 			},
 		});
 

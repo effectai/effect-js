@@ -9,7 +9,7 @@ import { type Cache, MemoryCache } from "./cache";
 import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 import { EffectSession } from "./session";
-import { chains } from "./constants/network";
+import { networks } from "./constants/network";
 
 export interface ClientOpts {
 	ipfsCacheDurationInMs?: number | null;
@@ -101,7 +101,7 @@ export const createClient = ({
 
 	if (session) {
 		// if session is given here, retrieve the network from session
-		const chain = chains.find((chain) => chain.id === session.chain.id);
+		const chain = networks.find((network) => network.id === session.chain.id);
 
 		if (!chain)
 			throw new Error(
