@@ -9,6 +9,7 @@ import { type Cache, MemoryCache } from "./cache";
 import { type CacheManager, IDBCache, createCacheManager } from "./cache";
 import { getOrCreateVAccount } from "./actions/vaccount/getOrCreate";
 import { EffectSession } from "./session";
+import { chains } from "./constants/network";
 
 export interface ClientOpts {
 	ipfsCacheDurationInMs?: number | null;
@@ -20,19 +21,11 @@ const defaultClientOpts: ClientOpts = {
 	ipfsCacheDurationInMs: 600_000, // 10 minutes
 };
 
-/**
- * Represents a client for the Effect SDK, used for interacting with the network.
- * @class Client
- * @property {FetchProvider} fetchProvider - the fetch provider for the client, allows for custtom fetch implementations.
- * @property {Network} network - the network configuration for the client.
- * @property {ClientOpts} options = additonal options for the client.
- * @property {APIClient} provider - the API client for the client.
- */
 export class Client {
-	public readonly fetchProvider: FetchProvider;
-	public readonly network: Network;
-	public readonly options: ClientOpts;
-	public readonly provider: APIClient;
+	public readonly fetchProvider: FetchProvider; // fetch provider for the client
+	public readonly network: Network; // network configuration for the client
+	public readonly options: ClientOpts; // additional options for the client
+	public readonly provider: APIClient; // API client for the client
 
 	public cache: CacheManager;
 
@@ -42,17 +35,12 @@ export class Client {
 		return this._session;
 	}
 
-	/**
-	 * Constructs a new instance of the Client class.
-	 * @param {Network} network The network configuration for the client.
-	 * @param {ClientOpts} options Additional options for the client.
-	 */
 	constructor(network: Network, options: ClientOpts) {
 		this.options = { ...defaultClientOpts, ...options };
 
 		this.network = network;
 
-		this.fetchProvider = new FetchProvider(this.network.eosRpcUrl, {
+		this.fetchProvider = new FetchProvider(this.network.url, {
 			fetch: this.options.fetchProvider?.fetch,
 		});
 
@@ -67,43 +55,9 @@ export class Client {
 		}
 	}
 
-	/**
-	 * Sets the session for the client, using user credentials.
-	 * @param {Session|null} session The session to set for the client.
-	 * @returns {Promise<EffectSession> | null} The updated session for the client.
-	 * @throws {Error} If failed to set session.
-	 *
-	 * ```typescript
-	 * // Import the Effect Client, network configuration, and sdk function
-	 * import { createClient, eos, createBatch } from "@effectai/effect-js"
-	 * import { Session } from "@wharfkit/session";
-	 * import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
-	 *
-	 * // Create a new client
-	 * const client = createClient({ network: eos });
-	 *
-	 * // Set up wallet with privatekey
-	 * const walletPlugin = new WalletPluginPrivateKey(privateKey);
-	 *
-	 * // Set up session with wallet and chain
-	 * const session = new Session({
-	 *   actor,
-	 *   permission,
-	 *   walletPlugin,
-	 *   chain: {
-	 *     id: network.eosChainId,
-	 *     url: network.eosRpcUrl,
-	 *   },
-	 * });
-	 *
-	 * // Connect session to client
-	 * await client.setSession(session);
-	 *
-	 * // Use the client to create a batch with the session
-	 * await createBatch({ client, batch, data })
-	 * ```
-	 */
-	public setSession = async (session: Session | null) => {
+	public setSession = async (
+		session: Session | null,
+	): Promise<EffectSession | null> => {
 		try {
 			if (!session) {
 				this._session = null;
@@ -128,36 +82,39 @@ export class Client {
 	};
 }
 
-/**
- * Create a new client for the Effect SDK.
- * Pass in the network configuration and any additonal options.
- * Client must be used as an argument to SDK functions to interact with the network.
- *
- * @param {Object} createClientParam - The network and options for the Effect SDK client.
- * @param {Network} createClientParam.network - The network configuration for the client.
- * @param {ClientOpts} [createClientParam.options] - Additional options for the client.
- * @returns {Client} A new instance of the Client class.
- *
- * ```typescript
- * // Import the Effect Client, network configuration, and sdk function
- * import { createClient, eos, getAccountById } from "@effectai/effect-js"
- *
- * // Create a new client
- * const client = createClient({ network: eos });
- *
- * // Use the client to get an account by id
- * const accountId = 42;
- * const vAccount = await getAccountById({ client, accountId });
- * ```
- */
+export type CreateClientArgs = {
+	network?: Network;
+	session?: Session;
+	options?: ClientOpts;
+} & ({ network: Network } | { session: Session });
+
 export const createClient = ({
 	network,
 	session,
 	options = {},
-}: {
-	network: Network;
-	session?: Session;
-	options?: ClientOpts;
-}) => {
+}: CreateClientArgs) => {
+	if (!network && !session) {
+		throw new Error(
+			"Network or Session configuration is required to create a client.",
+		);
+	}
+
+	if (session) {
+		// if session is given here, retrieve the network from session
+		const chain = chains.find((chain) => chain.id === session.chain.id);
+
+		if (!chain)
+			throw new Error(
+				"Chain associated with session not found or not supported.",
+			);
+
+		const client = new Client(chain, options);
+
+		// automatically set the session whenever the session is provided
+		client.setSession(session);
+
+		return client;
+	}
+
 	return new Client(network, options);
 };
