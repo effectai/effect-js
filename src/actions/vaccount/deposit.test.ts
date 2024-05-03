@@ -10,14 +10,14 @@ describe("deposit", async () => {
     // TODO: implement test
   });
 
-  test.skip("Check that deposit is functioning correctly", async () => {
-    const { network, actor } = destructureEnv(jungle4);
-    const client = await testClientSession({ network });
-    console.debug(client.network);
-    const acc = Name.from(actor);
-    const vAccount = await getOrCreateVAccount({ client, actor: acc });
-    const vAccId = Number(vAccount.id);
-    const result = await deposit({ client, vAccountId: vAccId, amount: 0.1 });
-    console.debug(result);
-  });
+	test.skip("Check that deposit is functioning correctly", async () => {
+		const { network, actor } = destructureEnv();
+		const client = await testClientSession({ testEnvNetwork: network });
+		console.debug(client.network);
+		const acc = Name.from(actor);
+		const vAccount = await getOrCreateVAccount({ client, actor: acc });
+		const vAccId = Number(vAccount.id);
+		const result = await deposit({ client, vAccountId: vAccId, amount: 0.1 });
+		console.debug(result);
+	});
 });

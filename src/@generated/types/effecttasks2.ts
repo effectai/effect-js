@@ -78,7 +78,6 @@ export type Mkbatch = {
 	repetitions: number;
 	payer: string;
 };
-
 export type Mkcampaign = {
 	owner: Vaddress;
 	content: Content;
@@ -87,7 +86,6 @@ export type Mkcampaign = {
 	qualis: Quali[];
 	payer: string;
 };
-
 export type Payment = {
 	id: number;
 	account_id: number;

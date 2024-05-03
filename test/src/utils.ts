@@ -31,20 +31,21 @@ export interface testEnv {
   privateKey: PrivateKeyType;
 }
 
-export const destructureEnv = (network: Network) => {
-  return {
-    network: jungle4,
-    networkName: process.env.TESTNET_NETWORK_NAME,
-    permission: process.env.TESTNET_PERMISSION!,
-    actor: process.env.TESTNET_ACTOR!,
-    privateKey: PrivateKey.from(process.env.TESTNET_PRIVATE_KEY!),
-  };
+export const destructureEnv = () => {
+	return {
+		network: jungle4,
+		networkName: process.env.NETWORK_NAME,
+		permission: process.env.PERMISSION!,
+		actor: process.env.ACTOR!,
+		privateKey: PrivateKey.from(process.env.PRIVATE_KEY!),
+	};
 };
 
-export const testClientSession = async ({ network }: { network: Network }): Promise<Client> => {
-  // Retrieve parameters for session.
-  const { permission, actor, privateKey } = destructureEnv(network);
-  const chain = network;
+export const testClientSession = async ({
+	testEnvNetwork,
+}: { testEnvNetwork: Network }): Promise<Client> => {
+	// Retrieve parameters for session.
+	const { network, permission, actor, privateKey } = destructureEnv();
 
   if (!privateKey) {
     throw new Error("Private key not found");
