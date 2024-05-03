@@ -1,4 +1,4 @@
-import type { AnyAction } from "@wharfkit/antelope";
+import { Asset, type AnyAction } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
@@ -32,7 +32,7 @@ export const vTransferAction = ({
       from_id,
       to_id,
       quantity: {
-        quantity: quantity,
+        quantity: Asset.from(quantity, "4,EFX"),
         contract: token,
       },
       memo: "",
