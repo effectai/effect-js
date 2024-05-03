@@ -3,11 +3,9 @@ import type {
 	PermissionLevelType,
 	Session,
 	TransactArgs,
-	TransactOptions,
 } from "@wharfkit/session";
-import { TransactionError } from "./errors";
-import type { VAccount } from "./exports";
 import { TxState, waitForTransaction } from "./utils/transaction";
+import type { Account } from "./@generated/types/efxaccount11";
 
 export class EffectSession {
 	public readonly wharfKitSession: Session;
@@ -17,13 +15,13 @@ export class EffectSession {
 	public readonly permissionLevel: PermissionLevelType;
 	public readonly authorization: { actor: Name; permission: Name }[];
 
-	private _vAccount: VAccount | null;
+	private _vAccount: Account | null;
 
-	get vAccount(): VAccount | null {
+	get vAccount(): Account | null {
 		return this._vAccount;
 	}
 
-	constructor(session: Session, vAccount: VAccount) {
+	constructor(session: Session, vAccount: Account) {
 		this.actor = session.actor;
 		this.permission = session.permission;
 		this.permissionLevel = session.permissionLevel;

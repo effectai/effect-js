@@ -11,7 +11,7 @@ describe("deposit", async () => {
 	});
 
 	test.skip("Check that deposit is functioning correctly", async () => {
-		const { network, actor } = destructureEnv(jungle4);
+		const { network, actor } = destructureEnv();
 		const client = await testClientSession({ testEnvNetwork: network });
 		console.debug(client.network);
 		const acc = Name.from(actor);

@@ -31,7 +31,7 @@ export interface testEnv {
 	privateKey: PrivateKeyType;
 }
 
-export const destructureEnv = (networkEnv: Network) => {
+export const destructureEnv = () => {
 	return {
 		network: jungle4,
 		networkName: process.env.NETWORK_NAME,
@@ -45,8 +45,7 @@ export const testClientSession = async ({
 	testEnvNetwork,
 }: { testEnvNetwork: Network }): Promise<Client> => {
 	// Retrieve parameters for session.
-	const { network, permission, actor, privateKey } =
-		destructureEnv(testEnvNetwork);
+	const { network, permission, actor, privateKey } = destructureEnv();
 
 	if (!privateKey) {
 		throw new Error("Private key not found");
