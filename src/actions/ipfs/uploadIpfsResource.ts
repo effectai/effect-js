@@ -45,11 +45,11 @@ export const uploadIpfsResource = async ({
 	}
 };
 
-export const ipfsCIDToHex = (cid: string) : string => {
+export const ipfsCIDToHex = (cid: string): string => {
 	const string = atob(cid);
-	const array = new Uint8Array(string.length)
+	const array = new Uint8Array(string.length);
 	for (let i = 0; i < string.length; i++) {
-		array[i] = string.charCodeAt(i)
+		array[i] = string.charCodeAt(i);
 	}
 	return Bytes.from(array).hexString;
-}
+};
