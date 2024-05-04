@@ -3,9 +3,9 @@ import { getPrice } from "./getPrice";
 import { getBalance } from "./getBalance";
 import { swap, type SwapArgs } from "./swap";
 import { createClient } from "../../client";
-import { testClientSession } from "../../testHelper";
 import { eos, jungle4 } from "../../exports";
 import { Name } from "@wharfkit/antelope";
+import { testClientSession } from "../../../test/src/utils";
 
 describe("getPrice", async () => {
 	test("getPrice() should retrieve price on mainnet", async () => {

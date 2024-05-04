@@ -10,10 +10,6 @@ const getAbi = async (name: string) => {
 	return data;
 };
 
-const capitalize = (s: string) => {
-	return s.charAt(0).toUpperCase() + s.slice(1);
-};
-
 const getPrimitive = (field: any) => {
 	switch (field) {
 		case "string":
@@ -96,7 +92,7 @@ function snakeToPascal(name: string): string {
 		.join("");
 }
 
-const abis = ["effecttasks2"];
+const abis = ["effecttasks2", "efxaccount11"];
 
 const main = async () => {
 	for (const abi of abis) {

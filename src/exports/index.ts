@@ -172,11 +172,7 @@ export type {
 	Batch,
 } from "./../@generated/types/effecttasks2";
 
-export type {
-	Payment,
-	VAccount,
-	GetTableRowsResponse,
-} from "./types";
+export type { GetTableRowsResponse } from "./types";
 
 export { Template } from "./template";
 

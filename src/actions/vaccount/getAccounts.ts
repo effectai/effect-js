@@ -1,8 +1,8 @@
 import type { Name, UInt64Type } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { NotFoundError } from "../../errors";
-import type { VAccount } from "../../types/user";
 import { generateCheckSumForVAccount } from "../../utils/keys";
+import type { Account } from "../../@generated/types/efxaccount11";
 
 export type GetVAccountsArgs = {
 	client: Client;
@@ -17,7 +17,7 @@ export type GetVAccountsArgs = {
 export const getVAccounts = async ({
 	client,
 	actor,
-}: GetVAccountsArgs): Promise<VAccount[]> => {
+}: GetVAccountsArgs): Promise<Account[]> => {
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 

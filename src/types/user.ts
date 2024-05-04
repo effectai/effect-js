@@ -8,21 +8,6 @@
  * @property {string} contract - Vaccount contract
  * @property {string} quantity - Vaccount quantity
  */
-export interface VAccount {
-	id: number;
-	nonce: number;
-	address: [string, string];
-	balance: {
-		quantity: string;
-		contract: string;
-	};
-}
-
-export interface efxTicker {
-	btc: number;
-	eth: number;
-	usd: number;
-}
 
 export interface DefiBoxPair {
 	id: number;
@@ -42,16 +27,4 @@ export interface DefiBoxPair {
 	price0_cumulative_last: string;
 	price1_cumulative_last: number;
 	block_time_last: string;
-}
-
-//TODO:: this type is not complete..
-export interface Payment {
-	id: number;
-	account_id: number;
-	batch_id: number;
-	last_submission_time: string;
-	pending: {
-		quantity: string;
-		contract: string;
-	};
 }

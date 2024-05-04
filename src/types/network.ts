@@ -1,3 +1,8 @@
+import type { ChainDefinitionType } from "@wharfkit/session";
+
+export type Network = ChainDefinitionType & {
+	config: NetworkConfig;
+};
 export interface AtomicConfig {
 	atomicContract: string;
 	ipfsEndpoint: string;
@@ -35,13 +40,4 @@ export interface NetworkConfig {
 	atomic: AtomicConfig;
 	efx: EfxConfig;
 	relayer: RelayerConfig;
-}
-
-export interface Network {
-	name: string;
-	explorerUrl: string;
-	eosRpcUrl: string;
-	eosChainId: string;
-
-	config: NetworkConfig;
 }

@@ -1,11 +1,9 @@
 import type { AnyAction, Name } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { VAccountError } from "../../errors";
-import type { Payment } from "../../exports";
 import { useEFXContracts } from "../../utils/state";
 import { getPendingPayments } from "./getPendingPayments";
-
-/* Claims pending amount to vAccount */
+import type { Payment } from "../../@generated/types/effecttasks2";
 
 export type ClaimArgs = {
 	client: Client;

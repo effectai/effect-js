@@ -17,7 +17,8 @@ export const createSession = async ({
 	privateKey,
 }: CreateSessionArgs) => {
 	const walletPlugin = new WalletPluginPrivateKey(privateKey);
-	const { eosRpcUrl: url, eosChainId: id } = client.network;
+	const { id, url } = client.network;
+
 	const session = new Session({
 		actor,
 		permission,
