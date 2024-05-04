@@ -36,7 +36,7 @@ export const submitTask = async ({
 					campaign_id: UInt32.from(reservation.campaign_id),
 					account_id: UInt32.from(reservation.account_id),
 					task_idx: UInt32.from(reservation.task_idx),
-					data: { "first": 1, "second": ipfsHex },
+					data: { first: 1, second: ipfsHex },
 					payer: actor,
 					sig: null,
 				},
