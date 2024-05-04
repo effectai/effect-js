@@ -1,0 +1,166 @@
+
+# VTransfer
+
+## Description
+
+Transfer EFX tokens from one vAccount to another.
+
+## Usage
+
+```ts [example.ts]
+import { getCampaigns } from '@effectai/effect-js'
+
+const campaigns = await getCampaigns({ // [!code focus]
+    client,
+    limit: 10,
+    page: 1
+});
+```
+
+## Returns
+
+- **Type:**  [`Promise<GetTableRowsResponse<UInt128, Campaign>>`](/docs/glossary/types#campaign)
+- **Description:** A list of campaigns.
+- **Properties:**
+  - **rows:** An array of campaigns.
+  - **more:** A boolean indicating if there are more campaigns to fetch.
+  - **next_key:** A string that can be used to fetch the next page of campaigns.
+
+## Parameters
+
+### client
+- **Type:** `Client`
+
+### limit (optional) 
+- **Type:** `number`
+- **Default:** `10`
+
+### page (optional)
+- **Type:** `number`
+- **Default:** `1`
+
+```json
+ // Response
+ response: {
+    transaction_id: "18c35c04fce3dbbfee0dea46707003c4897bb3c02766a69936c3ceb0bb836c99",
+    processed: {
+      id: "18c35c04fce3dbbfee0dea46707003c4897bb3c02766a69936c3ceb0bb836c99",
+      block_num: 137868012,
+      block_time: "2024-05-03T04:12:07.500",
+      producer_block_id: null,
+      receipt: {
+        status: "executed",
+        cpu_usage_us: 207,
+        net_usage_words: 16,
+      },
+      elapsed: 207,
+      net_usage: 128,
+      scheduled: false,
+      action_traces: [
+        {
+          action_ordinal: 1,
+          creator_action_ordinal: 0,
+          closest_unnotified_ancestor_action_ordinal: 0,
+          receipt: {
+            receiver: "efxaccount11",
+            act_digest: "d6f9be5af2565060d572a08f6e5f75498ea4c6a3d2cf77e26f3e3ffff4b6e244",
+            global_sequence: 196109234,
+            recv_sequence: 387,
+            auth_sequence: [
+              [ "forcedev1234", 32 ]
+            ],
+            code_sequence: 8,
+            abi_sequence: 15,
+          },
+          receiver: "efxaccount11",
+          act: {
+            account: "efxaccount11",
+            name: "vtransfer",
+            authorization: [
+              {
+                actor: "forcedev1234",
+                permission: "active",
+              }
+            ],
+            data: {
+              from_id: 24,
+              to_id: 3,
+              quantity: {
+                quantity: "0.0001 EFX",
+                contract: "efxtoken1112",
+              },
+              memo: "",
+              sig: null,
+              fee: null,
+            },
+            hex_data: "180000000000000003000000000000000100000000000000044546580000000020420853419afb52000000",
+          },
+          context_free: false,
+          elapsed: 76,
+          console: "",
+          trx_id: "18c35c04fce3dbbfee0dea46707003c4897bb3c02766a69936c3ceb0bb836c99",
+          block_num: 137868012,
+          block_time: "2024-05-03T04:12:07.500",
+          producer_block_id: null,
+          account_ram_deltas: [],
+          except: null,
+          error_code: null,
+          return_value_hex_data: "",
+        }, {
+          action_ordinal: 2,
+          creator_action_ordinal: 1,
+          closest_unnotified_ancestor_action_ordinal: 1,
+          receipt: {
+            receiver: "vibrantcacti",
+            act_digest: "d6f9be5af2565060d572a08f6e5f75498ea4c6a3d2cf77e26f3e3ffff4b6e244",
+            global_sequence: 196109235,
+            recv_sequence: 69,
+            auth_sequence: [
+              [ "forcedev1234", 33 ]
+            ],
+            code_sequence: 8,
+            abi_sequence: 15,
+          },
+          receiver: "vibrantcacti",
+          act: {
+            account: "efxaccount11",
+            name: "vtransfer",
+            authorization: [
+              {
+                actor: "forcedev1234",
+                permission: "active",
+              }
+            ],
+            data: {
+              from_id: 24,
+              to_id: 3,
+              quantity: {
+                quantity: "0.0001 EFX",
+                contract: "efxtoken1112",
+              },
+              memo: "",
+              sig: null,
+              fee: null,
+            },
+            hex_data: "180000000000000003000000000000000100000000000000044546580000000020420853419afb52000000",
+          },
+          context_free: false,
+          elapsed: 5,
+          console: "",
+          trx_id: "18c35c04fce3dbbfee0dea46707003c4897bb3c02766a69936c3ceb0bb836c99",
+          block_num: 137868012,
+          block_time: "2024-05-03T04:12:07.500",
+          producer_block_id: null,
+          account_ram_deltas: [],
+          except: null,
+          error_code: null,
+          return_value_hex_data: "",
+        }
+      ],
+      account_ram_delta: null,
+      except: null,
+      error_code: null,
+    },
+  },
+}
+```
