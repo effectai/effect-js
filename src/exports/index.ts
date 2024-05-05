@@ -170,7 +170,10 @@ export type {
 	Reservation,
 	Settings,
 	Batch,
+	Payment,
 } from "./../@generated/types/effecttasks2";
+
+export type { Account } from "./../@generated/types/efxaccount11";
 
 export type { GetTableRowsResponse } from "./types";
 
