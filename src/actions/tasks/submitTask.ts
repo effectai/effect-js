@@ -2,7 +2,7 @@ import { UInt32 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
-import { uploadIpfsResource } from "../ipfs/uploadIpfsResource";
+import { uploadIpfsResource, ipfsCIDToHex } from "../ipfs/uploadIpfsResource";
 import type { Reservation } from "../../@generated/types/effecttasks2";
 
 export type SubmitTaskArgs = {
@@ -25,6 +25,7 @@ export const submitTask = async ({
 		const { tasks } = useEFXContracts(client);
 
 		const ipfsData = await uploadIpfsResource({ client, data });
+		const ipfsHex = ipfsCIDToHex(ipfsData);
 
 		const response = await transact({
 			action: {
@@ -35,7 +36,7 @@ export const submitTask = async ({
 					campaign_id: UInt32.from(reservation.campaign_id),
 					account_id: UInt32.from(reservation.account_id),
 					task_idx: UInt32.from(reservation.task_idx),
-					data: ipfsData,
+					data: { first: 1, second: ipfsHex },
 					payer: actor,
 					sig: null,
 				},
