@@ -53,6 +53,7 @@
 	"dependencies": {
 		"@wharfkit/antelope": "^1.0.7",
 		"@wharfkit/session": "^1.2.8",
+		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
 		"ajv": "^8.12.0",
 		"atomicassets": "^1.5.1",
 		"idb-keyval": "^6.2.1",
