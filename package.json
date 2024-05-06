@@ -8,7 +8,7 @@
 	"types": "./dist/exports/index.d.ts",
 	"files": ["dist"],
 	"scripts": {
-		"test": "bun --env-file=.env test --preload ./test/global-setup.ts",
+		"test": "bun --env-file=.env test",
 		"test:watch": "bun --env-file=.env test --watch",
 		"test:coverage": "bun --env-file=.env test --coverage",
 		"dev": "tsc -w",
