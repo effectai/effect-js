@@ -1,36 +1,105 @@
-# Get Campaigns [Queries the Effect SDK API for a list of campaigns.]
+# createCampaign
+
+## Description
+
+This function creates a campaign from a specified client with the given campaign parameters.
+You can view the campaign on the [Effect Network](https://app.effect.network/campaigns) before you start collecting data, 
+you need to add tasks to the campaign. You can do this by following the [Adding Tasks](/docs/collecting-data/adding-tasks) guide.
 
 ## Usage
 
-```ts [example.ts]
-import { getCampaigns } from '@effectai/effect-js'
+```ts
+import { 
+  createCampaign, 
+  CreateCampaignArgs, 
+  createClient 
+} from '@effectai/sdk'
 
-const campaigns = await getCampaigns({ // [!code focus]
-    client,
-    limit: 10,
-    page: 1
-});
+const myNewCampaign: CreateCampaignArgs["campaign"] = {
+  version: 1.0,
+  maxTaskTime: 100,
+  reward: 3.5,
+  title: "Labelstudio OCR (LAION)",
+  description: "You are contributing to a dataset for conversational style chatbots.",
+  instructions: "Some instructions here",
+  template: "<h1>Template here</h1>",
+  input_schema: null,
+  output_schema: null,
+  image: "",
+  category: "",
+  example_task: "",
+  estimated_time: 10,
+};
+
+const client = await createClient({ network: jungle4 });
+const result = await createCampaign({ client, campaign: myNewCampaign });
 ```
+
+## Output
+
+```json
+response: {
+  transaction_id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+  processed: {
+    id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+    block_num: 137520447,
+    block_time: "2024-05-01T03:55:31.500",
+    producer_block_id: null,
+    receipt: [Object ...],
+    elapsed: 4854,
+    net_usage: 176,
+    scheduled: false,
+    action_traces: [
+      [Object ...]
+    ],
+    account_ram_delta: null,
+    except: null,
+    error_code: null,
+  },
+}
+```
+## Parameters
+
+
+### client
+- **Type:** `SomeClient`
+- **Description:** The client used to retrieve campaigns.
+
+### CreateCampaignArgs["campaign"]
+- **version**: Version number of the campaign
+- **maxTaskTime**: Time maximum time in seconds for the task
+- **reward**: Reward for each task in EFX
+- **title**: Title of the campaign
+- **description**: Description of the campaign
+- **instructions**: Instructions for the campaign
+- **template**: Template for the campaign, which is a string of HTML
+- **input_schema**: JSON schema for each input task
+- **output_schema**: JSON schema for each output task
+- **image**: Image URL for the campaign
+- **category**: Category of the campaign
+- **example_task**: An example_task for the campaign, this should be data that will be input into the campaign
+- **estimated_time**: Estimated time in seconds for the task
 
 ## Returns
 
-- **Type:**  [`Promise<GetTableRowsResponse<UInt128, Campaign>>`](/docs/glossary/types#campaign)
-- **Description:** A list of campaigns.
-- **Properties:**
-  - **rows:** An array of campaigns.
-  - **more:** A boolean indicating if there are more campaigns to fetch.
-  - **next_key:** A string that can be used to fetch the next page of campaigns.
+**Type:**  [`Promise<Transaction_Result>`](/docs/glossary/types#transaction_result)
 
-## Parameters
+**Description:** Transaction result object that contains the transaction id and the processed transaction.
 
-### client
-- **Type:** `Client`
+**Properties:**
 
-### limit (optional) 
-- **Type:** `number`
-- **Default:** `10`
-
-### page (optional)
-- **Type:** `number`
-- **Default:** `1`
-
+- **response**: Object
+- **transaction_id**: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+  - **processed**: 
+    - **id**: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+    - **block_num**: 137520447,
+    - **block_time**: "2024-05-01T03:55:31.500",
+    - **producer_block_id**: null,
+    - **receipt**: [Object ...],
+    - **elapsed**: 4854,
+    - **net_usage**: 176,
+    - **scheduled**: false,
+    - **action_traces**: [ [Object ...] ],
+    - **account_ram_delta**: null,
+    - **except**: null,
+    - **error_code**: null,

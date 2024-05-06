@@ -1,6 +1,4 @@
-
-```ts
-# Function Template
+# getCampaigns
 
 ## Description
 
@@ -14,33 +12,32 @@ import { createClient, getCampaigns, jungle4 } from "@effectai/sdk"
 const client = createCllient({ network: jungle4 });
 const campaigns = await getCampaigns({ client });
 console.log(campaigns);
+```
 
-/**
- * Output:
- *{
- *  rows: [
- *    {
- *      id: 0,
- *      reservations_done: 2,
- *      total_submissions: 2,
- *      total_tasks: 6,
- *      active_batch: 0,
- *      num_batches: 2,
- *      owner: [ "name", "efxefxefxefx" ],
- *      paused: 0,
- *      content: [Object ...],
- *      max_task_time: 3600,
- *      reward: [Object ...],
- *      qualis: [],
- *      info: [Object ...],
- *    }, { */ ... /* }, { */ ... /* }
- *  ],
- *  next_key: UInt128 { */ ... /*  },
- *  more: true,
- *}
- */
+## Output
 
-
+```json
+{
+ rows: [
+   {
+     id: 0,
+     reservations_done: 2,
+     total_submissions: 2,
+     total_tasks: 6,
+     active_batch: 0,
+     num_batches: 2,
+     owner: [ "name", "efxefxefxefx" ],
+     paused: 0,
+     content: [Object ...],
+     max_task_time: 3600,
+     reward: [Object ...],
+     qualis: [],
+     info: [Object ...],
+   }, { */ ... /* }, { */ ... /* }
+ ],
+ next_key: UInt128 { */ ... /*  },
+ more: true,
+}
 ```
 
 
@@ -65,7 +62,6 @@ console.log(campaigns);
 ### ipfsFetch
 - **Type:** `boolean`
 - **Description:** Whether to fetch additional information from IPFS for each campaign. Default is true.
-```
 
 
 ## Returns
