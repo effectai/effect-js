@@ -48,14 +48,17 @@ export const sidebar = {
 							text: "TODO: getAccounts",
 							link: "/docs/tasks/vaccount/getAccounts",
 						},
-						{ text: "TODO: getAvatar", link: "/docs/tasks/vaccount/getAvatar" },
+						{
+							text: "TODO: getAvatar",
+							link: "/docs/tasks/vaccount/get-avatar",
+						},
 						{
 							text: "TODO: getOrCreate",
-							link: "/docs/tasks/vaccount/getOrCreate",
+							link: "/docs/tasks/vaccount/get-or-create",
 						},
 						{
 							text: "TODO: getPendingPayments",
-							link: "/docs/tasks/vaccount/getPendingPayments",
+							link: "/docs/tasks/vaccount/get-pending-payments",
 						},
 						{ text: "TODO: payout", link: "/docs/tasks/vaccount/payout" },
 						{ text: "TODO: transfer", link: "/docs/tasks/vaccount/transfer" },
@@ -65,8 +68,8 @@ export const sidebar = {
 				{
 					text: "Token",
 					items: [
-						{ text: "TODO: getPrice", link: "/docs/tasks/token/getPrice" },
-						{ text: "TODO: getBalance", link: "/docs/tasks/token/getBalance" },
+						{ text: "TODO: getPrice", link: "/docs/tasks/token/get-price" },
+						{ text: "TODO: getBalance", link: "/docs/tasks/token/get-balance" },
 						{ text: "TODO: swap", link: "/docs/tasks/token/swap" },
 					],
 				},
@@ -75,15 +78,24 @@ export const sidebar = {
 					items: [
 						{
 							text: "TODO: createCampaign",
-							link: "/docs/tasks/campaigns/createCampaign",
+							link: "/docs/tasks/campaigns/create-campaign",
 						},
 						{
 							text: "getCampaigns",
-							link: "/docs/tasks/campaigns/getCampaigns",
+							link: "/docs/tasks/campaigns/get-campaigns",
 						},
 						{
 							text: "getCampaignById",
-							link: "/docs/tasks/campaigns/getCampaignById",
+							link: "/docs/tasks/campaigns/get-campaign-by-id",
+						},
+					],
+				},
+				{
+					text: "DAO",
+					items: [
+						{
+							text: "TODO: getAccountAssets",
+							link: "/docs/tasks/dao/get-account-assets",
 						},
 					],
 				},
@@ -91,7 +103,9 @@ export const sidebar = {
 		},
 		{
 			text: "Glossary",
-			items: [{ text: "Client Options", link: "/docs/glossary/clientOptions" }],
+			items: [
+				{ text: "Client Options", link: "/docs/glossary/client-options" },
+			],
 		},
 		{
 			text: "FAQ",
