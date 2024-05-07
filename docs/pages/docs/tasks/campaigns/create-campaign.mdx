@@ -89,17 +89,17 @@ response: {
 **Properties:**
 
 - **response**: Object
-- **transaction_id**: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+- **transaction_id**: Transaction ID of the transaction
   - **processed**: 
-    - **id**: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
-    - **block_num**: 137520447,
-    - **block_time**: "2024-05-01T03:55:31.500",
+    - **id**: Id of the transaction
+    - **block_num**: Number of the block that the transaction was processed in
+    - **block_time**: Time the block was processed
     - **producer_block_id**: null,
     - **receipt**: [Object ...],
-    - **elapsed**: 4854,
-    - **net_usage**: 176,
-    - **scheduled**: false,
+    - **elapsed**: Time elapsed in milliseconds
+    - **net_usage**: Net usage of the transaction
+    - **scheduled**: If the transaction was scheduled
     - **action_traces**: [ [Object ...] ],
-    - **account_ram_delta**: null,
-    - **except**: null,
-    - **error_code**: null,
+    - **account_ram_delta**: Amount of RAM used
+    - **except**: exception message
+    - **error_code**: Error code if there was an error
