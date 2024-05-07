@@ -13,10 +13,7 @@ export const sidebar = {
 		{
 			text: "Collecting Data",
 			items: [
-				{
-					text: "Introduction",
-					link: "/docs/collecting-data/introduction",
-				},
+				{ text: "Introduction", link: "/docs/collecting-data/introduction" },
 				{
 					text: "Creating a Template",
 					link: "/docs/collecting-data/create-a-template",
@@ -39,15 +36,54 @@ export const sidebar = {
 			text: "SDK API",
 			items: [
 				{
+					text: "vAccount",
+					items: [
+						{ text: "TODO: claim", link: "/docs/tasks/vaccount/claim" },
+						{
+							text: "TODO: createAccount",
+							link: "/docs/tasks/vaccount/createAccount",
+						},
+						{ text: "TODO: deposit", link: "/docs/tasks/vaccount/deposit" },
+						{
+							text: "TODO: getAccounts",
+							link: "/docs/tasks/vaccount/getAccounts",
+						},
+						{ text: "TODO: getAvatar", link: "/docs/tasks/vaccount/getAvatar" },
+						{
+							text: "TODO: getOrCreate",
+							link: "/docs/tasks/vaccount/getOrCreate",
+						},
+						{
+							text: "TODO: getPendingPayments",
+							link: "/docs/tasks/vaccount/getPendingPayments",
+						},
+						{ text: "TODO: payout", link: "/docs/tasks/vaccount/payout" },
+						{ text: "TODO: transfer", link: "/docs/tasks/vaccount/transfer" },
+						{ text: "TODO: withdraw", link: "/docs/tasks/vaccount/withdraw" },
+					],
+				},
+				{
 					text: "Token",
-					items: [{ link: "/docs/token/getPrice", text: "getPrice" }],
+					items: [
+						{ text: "TODO: getPrice", link: "/docs/tasks/token/getPrice" },
+						{ text: "TODO: getBalance", link: "/docs/tasks/token/getBalance" },
+						{ text: "TODO: swap", link: "/docs/tasks/token/swap" },
+					],
 				},
 				{
 					text: "Tasks",
 					items: [
 						{
+							text: "TODO: createCampaign",
+							link: "/docs/tasks/campaigns/createCampaign",
+						},
+						{
 							text: "getCampaigns",
 							link: "/docs/tasks/campaigns/getCampaigns",
+						},
+						{
+							text: "getCampaignById",
+							link: "/docs/tasks/campaigns/getCampaignById",
 						},
 					],
 				},
