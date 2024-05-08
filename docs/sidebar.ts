@@ -68,7 +68,7 @@ export const sidebar = {
 				{
 					text: "Token",
 					items: [
-						{ text: "TODO: getPrice", link: "/docs/tasks/token/get-price" },
+						{ text: "getPrice", link: "/docs/tasks/token/get-price" },
 						{ text: "TODO: getBalance", link: "/docs/tasks/token/get-balance" },
 						{ text: "TODO: swap", link: "/docs/tasks/token/swap" },
 					],
@@ -77,7 +77,7 @@ export const sidebar = {
 					text: "Tasks",
 					items: [
 						{
-							text: "TODO: createCampaign",
+							text: "createCampaign",
 							link: "/docs/tasks/campaigns/create-campaign",
 						},
 						{
@@ -106,6 +106,7 @@ export const sidebar = {
 			items: [
 				{ text: "Client Options", link: "/docs/glossary/client-options" },
 				{ text: "TransactResult", link: "/docs/glossary/transaction-result" },
+				{ text: "Asset", link: "/docs/glossary/asset" },
 			],
 		},
 		{
