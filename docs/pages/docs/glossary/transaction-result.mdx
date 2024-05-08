@@ -1,0 +1,26 @@
+# Transaction Result
+
+## Description
+
+Some functions with the `@effectai/sdk` package will return a `TransactionResult` object. 
+This object contains the transaction hash and the transaction receipt.
+
+The interface for the `TransactionResult` object is as follows:
+
+
+```ts
+interface TransactResult {
+  chain: ChainDefinition
+  request: SigningRequest
+  resolved: ResolvedSigningRequest | undefined
+  response?: { [key: string]: any }
+  revisions: TransactRevisions
+  signatures: Signature[]
+  signer: PermissionLevel
+  transaction: ResolvedTransaction | undefined
+}
+```
+
+Read more about the `TransactionResult` object here:
+
+https://wharfkit.com/docs/session-kit/transact-result

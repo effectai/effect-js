@@ -82,24 +82,8 @@ response: {
 
 ## Returns
 
-**Type:**  [`Promise<Transaction_Result>`](/docs/glossary/types#transaction_result)
+**Type:**  TransactionResult 
 
-**Description:** Transaction result object that contains the transaction id and the processed transaction.
-
-**Properties:**
-
-- **response**: Object
-- **transaction_id**: Transaction ID of the transaction
-  - **processed**: 
-    - **id**: Id of the transaction
-    - **block_num**: Number of the block that the transaction was processed in
-    - **block_time**: Time the block was processed
-    - **producer_block_id**: null,
-    - **receipt**: [Object ...],
-    - **elapsed**: Time elapsed in milliseconds
-    - **net_usage**: Net usage of the transaction
-    - **scheduled**: If the transaction was scheduled
-    - **action_traces**: [ [Object ...] ],
-    - **account_ram_delta**: Amount of RAM used
-    - **except**: exception message
-    - **error_code**: Error code if there was an error
+**Description:** 
+Returns a transaction response object that contains the transaction id block number, and various properties that correlate to the transaction.
+Read more about the transaction response here: [[../glossary/transaction-result.mdx]]

@@ -105,6 +105,7 @@ export const sidebar = {
 			text: "Glossary",
 			items: [
 				{ text: "Client Options", link: "/docs/glossary/client-options" },
+				{ text: "TransactResult", link: "/docs/glossary/transaction-result" },
 			],
 		},
 		{
