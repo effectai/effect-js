@@ -6,6 +6,8 @@ This function is used to swap tokens from EFX to USDT or vice versa.
 Note that the function requires a client object that is used to interact with the blockchain.
 The client object also needs a Session object that is used to sign the transactions.
 
+### WalletPlugin
+
 Note that the `walletPlugin` object is used to sign the transactions.
 The `walletPlugin` object is an instance of the WalletPluginPrivateKey class that is used to sign the transactions using the private key of the user.
 Other wallet plugins can be used to sign transactions and can be found at: https://wharfkit.com/plugins
@@ -39,6 +41,8 @@ console.log(response);
 ```
 
 ## Output
+
+Read more about the transaction response here: [TransactionResponse](/docs/glossary/transaction-result.mdx)
 
 ```
  response: {
@@ -189,5 +193,5 @@ The direction of the swap. It can be either "UsdtToEfx" or "EfxToUsdt".
 
 **Description:** 
 Returns a transaction response object that contains the transaction id block number, and various properties that correlate to the transaction.
-Read more about the transaction response here: [[../glossary/transaction-result.mdx]]
+Read more about the transaction response here: [TransactionResponse](/docs/glossary/transaction-result.mdx)
 

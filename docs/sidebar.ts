@@ -68,9 +68,9 @@ export const sidebar = {
 				{
 					text: "Token",
 					items: [
-						{ text: "getPrice", link: "/docs/tasks/token/get-price" },
-						{ text: "TODO: getBalance", link: "/docs/tasks/token/get-balance" },
-						{ text: "TODO: swap", link: "/docs/tasks/token/swap" },
+						{ text: "getPrice", link: "/docs/token/get-price" },
+						{ text: "getBalance", link: "/docs/token/get-balance" },
+						{ text: "swap", link: "/docs/token/swap" },
 					],
 				},
 				{
