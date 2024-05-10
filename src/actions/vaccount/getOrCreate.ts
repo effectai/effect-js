@@ -1,6 +1,11 @@
 import type { NameType } from "@wharfkit/antelope";
 import type { Session } from "@wharfkit/session";
-import { type Client, createVAccount, getVAccounts } from "../../exports";
+import {
+	type Client,
+	createVAccount,
+	getVAccounts,
+	type Account,
+} from "../../exports";
 
 export const getOrCreateVAccount = async ({
 	client,
@@ -10,7 +15,7 @@ export const getOrCreateVAccount = async ({
 	client: Client;
 	actor: NameType;
 	session?: Session;
-}) => {
+}): Promise<Account> => {
 	try {
 		let [account] = await getVAccounts({ client, actor });
 
