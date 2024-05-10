@@ -6,9 +6,11 @@
 	"module": "./dist/exports/index.js",
 	"browser": "dist/exports/index.js",
 	"types": "./dist/exports/index.d.ts",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
-		"test": "bun --env-file=.env test --preload ./test/global-setup.ts",
+		"test": "bun --env-file=.env test",
 		"test:watch": "bun --env-file=.env test --watch",
 		"test:coverage": "bun --env-file=.env test --coverage",
 		"dev": "tsc -w",
@@ -27,7 +29,12 @@
 		"type": "git",
 		"url": "git+https://github.com/effectai/effect-js.git"
 	},
-	"keywords": ["efx", "AI", "blockchain", "microtasks"],
+	"keywords": [
+		"efx",
+		"AI",
+		"blockchain",
+		"microtasks"
+	],
 	"author": {
 		"name": "Effect-AI",
 		"url": "https://effect.network",
@@ -59,5 +66,7 @@
 		"idb-keyval": "^6.2.1",
 		"node-localstorage": "^3.0.5"
 	},
-	"trustedDependencies": ["@biomejs/biome"]
+	"trustedDependencies": [
+		"@biomejs/biome"
+	]
 }
