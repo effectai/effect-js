@@ -1,5 +1,5 @@
 import { expect, test, describe } from "bun:test";
-import { destructureEnv, testClientSession } from "../../../../test/src/utils";
+import { testClientSession } from "../../../../test/src/utils";
 import { reserveTask } from "./reserveTask";
 
 describe("reserveTask", async () => {
@@ -8,7 +8,6 @@ describe("reserveTask", async () => {
 		const client = await testClientSession();
 
 		const reservation = await reserveTask({ client, campaignId: 1 });
-		console.debug(reservation);
 
 		expect(reservation).toBeDefined();
 	});

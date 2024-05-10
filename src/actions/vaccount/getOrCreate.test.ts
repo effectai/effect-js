@@ -1,6 +1,6 @@
 import { expect, test, describe } from "bun:test";
 import { destructureEnv, testClientSession } from "../../../test/src/utils";
-import { jungle4 as network, type Account } from "../../exports";
+import { type Account } from "../../exports";
 import { getOrCreateVAccount } from "./getOrCreate";
 
 describe("GetOrCreate", async () => {

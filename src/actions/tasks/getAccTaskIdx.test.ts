@@ -1,14 +1,6 @@
 import { expect, test, describe } from "bun:test";
 import { destructureEnv, testClientSession } from "../../../test/src/utils";
-import {
-	createBatch,
-	getAccTaskIdx,
-	getBatchById,
-	getCampaignById,
-	getIpfsResource,
-	getVAccounts,
-	jungle4 as network,
-} from "../../exports";
+import { getAccTaskIdx, getVAccounts } from "../../exports";
 
 describe("getAccountTaskIndex", async () => {
 	test("Should return an array", async () => {

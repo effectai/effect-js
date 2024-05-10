@@ -1,9 +1,4 @@
-import type {
-	AtomicConfig,
-	EfxConfig,
-	IpfsConfig,
-	RelayerConfig,
-} from "../types/network";
+import type { AtomicConfig, IpfsConfig, RelayerConfig } from "../types/network";
 
 export const ipfsConfig: IpfsConfig = {
 	ipfsEndpoint: "https://ipfs.effect.ai",

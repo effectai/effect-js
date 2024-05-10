@@ -1,6 +1,5 @@
 import { expect, test, describe } from "bun:test";
 import { createClient } from "../../client";
-import { destructureEnv, testClientSession } from "../../../test/src/utils";
 import { getAvatar, jungle4 as network } from "../../exports";
 
 describe("getAvatar", async () => {

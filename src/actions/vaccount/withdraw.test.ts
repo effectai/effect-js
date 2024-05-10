@@ -1,6 +1,6 @@
 import { expect, test, describe } from "bun:test";
-import { destructureEnv, testClientSession } from "../../../test/src/utils";
-import { withdraw, jungle4 as network, createClient } from "../../exports";
+import { testClientSession } from "../../../test/src/utils";
+import { withdraw } from "../../exports";
 import type { ExtendedAssetType } from "@wharfkit/antelope";
 
 describe("withdraw", async () => {

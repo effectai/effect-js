@@ -11,7 +11,7 @@ describe("submitTask", async () => {
 		const { actor } = destructureEnv();
 		const [vAccount] = await getVAccounts({ client, actor });
 
-		const reservation = getReservationForCampaign({
+		const reservation = await getReservationForCampaign({
 			client,
 			campaignId: 1,
 			vAccountId: vAccount.id,
@@ -19,7 +19,6 @@ describe("submitTask", async () => {
 
 		const response = await submitTask({ client, reservation, data: {} });
 
-		console.debug(response);
 		expect(response).toBeDefined();
 	});
 });

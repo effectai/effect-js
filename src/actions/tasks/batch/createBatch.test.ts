@@ -1,11 +1,10 @@
 import { expect, test, describe } from "bun:test";
-import { destructureEnv, testClientSession } from "../../../../test/src/utils";
+import { testClientSession } from "../../../../test/src/utils";
 import {
 	createBatch,
 	getBatchById,
 	getCampaignById,
 	getIpfsResource,
-	jungle4 as network,
 } from "../../../exports";
 
 describe("getAvatar", async () => {
@@ -15,13 +14,11 @@ describe("getAvatar", async () => {
 		const preCampaign = await getCampaignById({ client, id: campaignId });
 
 		const batch = await getBatchById({ client, id: preCampaign.active_batch });
-		console.debug("batch", batch);
 
 		const batchData = await getIpfsResource({
 			client,
 			hash: batch.content.field_1,
 		});
-		console.debug("batchData", batchData);
 
 		const taskData: Record<string, string> = {
 			"e20bb19f-ca14-4575-8c14-1916896cb2f3": "Random question here",

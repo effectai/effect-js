@@ -1,12 +1,6 @@
 import { expect, test, describe } from "bun:test";
-import { destructureEnv, testClientSession } from "../../../../test/src/utils";
-import {
-	createBatch,
-	getBatchById,
-	getCampaignById,
-	getIpfsResource,
-	jungle4 as network,
-} from "../../../exports";
+import { testClientSession } from "../../../../test/src/utils";
+import { getBatchById, getCampaignById } from "../../../exports";
 
 describe("getAvatar", async () => {
 	test("Should create a new batch for given campaign", async () => {

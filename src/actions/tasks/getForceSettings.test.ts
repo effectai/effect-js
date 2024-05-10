@@ -15,7 +15,6 @@ describe("getForceSettings", async () => {
 	test("Should match config settings", async () => {
 		const client = await testClientSession();
 		const settings = await getForceSettings({ client });
-		console.debug(settings);
 		expect(settings).toBeDefined();
 		expect(Object.keys(settings)).toEqual(Object.keys(settingsExample));
 	});

@@ -55,8 +55,6 @@ describe("getReservation", async () => {
 			campaignId: 1,
 		});
 
-		console.debug(reservation);
-
 		expect(reservation).toBeDefined();
 		expect(reservation).toBeArray();
 	});
