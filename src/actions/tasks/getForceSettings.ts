@@ -8,12 +8,12 @@ export type GetForceSettingsArgs = {
 
 export const getForceSettings = async ({ client }: GetForceSettingsArgs) => {
 	const { provider, network } = client;
-	const { contracts } = network.config.efx;
+	const { tasks } = network.config.efx.contracts;
 
 	try {
 		const response = (await provider.v1.chain.get_table_rows({
-			code: contracts.tasks,
-			scope: contracts.tasks,
+			code: tasks,
+			scope: tasks,
 			table: "settings",
 		})) as GetTableRowsResponse<unknown, Settings>;
 
