@@ -1,5 +1,5 @@
 import type {
-	Name,
+	NameType,
 	PermissionLevelType,
 	Session,
 	TransactArgs,
@@ -8,12 +8,12 @@ import { TxState, waitForTransaction } from "./utils/transaction";
 import type { Account } from "./@generated/types/efxaccount11";
 
 export class EffectSession {
-  public readonly wharfKitSession: Session;
+	public readonly wharfKitSession: Session;
 
-  public readonly actor: Name;
-  public readonly permission: Name;
-  public readonly permissionLevel: PermissionLevelType;
-  public readonly authorization: { actor: Name; permission: Name }[];
+	public readonly actor: NameType;
+	public readonly permission: NameType;
+	public readonly permissionLevel: PermissionLevelType;
+	public readonly authorization: { actor: NameType; permission: NameType }[];
 
 	private _vAccount: Account | null;
 

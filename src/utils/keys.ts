@@ -2,6 +2,7 @@ import {
 	ABIEncoder,
 	Checksum256,
 	Name,
+	NameType,
 	UInt32,
 	UInt64,
 } from "@wharfkit/antelope";
@@ -21,12 +22,12 @@ export function createCompositeU64Key(lowerId: number, upperId: number) {
 }
 
 export const generateCheckSumForVAccount = (
-	actor: Name,
+	actor: NameType,
 	tokenContract: string,
 ): Checksum256 => {
 	const enc = new ABIEncoder(32);
 	Name.from(tokenContract).toABI(enc);
-	const vaddr = VAddress.from(Name.from(actor.toString()));
+	const vaddr = VAddress.from(actor);
 	enc.writeByte(vaddr.variantIdx);
 	vaddr.value.toABI(enc);
 

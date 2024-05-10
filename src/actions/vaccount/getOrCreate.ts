@@ -1,4 +1,4 @@
-import type { Name } from "@wharfkit/antelope";
+import type { NameType } from "@wharfkit/antelope";
 import type { Session } from "@wharfkit/session";
 import { type Client, createVAccount, getVAccounts } from "../../exports";
 
@@ -8,7 +8,7 @@ export const getOrCreateVAccount = async ({
 	session,
 }: {
 	client: Client;
-	actor: Name;
+	actor: NameType;
 	session?: Session;
 }) => {
 	try {

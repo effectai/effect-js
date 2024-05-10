@@ -1,4 +1,4 @@
-import type { Name, TransactResult, Session } from "@wharfkit/session";
+import type { TransactResult, Session, NameType } from "@wharfkit/session";
 import type { Client } from "../../client";
 import { ExtendedSymbol } from "../../utils/structs";
 import { VAddress } from "../../utils/variants";
@@ -6,7 +6,7 @@ import { VAddress } from "../../utils/variants";
 export type CreateVAccountArgs = {
 	client: Client;
 	session?: Session;
-	account?: Name;
+	account?: NameType;
 };
 
 /**
@@ -44,8 +44,8 @@ export const createVAccount = async ({
 		throw new Error("No session provided");
 	}
 
-	// If no account is provided, use the current session actor
-	const acc: Name = account ?? sessionToUse.actor;
+	// TODO: If no account is provided, use the current session actor. Not implemented yet
+	const acc: NameType = account ?? sessionToUse.actor;
 
 	const { actor } = sessionToUse;
 	const { contracts, token } = client.network.config.efx;

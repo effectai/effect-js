@@ -1,4 +1,4 @@
-import { type AnyAction, ExtendedAsset, type Name } from "@wharfkit/antelope";
+import { type AnyAction, ExtendedAsset, NameType } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { VAccountError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
@@ -9,7 +9,7 @@ import { withdrawAction } from "./withdraw";
 /* claim & withdraw EFX to VAccount */
 export type PayoutArgs = {
 	client: Client;
-	actor: Name;
+	actor: NameType;
 };
 
 export const payout = async ({ client, actor }: PayoutArgs) => {

@@ -1,9 +1,9 @@
-import type { Asset, Name } from "@wharfkit/session";
+import type { Asset, NameType } from "@wharfkit/session";
 import type { Client } from "../../exports";
 
 export type GetBalanceArgs = {
 	client: Client;
-	actor: Name;
+	actor: NameType;
 };
 
 /**

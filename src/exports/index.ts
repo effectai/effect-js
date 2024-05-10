@@ -179,6 +179,6 @@ export type { GetTableRowsResponse } from "./types";
 
 export { Template } from "./template";
 
-export { Session, Name } from "@wharfkit/session";
+export { Session, Name, type NameType } from "@wharfkit/session";
 
 export { version } from "./version";

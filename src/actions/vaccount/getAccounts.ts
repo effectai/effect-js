@@ -1,4 +1,4 @@
-import type { Name, UInt64Type } from "@wharfkit/antelope";
+import { Name, type NameType, type UInt64Type } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { NotFoundError } from "../../errors";
 import { generateCheckSumForVAccount } from "../../utils/keys";
@@ -6,14 +6,9 @@ import type { Account } from "../../@generated/types/efxaccount11";
 
 export type GetVAccountsArgs = {
 	client: Client;
-	actor: Name;
+	actor: NameType;
 };
 
-/**
- * Get all virtual accounts for a given account
- * @param {GetVAccountsArgs} getVAccountargs - Object with sdk client and account name
- * @returns {Promise<VAccount[]>} VAccount[] - Array of Effect Virtual Accounts
- */
 export const getVAccounts = async ({
 	client,
 	actor,
@@ -21,7 +16,7 @@ export const getVAccounts = async ({
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 
-	const keycs = generateCheckSumForVAccount(actor, contracts.token);
+	const keycs = generateCheckSumForVAccount(Name.from(actor), contracts.token);
 
 	const response = await provider.v1.chain.get_table_rows({
 		code: contracts.vaccount,

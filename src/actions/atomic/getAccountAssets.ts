@@ -1,10 +1,10 @@
-import type { Name, UInt32 } from "@wharfkit/antelope";
+import type { NameType, UInt32 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../exports";
 
 export type getAccountAssetsArgs = {
 	client: Client;
-	account: Name;
+	account: NameType;
 };
 
 // TODO: What does this comment mean?

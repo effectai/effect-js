@@ -1,4 +1,4 @@
-import type { AnyAction, ExtendedAsset, Name } from "@wharfkit/antelope";
+import type { AnyAction, ExtendedAsset, NameType } from "@wharfkit/antelope";
 import type { Client } from "../../exports";
 
 export type WithdrawArgs = {
@@ -28,10 +28,10 @@ export const withdraw = async ({ client, quantity }: WithdrawArgs) => {
 
 export type WithdrawActionArgs = {
 	from_id: number;
-	to_account: Name;
+	to_account: NameType;
 	quantity: ExtendedAsset;
 	account: string;
-	authorization: { actor: Name; permission: Name }[];
+	authorization: { actor: NameType; permission: NameType }[];
 	memo: string;
 };
 
