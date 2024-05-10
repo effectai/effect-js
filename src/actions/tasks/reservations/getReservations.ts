@@ -17,10 +17,10 @@ export const getReservations = async ({
 	lowerBound,
 	upperBound,
 	indexPosition = "secondary",
-}: GetReservationsArgs) => {
+}: GetReservationsArgs): Promise<Reservation[]> => {
 	const { tasks } = useEFXContracts(client);
 
-	return (await client.provider.v1.chain.get_table_rows({
+	const response = (await client.provider.v1.chain.get_table_rows({
 		scope: tasks,
 		code: tasks,
 		table: "reservation",
@@ -28,6 +28,9 @@ export const getReservations = async ({
 		upper_bound: upperBound,
 		lower_bound: lowerBound,
 	})) as GetTableRowsResponse<UInt64, Reservation>;
+
+	const { rows } = response;
+	return rows;
 };
 
 export type GetReservationsForCampaignArgs = {
@@ -38,12 +41,11 @@ export type GetReservationsForCampaignArgs = {
 export const getReservationsForCampaign = async ({
 	client,
 	campaignId,
-}: GetReservationsForCampaignArgs) => {
+}: GetReservationsForCampaignArgs): Promise<Reservation[]> => {
 	try {
 		const lowerBound = createCompositeU64Key(campaignId, 0);
 		const upperBound = createCompositeU64Key(campaignId, Number(UInt32.max));
-		const { rows } = await getReservations({ client, lowerBound, upperBound });
-		return rows;
+		return await getReservations({ client, lowerBound, upperBound });
 	} catch (e) {
 		console.error(e);
 		throw e;
@@ -58,18 +60,16 @@ export type GetReservationForVAccountArgs = {
 export const getReservationsForVAccount = async ({
 	client,
 	vAccountId,
-}: GetReservationForVAccountArgs) => {
+}: GetReservationForVAccountArgs): Promise<Reservation[]> => {
 	try {
 		if (!vAccountId) throw new Error("vAccountId is required");
 
-		const data = await getReservations({
+		return await getReservations({
 			client,
 			lowerBound: UInt64.from(vAccountId),
 			upperBound: UInt64.from(vAccountId),
 			indexPosition: "fourth",
 		});
-
-		return data.rows;
 	} catch (e) {
 		console.error(e);
 		throw e;
@@ -82,11 +82,12 @@ export type GetReservationForCampaignArgs = {
 	vAccountId: number;
 };
 
+// TODO: This function name is unclear, we should rename it to: getVAccountReservationForCampaign
 export const getReservationForCampaign = async ({
 	client,
 	campaignId,
 	vAccountId,
-}: GetReservationForCampaignArgs) => {
+}: GetReservationForCampaignArgs): Promise<Reservation> => {
 	try {
 		const bound = createCompositeU64Key(campaignId, vAccountId);
 		const data = await getReservations({
@@ -95,7 +96,8 @@ export const getReservationForCampaign = async ({
 			upperBound: bound,
 		});
 
-		return data.rows[0];
+		const [reservation] = data;
+		return reservation;
 	} catch (e) {
 		console.error(e);
 		throw e;
