@@ -12,7 +12,7 @@ export type GetSubmissionsArgs = {
 export const getSubmissions = async ({
 	client,
 	reverse = false,
-}: GetSubmissionsArgs) => {
+}: GetSubmissionsArgs): Promise<Submission[]> => {
 	try {
 		const { provider } = client;
 		const { tasks } = useEFXContracts(client);
@@ -24,7 +24,9 @@ export const getSubmissions = async ({
 			reverse,
 		})) as GetTableRowsResponse<UInt64Type, Submission>;
 
-		return data;
+		const { rows } = data;
+
+		return rows;
 	} catch (e) {
 		console.error("Error while fetching tasks:", e);
 		throw new Error("Failed to fetch tasks");
