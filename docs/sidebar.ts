@@ -61,7 +61,6 @@ export const sidebar = {
 							link: "/docs/tasks/vaccount/get-pending-payments",
 						},
 						{ text: "TODO: payout", link: "/docs/tasks/vaccount/payout" },
-						{ text: "TODO: transfer", link: "/docs/tasks/vaccount/transfer" },
 						{ text: "TODO: withdraw", link: "/docs/tasks/vaccount/withdraw" },
 					],
 				},
@@ -70,6 +69,7 @@ export const sidebar = {
 					items: [
 						{ text: "getPrice", link: "/docs/token/get-price" },
 						{ text: "getBalance", link: "/docs/token/get-balance" },
+						{ text: "TODO: transfer", link: "/docs/token/transfer" },
 						{ text: "swap", link: "/docs/token/swap" },
 					],
 				},
