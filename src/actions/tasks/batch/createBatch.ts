@@ -107,7 +107,7 @@ export const createBatch = async ({
 		}
 
 		const campaign = await getCampaignById({ client, id: campaignId });
-		const assetQuantity = Asset.from(reward, " EFX");
+		const assetQuantity = Asset.from(reward, "4,EFX");
 		const batchPrice = assetQuantity.value * repetitions;
 
 		// Check if the user has enough funds to pay for the batch
