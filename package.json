@@ -12,6 +12,7 @@
 	"scripts": {
 		"test": "bun --env-file=.env test",
 		"test:watch": "bun --env-file=.env test --watch",
+		"test:only": "bun --env-file=.env test --watch --only",
 		"test:coverage": "bun --env-file=.env test --coverage",
 		"dev": "tsc -w",
 		"build": "tsc --module es2020",
