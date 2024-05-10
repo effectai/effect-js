@@ -88,7 +88,7 @@ export type CreateClientArgs = {
 	options?: ClientOpts;
 } & ({ network: Network } | { session: Session });
 
-export const createClient = ({
+export const createClient = async ({
 	network,
 	session,
 	options = {},
@@ -99,6 +99,7 @@ export const createClient = ({
 		);
 	}
 
+	// TODO: We should also check that network and session.network are the same
 	if (session) {
 		// if session is given here, retrieve the network from session
 
@@ -114,7 +115,7 @@ export const createClient = ({
 		const client = new Client(chain, options);
 
 		// automatically set the session whenever the session is provided
-		client.setSession(session);
+		await client.setSession(session);
 
 		return client;
 	}
