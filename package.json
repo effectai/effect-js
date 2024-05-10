@@ -50,6 +50,7 @@
 	"homepage": "https://github.com/effectai/effect-js#readme",
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
+		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
 		"@changesets/changelog-github": "^0.4.5",
 		"@changesets/cli": "^2.23.2",
 		"@greymass/abi2core": "^2.0.1",
@@ -60,7 +61,6 @@
 	"dependencies": {
 		"@wharfkit/antelope": "^1.0.7",
 		"@wharfkit/session": "^1.2.8",
-		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
 		"ajv": "^8.12.0",
 		"atomicassets": "^1.5.1",
 		"idb-keyval": "^6.2.1",
