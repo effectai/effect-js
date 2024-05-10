@@ -1,8 +1,5 @@
 import type {
-	BytesType,
 	Checksum160,
-	Checksum160Type,
-	UInt64,
 	ExtendedSymbol,
 	Signature,
 } from "@wharfkit/antelope";
