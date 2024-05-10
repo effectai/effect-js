@@ -6,6 +6,7 @@ export type GetAvatarArgs = {
 	account: string;
 };
 
+// TODO: This does not seem to be working as expected
 export const getAvatar = async ({ client, account }: GetAvatarArgs) => {
 	const { dao } = useEFXContracts(client);
 	const { provider } = client;
