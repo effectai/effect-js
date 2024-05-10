@@ -6,7 +6,7 @@ import { campaign as exampleCampaign } from "../../../../test/src/constants";
 
 describe("getCampaignById", async () => {
 	test("getCampaignById() should throw an error when accessing unretrievable id", async () => {
-		const client = createClient({ network: jungle4 });
+		const client = await createClient({ network: jungle4 });
 		const id = 11111;
 		expect(async () => {
 			await getCampaignById({ client, id });
@@ -14,7 +14,7 @@ describe("getCampaignById", async () => {
 	});
 
 	test("getCampaignById() should retrieve campaign on testnet", async () => {
-		const client = createClient({ network: jungle4 });
+		const client = await createClient({ network: jungle4 });
 		const id = 1;
 		const campaign = await getCampaignById({ client, id });
 		expect(campaign).toBeDefined();

@@ -6,7 +6,7 @@ import { jungle4 } from "../../../exports";
 
 describe("getAllCampaigns", async () => {
 	test("getAllCampaigns() should retrieve all campaign", async () => {
-		const client = createClient({ network: jungle4 });
+		const client = await createClient({ network: jungle4 });
 		const campaigns = await getAllCampaigns({ client });
 		expect(campaigns).toBeDefined();
 		expect(campaigns).toBeArray();

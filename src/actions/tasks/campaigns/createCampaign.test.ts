@@ -22,19 +22,19 @@ const myNewCampaign: CreateCampaignArgs["campaign"] = {
 };
 
 describe("createCampaign", async () => {
-  test("createCampaign() should throw an error", async () => {
-    const client = createClient({ network: jungle4 });
-    expect(async () => {
-      await createCampaign({
-        client,
-        campaign: myNewCampaign,
-      });
-    }).toThrowError();
-  });
+	test("createCampaign() should throw an error", async () => {
+		const client = await createClient({ network: jungle4 });
+		expect(async () => {
+			await createCampaign({
+				client,
+				campaign: myNewCampaign,
+			});
+		}).toThrowError();
+	});
 
-  test.skip("createCampaign() should create a new campaign", async () => {
-    const client = await testClientSession({ network: jungle4 });
-    const result = await createCampaign({ client, campaign: myNewCampaign });
-    expect(result).toBeDefined();
-  });
+	test.skip("createCampaign() should create a new campaign", async () => {
+		const client = await testClientSession();
+		const result = await createCampaign({ client, campaign: myNewCampaign });
+		expect(result).toBeDefined();
+	});
 });

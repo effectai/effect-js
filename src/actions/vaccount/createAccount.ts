@@ -9,30 +9,6 @@ export type CreateVAccountArgs = {
 	account?: NameType;
 };
 
-/**
- * Creates a virtual Effect account
- * Client must be initialized
- * Session is optional if the client has a session already
- * Account is optional, can be initialized with:
- *
- * ```ts
- * import { Name } from "@wharfkit/session";
- * const account: Name = Name.from("accountname");
- * ```
- * The account name must be a valid EOS account name.
- * If no account is provided, the current session actor will be used.
- *
- * @param {CreateVAccountArgs} { client, session, account } - Provide the client, session, and account name.
- * @returns {TransactResult = The result of the the transaction.}
- *
- * @example
- * ```ts
- * import { createVAccount } from "@effectai/effect-js";
- * import { Name } from "@wharfkit/session";
- * const account: Name = Name.from("accountname");
- * const result = await createVAccount({ client, account });
- * ```
- */
 export const createVAccount = async ({
 	client,
 	session,

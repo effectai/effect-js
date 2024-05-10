@@ -1,4 +1,4 @@
-import type { AnyAction, Name } from "@wharfkit/antelope";
+import type { AnyAction, NameType } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { VAccountError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
@@ -43,7 +43,7 @@ export const claim = async ({ client }: ClaimArgs) => {
 export type ClaimActionsArgs = {
 	payments: Payment[];
 	tasks: string;
-	authorization: { actor: Name; permission: Name }[];
+	authorization: { actor: NameType; permission: NameType }[];
 };
 
 export const claimActions = ({

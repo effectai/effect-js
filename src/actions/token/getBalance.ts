@@ -6,19 +6,6 @@ export type GetBalanceArgs = {
 	actor: NameType;
 };
 
-/**
- * Get the balance of a user
- * @param {{ client: Client, actor: Name}} Effect SDK client and the actor to get the balance for.
- * @returns {Promise<Asset>} The balance of the user
- * @throws {Error} if no balance is found
- *
- * @example
- * const client = createClient({ network: eos });
- * const actor = Name.from("cryptonode42");
- * const balance = await getBalance({ client, actor });
- * console.log(balance.toString());
- * // => "100.0000 EFX"
- */
 export const getBalance = async ({
 	client,
 	actor,

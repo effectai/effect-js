@@ -1,8 +1,8 @@
 import {
 	type AnyAction,
 	Asset,
-	type Name,
 	type PermissionLevelType,
+	type NameType,
 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { DefiBoxPairEnum } from "./getDefiBoxPair";
@@ -16,7 +16,7 @@ export const swapDirection = {
 
 export const buildSwapAction = (
 	direction: string,
-	actor: Name,
+	actor: NameType,
 	authorization: PermissionLevelType[],
 	amount: number,
 	tokenContract: string,

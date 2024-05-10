@@ -2,7 +2,6 @@ import {
   PrivateKey,
   type PrivateKeyType,
   Session,
-  PermissionLevel,
 } from "@wharfkit/session";
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
 import { jungle4, } from "../../src/exports";
@@ -41,7 +40,7 @@ export const destructureEnv = () => {
   };
 };
 
-export const testClientSession = async ({ network }: { network: Network }): Promise<Client> => {
+export const testClientSession = async (): Promise<Client> => {
   // Retrieve parameters for session.
   const { network: chain, permission, actor, privateKey } = destructureEnv();
 
@@ -49,19 +48,13 @@ export const testClientSession = async ({ network }: { network: Network }): Prom
     throw new Error("Private key not found");
   }
 
-  // Create client
-  const client = createClient({ network });
-
   // Setup wallet plugin with private key
   const walletPlugin = new WalletPluginPrivateKey(privateKey);
 
-  /** Create new permission level from representing types. Can be expressed as a string in the format `<actor>@<permission>`. */
-  const permissionLevel = PermissionLevel.from(`${actor}@${permission}`);
-  // Set up session with wallet and chain
-  const session = new Session({ actor, permission, walletPlugin, chain, permissionLevel });
+  const session = new Session({ actor, permission, walletPlugin, chain  });
 
-  // Connect session to client
-  await client.setSession(session);
+  // Create client
+  const client = await createClient({ session });
 
   return client;
 };
