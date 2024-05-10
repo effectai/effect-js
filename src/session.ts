@@ -30,19 +30,19 @@ export class EffectSession {
 		this._vAccount = vAccount;
 	}
 
-  public transact = async (args: TransactArgs): Promise<TransactResult> => {
-    // Start the transaction
-    const transaction = await this.wharfKitSession.transact({
-      ...args,
-    });
+	public transact = async (args: TransactArgs) => {
+		// Start the transaction
+		const transaction = await this.wharfKitSession.transact({
+			...args,
+		});
 
-    //wait for TX to be IN BLOCK
-    await waitForTransaction(
-      transaction.response?.transaction_id,
-      this.wharfKitSession.client.v1.chain,
-      TxState.IN_BLOCK,
-    );
+		//wait for TX to be IN BLOCK
+		await waitForTransaction(
+			transaction.response?.transaction_id,
+			this.wharfKitSession.client.v1.chain,
+			TxState.IN_BLOCK,
+		);
 
-    return transaction;
-  };
+		return transaction;
+	};
 }
