@@ -1,7 +1,11 @@
 import type { Client } from "../../client";
 import { useEFXContracts } from "../../utils/state";
 
-export const getRepetitions = async (client: Client) => {
+export type GetRepetitionsArgs = {
+	client: Client;
+};
+
+export const getRepetitions = async ({ client }: GetRepetitionsArgs) => {
 	try {
 		const { tasks } = useEFXContracts(client);
 		const { provider } = client;
