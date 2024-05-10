@@ -11,7 +11,7 @@ export {
 
 export { getSchema, type getSchemaArgs } from "./../actions/atomic/getSchema";
 
-export { getAvatar, type GetAvatarArgs } from "./../actions/dao/getAvatar";
+export { type GetAvatarArgs } from "./../actions/dao/getAvatar";
 export {
 	getDaoSettings,
 	type GetDaoSettingsArgs,
@@ -108,6 +108,8 @@ export {
 export { getPrice } from "./../actions/token/getPrice";
 export { getBalance, type GetBalanceArgs } from "./../actions/token/getBalance";
 export { swap, swapDirection } from "./../actions/token/swap";
+
+export { getAvatar } from "./../actions/vaccount/getAvatar";
 
 export {
 	getVAccounts,
