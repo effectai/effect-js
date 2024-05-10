@@ -1,19 +1,38 @@
-
 # VTransfer
 
 ## Description
 
 Transfer EFX tokens from one vAccount to another.
+Effect accounts are created so that users can interact with the Effect Network platform.
+These accounts can be loaded with EFX tokens and used to pay for services on the platform.
+This action allows users to transfer EFX tokens from one Effect account to another Effect account.
 
 ## Usage
 
-```ts [example.ts]
-import { getCampaigns } from '@effectai/effect-js'
+```ts 
+import { 
+  getCampaigns, 
+  createClient, 
+  jungle4 as network
+  vTransfer
+} from '@effectai/sdk'
 
-const campaigns = await getCampaigns({ // [!code focus]
-    client,
-    limit: 10,
-    page: 1
+const client = createClient({ network })
+const accountName = Name.from(actor);
+
+const vAccount = await getOrCreateVAccount({ client, actor: accountName });
+const preBalanceVAccount = Number(vAccount.balance.quantity);
+
+const vAccountReceiver = await getOrCreateVAccount({
+	client,
+	actor: receiver,
+});
+const preBalanceReceiver = Number(vAccountReceiver.balance.quantity);
+
+const result = await vTransfer({
+	client,
+	to_id: vAccountReceiver.id,
+	quantity,
 });
 ```
 

@@ -1,5 +1,5 @@
-import { createClient } from "@effectai/effect-js";
+import { createClient, eos } from "@effectai/sdk";
 
 export const client = createClient({
-	chain: mainnet,
+	chain: eos,
 });
