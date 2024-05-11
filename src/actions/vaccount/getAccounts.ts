@@ -39,7 +39,7 @@ export type GetAccountByIdArgs = {
 export const getAccountById = async ({
 	client,
 	accountId,
-}: GetAccountByIdArgs) => {
+}: GetAccountByIdArgs): Promise<Account> => {
 	const { provider, network } = client;
 	const { contracts } = network.config.efx;
 
