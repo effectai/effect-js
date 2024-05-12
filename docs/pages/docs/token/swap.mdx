@@ -14,30 +14,8 @@ Other wallet plugins can be used to sign transactions and can be found at: https
 
 ## Usage
 
-```ts
-import { createClient, Session, swap, eos as chain } from '@effectai/sdk';
-import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
-
-const walletPlugin = new WalletPluginPrivateKey("your_private_key");
-const actor = "forcedev1234";
-const permission = "active";
-
-// Create a session
-const session = new Session({ actor, permission, walletPlugin, chain });
-
-// Create client and connect session
-const client = createClient({ session });
-
-// Define the swap arguments
-const swapArgs: SwapArgs = {
-  client, 
-  amount: 4,
-  direction: "UsdtToEfx", // or "EfxToUsdt"
-};
-
-// Call the swap function
-const response = await swap(swapArgs);
-console.log(response);
+```ts twoslash
+// [!include ~/snippets/token/swap.ts]
 ```
 
 ## Output
