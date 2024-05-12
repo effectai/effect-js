@@ -8,33 +8,9 @@ you need to add tasks to the campaign. You can do this by following the [Adding 
 
 ## Usage
 
-```ts
-import { 
-  createCampaign, 
-  CreateCampaignArgs, 
-  createClient 
-} from '@effectai/sdk'
-
-const myNewCampaign: CreateCampaignArgs["campaign"] = {
-  version: 1.0,
-  maxTaskTime: 100,
-  reward: 3.5,
-  title: "Labelstudio OCR (LAION)",
-  description: "You are contributing to a dataset for conversational style chatbots.",
-  instructions: "Some instructions here",
-  template: "<h1>Template here</h1>",
-  input_schema: null,
-  output_schema: null,
-  image: "",
-  category: "",
-  example_task: "",
-  estimated_time: 10,
-};
-
-const client = await createClient({ network: jungle4 });
-const result = await createCampaign({ client, campaign: myNewCampaign });
+```ts twoslash
+// [!include ~/snippets/tasks/create-campaign.ts]
 ```
-
 ## Output
 
 ```json
