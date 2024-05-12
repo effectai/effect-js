@@ -68,6 +68,7 @@ export type SwapArgs = {
 	direction: "EfxToUsdt" | "UsdtToEfx";
 };
 
+// TODO: Add throw error if balance too low
 export const swap = async ({ client, amount, direction }: SwapArgs) => {
 	try {
 		if (!client.session) {
