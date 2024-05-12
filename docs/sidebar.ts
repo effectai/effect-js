@@ -38,30 +38,30 @@ export const sidebar = {
 				{
 					text: "vAccount",
 					items: [
-						{ text: "TODO: claim", link: "/docs/tasks/vaccount/claim" },
+						{ text: "claim", link: "/docs/vaccount/claim" },
 						{
 							text: "TODO: createAccount",
-							link: "/docs/tasks/vaccount/createAccount",
+							link: "/docs/vaccount/createAccount",
 						},
-						{ text: "TODO: deposit", link: "/docs/tasks/vaccount/deposit" },
+						{ text: "TODO: deposit", link: "/docs/vaccount/deposit" },
 						{
 							text: "TODO: getAccounts",
-							link: "/docs/tasks/vaccount/getAccounts",
+							link: "/docs/vaccount/getAccounts",
 						},
 						{
 							text: "TODO: getAvatar",
-							link: "/docs/tasks/vaccount/get-avatar",
+							link: "/docs/vaccount/get-avatar",
 						},
 						{
 							text: "TODO: getOrCreate",
-							link: "/docs/tasks/vaccount/get-or-create",
+							link: "/docs/vaccount/get-or-create",
 						},
 						{
 							text: "TODO: getPendingPayments",
-							link: "/docs/tasks/vaccount/get-pending-payments",
+							link: "/docs/vaccount/get-pending-payments",
 						},
-						{ text: "TODO: payout", link: "/docs/tasks/vaccount/payout" },
-						{ text: "TODO: withdraw", link: "/docs/tasks/vaccount/withdraw" },
+						{ text: "TODO: payout", link: "/docs/vaccount/payout" },
+						{ text: "TODO: withdraw", link: "/docs/vaccount/withdraw" },
 					],
 				},
 				{
@@ -69,7 +69,7 @@ export const sidebar = {
 					items: [
 						{ text: "getPrice", link: "/docs/token/get-price" },
 						{ text: "getBalance", link: "/docs/token/get-balance" },
-						{ text: "TODO: transfer", link: "/docs/token/transfer" },
+						{ text: "transfer", link: "/docs/token/transfer" },
 						{ text: "swap", link: "/docs/token/swap" },
 					],
 				},
