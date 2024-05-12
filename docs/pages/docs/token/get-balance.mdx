@@ -10,13 +10,8 @@ Note the use of `balance.toString()` to convert the balance to a string.
 
 ## Usage
 
-```ts
-import { createClient, Name, getBalance, jungle4 } from '@effectai/sdk';
-
-const client = createClient({ network: jungle4 });
-const actor = Name.from("forcedev1234");
-const balance = await getBalance({ client, actor });
-console.log(balance.toString());
+```ts twoslash
+// [!include ~/snippets/token/get-balance.ts]
 ```
 
 ## Output
