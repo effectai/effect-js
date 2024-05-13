@@ -1,5 +1,5 @@
 import { defineConfig } from "vocs";
-import pkg from "../package.json";
+import pkg from "../src/package.json";
 import { sidebar } from "./sidebar";
 
 export default defineConfig({

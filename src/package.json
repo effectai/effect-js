@@ -1,0 +1,25 @@
+{
+	"name": "@effectai/sdk",
+	"version": "2.0.0",
+	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
+	"main": "./dist/exports/index.js",
+	"module": "./dist/exports/index.js",
+	"browser": "dist/exports/index.js",
+	"types": "./dist/exports/index.d.ts",
+	"files": ["dist"],
+	"type": "module",
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"dependencies": {
+		"@wharfkit/antelope": "^1.0.7",
+		"@wharfkit/session": "^1.2.8",
+		"ajv": "^8.12.0",
+		"atomicassets": "^1.5.1",
+		"idb-keyval": "^6.2.1",
+		"node-localstorage": "^3.0.5"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	}
+}

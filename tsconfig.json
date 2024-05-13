@@ -15,7 +15,7 @@
 		"strict": true,
 		"target": "ES2021",
 		"outDir": "dist",
-		"skipLibCheck": true
+		"skipLibCheck": true,
 	},
 	"exclude": ["node_modules/**/*", "**/*.test.ts"],
 	"include": ["src/**/*", "abis/**/*", "test/testHelper.ts"]

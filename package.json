@@ -1,26 +1,19 @@
 {
-	"name": "@effectai/sdk",
-	"version": "2.0.0",
-	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
-	"main": "./dist/exports/index.js",
-	"module": "./dist/exports/index.js",
-	"browser": "dist/exports/index.js",
-	"types": "./dist/exports/index.d.ts",
-	"files": ["dist"],
+	"workspaces": ["docs", "src"],
 	"scripts": {
 		"test": "bun --env-file=.env test",
 		"test:watch": "bun --env-file=.env test --watch",
 		"test:only": "bun --env-file=.env test --watch --only",
 		"test:coverage": "bun --env-file=.env test --coverage",
 		"dev": "tsc -w",
-		"build": "tsc --module es2020",
+		"build": "tsc --project src/tsconfig.build.json --module es2020",
 		"lint": "biome lint --apply .",
 		"format": "biome format --write .",
 		"check": "biome check --apply .",
 		"changeset": "changeset",
 		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
 		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
-		"docs:dev": "bun link && cd docs && bun run dev",
+		"docs:dev": "cd docs && bun run dev",
 		"docs:build": "cd docs && bun run build",
 		"docs:preview": "cd docs && bun run preview"
 	},
@@ -51,14 +44,6 @@
 		"@size-limit/preset-big-lib": "^11.1.2",
 		"@types/bun": "^1.1.1",
 		"typescript": "5.4.2"
-	},
-	"dependencies": {
-		"@wharfkit/antelope": "^1.0.7",
-		"@wharfkit/session": "^1.2.8",
-		"ajv": "^8.12.0",
-		"atomicassets": "^1.5.1",
-		"idb-keyval": "^6.2.1",
-		"node-localstorage": "^3.0.5"
 	},
 	"trustedDependencies": ["@biomejs/biome"]
 }
