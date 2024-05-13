@@ -6,6 +6,7 @@ import {
 	Session,
 	createVAccount,
 	type CreateVAccountArgs,
+	getVAccounts,
 } from "@effectai/sdk";
 
 const actor = "actor-name";
@@ -21,16 +22,9 @@ const session = new Session({
 
 // Create client and connect session
 const client = await createClient({ session });
+const account = "account-name";
+const tx_result = await createVAccount({ client, account });
+console.log(tx_result);
 
-const [vacc] = await getVAccounts({ client, actor });
-
-// Check pending payments
-const pendingPayments = await getPendingPayments({
-	client,
-	vAccountId: vacc.id,
-});
-
-// If there are claimable payments, claim them.
-if (pendingPayments.totalEfxClaimable > 0) {
-	await claim({ client });
-}
+// Retrieve the created vaccount
+const [vacc] = await getVAccounts({ client, actor: account });

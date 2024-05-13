@@ -40,8 +40,8 @@ export const sidebar = {
 					items: [
 						{ text: "claim", link: "/docs/vaccount/claim" },
 						{
-							text: "TODO: createAccount",
-							link: "/docs/vaccount/createAccount",
+							text: "createAccount",
+							link: "/docs/vaccount/create-account",
 						},
 						{ text: "deposit", link: "/docs/vaccount/deposit" },
 						{
