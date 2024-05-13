@@ -2,7 +2,7 @@ import {
 	ABIEncoder,
 	Checksum256,
 	Name,
-	NameType,
+	type NameType,
 	UInt32,
 	UInt64,
 } from "@wharfkit/antelope";

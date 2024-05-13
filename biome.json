@@ -5,17 +5,10 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"ignore": [
-			"dist",
-			"test"
-		]
+		"ignore": ["dist", "test"]
 	},
 	"linter": {
-		"ignore": [
-			"dist",
-			"test",
-			"scripts"
-		],
+		"ignore": ["dist", "test", "scripts"],
 		"enabled": true,
 		"rules": {
 			"recommended": true
