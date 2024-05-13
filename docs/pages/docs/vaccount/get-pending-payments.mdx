@@ -1,0 +1,54 @@
+# getPendinPayments
+
+## Description
+
+Every time a user completes a task, EFX tokens are unlocked from the task, and put into escrow for the Vaccount. This function returns the pending payments for a given Vaccount.
+Thus the Vaccount can claim the pending payments, and pay then out to the user when the unlock period has passed.
+
+
+## Usage
+
+```ts twoslash
+// [!include ~/snippets/vaccount/get-pending-payments.ts]
+```
+
+## Output
+
+```json
+{
+  pendingPayments: [],
+  claimablePayments: [],
+  totalEfxPending: 0,
+  totalEfxClaimable: 0,
+}
+```
+
+## Parameters
+
+### Client
+- **Description:** The client object, **must** be connected with a Session.
+
+### vAccountId
+- **Description:** The id of the vAccount.
+
+## Returns
+
+**Type:**  An object containing the following fields: 
+
+- **pendingPayments**
+  - **Type:** Array of objects
+  - **Description:** An array of objects containing the pending payments for the Vaccount.
+
+- **claimablePayments**
+  - **Type:** Array of objects
+  - **Description:** An array of objects containing the claimable payments for the Vaccount.
+
+- **totalEfxPending**
+  - **Type:** Number
+  - **Description:** The total amount of EFX pending for the Vaccount.
+
+- **totalEfxClaimable**
+  - **Type:** Number
+  - **Description:** The total amount of EFX claimable for the Vaccount.
+
+
