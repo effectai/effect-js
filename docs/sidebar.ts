@@ -61,7 +61,7 @@ export const sidebar = {
 							link: "/docs/vaccount/get-pending-payments",
 						},
 						{ text: "payout", link: "/docs/vaccount/payout" },
-						{ text: "TODO: withdraw", link: "/docs/vaccount/withdraw" },
+						{ text: "withdraw", link: "/docs/vaccount/withdraw" },
 					],
 				},
 				{
