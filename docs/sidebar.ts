@@ -48,16 +48,12 @@ export const sidebar = {
 							text: "getVAccounts",
 							link: "/docs/vaccount/get-accounts",
 						},
+						// {
+						// 	text: "TODO: getAvatar",
+						// 	link: "/docs/vaccount/get-avatar",
+						// },
 						{
-							text: "TODO: getAvatar",
-							link: "/docs/vaccount/get-avatar",
-						},
-						{
-							text: "TODO: getOrCreate",
-							link: "/docs/vaccount/get-or-create",
-						},
-						{
-							text: "TODO: getPendingPayments",
+							// text: "getPendingPayments",
 							link: "/docs/vaccount/get-pending-payments",
 						},
 						{ text: "payout", link: "/docs/vaccount/payout" },
@@ -90,15 +86,15 @@ export const sidebar = {
 						},
 					],
 				},
-				{
-					text: "DAO",
-					items: [
-						{
-							text: "TODO: getAccountAssets",
-							link: "/docs/tasks/dao/get-account-assets",
-						},
-					],
-				},
+				// {
+				// 	text: "DAO",
+				// 	items: [
+				// 		{
+				// 			text: "TODO: getAccountAssets",
+				// 			link: "/docs/tasks/dao/get-account-assets",
+				// 		},
+				// 	],
+				// },
 			],
 		},
 		{
