@@ -17,24 +17,7 @@
 		"docs:build": "cd docs && bun run build",
 		"docs:preview": "cd docs && bun run preview"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/effectai/effect-js.git"
-	},
-	"keywords": ["efx", "AI", "blockchain", "microtasks"],
-	"author": {
-		"name": "Effect-AI",
-		"url": "https://effect.network",
-		"email": "hello@effect.ai"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/effectai/effect-js/issues"
-	},
-	"homepage": "https://github.com/effectai/effect-js#readme",
+	
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
 		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
