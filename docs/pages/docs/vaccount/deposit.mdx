@@ -1,0 +1,59 @@
+# deposit
+
+## Description
+
+User are able to deposit funds into their vAccount or claim the funds from escrow and have them deposited in to their vAccount.
+Depositing funds into the vAccount is nessesary to be able to pay for creating campaigns, batches and tasks. 
+
+## Usage
+
+```ts twoslash
+
+// [!include ~/snippets/vaccount/deposit.ts]
+```
+
+## Output
+
+```json
+response: {
+  transaction_id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+  processed: {
+    id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+    block_num: 137520447,
+    block_time: "2024-05-01T03:55:31.500",
+    producer_block_id: null,
+    receipt: [Object ...],
+    elapsed: 4854,
+    net_usage: 176,
+    scheduled: false,
+    action_traces: [
+      [Object ...]
+    ],
+    account_ram_delta: null,
+    except: null,
+    error_code: null,
+  },
+}
+```
+
+## Parameters
+
+### Client
+- **Description:** The client object, **must** be connected with a Session.
+
+### vAccountId
+- **Description:** The vAccount id, where the funds should be deposited.
+
+
+### amount
+- **Description:** The amount of funds to be deposited.
+
+## Returns
+
+**Type:**  TransactionResult 
+
+**Description:** 
+Returns a transaction response object that contains the transaction id block number, and various properties that correlate to the transaction.
+Read more about the transaction response here: [TransactionResponse](/docs/glossary/transaction-result.mdx)
+
+
