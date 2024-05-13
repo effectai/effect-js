@@ -10,30 +10,7 @@ This action allows users to transfer EFX tokens from one Effect account to anoth
 ## Usage
 
 ```ts 
-import { 
-  getCampaigns, 
-  createClient, 
-  jungle4 as network
-  vTransfer
-} from '@effectai/sdk'
-
-const client = createClient({ network })
-const accountName = Name.from(actor);
-
-const vAccount = await getOrCreateVAccount({ client, actor: accountName });
-const preBalanceVAccount = Number(vAccount.balance.quantity);
-
-const vAccountReceiver = await getOrCreateVAccount({
-	client,
-	actor: receiver,
-});
-const preBalanceReceiver = Number(vAccountReceiver.balance.quantity);
-
-const result = await vTransfer({
-	client,
-	to_id: vAccountReceiver.id,
-	quantity,
-});
+// [!include ~/snippets/token/transfer.ts]
 ```
 
 ## Returns
