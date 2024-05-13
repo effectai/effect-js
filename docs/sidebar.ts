@@ -45,8 +45,8 @@ export const sidebar = {
 						},
 						{ text: "deposit", link: "/docs/vaccount/deposit" },
 						{
-							text: "TODO: getAccounts",
-							link: "/docs/vaccount/getAccounts",
+							text: "getVAccounts",
+							link: "/docs/vaccount/get-accounts",
 						},
 						{
 							text: "TODO: getAvatar",

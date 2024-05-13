@@ -1,0 +1,57 @@
+
+# getVaccounts
+
+## Description
+
+Next to having an EOS account, users will also need to create an Effect Network Virtual account, also known as a VAccount.
+This virtual account is used to store the user's funds and is used to pay for services on the Effect Network.
+The vAccount system is controled by the smart contract found at: [https://www.bloks.io/account/vaccount.efx](https://www.bloks.io/account/vaccount.efx)
+
+This function will return the vAccounts associated with the actor name provided.
+
+
+## Usage
+
+```ts twoslash
+
+// [!include ~/snippets/vaccount/get-accounts.ts]
+```
+
+## Output
+
+```json
+{
+  id: 24,
+  nonce: 19,
+  address: [ "name", "forcedev1234" ],
+  balance: {
+    quantity: "2.0981 EFX",
+    contract: "efxtoken1112",
+  },
+}
+```
+
+## Parameters
+
+### Client
+- **Description:** The client object, **must** be connected with a Session.
+
+### Actor
+- **Description:** The actor name, from which the PendinPayments should be claimed and paid out. 
+
+## Returns
+
+**Type:**  Vaccount 
+
+**Description:** 
+An object representing a Vaccount, containing the following fields:
+- **id**: The id of the vAccount.
+- **nonce**: The nonce of the vAccount.
+- **address**: The address of the vAccount.
+- **balance**: The balance of the vAccount, containing the following fields:
+  - **quantity**: The amount of EFX tokens in the vAccount.
+  - **contract**: The contract of the EFX tokens in the vAccount.
+
+
+
+
