@@ -1,13 +1,15 @@
-import type {
-	AnyAction,
-	ExtendedAssetType,
-	NameType,
+import {
+	Asset,
+	ExtendedAsset,
+	type AnyAction,
+	type ExtendedAssetType,
+	type NameType,
 } from "@wharfkit/antelope";
 import type { Client } from "../../exports";
 
 export type WithdrawArgs = {
 	client: Client;
-	quantity: ExtendedAssetType;
+	quantity: number;
 };
 
 export const withdraw = async ({ client, quantity }: WithdrawArgs) => {
@@ -17,11 +19,15 @@ export const withdraw = async ({ client, quantity }: WithdrawArgs) => {
 
 	const { transact, actor, authorization } = client.session;
 	const { contracts } = client.network.config.efx;
+	const quantityAsset = ExtendedAsset.from({
+		quantity: Asset.from(quantity, "EFX"),
+		contract: contracts.token,
+	});
 
 	const action = withdrawAction({
 		from_id: client.session.vAccount.id,
 		to_account: actor,
-		quantity,
+		quantity: quantityAsset,
 		account: contracts.vaccount,
 		authorization,
 		memo: "",
