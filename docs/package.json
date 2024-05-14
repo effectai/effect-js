@@ -1,11 +1,14 @@
 {
-	"name": "site",
+	"name": "@effectai/sdkdocs",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "vocs dev",
+		"dev": "bun install && vocs dev",
 		"build": "vocs build --searchIndex false && vocs search-index",
 		"preview": "vocs preview"
+	},
+	"dependencies": {
+		"@effectai/sdk": "link:@effectai/sdk"
 	},
 	"devDependencies": {
 		"react": "^18.2.0",
