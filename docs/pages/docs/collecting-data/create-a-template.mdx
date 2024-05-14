@@ -6,8 +6,12 @@ A template is a blueprint for the tasks in a campaign. It defines the structure 
 Templates are created by the data requester (you) and can be reused across multiple campaigns.
 
 A typical template will be a HTML file that contains the structure of the tasks. The template can contain placeholders for the input data, output data, and other dynamic content.
+In this case, we aim to determine whether an image depicts a Chihuahua or a muffin. 
+Our template should include the following:
 
-For this guide, we will create a simple template for an image labeling campaign. The template contains a title, an image, and a question for the workers to answer. The image is loaded from IPFS using the `ipfs` placeholder.
+- Load an Image: Implement functionality to load images within the campaign interface. Users should be able to view and analyze each image provided.
+
+- HTML Form: Integrate an HTML form into the campaign template. This form will allow annotators to make their selection regarding whether the displayed image is a Chihuahua or a muffin. The form should be user-friendly and intuitive, guiding annotators through the decision-making process.
 
 ```html
 <html>
@@ -18,24 +22,20 @@ For this guide, we will create a simple template for an image labeling campaign.
     <form>
         <div class="classify-image">
             <h1 class="title">Classify The Image</h1>
-
               <!-- The image loaded from IPFS  -->
-            <img src='https://gateway.pinata.cloud/ipfs/${ipfs}'/>
+            <img src='https://gateway.pinata.cloud/ipfs/${ipfs_url}'/>
         </div>
         <div class="question question-sentiment">
               <!-- Our question to ask the workers-->
-            <h2 class="subtitle">How much does this resemble the original one?</h2>
+            <h2 class="subtitle">Is this an image of a Chihuahua or a Muffin?</h2>
 
               <!-- Input options for the workers-->
             <div class="field">
-                <input class="is-checkradio" id="full" value="full" type="radio" name="resemblance" required>
-                <label for="full">Completly</label>
-                <input class="is-checkradio" id="half" value="half" type="radio" name="resemblance">
-                <label for="half">Half</label>
-                <input class="is-checkradio" id="none" value="none" type="radio" name="resemblance">
-                <label for="none">Nothing At All</label>
+                <input class="is-checkradio" id="chihuahua" value="chihuahua" type="radio" name="resemblance" required>
+                <label for="full">Chihuahua</label>
+                <input class="is-checkradio" id="muffin" value="muffin" type="radio" name="resemblance">
+                <label for="half">Muffin</label>
             </div>
-
         </div>
 
         <!-- Submit button so workers can submit their data -->
@@ -49,6 +49,9 @@ setTimeout(() => console.log(window.FORCE_PLACEHOLDERS), 1000)
 
 </html>
 ```
+
+In the above template, we are making use of a placeholder `${ipfs_url}` 
+This value will be filled with our images when we create the tasks.
 
 You can find examples for different types of templates on our [github](https://github.com/effectai/effect-force-templates)
 We highly recommended to follow the [template guide](/docs/templates/introduction) when you are creating your own template.

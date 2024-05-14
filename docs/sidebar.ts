@@ -7,7 +7,6 @@ export const sidebar = {
 			items: [
 				{ text: "Why Effect AI", link: "/docs/introduction" },
 				{ text: "Getting Started", link: "/docs/getting-started" },
-				{ text: "Local Development", link: "/docs/local-development" },
 			],
 		},
 		{

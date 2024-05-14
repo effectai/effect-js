@@ -24,59 +24,47 @@ pnpm i @effectai/sdk
 
 ### 1. Import and Instantiate the EffectAI Client
 
-Here the handy dandy `createClient` function is used to create a client instance.
-It can three arguments, the first one is the network configuration,
-the second one is the a session object, and the third one is the options object.
+:::code-group
 
-In this quick start guide we will be focusing on the first two, 
-how to get started with a non authenticated client using the network configuration and 
-an authenticated client using the session object.
+```ts twoslash [EOS Testnet]
+import {
+	createClient,
+	jungle4
+} from "@effectai/sdk";
 
-You can read more about the options object in the [ClientOptions](#client-options) section.
+// Create client
+const client = await createClient({ network: jungle4 });
+```
 
-Here is an example of how to create a client with a network configuration.
+```ts twoslash [EOS Mainnet]
+import {
+	createClient,
+	eos
+} from "@effectai/sdk";
 
-```ts twoslash
-// [!include ~/snippets/getting-started/getting-started-init.ts]
+const client = await createClient({ network: eos });
+```
+:::
+
+
+### 2. Use the client
+```ts twoslash 
+import {
+	createClient,
+	eos
+} from "@effectai/sdk";
+const client = await createClient({ network: eos });
+// ---cut---
+import {
+	getCampaigns
+} from "@effectai/sdk";
+
+const campaigns = await getCampaigns({ client });
 ```
 
 
-### 2. Interact with the Client
+## What's next ? 
 
-The sdk is built using a stateless model, meaning that all the functions are pure 
-and (almost) does not mutate the client object.
-In practice this means that you wiil need to create a client object, 
-and pass it as an argument to the functions you want to use.
-
-Here is an example of how to retrieve an Effect account by using its ID.
-
-```ts twoslash
-// [!include ~/snippets/getting-started/getting-started-nonauth.ts]
-```
-
-### 3. Set up wallet and session
-
-If you want to make transactions, such as creating a new account, creating a new tasks, 
-or transfering tokens, you need to set up a wallet and a session.
-The wallet plugin is an interface that allows you to sign transactions and interact with the blockchain.
-
-Currently the SDK does not come with any wallet plugins, 
-and you will need to use one provided by [wharfkit.com](https://wharfkit.com/).
-A list of plugins can be found at [wharfkit.com/plugins](https://wharfkit.com/plugins?sort=popular)
-
-In this example we will use the [`@wharfkit/wallet-plugin-privatekey`](https://wharfkit.com/plugins/wallet-plugin-privatekey) plugin, which requres a private key to be passed in.
-
-Afterwards we can set up the Session object, which allows us to specify other parameters like 
-the actor, permission, and the blockchain netork.
-
-Last but not least we connect the session to the client, and the client will be ready to use.
-
-```ts twoslash
-// [!include ~/snippets/getting-started/getting-started-auth.ts]
-```
-
-## Conclusion 
-
-Now that we have a basic understaning of how to set up the client, we can move on to more advanced topics.
+Now that we have a basic understanding of how to set up the client, we can move on to more advanced topics, like creating our first data collection campaign.
 Read more on the following pages.
 
