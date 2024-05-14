@@ -1,9 +1,6 @@
 {
 	"name": "@effectai/sdk",
-	"workspaces": [
-		"docs",
-		"src"
-	],
+	"workspaces": ["docs", "src"],
 	"scripts": {
 		"test": "bun --env-file=.env test",
 		"test:watch": "bun --env-file=.env test --watch",
@@ -31,7 +28,5 @@
 		"@types/bun": "^1.1.1",
 		"typescript": "5.4.2"
 	},
-	"trustedDependencies": [
-		"@biomejs/biome"
-	]
+	"trustedDependencies": ["@biomejs/biome"]
 }
