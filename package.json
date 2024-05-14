@@ -17,7 +17,7 @@
 		"docs:build": "cd docs && bun run build",
 		"docs:preview": "cd docs && bun run preview"
 	},
-	
+
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
 		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",

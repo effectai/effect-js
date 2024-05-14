@@ -1,9 +1,5 @@
 import { WalletPluginPrivateKey } from "@wharfkit/wallet-plugin-privatekey";
-import {
-	Session,
-	jungle4 as chain,
-	createClient,
-} from "@effectai/sdk";
+import { Session, jungle4 as chain, createClient } from "@effectai/sdk";
 
 const session = new Session({
 	actor: "your-account",

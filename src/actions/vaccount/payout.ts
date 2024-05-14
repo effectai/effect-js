@@ -1,4 +1,8 @@
-import { type AnyAction, ExtendedAsset, type NameType } from "@wharfkit/antelope";
+import {
+	type AnyAction,
+	ExtendedAsset,
+	type NameType,
+} from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { VAccountError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
