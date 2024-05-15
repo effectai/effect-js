@@ -46,7 +46,7 @@ export class Client {
 
 		this.provider = new APIClient({ provider: this.fetchProvider });
 
-		if (this.options.cacheImplementation) {
+		if (this.options.cacheImplementatiuseon) {
 			this.cache = createCacheManager(this.options.cacheImplementation);
 		} else if (typeof indexedDB !== "undefined") {
 			this.cache = createCacheManager(new IDBCache());
@@ -88,7 +88,7 @@ export type CreateClientArgs = {
 	options?: ClientOpts;
 } & ({ network: Network } | { session: Session });
 
-export const createClient = async ({
+export const createClient = ({
 	network,
 	session,
 	options = {},
@@ -115,7 +115,7 @@ export const createClient = async ({
 		const client = new Client(chain, options);
 
 		// automatically set the session whenever the session is provided
-		await client.setSession(session);
+		client.setSession(session);
 
 		return client;
 	}
