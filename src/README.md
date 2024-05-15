@@ -1,4 +1,4 @@
-# 🔥 @effectai/effect-js
+# 🔥 @effectai/sdk
 
 <p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
 
