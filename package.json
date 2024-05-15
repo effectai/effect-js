@@ -16,7 +16,9 @@
 		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
 		"docs:dev": "cd docs && bun run dev",
 		"docs:build": "cd docs && bun run build",
-		"docs:preview": "cd docs && bun run preview"
+		"docs:preview": "cd docs && bun run preview",
+		"link": "cd src && bun link"
+
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
