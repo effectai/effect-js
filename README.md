@@ -5,7 +5,7 @@
 Effect-js is a free and open-source library powered by blockchain technology that enables developers to collect and enrich their data-sets in a transparent way. 
 
 ## 🗒️ Documentation
-For full documentation, visit ... 
+For full documentation, visit https://docs.effect.ai
 
 ## 🙋 Contributing
 If you want to add contributions to this repository, please follow the instructions in [contributing.md](CONTRIBUTING.md).

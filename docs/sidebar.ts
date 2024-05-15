@@ -35,6 +35,32 @@ export const sidebar = {
 			text: "SDK API",
 			items: [
 				{
+					text: "Tasks",
+					items: [
+						{
+							text: "createCampaign",
+							link: "/docs/tasks/campaigns/create-campaign",
+						},
+						{
+							text: "getCampaigns",
+							link: "/docs/tasks/campaigns/get-campaigns",
+						},
+						{
+							text: "getCampaignById",
+							link: "/docs/tasks/campaigns/get-campaign-by-id",
+						},
+					],
+				},
+				{
+					text: "Token",
+					items: [
+						{ text: "getPrice", link: "/docs/token/get-price" },
+						{ text: "getBalance", link: "/docs/token/get-balance" },
+						{ text: "transfer", link: "/docs/token/transfer" },
+						{ text: "swap", link: "/docs/token/swap" },
+					],
+				},
+				{
 					text: "vAccount",
 					items: [
 						{ text: "claim", link: "/docs/vaccount/claim" },
@@ -57,32 +83,6 @@ export const sidebar = {
 						},
 						{ text: "payout", link: "/docs/vaccount/payout" },
 						{ text: "withdraw", link: "/docs/vaccount/withdraw" },
-					],
-				},
-				{
-					text: "Token",
-					items: [
-						{ text: "getPrice", link: "/docs/token/get-price" },
-						{ text: "getBalance", link: "/docs/token/get-balance" },
-						{ text: "transfer", link: "/docs/token/transfer" },
-						{ text: "swap", link: "/docs/token/swap" },
-					],
-				},
-				{
-					text: "Tasks",
-					items: [
-						{
-							text: "createCampaign",
-							link: "/docs/tasks/campaigns/create-campaign",
-						},
-						{
-							text: "getCampaigns",
-							link: "/docs/tasks/campaigns/get-campaigns",
-						},
-						{
-							text: "getCampaignById",
-							link: "/docs/tasks/campaigns/get-campaign-by-id",
-						},
 					],
 				},
 				// {
