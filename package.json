@@ -1,35 +1,35 @@
 {
-  "name": "@effectai/sdk",
-  "workspaces": ["docs", "src"],
-  "scripts": {
-    "test": "bun --env-file=.env test",
-    "test:watch": "bun --env-file=.env test --watch",
-    "test:only": "bun --env-file=.env test --watch --only",
-    "test:coverage": "bun --env-file=.env test --coverage",
-    "dev": "tsc -w",
-    "build": "tsc --project src/tsconfig.build.json --module es2020",
-    "lint": "biome lint --apply .",
-    "format": "biome format --write .",
-    "check": "biome check --apply .",
-    "changeset": "changeset",
-    "changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
-    "changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
-    "docs:dev": "cd docs && bun run dev",
-    "docs:build": "cd docs && bun run build",
-    "docs:preview": "cd docs && bun run preview"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.7.0",
-    "@wharfkit/wallet-plugin-privatekey": "^1.0.0",
-    "@changesets/changelog-github": "^0.4.5",
-    "@changesets/cli": "^2.23.2",
-    "@greymass/abi2core": "^2.0.1",
-    "@size-limit/preset-big-lib": "^11.1.2",
-    "@types/bun": "^1.1.1",
-    "typescript": "5.4.2"
-  },
-  "trustedDependencies": ["@biomejs/biome"],
-  "dependencies": {
-    "gh-pages": "^6.1.1"
-  }
+	"name": "@effectai/sdk",
+	"workspaces": ["docs", "src"],
+	"scripts": {
+		"test": "bun --env-file=.env test",
+		"test:watch": "bun --env-file=.env test --watch",
+		"test:only": "bun --env-file=.env test --watch --only",
+		"test:coverage": "bun --env-file=.env test --coverage",
+		"dev": "tsc -w",
+		"build": "tsc --project src/tsconfig.build.json --module es2020",
+		"lint": "biome lint --apply .",
+		"format": "biome format --write .",
+		"check": "biome check --apply .",
+		"changeset": "changeset",
+		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
+		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
+		"docs:dev": "cd docs && bun run dev",
+		"docs:build": "cd docs && bun run build",
+		"docs:preview": "cd docs && bun run preview"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.7.0",
+		"@wharfkit/wallet-plugin-privatekey": "^1.0.0",
+		"@changesets/changelog-github": "^0.4.5",
+		"@changesets/cli": "^2.23.2",
+		"@greymass/abi2core": "^2.0.1",
+		"@size-limit/preset-big-lib": "^11.1.2",
+		"@types/bun": "^1.1.1",
+		"typescript": "5.4.2"
+	},
+	"trustedDependencies": ["@biomejs/biome"],
+	"dependencies": {
+		"gh-pages": "^6.1.1"
+	}
 }
