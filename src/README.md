@@ -1,8 +1,8 @@
-# 🔥 @effectai/sdk
+# 🔥 The @effectai/sdk Monorepo
 
 <p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
 
-Effect-js is a free and open-source library powered by blockchain technology that enables developers to collect and enrich their data-sets in a transparent way. 
+The @effectai/sdk is a free and open source library for training next-gen transparent AI models. Integrate the SDK into your app and tap into a global, decentralized workforce powered by blockchain technology.
 
 ## 🗒️ Documentation
 For full documentation, visit https://docs.effect.ai
