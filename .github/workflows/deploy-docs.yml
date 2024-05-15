@@ -1,0 +1,24 @@
+name: Deploy on gh-pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - run: bun install --frozen-lockfile
+      - run: bun run docs:build
+
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

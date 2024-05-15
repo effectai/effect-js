@@ -32,7 +32,6 @@ import {
 	jungle4
 } from "@effectai/sdk";
 
-// Create client
 const client = await createClient({ network: jungle4 });
 ```
 
@@ -44,10 +43,10 @@ import {
 
 const client = await createClient({ network: eos });
 ```
+
 :::
 
-
-### 2. Use the client
+### 2. Using the client
 ```ts twoslash 
 import {
 	createClient,
@@ -61,6 +60,10 @@ import {
 
 const campaigns = await getCampaigns({ client });
 ```
+
+### 3. Authentication
+
+Depending on your use case, you might need some sort of authentication with the EOS blockchain. Authentication is done through passing a [Wharfkit Session](https://wharfkit.com/kits/session). Read our guide on how to Authentication depending on your environment.
 
 
 ## What's next ? 
