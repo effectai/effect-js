@@ -46,7 +46,7 @@ export class Client {
 
 		this.provider = new APIClient({ provider: this.fetchProvider });
 
-		if (this.options.cacheImplementatiuseon) {
+		if (this.options.cacheImplementation) {
 			this.cache = createCacheManager(this.options.cacheImplementation);
 		} else if (typeof indexedDB !== "undefined") {
 			this.cache = createCacheManager(new IDBCache());
