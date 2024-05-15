@@ -2,10 +2,11 @@
 
 ## Description
 
-This function is used to get the balance of EFX of an Effect Network account on the EOS blockchain.
-There is a difference between the balance of EFX of an account on the blockchain and the balance of EFX deposited in an Effect Account.
-This function returns the balance of EFX on the blockchain.
-Note the use of `balance.toString()` to convert the balance to a string.
+This function is used to return the blance of EFX, USDT, and EOS of an account on the EOS blockchain.
+Namely the balance is what is available in the wallet of the user.
+
+There is a difference between the balance of EFX of an account that is available in the wallet of the user and the balance of EFX that is available in an Effect Network Virtual Account.
+To retrieve the EFX balance of a user in their Virtual Account, use the [getVaccount](/docs/vaccount/get-accounts.mdx)
 
 
 ## Usage
@@ -17,7 +18,9 @@ Note the use of `balance.toString()` to convert the balance to a string.
 ## Output
 
 ```
-"100.0000 EFX"
+378332.1630 EFX
+26.7212 USDT
+31.3322 EOS
 ```
 ## Parameters
 
@@ -34,11 +37,11 @@ Note that the account name is a Name object that is created using the `Name.from
 
 ## Returns
 
-**Type:**  Asset
+**Type:**  `{ efxBalance: Asset; usdtBalance: Asset; eosBalance: Asset; }`
 
 **Description:** 
-Returns the balance of the account in the form of an Asset object.
+Return an object with three properties: `efxBalance`, `usdtBalance`, and `eosBalance`, each of which is an Asset object.
 The asset object has properties that represent the amount and symbol of the balance of the user.
 Note that the Asset object has a `toString` method that can be used to convert the balance to a string.
 
-You can read more about the: [`Asset` object](/docs/glossary/asset)
+You can read more about the: [`Asset` here](/docs/glossary/asset).
