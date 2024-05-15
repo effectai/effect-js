@@ -32,6 +32,14 @@ export const sidebar = {
 			items: [{ text: "introduction", link: "/docs/templates/introduction" }],
 		},
 		{
+			text: "Basics",
+			items: [
+				{ text: "Accounts", link: "/docs/basics/accounts" },
+				{ text: "Contracts", link: "/docs/basics/contracts" },
+				{ text: "vAccounts", link: "/docs/basics/vaccounts" },
+			],
+		},
+		{
 			text: "SDK API",
 			items: [
 				{
