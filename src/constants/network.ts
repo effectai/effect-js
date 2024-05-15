@@ -14,6 +14,8 @@ export const jungle4: Network = {
 			contracts: {
 				tasks: "effecttasks2",
 				token: "efxtoken1112",
+				usdt: "tethertether",
+				eostoken: "eosio.token",
 				stake: "efxstake1111",
 				feepool: "efxfeepool11",
 				proposals: "efxproposals",
@@ -39,6 +41,8 @@ export const eos: Network = {
 			contracts: {
 				tasks: "force.efx",
 				token: "effecttokens",
+				usdt: "tethertether",
+				eostoken: "eosio.token",
 				stake: "efxstakepool",
 				feepool: "feepool.efx",
 				proposals: "daoproposals",

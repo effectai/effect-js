@@ -9,18 +9,36 @@ export type GetBalanceArgs = {
 export const getBalance = async ({
 	client,
 	actor,
-}: GetBalanceArgs): Promise<Asset> => {
+}: GetBalanceArgs): Promise<{
+	efxBalance: Asset;
+	usdtBalance: Asset;
+	eosBalance: Asset;
+}> => {
 	const { network, provider } = client;
 	const { contracts } = network.config.efx;
 
-	const [balance] = await provider.v1.chain.get_currency_balance(
+	const [efxBalance] = await provider.v1.chain.get_currency_balance(
 		contracts.token,
 		actor,
 	);
 
-	if (!balance) {
-		throw new Error("No balance found");
+	const [usdtBalance] = await provider.v1.chain.get_currency_balance(
+		contracts.usdt,
+		actor,
+	);
+
+	const [eosBalance] = await provider.v1.chain.get_currency_balance(
+		contracts.eostoken,
+		actor,
+	);
+
+	if (!efxBalance && !usdtBalance && eosBalance) {
+		throw new Error("No efxBalance found");
 	}
 
-	return balance;
+	return {
+		efxBalance,
+		usdtBalance,
+		eosBalance,
+	};
 };
