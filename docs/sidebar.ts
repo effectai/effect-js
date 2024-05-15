@@ -41,6 +41,7 @@ export const sidebar = {
 		},
 		{
 			text: "SDK API",
+			collapsed: true,
 			items: [
 				{
 					text: "Tasks",
