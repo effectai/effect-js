@@ -1,0 +1,17 @@
+{
+	"name": "@effectai/sdkdocs",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun install && vocs dev",
+		"build": "vocs build --searchIndex false && vocs search-index",
+		"preview": "vocs preview"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"vocs": "^1.0.0-alpha.46",
+		"@types/bun": "latest"
+	}
+}

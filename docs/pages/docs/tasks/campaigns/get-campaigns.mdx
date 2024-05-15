@@ -1,0 +1,82 @@
+# getCampaigns
+
+## Description
+
+This function retrieves campaigns from a specified client with optional parameters for pagination, sorting, and IPFS fetching.
+
+## Usage
+
+```ts twoslash
+// [!include ~/snippets/tasks/get-campaigns.ts]
+```
+## Output
+
+```json
+{
+ rows: [
+   {
+     id: 0,
+     reservations_done: 2,
+     total_submissions: 2,
+     total_tasks: 6,
+     active_batch: 0,
+     num_batches: 2,
+     owner: [ "name", "efxefxefxefx" ],
+     paused: 0,
+     content: [Object ...],
+     max_task_time: 3600,
+     reward: [Object ...],
+     qualis: [],
+     info: [Object ...],
+   }, { */ ... /* }, { */ ... /* }
+ ],
+ next_key: UInt128 { */ ... /*  },
+ more: true,
+}
+```
+
+
+## Parameters
+
+### client
+- **Type:** `SomeClient`
+- **Description:** The client used to retrieve campaigns.
+
+### page
+- **Type:** `number`
+- **Description:** The page number of the campaigns to retrieve. Default is 1.
+
+### limit
+- **Type:** `number`
+- **Description:** The maximum number of campaigns to retrieve per page. Default is 20.
+
+### reverse
+- **Type:** `boolean`
+- **Description:** Whether to reverse the order of the retrieved campaigns. Default is false.
+
+### ipfsFetch
+- **Type:** `boolean`
+- **Description:** Whether to fetch additional information from IPFS for each campaign. Default is true.
+
+
+## Returns
+
+- **Type:**  [`Promise<GetTableRowsResponse<UInt128, Campaign>>`](/docs/glossary/types#campaign)
+- **Description:** A list of campaigns.
+- **Properties:**
+  - **rows:** An array of campaigns with the following structure:
+    - **id:** Campaign ID.
+    - **reservations_done:** Number of reservations done for the campaign.
+    - **total_submissions:** Total number of submissions for the campaign.
+    - **total_tasks:** Total number of tasks in the campaign.
+    - **active_batch:** Active batch number.
+    - **num_batches:** Total number of batches.
+    - **owner:** Owner of the campaign.
+    - **paused:** Indicator if the campaign is paused.
+    - **content:** Campaign content.
+    - **max_task_time:** Maximum task time in seconds.
+    - **reward:** Reward information.
+    - **qualis:** Qualification information.
+    - **info:** Additional information retrieved from IPFS if enabled.
+  - **next_key:** A string that can be used to fetch the next page of campaigns.
+  - **more:** A boolean indicating if there are more campaigns to fetch.

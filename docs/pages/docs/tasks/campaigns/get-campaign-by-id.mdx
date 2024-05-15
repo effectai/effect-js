@@ -1,0 +1,83 @@
+
+# getCampaignById
+
+## Description
+
+This function retrieves a campaign from a specified client with the given ID.
+
+## Usage
+
+
+```ts twoslash
+// [!include ~/snippets/tasks/get-campaign-by-id.ts]
+
+```
+
+## Output
+
+```json
+{
+  id: 1,
+  reservations_done: 1,
+  total_submissions: 2,
+  total_tasks: 1,
+  active_batch: 1,
+  num_batches: 1,
+  owner: [ "name", "efxefxefxefx" ],
+  paused: 0,
+  content: {
+    field_0: 0,
+    field_1: "QmVKwq3bYM6cPW6kstpiq4WYckWRtdfJnzAmms2iMyGqQg",
+  },
+  max_task_time: 3600,
+  reward: {
+    quantity: "0.0100 EFX",
+    contract: "efxtoken1112",
+  },
+  qualis: [],
+  info: {
+    version: 1.1,
+    title: "Labelstudio OCR (LAION)",
+    description: "You are contributing to a dataset for conversational style chatbots.",
+    instructions: "Instructions here...",
+    template: "<h2>Template here...</h2>",
+    input_schema: null,
+    output_schema: null,
+    image: null,
+    category: null,
+    example_task: null,
+    estimated_time: null,
+  },
+}
+```
+## Parameters
+
+### client
+- **Type:** `SomeClient`
+- **Description:** The client used to retrieve campaigns.
+
+### id
+- **Type:** `number`
+- **Description:** The campaign id number of the campaign to retrieve.
+
+## Returns
+
+**Type:**  [`Promise<Campaign>`](/docs/glossary/types#campaign)
+
+**Description:** A list of campaigns.
+
+**Properties:**
+
+- **id:** Campaign ID.
+- **reservations_done:** Number of reservations done for the campaign.
+- **total_submissions:** Total number of submissions for the campaign.
+- **total_tasks:** Total number of tasks in the campaign.
+- **active_batch:** Active batch number.
+- **num_batches:** Total number of batches.
+- **owner:** Owner of the campaign.
+- **paused:** Indicator if the campaign is paused.
+- **content:** Campaign content.
+- **max_task_time:** Maximum task time in seconds.
+- **reward:** Reward information.
+- **qualis:** Qualification information.
+- **info:** Additional information retrieved from IPFS.

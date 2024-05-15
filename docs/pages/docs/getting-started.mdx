@@ -1,0 +1,73 @@
+# Getting Started [Get started with the SDK in just a few lines of code.]
+
+## Installation
+
+Use your favorite package manager to install the SDK.
+The sdk is available on [npm](https://www.npmjs.com/package/@effectai/sdk)
+
+:::code-group
+
+```bash [npm]
+npm i @effectai/sdk
+```
+
+```bash [bun]
+bun i @effectai/sdk
+```
+
+```bash [pnpm]
+pnpm i @effectai/sdk
+```
+:::
+
+## Quick Start
+
+### 1. Import and Instantiate the EffectAI Client
+
+:::code-group
+
+```ts twoslash [EOS Testnet]
+import {
+	createClient,
+	jungle4
+} from "@effectai/sdk";
+
+const client = await createClient({ network: jungle4 });
+```
+
+```ts twoslash [EOS Mainnet]
+import {
+	createClient,
+	eos
+} from "@effectai/sdk";
+
+const client = await createClient({ network: eos });
+```
+
+:::
+
+### 2. Using the client
+```ts twoslash 
+import {
+	createClient,
+	eos
+} from "@effectai/sdk";
+const client = await createClient({ network: eos });
+// ---cut---
+import {
+	getCampaigns
+} from "@effectai/sdk";
+
+const campaigns = await getCampaigns({ client });
+```
+
+### 3. Authentication
+
+Depending on your use case, you might need some sort of authentication with the EOS blockchain. Authentication is done through passing a [Wharfkit Session](https://wharfkit.com/kits/session). Read our guide on how to Authentication depending on your environment.
+
+
+## What's next ? 
+
+Now that we have a basic understanding of how to set up the client, we can move on to more advanced topics, like creating our first data collection campaign.
+Read more on the following pages.
+

@@ -1,0 +1,56 @@
+# withdraw
+
+## Description
+
+User are able to deposit funds into their vAccount or claim the funds from escrow and have them deposited in to their vAccount.
+These funds can be withdrawn to the user's wallet by calling the withdraw action.
+
+
+## Usage
+
+```ts twoslash
+
+// [!include ~/snippets/vaccount/withdraw.ts]
+```
+
+## Output
+
+```json
+response: {
+  transaction_id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+  processed: {
+    id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+    block_num: 137520447,
+    block_time: "2024-05-01T03:55:31.500",
+    producer_block_id: null,
+    receipt: [Object ...],
+    elapsed: 4854,
+    net_usage: 176,
+    scheduled: false,
+    action_traces: [
+      [Object ...]
+    ],
+    account_ram_delta: null,
+    except: null,
+    error_code: null,
+  },
+}
+```
+
+## Parameters
+
+### Client
+- **Description:** The client object, **must** be connected with a Session.
+
+### Actor
+- **Description:** The actor name, from which the PendinPayments should be claimed and paid out. 
+
+## Returns
+
+**Type:**  TransactionResult 
+
+**Description:** 
+Returns a transaction response object that contains the transaction id block number, and various properties that correlate to the transaction.
+Read more about the transaction response here: [TransactionResponse](/docs/glossary/transaction-result.mdx)
+
+

@@ -1,0 +1,44 @@
+# getBalance
+
+## Description
+
+This function is used to get the balance of EFX of an Effect Network account on the EOS blockchain.
+There is a difference between the balance of EFX of an account on the blockchain and the balance of EFX deposited in an Effect Account.
+This function returns the balance of EFX on the blockchain.
+Note the use of `balance.toString()` to convert the balance to a string.
+
+
+## Usage
+
+```ts twoslash
+// [!include ~/snippets/token/get-balance.ts]
+```
+
+## Output
+
+```
+"100.0000 EFX"
+```
+## Parameters
+
+### Client
+- **Type:** `Client`
+- **Description:** Client object that is used to interact with the blockchain.
+
+### Actor
+
+- **Type:** `Name`
+- **Description:** 
+The account name of the user for which the balance is to be fetched. 
+Note that the account name is a Name object that is created using the `Name.from` method.
+
+## Returns
+
+**Type:**  Asset
+
+**Description:** 
+Returns the balance of the account in the form of an Asset object.
+The asset object has properties that represent the amount and symbol of the balance of the user.
+Note that the Asset object has a `toString` method that can be used to convert the balance to a string.
+
+You can read more about the: [`Asset` object](/docs/glossary/asset)

@@ -1,0 +1,65 @@
+# createCampaign
+
+## Description
+
+This function creates a campaign from a specified client with the given campaign parameters.
+You can view the campaign on the [Effect Network](https://app.effect.network/campaigns) before you start collecting data, 
+you need to add tasks to the campaign. You can do this by following the [Adding Tasks](/docs/collecting-data/adding-tasks) guide.
+
+## Usage
+
+```ts twoslash
+// [!include ~/snippets/tasks/create-campaign.ts]
+```
+## Output
+
+```json
+response: {
+  transaction_id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+  processed: {
+    id: "9d321af28b7354c5cbee6ee956ea3e6590228b48539a9f0cafc6a8ca5ffe0ca2",
+    block_num: 137520447,
+    block_time: "2024-05-01T03:55:31.500",
+    producer_block_id: null,
+    receipt: [Object ...],
+    elapsed: 4854,
+    net_usage: 176,
+    scheduled: false,
+    action_traces: [
+      [Object ...]
+    ],
+    account_ram_delta: null,
+    except: null,
+    error_code: null,
+  },
+}
+```
+## Parameters
+
+
+### client
+- **Type:** `SomeClient`
+- **Description:** The client used to retrieve campaigns.
+
+### CreateCampaignArgs["campaign"]
+- **version**: Version number of the campaign
+- **maxTaskTime**: Time maximum time in seconds for the task
+- **reward**: Reward for each task in EFX
+- **title**: Title of the campaign
+- **description**: Description of the campaign
+- **instructions**: Instructions for the campaign
+- **template**: Template for the campaign, which is a string of HTML
+- **input_schema**: JSON schema for each input task
+- **output_schema**: JSON schema for each output task
+- **image**: Image URL for the campaign
+- **category**: Category of the campaign
+- **example_task**: An example_task for the campaign, this should be data that will be input into the campaign
+- **estimated_time**: Estimated time in seconds for the task
+
+## Returns
+
+**Type:**  TransactionResult 
+
+**Description:** 
+Returns a transaction response object that contains the transaction id block number, and various properties that correlate to the transaction.
+Read more about the transaction response here: [TransactionResponse](/docs/glossary/transaction-result.mdx)
