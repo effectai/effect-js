@@ -3,7 +3,7 @@ import { Bytes } from "@wharfkit/antelope";
 
 export type UploadIpfsResourceArgs = {
 	client: Client;
-	data: Record<string, unknown>;
+	data: Record<string, unknown> | Record<string, unknown>[];
 };
 
 export const uploadIpfsResource = async ({

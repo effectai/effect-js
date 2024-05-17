@@ -1,30 +1,44 @@
 ## Adding tasks
 
-Adding tasks to a campaign is done through <u>batches</u> batches are a collection of tasks that are added to a campaign. Each batch can contain multiple tasks.
+Adding tasks to a campaign is done through adding <u>batches</u>.
+
+Batches are a collection of tasks that are added to a campaign. Each batch can contain multiple tasks.
 Let's start by creating a batch with 3 tasks to our newly created image classification campaign.
 
-```ts [example.ts]
-import { createBatch } from '@effectai/sdk'
-
+```ts twoslash
+// [!include ~/snippets/getting-started/getting-started-auth.ts]
+if(!client.session) {
+  throw new Error('No session found')
+}
 const { actor } = client.session
+
+if(!actor) {
+  throw new Error('No actor found')
+}
+//---cut---
+import { createBatch } from '@effectai/sdk'
 
 const batch = await createBatch({
   client,
-  batch: {
-      campaign_id: '<..>', // the id of the campaign
-      repetitions: 1 // number of times each task should be repeated
-      payer: actor // the actor that will pay the workers for the tasks
-  }
-  data: [
+  // The campaign id to which the batch should be added
+  campaignId : 1,
+  // The number of times each task in the batch should be repeated
+  repetitions: 1,
+  // The reward for each task in the batch
+  reward: 3,
+  // The template placeholders for each task in the batch
+  taskData : [
     {
-      image: 'https://example.com/image.jpg', //task 1 image placeholder
+      ipfs_url: 'https://example.com/image.jpg', //task 1 image placeholder
     },
     {
-      image: 'https://example.com/image2.jpg', //task 2 image placeholder
+      ipfs_url: 'https://example.com/image2.jpg', //task 2 image placeholder
     },
     {
-      image: 'https://example.com/image3.jpg', // task 3 image placeholder
+      ipfs_url: 'https://example.com/image3.jpg', // task 3 image placeholder
     }
-  ]
+  ],
 })
+
 ```
+

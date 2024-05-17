@@ -2,4 +2,5 @@
 "@effectai/sdk": patch
 ---
 
-add symlinks for license and README
+- add symlinks for license and README
+- fix createBatch types
