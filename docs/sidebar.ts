@@ -7,6 +7,7 @@ export const sidebar = {
 			items: [
 				{ text: "Why Effect AI", link: "/docs/introduction" },
 				{ text: "Getting Started", link: "/docs/getting-started" },
+				{ text: "Authentication", link: "/docs/authentication" },
 			],
 		},
 		{
@@ -25,6 +26,10 @@ export const sidebar = {
 					text: "Adding Tasks to a Campaign",
 					link: "/docs/collecting-data/adding-tasks",
 				},
+				{
+					text: "Collecting results",
+					link: "/docs/collecting-data/collecting-results",
+				},
 			],
 		},
 		{
@@ -34,6 +39,32 @@ export const sidebar = {
 		{
 			text: "SDK API",
 			items: [
+				{
+					text: "Tasks",
+					items: [
+						{
+							text: "createCampaign",
+							link: "/docs/tasks/campaigns/create-campaign",
+						},
+						{
+							text: "getCampaigns",
+							link: "/docs/tasks/campaigns/get-campaigns",
+						},
+						{
+							text: "getCampaignById",
+							link: "/docs/tasks/campaigns/get-campaign-by-id",
+						},
+					],
+				},
+				{
+					text: "Token",
+					items: [
+						{ text: "getPrice", link: "/docs/token/get-price" },
+						{ text: "getBalance", link: "/docs/token/get-balance" },
+						{ text: "transfer", link: "/docs/token/transfer" },
+						{ text: "swap", link: "/docs/token/swap" },
+					],
+				},
 				{
 					text: "vAccount",
 					items: [
@@ -57,32 +88,6 @@ export const sidebar = {
 						},
 						{ text: "payout", link: "/docs/vaccount/payout" },
 						{ text: "withdraw", link: "/docs/vaccount/withdraw" },
-					],
-				},
-				{
-					text: "Token",
-					items: [
-						{ text: "getPrice", link: "/docs/token/get-price" },
-						{ text: "getBalance", link: "/docs/token/get-balance" },
-						{ text: "transfer", link: "/docs/token/transfer" },
-						{ text: "swap", link: "/docs/token/swap" },
-					],
-				},
-				{
-					text: "Tasks",
-					items: [
-						{
-							text: "createCampaign",
-							link: "/docs/tasks/campaigns/create-campaign",
-						},
-						{
-							text: "getCampaigns",
-							link: "/docs/tasks/campaigns/get-campaigns",
-						},
-						{
-							text: "getCampaignById",
-							link: "/docs/tasks/campaigns/get-campaign-by-id",
-						},
 					],
 				},
 				// {

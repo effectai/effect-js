@@ -14,9 +14,10 @@
 		"changeset": "changeset",
 		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
 		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
-		"docs:dev": "cd src/ && bun link && cd ../docs && bun link @effectai/sdk && bun run dev",
+		"docs:dev": "cd docs && bun run dev",
 		"docs:build": "cd docs && bun run build",
-		"docs:preview": "cd docs && bun run preview"
+		"docs:preview": "cd docs && bun run preview",
+		"link": "cd src && bun link"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
@@ -28,5 +29,8 @@
 		"@types/bun": "^1.1.1",
 		"typescript": "5.4.2"
 	},
-	"trustedDependencies": ["@biomejs/biome"]
+	"trustedDependencies": ["@biomejs/biome"],
+	"dependencies": {
+		"gh-pages": "^6.1.1"
+	}
 }
