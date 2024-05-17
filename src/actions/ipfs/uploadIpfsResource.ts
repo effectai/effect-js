@@ -1,5 +1,5 @@
 import type { Client } from "../../client";
-import { Bytes } from "@wharfkit/antelope";
+import { Bytes, Base58 } from "@wharfkit/antelope";
 
 export type UploadIpfsResourceArgs = {
 	client: Client;
@@ -46,10 +46,5 @@ export const uploadIpfsResource = async ({
 };
 
 export const ipfsCIDToHex = (cid: string): string => {
-	const string = atob(cid);
-	const array = new Uint8Array(string.length);
-	for (let i = 0; i < string.length; i++) {
-		array[i] = string.charCodeAt(i);
-	}
-	return Bytes.from(array).hexString;
+	return Base58.decode(cid).hexString;
 };
