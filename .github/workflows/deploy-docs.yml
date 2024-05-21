@@ -15,8 +15,12 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
+      
+      # builds the sdk
       - run: bun run build
-      - run: bun run docs:build
+      
+      # builds the docs
+      - run: cd docs && bun install --frozen-lockfile && bun run build
 
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
