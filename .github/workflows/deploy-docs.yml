@@ -1,15 +1,17 @@
 name: Deploy on gh-pages
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.1.0'  # Replace with the desired Node.js version
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
