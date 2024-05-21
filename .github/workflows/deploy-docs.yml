@@ -21,9 +21,6 @@ jobs:
 
       - run: bun install --frozen-lockfile
       
-      # Build the sdk
-      - run: bun run build
-
       # Build the docs
       - name: Build
         run: bun run vocs build --searchIndex false && bun run vocs search-index
