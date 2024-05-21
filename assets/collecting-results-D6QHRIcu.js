@@ -1,2 +1,0 @@
-import{d as o,j as n}from"./index-KRMi5ohj.js";const i=void 0;function s(e){const t={a:"a",div:"div",h2:"h2",p:"p",...o(),...e.components};return n.jsxs(n.Fragment,{children:[n.jsxs(t.h2,{id:"collecting-results",children:["Collecting Results",n.jsx(t.a,{"aria-hidden":"true",tabIndex:"-1",href:"#collecting-results",children:n.jsx(t.div,{"data-autolink-icon":!0})})]}),`
-`,n.jsx(t.p,{children:"TODO::"})]})}function c(e={}){const{wrapper:t}={...o(),...e.components};return t?n.jsx(t,{...e,children:n.jsx(s,{...e})}):s(e)}export{c as default,i as frontmatter};
