@@ -7,7 +7,7 @@
 		"test:only": "bun --env-file=.env test --watch --only",
 		"test:coverage": "bun --env-file=.env test --coverage",
 		"dev": "tsc -w",
-		"build": "tsc --project src/tsconfig.build.json --module es2020",
+		"build": "bun run sdk:build && bun run docs:build",
 		"lint": "biome lint --apply .",
 		"format": "biome format --write .",
 		"check": "biome check --apply .",
@@ -17,6 +17,7 @@
 		"docs:dev": "cd docs && bun run dev",
 		"docs:build": "cd docs && bun run build",
 		"docs:preview": "cd docs && bun run preview",
+		"sdk:build": "tsc --project src/tsconfig.build.json --module es2020",
 		"link": "cd src && bun link"
 	},
 	"devDependencies": {
@@ -27,7 +28,8 @@
 		"@greymass/abi2core": "^2.0.1",
 		"@size-limit/preset-big-lib": "^11.1.2",
 		"@types/bun": "^1.1.1",
-		"typescript": "5.4.2"
+		"typescript": "5.4.2",
+		"vite": "^5.0.7"
 	},
 	"trustedDependencies": ["@biomejs/biome"],
 	"dependencies": {

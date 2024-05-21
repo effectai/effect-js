@@ -14,7 +14,7 @@
 		"@wharfkit/wallet-plugin-privatekey": "1.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"vocs": "^1.0.0-alpha.46",
+		"vocs": "^1.0.0-alpha.52",
 		"@types/bun": "latest"
 	}
 }
