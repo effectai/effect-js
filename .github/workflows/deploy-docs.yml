@@ -21,7 +21,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
       
-      - run: bun run build
+      - run: bun run vocs build
       
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
