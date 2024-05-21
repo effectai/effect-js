@@ -21,7 +21,13 @@ jobs:
 
       - run: bun install --frozen-lockfile
       
-      - run: bun run vocs build
+      # Build the sdk
+      - run: bun run build
+
+      # Build the docs
+      - name: Build
+        run: bun run build
+        working-directory: ./docs
       
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
