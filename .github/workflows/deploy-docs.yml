@@ -1,6 +1,9 @@
 name: Deploy on gh-pages
 
-on: workflow_dispatch
+on: 
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -18,12 +21,8 @@ jobs:
 
       - run: bun install --frozen-lockfile
       
-      # builds the sdk
       - run: bun run build
       
-      # builds the docs
-      - run: cd docs && bun install --frozen-lockfile && bun run build
-
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
