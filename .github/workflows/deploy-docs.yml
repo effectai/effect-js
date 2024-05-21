@@ -11,20 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22.1.0'  # Replace with the desired Node.js version
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+        
       - run: bun install --frozen-lockfile
-      
-      # Build the docs
-      - name: Build
-        run: bun run vocs build --searchIndex false && bun run vocs search-index
-        working-directory: ./docs
+
+      - run: bun run build
       
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
