@@ -9,20 +9,19 @@ A typical template will be a HTML file that contains the structure of the tasks.
 In this case, we aim to determine whether an image depicts a Chihuahua or a muffin. 
 Our template should include the following:
 
-- Load an Image: Implement functionality to load images within the campaign interface. Users should be able to view and analyze each image provided.
-
-- HTML Form: Integrate an HTML form into the campaign template. This form will allow annotators to make their selection regarding whether the displayed image is a Chihuahua or a muffin. The form should be user-friendly and intuitive, guiding annotators through the decision-making process.
+- **Load an Image**: In order for our workers to distinguish between a Chihuahua or a Muffin, an image must be loaded and displayed to them.
+- **HTML Form**: We must integrate an HTML form into the template so our users can fill in whether the loaded image is a Chihuahua or a Muffin.
 
 ```html
 <html>
   <head>
-    <title>My Image labeling Campaign</title>
+    <title>Chihuahua or Muffin</title>
   </head>
   <body>
     <form>
         <div class="classify-image">
-            <h1 class="title">Classify The Image</h1>
-              <!-- The image loaded from IPFS  -->
+            <h1 class="title">Chihuahua or Muffin ?</h1>
+              <!-- The image loaded from IPFS using a template variable -->
             <img src='https://gateway.pinata.cloud/ipfs/${ipfs_url}'/>
         </div>
         <div class="question question-sentiment">
@@ -42,11 +41,6 @@ Our template should include the following:
         <button type="submit" class="is-large mt-6">Submit</button>
       </form>
   </body>
-
-<script>
-setTimeout(() => console.log(window.FORCE_PLACEHOLDERS), 1000)
-</script>
-
 </html>
 ```
 

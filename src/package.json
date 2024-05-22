@@ -8,7 +8,6 @@
 	"types": "./dist/exports/index.d.ts",
 	"files": ["dist"],
 	"type": "module",
-
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/effectai/effect-js.git"
@@ -27,7 +26,6 @@
 		"url": "https://github.com/effectai/effect-js/issues"
 	},
 	"homepage": "https://github.com/effectai/effect-js#readme",
-
 	"devDependencies": {
 		"@types/bun": "latest"
 	},

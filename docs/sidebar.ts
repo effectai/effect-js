@@ -7,6 +7,7 @@ export const sidebar = {
 			items: [
 				{ text: "Why Effect AI", link: "/docs/introduction" },
 				{ text: "Getting Started", link: "/docs/getting-started" },
+				{ text: "Authentication", link: "/docs/authentication" },
 			],
 		},
 		{
@@ -24,6 +25,10 @@ export const sidebar = {
 				{
 					text: "Adding Tasks to a Campaign",
 					link: "/docs/collecting-data/adding-tasks",
+				},
+				{
+					text: "Collecting results",
+					link: "/docs/collecting-data/collecting-results",
 				},
 			],
 		},

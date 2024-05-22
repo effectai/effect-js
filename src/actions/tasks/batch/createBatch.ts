@@ -84,7 +84,7 @@ export type CreateBatchArgs = {
 	campaignId: number;
 	repetitions: number;
 	reward: number;
-	taskData: Record<string, unknown>;
+	taskData: Record<string, unknown>[];
 };
 
 export const createBatch = async ({
