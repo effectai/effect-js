@@ -1,0 +1,62 @@
+# Authentication
+Some functions in the Effect AI SDK require authentication with the EOS blockchain. This is done by passing a session object to the createClient function.
+A session can be established by either [private key](https://github.com/wharfkit/wallet-plugin-privatekey) or [wallet plugins](https://wharfkit.com/plugins?tag=wallet-plugin). 
+
+### Private Key
+To authenticate using a private key we recommend using the [wallet-plugin-privatekey](https://github.com/wharfkit/wallet-plugin-privatekey)
+And passing it through a session to the `createClient` function.
+
+```ts twoslash
+import {
+    createClient,
+    eos,
+    Session
+} from "@effectai/sdk";
+
+import { WalletPluginPrivateKey } from '@wharfkit/wallet-plugin-privatekey'
+
+const session = new Session({
+    chain: eos,
+    walletPlugin: new WalletPluginPrivateKey(
+        '5Jtoxgny5tT7NiNFp1MLogviuPJ9NniWjnU4wKzaX4t7pL4kJ8s',
+    ),
+})
+
+const client = await createClient({ session })
+```
+
+### Wallet Plugin
+It's also possible to authenticate using a wallet plugin, for example using the [wallet-plugin-anchor](https://github.com/wharfkit/wallet-plugin-anchor)
+This one is a bit more complicated and requires two additional packages: [`@wharfkit/session`](https://github.com/wharfkit/session) and [`@wharfkit/web-renderer`](https://github.com/wharfkit/web-renderer)
+
+```ts twoslash
+import {
+    createClient,
+    eos,
+} from "@effectai/sdk";
+
+import { SessionKit } from "@wharfkit/session";
+import { WebRenderer } from "@wharfkit/web-renderer";
+import { WalletPluginAnchor } from "@wharfkit/wallet-plugin-anchor";
+
+const webRenderer = new WebRenderer();
+
+const sessionKit = new SessionKit(
+		{
+			appName: "<YOUR APP NAME>",
+			chains: [eos],
+			ui: webRenderer,
+			walletPlugins: [
+				new WalletPluginAnchor(),
+			],
+		},
+	)
+
+const session = await sessionKit.restore();
+
+if(!session) {
+    throw new Error('Session not found')
+}
+
+const client = await createClient({ session })
+```

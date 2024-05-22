@@ -10,22 +10,36 @@ const session = new Session({
 
 const client = await createClient({ session });
 // ---cut---
-import { createCampaign, type CreateCampaignArgs } from "@effectai/sdk";
+import { createCampaign } from "@effectai/sdk";
 
-const myNewCampaign: CreateCampaignArgs["campaign"] = {
-	version: 1.0,
-	maxTaskTime: 100,
-	reward: 3.5,
-	title: "My First Campaign!",
-	description: "Description of the task here.",
-	instructions: "Some instructions here",
-	template: "<h1>Template here</h1>",
-	input_schema: null,
-	output_schema: null,
-	image: "",
-	category: "",
-	example_task: "",
-	estimated_time: 10,
-};
-
-const campaign = await createCampaign({ client, campaign: myNewCampaign });
+const campaign = await createCampaign({
+	client,
+	campaign: {
+		// Name of your campaign
+		title: "My First Campaign!",
+		// Description of the campaign
+		description: "Description of the task here.",
+		// Campaign version
+		version: 1.0,
+		// Maximum time to complete a task in seconds
+		maxTaskTime: 100,
+		// EFX reward per task
+		reward: 3.5,
+		// Custom instructions for completing tasks in this campaign (Markdown supported)
+		instructions: "Some instructions here",
+		// Template of the campaign see https://docs.effect.ai/docs/templates/introduction
+		template: "<h1>Template here</h1>",
+		// Input schema to validate the task data.
+		input_schema: null,
+		// TODO::
+		output_schema: null,
+		// Image URL for the campaign
+		image: "",
+		// Category of the campaign
+		category: "",
+		// TODO::
+		example_task: "",
+		// TODO:: Estimated time to complete a task in this campaign
+		estimated_time: 10,
+	},
+});

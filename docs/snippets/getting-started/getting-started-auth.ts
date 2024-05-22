@@ -16,9 +16,4 @@ const session = new Session({
 });
 
 // Create client to make authenticated transactions
-const authClient = await createClient({ session });
-
-// Create a new Effect Account
-const account = "efxforce1112";
-const response = await createVAccount({ client: authClient, account });
-console.log(response); // => Transaction Details
+const client = await createClient({ session });

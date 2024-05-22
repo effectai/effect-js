@@ -3,8 +3,8 @@ import pkg from "../src/package.json";
 import { sidebar } from "./sidebar";
 
 export default defineConfig({
-	baseUrl: "https://effect.ai",
-	title: "Effect JS",
+	baseUrl: "https://docs.effect.ai",
+	title: "Effect SDK Docs",
 	titleTemplate: "%s · Effect.AI",
 	description:
 		"Effect-js is a free and open-source library powered by blockchain technology that enables developers to collect and enrich their data-sets in a transparent way.",

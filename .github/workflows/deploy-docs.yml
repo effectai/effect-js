@@ -1,0 +1,30 @@
+name: Deploy on gh-pages
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+        
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+      
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/dist
