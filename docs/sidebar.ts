@@ -34,7 +34,10 @@ export const sidebar = {
 		},
 		{
 			text: "Templates",
-			items: [{ text: "introduction", link: "/docs/templates/introduction" }],
+			items: [
+				{ text: "Introduction", link: "/docs/templates/introduction" },
+				{ text: "Label-Studio", link: "/docs/templates/labelstudio" },
+			],
 		},
 		{
 			text: "Basics",
