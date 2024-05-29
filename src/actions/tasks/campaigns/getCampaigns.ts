@@ -12,7 +12,7 @@ export type CampaignInfo = {
 	image: string;
 	instructions: string;
 	input_schema: string | null;
-	output_schema: string | null ;
+	output_schema: string | null;
 	template: string;
 	title: string;
 	version: number;
