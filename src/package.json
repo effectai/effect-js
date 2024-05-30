@@ -6,20 +6,13 @@
 	"module": "./dist/exports/index.js",
 	"browser": "dist/exports/index.js",
 	"types": "./dist/exports/index.d.ts",
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/effectai/effect-js.git"
 	},
-	"keywords": [
-		"efx",
-		"AI",
-		"blockchain",
-		"microtasks"
-	],
+	"keywords": ["efx", "AI", "blockchain", "microtasks"],
 	"author": {
 		"name": "Effect-AI",
 		"url": "https://effect.network",
