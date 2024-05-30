@@ -39,14 +39,7 @@ export const sidebar = {
 				{ text: "Label-Studio", link: "/docs/templates/labelstudio" },
 			],
 		},
-		{
-			text: "Basics",
-			items: [
-				{ text: "Accounts", link: "/docs/basics/accounts" },
-				{ text: "Contracts", link: "/docs/basics/contracts" },
-				{ text: "vAccounts", link: "/docs/basics/vaccounts" },
-			],
-		},
+		
 		{
 			text: "SDK API",
 			collapsed: true,
@@ -116,9 +109,8 @@ export const sidebar = {
 		{
 			text: "Glossary",
 			items: [
-				{ text: "Client Options", link: "/docs/glossary/client-options" },
-				{ text: "TransactResult", link: "/docs/glossary/transaction-result" },
-				{ text: "Asset", link: "/docs/glossary/asset" },
+				{ text: "Terminology", link: "/docs/glossary/terminology" },
+				{ text: "Types", link: "/docs/glossary/types" },
 			],
 		},
 		{

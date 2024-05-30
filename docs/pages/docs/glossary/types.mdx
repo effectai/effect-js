@@ -1,6 +1,103 @@
-# Types [Glossary of Types in effect-js.]
+# Types [Glossary of Types in the effect sdk.]
 
 ## Campaign
 
 [See Type](https://github.com/effectai/effect-js/blob/main/src/types/campaign.ts)
 
+## Client Options 
+
+The ClientOpts interface is used to define the options that can be passed to the EffectAI Client constructor.
+
+```typescript
+interface ClientOpts {
+  ipfsCacheDurationInMs?: number | null;
+  fetchProvider?: FetchProviderOptions;
+  cacheImplementation?: Cache;
+}
+```
+
+As we can see, the ClientOpts interface has three optional properties:
+
+## `ipfsCacheDurationIMs`
+
+This property is used to set the cache duration for the IPFS data. 
+ The default value is 600_000 milliseconds; 10 minutes.
+
+## `fetchProvider`
+
+This property is used to set the fetch provider. 
+This is needed because of the different runtimes availalbe to Java Script.
+For example, in older versions of Node.js, the fetch API is not available. 
+For older versions of Node.js, you can use the [`node-fetch` ](https://github.com/node-fetch/node-fetch) package.
+
+Since Node.js v18.0.0, the fetch API is available by default.
+
+In the browser fetch is generally available, and is available on the `window.fetch` object.
+You can read more about it here: [MDN Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+
+Other serverside Java Script runtimes such as [Bun](https://bun.sh/) and (Deno)[https://deno.com/] already have fetch available on the global `fetch` object.
+
+## `cacheImplementation`
+
+This property is used to set the cache implementation.
+There are three different cache mechanigms abailable in the EffectAI SDK.
+First of all, "IDBCache", "LocalStorageCache", "MemoryCache".
+Any of these can be passed to the `cacheImplementation` property while instanlizing the EffectAI Client.
+
+```typescript
+import { createClient, IDBCache, LocalStorageCache, MemoryCache } from '@effectai/sdk'
+const client = createClient({
+  cacheImplementation: new IDBCache() // or new LocalStorageCache() or new MemoryCache()
+})
+```
+
+[See Type](https://github.com/effectai/effect-js/blob/main/src/client.ts)
+
+## Asset
+
+### Description
+
+Some functions with the `@effectai/sdk` package will return a `Asset` object. 
+This object contains information about tokens on the blockchain and contain information such as the symbol, precision, and amount.
+
+An example for the `Asset` object is as follows:
+
+
+```json
+{
+  "precision": 4,
+  "symbol": "EFX",
+  "units": 10000,
+  "value": 1
+}
+```
+
+Read more about the `Asset` object here:
+https://wharfkit.com/docs/antelope/asset
+
+## Transaction Result
+
+### Description
+
+Some functions with the `@effectai/sdk` package will return a `TransactionResult` object. 
+This object contains the transaction hash and the transaction receipt.
+
+The interface for the `TransactionResult` object is as follows:
+
+
+```ts
+interface TransactResult {
+  chain: ChainDefinition
+  request: SigningRequest
+  resolved: ResolvedSigningRequest | undefined
+  response?: { [key: string]: any }
+  revisions: TransactRevisions
+  signatures: Signature[]
+  signer: PermissionLevel
+  transaction: ResolvedTransaction | undefined
+}
+```
+
+Read more about the `TransactionResult` object here:
+
+https://wharfkit.com/docs/session-kit/transact-result

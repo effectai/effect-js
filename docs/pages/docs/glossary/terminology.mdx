@@ -1,5 +1,6 @@
+# Terminology
 
-# Accounts and Wallets
+## Accounts
 
 Antelope accounts are different compared to other EVM blockchains, and other kinds of blockchains in the space.
 You still will be working with a private key, but your private key can be linked to several accounts.
@@ -9,7 +10,7 @@ Here's a quick synopsis from the (Antelope documentation)[https://docs.antelope.
 > An account identifies a participant in an Antelope blockchain. A participant can be an individual or a group depending on the assigned permissions within the account. Accounts also represent the smart contract actors that push and receive actions to and from other accounts in the blockchain. Actions are always contained within transactions. A transaction can be one or more atomic actions.
 > Permissions associated with an account are used to authorize actions and transactions to other accounts. Each permission is linked to an authority table which contains a threshold that must be reached in order to allow the action associated with the given permission to be authorized for execution. The following diagram illustrates the relationship between accounts, permissions, and authorities.
 
-Simply put, an acount contains a collection of permissions, and each permission is linked to an authority table to allow certain actions to be exectued.
+Simply put, an account contains a collection of permissions, and each permission is linked to an authority table to allow certain actions to be exectued.
 As mentioned above, a private key can be linked to several accounts, and each account can have different permissions.
 
 The anatomy of an antelope account is as follows:
@@ -18,22 +19,7 @@ The anatomy of an antelope account is as follows:
 - `permissions`: The permissions associated with the account
 - `keys`: The keys associated with the account (private and corresponding public keys)
 
-# Creating an Account
-
-## Jungle4 Testnet
-
-We recomend first creating an account on the Jungle4 testnet, to get a feel for how Antelope accounts work.
-To create an account on the Jungle4 testnet, you can use the [Jungle Testnet](https://monitor4.jungletestnet.io/).
-
-There you will be able to generate key pairs, create an account, you will be able to retrieve native tokens using the faucet, you will be able to _power up_ you account (to make transactions).
-
-## Mainnet
-
-To create an account, we recomend using the [Unicove](https://unicove.com/) wallet. 
-Unicove is a wallet that allows you to create and manage Antelope accounts, and also allows you to interact with Antelope smart contracts.
-Note that in order to create an account, you will need to do a transction on the blockchain, Unicove will guide you through this process, and you will be able to pay with Credit Card.
-
-# Wallets
+## Wallets
 
 There are several wallets that you can use to interact with Antelope blockchains, some of them are:
 We recomend using Unicove and Anchor Wallet, as they are the most user friendly wallets.
@@ -43,3 +29,36 @@ We recomend using Unicove and Anchor Wallet, as they are the most user friendly 
 - [TokenPocket](https://www.tokenpocket.pro/)
 - [Wombat](https://getwombat.io/)
 
+## Contracts
+
+These are the important smart contracts that are used in the Effect Network.
+The important contract for developing on Effect Network are: 
+
+- tasks
+- token
+- vaccount
+
+With these contracts you can create tasks, and retrieve virtual accounts.
+
+These are the contracts that are deployed on the Jungle4 testnet for the Effect Network.
+[https://jungle4.eosq.eosnation.io/](https://jungle4.eosq.eosnation.io/)
+
+- tasks: [effecttasks2](https://jungle4.eosq.eosnation.io/account/effecttasks2)
+- token: [efxtoken1112](https://jungle4.eosq.eosnation.io/account/efxtoken1112)
+- stake: [efxstake1111](https://jungle4.eosq.eosnation.io/account/efxstake1111)
+- feepool: [efxfeepool11](https://jungle4.eosq.eosnation.io/account/efxfeepool11)
+- proposals: [efxproposals](https://jungle4.eosq.eosnation.io/account/efxproposals)
+- vaccount: [efxaccount11](https://jungle4.eosq.eosnation.io/account/efxaccount11)
+
+
+These are the contracts that are depoloyed on the EOS mainnet for the Effect Network.
+[https://www.bloks.io/](https://www.bloks.io/)
+
+
+- tasks: [force.efx](https://www.bloks.io/account/force.efx)
+- token: [effecttokens](https://www.bloks.io/account/effecttokens)
+- stake: [efxstakepool](https://www.bloks.io/account/efxstakepool)
+- feepool: [feepool.efx](https://www.bloks.io/account/feepool.efx)
+- proposals: [daoproposals](https://www.bloks.io/account/daoproposals)
+- vaccount: [vaccount.efx](https://www.bloks.io/account/vaccount.efx)
+- dao: [theeffectdao](https://www.bloks.io/account/theeffectdao)
