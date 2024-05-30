@@ -34,10 +34,15 @@ export const sidebar = {
 		},
 		{
 			text: "Templates",
-			items: [{ text: "introduction", link: "/docs/templates/introduction" }],
+			items: [
+				{ text: "Introduction", link: "/docs/templates/introduction" },
+				{ text: "Label-Studio", link: "/docs/templates/labelstudio" },
+			],
 		},
+
 		{
 			text: "SDK API",
+			collapsed: true,
 			items: [
 				{
 					text: "Tasks",
@@ -104,9 +109,8 @@ export const sidebar = {
 		{
 			text: "Glossary",
 			items: [
-				{ text: "Client Options", link: "/docs/glossary/client-options" },
-				{ text: "TransactResult", link: "/docs/glossary/transaction-result" },
-				{ text: "Asset", link: "/docs/glossary/asset" },
+				{ text: "Terminology", link: "/docs/glossary/terminology" },
+				{ text: "Types", link: "/docs/glossary/types" },
 			],
 		},
 		{

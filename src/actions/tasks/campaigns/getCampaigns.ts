@@ -11,8 +11,8 @@ export type CampaignInfo = {
 	example_task: string;
 	image: string;
 	instructions: string;
-	input_schema: null;
-	output_schema: null;
+	input_schema: string | null;
+	output_schema: string | null;
 	template: string;
 	title: string;
 	version: number;
