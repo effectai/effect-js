@@ -39,7 +39,7 @@ export const sidebar = {
 				{ text: "Label-Studio", link: "/docs/templates/labelstudio" },
 			],
 		},
-		
+
 		{
 			text: "SDK API",
 			collapsed: true,
