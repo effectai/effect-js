@@ -1,6 +1,67 @@
 # Introduction
 
+As described in the previous section, with campaigns, a template is a blueprint that allows you to input data and display it in a specific format. They are the interface used by the workers of EffectAI to interact with the data and perform the tasks required by the client.
 
-## What is a template?
+In this section, we will provide an overview of the template engine, explain the basic concepts and components of a template, and guide you through the process of creating your own template.
 
-## Creating Your own template
+We will be creating a simple template that lets users create bounding boxes around objects in an image. This will be done with the help of the open-source data annotation tool called [Label Studio](https://labelstud.io/).
+
+## What is a Template?
+
+A template is some HTML, CSS, and JavaScript code that defines the structure and layout of the data that is to be displayed. It's not a standard HTML5 template that uses the HTML specifications. The template engine is custom-built to handle the data that is to be displayed in the template.
+
+There is an existing HTML document, with a head and body tag defined with the requirements for EffectAI. What we need is to add what you would usually add in the body of the document.
+
+So the simplest template, which is just a text template, would look like this:
+
+```html
+<div>
+  <p>Hello World!</p>
+</div>
+```
+
+This is a simple template that displays the text "Hello World!" in a paragraph tag. But the main issue here is that we still need to load in dynamic data from a data source so that each task is different.
+
+## Parameterizing Templates: Placeholders
+
+In order to be able to use the same template for different data, we need to parameterize the template. This means that we need to define placeholders in the template that will be replaced with the actual data when the template is rendered.
+
+The way this is done in EffectAI is by using the `${}` syntax. This is similar to the way you would use template literals in JavaScript.
+
+For example, if we want to display the name of a person in the template, we would define a placeholder like this:
+
+```html
+<div>
+  <p>Hello ${name}!</p>
+</div>
+```
+
+When the template is rendered, the `${name}` placeholder will be replaced with the actual name of the person.
+
+## Submitting Templates and Retrieving Results
+
+So now we understand how to input data into the template, but how do we get results back? Workers on EffectAI will get a rendered template with the data inputted into the template. The worker will then perform the task required by the client and submit the result.
+
+Submitting is a standard submit event in HTML, but the data is saved in the EffectAI smart contracts.
+
+Here's an example of a form with an input field and a submit button:
+
+```html
+<h2>Placeholder example: ${placeholder}</h2>
+<input type="text" required placeholder="'name' attribute is required on input fields" name="test" />
+<input type="submit" />
+```
+
+When we input the text "World" into the text field and submit this, we get the following submission:
+
+```json
+{
+  "test": "World"
+}
+```
+
+## Creating Your Own Template
+
+You can try out the templates for yourself by inputting them into [EffectAI's template preview tool](https://app.effect.network/preview/).
+
+
