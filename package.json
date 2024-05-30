@@ -14,6 +14,7 @@
 		"changeset": "changeset",
 		"changeset:public": "bun scripts/updateVersion.ts && bun build && changeset publish",
 		"changeset:version": "changeset version && bun install --frozen-lockfile && bun scripts/updateVersion.ts",
+		"changeset:publish": "bun build && changeset publish",
 		"docs:dev": "cd docs && bun run dev",
 		"docs:build": "cd docs && bun run build",
 		"docs:preview": "cd docs && bun run preview",
