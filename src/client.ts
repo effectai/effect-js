@@ -88,7 +88,7 @@ export type CreateClientArgs = {
 	options?: ClientOpts;
 } & ({ network: Network } | { session: Session });
 
-export const createClient = ({
+export const createClient = async ({
 	network,
 	session,
 	options = {},
@@ -115,7 +115,7 @@ export const createClient = ({
 		const client = new Client(chain, options);
 
 		// automatically set the session whenever the session is provided
-		client.setSession(session);
+		await client.setSession(session);
 
 		return client;
 	}
