@@ -17,6 +17,8 @@ export interface EfxConfig {
 	contracts: {
 		tasks: string;
 		token: string;
+		usdt: string;
+		eostoken: string;
 		stake: string;
 		feepool: string;
 		proposals: string;
