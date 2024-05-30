@@ -1,18 +1,25 @@
 {
 	"name": "@effectai/sdk",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Effect Network Javscript/Typescript SDK (for [https://effect.network](https://effect.network))",
 	"main": "./dist/exports/index.js",
 	"module": "./dist/exports/index.js",
 	"browser": "dist/exports/index.js",
 	"types": "./dist/exports/index.d.ts",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/effectai/effect-js.git"
 	},
-	"keywords": ["efx", "AI", "blockchain", "microtasks"],
+	"keywords": [
+		"efx",
+		"AI",
+		"blockchain",
+		"microtasks"
+	],
 	"author": {
 		"name": "Effect-AI",
 		"url": "https://effect.network",
