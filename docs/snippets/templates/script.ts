@@ -36,7 +36,7 @@ const campaign: CreateCampaignArgs = {
 		version: 1,
 		reward: 1,
 		maxTaskTime: 1,
-		qualitications: [],
+		qualifications: [],
 	},
 };
 

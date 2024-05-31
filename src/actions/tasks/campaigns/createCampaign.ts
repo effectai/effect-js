@@ -40,7 +40,7 @@ export type CreateCampaignArgs = {
 	campaign: CampaignInfo & {
 		reward: number;
 		maxTaskTime: number;
-		qualitications?: Quali[];
+		qualifications?: Quali[];
 	};
 };
 
@@ -70,7 +70,7 @@ export const createCampaign = async ({
 					},
 					payer: client.session.actor.toString(),
 					content: { field_0: 0, field_1: hash },
-					qualis: campaign.qualitications ?? [],
+					qualis: campaign.qualifications ?? [],
 					owner: ["name", client.session.actor.toString()],
 				},
 			}),
