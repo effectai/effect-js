@@ -39,7 +39,7 @@ export const eos: Network = {
 				precision: 4,
 			},
 			contracts: {
-				tasks: "force.efx",
+				tasks: "tasks.efx",
 				token: "effecttokens",
 				usdt: "tethertether",
 				eostoken: "eosio.token",
