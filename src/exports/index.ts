@@ -173,9 +173,9 @@ export type {
 	Settings,
 	Batch,
 	Payment,
-} from "./../@generated/types/effecttasks2";
+} from "./../@generated/types/tasks.efx";
 
-export type { Account } from "./../@generated/types/efxaccount11";
+export type { Account } from "./../@generated/types/vaccount.efx";
 
 export type { GetTableRowsResponse } from "./types";
 

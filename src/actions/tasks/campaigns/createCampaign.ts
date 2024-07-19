@@ -4,7 +4,7 @@ import { SessionNotFoundError } from "../../../errors";
 import { useEFXContracts } from "../../../utils/state";
 import { uploadIpfsResource } from "../../ipfs/uploadIpfsResource";
 import type { CampaignInfo } from "./getCampaigns";
-import type { Mkcampaign, Quali } from "../../../@generated/types/effecttasks2";
+import type { Mkcampaign, Quali } from "../../../@generated/types/tasks.efx";
 
 export type CreateCampaignActionArgs = {
 	client: Client;

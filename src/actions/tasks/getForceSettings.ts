@@ -1,6 +1,6 @@
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../types/helpers";
-import type { Settings } from "../../@generated/types/effecttasks2";
+import type { Settings } from "../../@generated/types/tasks.efx";
 
 export type GetForceSettingsArgs = {
 	client: Client;

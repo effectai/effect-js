@@ -3,7 +3,7 @@ import type { Client } from "../../../client";
 import type { GetTableRowsResponse } from "../../../types/helpers";
 import { createCompositeU64Key } from "../../../utils/keys";
 import { useEFXContracts } from "../../../utils/state";
-import type { Reservation } from "../../../@generated/types/effecttasks2";
+import type { Reservation } from "../../../@generated/types/tasks.efx";
 
 export type GetReservationsArgs = {
 	client: Client;

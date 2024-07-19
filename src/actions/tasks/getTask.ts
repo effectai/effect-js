@@ -4,12 +4,12 @@ import type { Client } from "../../client";
 import { TaskIpfsError } from "../../errors";
 import { getIpfsResource } from "../ipfs/getIpfsResource";
 import { getBatchById } from "./batch/getBatch";
-import type { Reservation } from "../../@generated/types/effecttasks2";
+import type { Reservation } from "../../@generated/types/tasks.efx";
 
 export type GetTaskDataArgs = {
 	client: Client;
-	taskIndex: UInt32Type;
-	batchId: UInt32Type;
+	taskIndex: number;
+	batchId: number;
 };
 
 export const getTaskData = async ({
@@ -19,6 +19,8 @@ export const getTaskData = async ({
 }: GetTaskDataArgs) => {
 	try {
 		const batch = await getBatchById({ client, id: batchId });
+
+		const i = taskIndex - batch.start_task_idx;
 
 		const ipfsData = await getIpfsResource({
 			client,
@@ -33,7 +35,7 @@ export const getTaskData = async ({
 		}
 
 		// Check if there is a task at the index
-		if (ipfsData.length <= taskIndex || taskIndex < 0) {
+		if (ipfsData.length <= i || i < 0) {
 			throw new TaskIpfsError(
 				`Task data retrieved from IPFS does not have a task at index ${taskIndex}. \n${JSON.stringify(
 					ipfsData,
@@ -41,7 +43,7 @@ export const getTaskData = async ({
 			);
 		}
 
-		return ipfsData[taskIndex];
+		return ipfsData[i];
 	} catch (error: unknown) {
 		console.error("Error while fetching task data:", error);
 		throw error;
@@ -52,9 +54,11 @@ export const getTaskDataByReservation = (
 	client: Client,
 	reservation: Reservation,
 ) => {
+
+
 	return getTaskData({
 		client,
 		taskIndex: reservation.task_idx,
-		batchId: reservation.batch_id,
+		batchId: reservation.batch_idx,
 	});
 };

@@ -2,7 +2,7 @@ import { transform } from "@greymass/abi2core";
 import type { ABI } from "@wharfkit/antelope";
 
 const getAbi = async (name: string) => {
-	const abis = await fetch("https://jungle4.cryptolions.io/v1/chain/get_abi", {
+	const abis = await fetch("https://eos.greymass.com/v1/chain/get_abi", {
 		method: "POST",
 		body: JSON.stringify({ account_name: name }),
 	});
@@ -92,7 +92,7 @@ function snakeToPascal(name: string): string {
 		.join("");
 }
 
-const abis = ["effecttasks2", "efxaccount11"];
+const abis = ["tasks.efx", "vaccount.efx"];
 
 const main = async () => {
 	for (const abi of abis) {

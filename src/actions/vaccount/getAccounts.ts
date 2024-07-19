@@ -2,7 +2,7 @@ import { Name, type NameType, type UInt64Type } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { NotFoundError } from "../../errors";
 import { generateCheckSumForVAccount } from "../../utils/keys";
-import type { Account } from "../../@generated/types/efxaccount11";
+import type { Account } from "../../@generated/types/vaccount.efx";
 
 export type GetVAccountsArgs = {
 	client: Client;

@@ -2,7 +2,7 @@ import { UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../../client";
 import type { GetTableRowsResponse } from "../../../types/helpers";
 import { getIpfsResource } from "../../ipfs/getIpfsResource";
-import type { Campaign } from "../../../@generated/types/effecttasks2";
+import type { Campaign } from "../../../@generated/types/tasks.efx";
 
 export type CampaignInfo = {
 	category: string;

@@ -1,9 +1,9 @@
 import { type UInt64, UInt128 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import type { GetTableRowsResponse } from "../../types/helpers";
-import type { Payment } from "../../@generated/types/effecttasks2";
+import type { Payment } from "../../@generated/types/tasks.efx";
 import { getForceSettings } from "../tasks/getForceSettings";
-import type { Settings } from "../../@generated/types/effecttasks2";
+import type { Settings } from "../../@generated/types/tasks.efx";
 
 export const isClaimable = (p: Payment, forceSettings: Settings) => {
 	return (

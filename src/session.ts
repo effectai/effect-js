@@ -5,7 +5,7 @@ import type {
 	TransactArgs,
 } from "@wharfkit/session";
 import { TxState, waitForTransaction } from "./utils/transaction";
-import type { Account } from "./@generated/types/efxaccount11";
+import type { Account } from "./@generated/types/vaccount.efx";
 
 export class EffectSession {
 	public readonly wharfKitSession: Session;

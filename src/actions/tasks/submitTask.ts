@@ -3,7 +3,7 @@ import type { Client } from "../../client";
 import { SessionNotFoundError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
 import { uploadIpfsResource, ipfsCIDToHex } from "../ipfs/uploadIpfsResource";
-import type { Reservation } from "../../@generated/types/effecttasks2";
+import type { Reservation } from "../../@generated/types/tasks.efx";
 
 export type SubmitTaskArgs = {
 	client: Client;

@@ -3,7 +3,7 @@ import type { Client } from "../../client";
 import { VAccountError } from "../../errors";
 import { useEFXContracts } from "../../utils/state";
 import { getPendingPayments } from "./getPendingPayments";
-import type { Payment } from "../../@generated/types/effecttasks2";
+import type { Payment } from "../../@generated/types/tasks.efx";
 
 export type ClaimArgs = {
 	client: Client;

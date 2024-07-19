@@ -2,7 +2,7 @@ import { UInt32, type UInt64 } from "@wharfkit/antelope";
 import type { Client } from "../../client";
 import { createCompositeU64Key } from "../../utils/keys";
 import { useEFXContracts } from "../../utils/state";
-import type { Acctaskidx } from "../../@generated/types/effecttasks2";
+import type { Acctaskidx } from "../../@generated/types/tasks.efx";
 import type { GetTableRowsResponse } from "../../exports";
 
 export type GetAccTaskIdxArgs = {

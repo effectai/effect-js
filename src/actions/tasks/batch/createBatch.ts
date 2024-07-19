@@ -7,7 +7,7 @@ import { getForceSettings } from "../getForceSettings";
 import { getCampaignById } from "../campaigns/getCampaignById";
 import { depositAction } from "../../vaccount/deposit";
 import { vTransferAction } from "../../vaccount/transfer";
-import type { Mkbatch, Settings } from "../../../@generated/types/effecttasks2";
+import type { Mkbatch, Settings } from "../../../@generated/types/tasks.efx";
 
 export type CreateBatchActionArgs = {
 	client: Client;
