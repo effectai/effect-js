@@ -54,8 +54,6 @@ export const getTaskDataByReservation = (
 	client: Client,
 	reservation: Reservation,
 ) => {
-
-
 	return getTaskData({
 		client,
 		taskIndex: reservation.task_idx,
