@@ -1,5 +1,12 @@
 # @effectai/sdk
 
+## 2.0.2
+
+### Patch Changes
+
+- 68b5d21: Change types to match contracts on mainnet instead of jungle
+  fix getTaskData index to consider the current batch
+
 ## 2.0.1
 
 ### Patch Changes
