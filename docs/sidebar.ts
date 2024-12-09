@@ -7,7 +7,8 @@ export const sidebar = {
 			items: [
 				{ text: "Why Effect AI", link: "/docs/introduction" },
 				{ text: "Getting Started", link: "/docs/getting-started" },
-				{ text: "Authentication", link: "/docs/authentication" },
+				{ text: "The EFX Token", link: "/docs/theefxtoken" },
+				{ text: "Migration to Solana", link: "/docs/solanamigration" },
 			],
 		},
 		{
